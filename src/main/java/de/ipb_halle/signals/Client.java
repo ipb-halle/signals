@@ -43,8 +43,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class Client {
 
-    private final static String CONFIG_API_KEY = "CONFIG_API_KEY";
-    private final static String CONFIG_BASE_URL = "CONFIG_BASE_URL";
     private final static String UTF8 = "UTF-8";
 
     private String apiKey;
@@ -60,9 +58,10 @@ public class Client {
     /**
      * constructor
      */
-    public Client(Config config) {
-        apiKey = config.getConfigString(CONFIG_API_KEY);
-        baseUrl = config.getConfigString(CONFIG_BASE_URL);
+    public Client(SignalsConfig config) {
+        apiKey = config.getApiKey();
+        baseUrl = config.getBaseUrl();
+        System.out.printf("BASE_URL: %s\n", baseUrl);
         urlParameterMap = new HashMap<> ();
         method = Method.GET;
     }
@@ -75,12 +74,12 @@ public class Client {
         urlConn.setRequestProperty("X-API-KEY", apiKey);
 
         if (query != null) {
-            urlConn.getOutputStream().write(query.getBytes("UTF8"));
+            urlConn.getOutputStream().write(query.getBytes(UTF8));
         }
 
         responseCode = urlConn.getResponseCode();
 
-        try(BufferedReader br = new BufferedReader(new InputStreamReader(urlConn.getInputStream(), "utf-8"))) {
+        try(BufferedReader br = new BufferedReader(new InputStreamReader(urlConn.getInputStream(), UTF8))) {
             StringBuilder sb = new StringBuilder();
             String responseLine = null;
             while ((responseLine = br.readLine()) != null) {

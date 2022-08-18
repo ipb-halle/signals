@@ -1,9 +1,45 @@
 # Helper Tool for Signals Notebook
 
-This project bundles code for migration of IPB data sources, for backup, maintenance and external services for the Perkin Elmer Signals Notebook. The command line tool relies on the following two configuration files:
+This project bundles code for migration of IPB data sources, for backup, maintenance and external services for the Perkin Elmer Signals Notebook. The command line tool relies on a single configuration file <code>openejb.xml</code>, which is passed via command line. The configuration file contains the <code>DataSource</code> definition(s), the base url of the Signals Notebook instance and the API key. Example content is as follows (please adjust for your instance):
 
-- <code>conf/openejb.xml</code> for data source setup (see OpenEJB documentation)
-- <code>config.json</code> (path provided as command line argument) for API-KEY and the Signals Notebook base URL 
+    <?xml version="1.0"?>
+    <openejb>
+        <Resource id="signalsDS" type="javax.sql.DataSource">
+            accessToUnderlyingConnectionAllowed = false
+            alternateUsernameAllowed = false
+            connectionProperties =
+            defaultAutoCommit = true
+            defaultReadOnly =
+            definition =
+            ignoreDefaultValues = false
+            initialSize = 0
+            jdbcDriver = org.postgresql.Driver
+            jdbcUrl = jdbc:postgresql://localhost:5432/myDATABASE?charSet=UTF-8
+            jtaManaged = true
+            maxActive = 20
+            maxIdle = 20
+            maxOpenPreparedStatements = 0
+            maxWaitTime = -1 millisecond
+            minEvictableIdleTime = 30 minutes
+            minIdle = 0
+            numTestsPerEvictionRun = 3
+            password = myPASSWORD
+            passwordCipher = PlainText
+            poolPreparedStatements = false
+            serviceId =
+            testOnBorrow = true
+            testOnReturn = false
+            testWhileIdle = false
+            timeBetweenEvictionRuns = -1 millisecond
+            userName = myUSER
+            validationQuery = SELECT 1 AS Validation;
+        </Resource>
+        <Resource id="signalsConfig" class-name="de.ipb_halle.signals.SignalsConfig">
+          apiKey = THIS+IS+THE+SUPER+SECRET+API+TOKEN+WHICH+NEVER+SHOULD+APPEAR+ON+GITHUB==
+          baseUrl = https://YOUR-ORG-TRIAL-INSTANCE.signalsnotebook.SOMECLOUD.INVALID/api/rest/v1.0
+        </Resource>
+    </openejb>
+
 
 To run the code, build the project 
 
@@ -11,5 +47,8 @@ To run the code, build the project
 
 adjust the config files and start the tool with the following command line:
 
-    java -jar target/signals-1.0.jar conf/config.json
+    java -jar target/signals-1.0.jar PATH/TO/openejb.xml
 
+
+## Trademark Notice
+PerkinElmer is a registered trademark of PerkinElmer Inc. Signals is a trade mark of PerkinElmer Inc. 

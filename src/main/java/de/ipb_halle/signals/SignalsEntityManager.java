@@ -29,10 +29,12 @@ import java.net.MalformedURLException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+
 
 /** 
  * Manager for signals entities (entities API endpoint) 
@@ -44,8 +46,9 @@ public class SignalsEntityManager {
     @PersistenceContext(unitName="signalsDB")
     private EntityManager em;
 
-    @Inject
-    private Config config;
+    @Resource(name="signalsConfig")
+    private SignalsConfig signalsConfig;
+    
 
     private class SignalsEntityIterator implements Iterator<SignalsEntity> {
         private Client client;
@@ -129,7 +132,7 @@ public class SignalsEntityManager {
     }
 
     public void fetchSignalsEntities(String includeTypes) {
-        SignalsEntityIterator iter = new SignalsEntityIterator(new Client(config), includeTypes);
+        SignalsEntityIterator iter = new SignalsEntityIterator(new Client(signalsConfig), includeTypes);
 
         while(iter.hasNext()) {
             SignalsEntity entity = iter.next();

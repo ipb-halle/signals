@@ -29,40 +29,30 @@ import java.net.MalformedURLException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import javax.annotation.Resource;
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 
 /** 
  * Manager for signals entities (entities API endpoint) 
  */
 
+@Stateless
 public class MaterialsLibrariesManager {
 
-    private Config config;
+    @PersistenceContext(unitName="signalsDB")
+    private EntityManager em;
 
-    public MaterialsLibrariesManager(Config cfg) {
-        config = cfg;
-    }
-
-    private class MaterialsLibrary {
-        private JsonElement json;
-        private String id;
-
-        public MaterialsLibrary(JsonElement j) {
-            json = j;
-            id = json.getAsJsonObject().getAsJsonPrimitive("id").getAsString();
-        }
-
-        public void dump() {
-            System.out.println(id);
-            System.out.println(json.toString());
-            System.out.println("============================================================");
-        }
-    }
-
-
+    @Resource(name="signalsConfig")
+    private SignalsConfig signalsConfig;
+    
     private Iterator<JsonElement> fetch() {
         JsonElement jsonResult;
         try {
-            Client client = new Client(config).setMethod(Method.GET)
+            Client client = new Client(signalsConfig).setMethod(Method.GET)
                 .setEndpoint("/materials/libraries")
                 .execute();
 
