@@ -62,4 +62,12 @@ public class SignalsEntity {
         System.out.println(json.toString());
         System.out.println("==============================================================");
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getJsonString() {
+        return json_string;
+    }
 }

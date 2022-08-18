@@ -129,27 +129,6 @@
                          
                         <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                         <transformer implementation="org.apache.openwebbeans.maven.shade.OpenWebBeansPropertiesTransformer"/>
-<!--
-                        <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
-                            <resource>META-INF/LICENSE</resource>
-                            <file>target/classes/META-INF/LICENSE</file>
-                        </transformer>
-                         
-                        <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
-                            <resource>META-INF/NOTICE</resource>
-                            <file>target/classes/META-INF/NOTICE</file>
-                        </transformer>
-                         
-                         
-                        <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
-                            <resource>META-INF/DEPENDENCIES</resource>
-                            <file>target/classes/META-INF/DEPENDENCIES</file>
-                        </transformer>
-                         
-                        <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                            <resource>META-INF/cxf/bus-extensions.txt</resource>
-                        </transformer>
--->
                     </transformers>
                  
                 </configuration>
@@ -246,6 +225,23 @@
       <artifactId>hibernate-core</artifactId>
       <version>5.3.26.Final</version>
   </dependency>
+
+
+  <!-- unit testing -->
+  <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.8.2</version>
+      <scope>test</scope>
+  </dependency>
+  <!-- keeps old JUnit4 tests functional -->
+  <dependency>
+      <groupId>org.junit.vintage</groupId>
+      <artifactId>junit-vintage-engine</artifactId>
+      <version>5.8.2</version>
+      <scope>test</scope>
+  </dependency>
+
 
   <!-- org.postgresql/postgresql JDBC 4.2 -->
   <dependency>
