@@ -22,8 +22,40 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 
+import java.util.Properties;
+import javax.ejb.embeddable.EJBContainer;
+import javax.inject.Inject;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import org.apache.openejb.OpenEjbContainer;
+import org.apache.openejb.api.LocalClient;
+
+
 public class TestBase {
 
+    /*
+     * Obtain a EJB context and bind-inject a bean to it
+     * @param bean the bean 
+     * @return the context
+     */
+    public static Context getTestContext(Object bean) {
+        try {
+
+            Properties properties = new Properties();
+            properties.put(Context.INITIAL_CONTEXT_FACTORY, "org.apache.openejb.client.LocalInitialContextFactory");
+            properties.put("openejb.configuration", TestBase.class.getResource("/test-openejb.xml").getFile());
+
+            EJBContainer container = EJBContainer.createEJBContainer(properties);
+            Context ctx = container.getContext();
+
+            ctx.bind("inject", bean);
+            return ctx;
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     /**
      * @param stream the InputStream as obtained from Class.getResourceAsStream()
