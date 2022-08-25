@@ -41,7 +41,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * Http client reader for Signals tool 
  */
 
-public class Client {
+public class RestClient {
 
     private final static String UTF8 = "UTF-8";
 
@@ -58,7 +58,7 @@ public class Client {
     /**
      * constructor
      */
-    public Client(SignalsConfig config) {
+    public RestClient(SignalsConfig config) {
         apiKey = config.getApiKey();
         baseUrl = config.getBaseUrl();
         System.out.printf("BASE_URL: %s\n", baseUrl);
@@ -67,7 +67,7 @@ public class Client {
     }
 
 
-    public Client execute() throws IOException, MalformedURLException, UnexpectedResponseCodeException {
+    public RestClient execute() throws IOException, MalformedURLException, UnexpectedResponseCodeException {
         HttpURLConnection urlConn = (HttpURLConnection) getURL().openConnection();
         urlConn.setRequestMethod(method.toString());
         urlConn.setRequestProperty("accept", "application/vnd.api+json");
@@ -128,33 +128,33 @@ public class Client {
         return url;
     }
 
-    public Client putUrlParameter(String key, String value) {
+    public RestClient putUrlParameter(String key, String value) {
         url = null;
         this.urlParameterMap.put(key, value);
         return this;
     }
 
-    public Client setEndpoint(String path) {
+    public RestClient setEndpoint(String path) {
         url = null;
         endpoint = path;
         return this;
     }
 
-    public Client setHeader(String key, String value) {
+    public RestClient setHeader(String key, String value) {
         return this;
     }
 
-    public Client setQuery(String q) {
+    public RestClient setQuery(String q) {
         query = q;
         return this;
     }
 
-    public Client setMethod(Method m) {
+    public RestClient setMethod(Method m) {
         this.method = m;
         return this;
     }
 
-    public Client setURL(String u) throws MalformedURLException {
+    public RestClient setURL(String u) throws MalformedURLException {
         endpoint = null;
         urlParameterMap.clear();
         url = new URL(u);

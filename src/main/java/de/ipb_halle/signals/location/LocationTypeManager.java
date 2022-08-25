@@ -15,13 +15,18 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals;
+package de.ipb_halle.signals.location;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+
+import de.ipb_halle.signals.Method;
+import de.ipb_halle.signals.RestClient;
+import de.ipb_halle.signals.SignalsConfig;
+import de.ipb_halle.signals.UnexpectedResponseCodeException;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -37,11 +42,11 @@ import javax.persistence.PersistenceContext;
 
 
 /** 
- * Manager for signals entities (entities API endpoint) 
+ * Manager for location types (inventory/types API endpoint) 
  */
 
 @Stateless
-public class SignalsEntityManager {
+public class LocationTypeManager {
 
     @PersistenceContext(unitName="signalsDB")
     private EntityManager em;
@@ -50,21 +55,21 @@ public class SignalsEntityManager {
     private SignalsConfig signalsConfig;
     
 
-    private class SignalsEntityIterator implements Iterator<SignalsEntity> {
+    private class LocationTypeIterator implements Iterator<LocationType> {
         private RestClient client;
         private JsonElement jsonResult;
         private Iterator<JsonElement> jsonIterator;
 
-        public SignalsEntityIterator(RestClient c, String includeTypes) {
+        public LocationTypeIterator(RestClient c) {
             client = c;
-            initialFetch(includeTypes);
+            initialFetch();
         }
 
-        private void initialFetch(String includeTypes) {
+        private void initialFetch() {
             try {
                 client.setMethod(Method.GET)
-                    .setEndpoint("/entities")
-                    .putUrlParameter("includeTypes", includeTypes)
+                    .setEndpoint("/inventory/types")
+                    .putUrlParameter("entityType","location")
                     .putUrlParameter("page[offset]", "1")
                     .putUrlParameter("page[limit]", "20")
                     .execute();
@@ -116,9 +121,9 @@ public class SignalsEntityManager {
             return false;
         }
 
-        public SignalsEntity next() {
+        public LocationType next() {
             if (hasNext()) {
-                return new SignalsEntity(jsonIterator.next());
+                return LocationType.createLocationType(jsonIterator.next());
             }
             throw new NoSuchElementException();
         }
@@ -127,22 +132,22 @@ public class SignalsEntityManager {
     /**
      * default constructor
      */
-    public SignalsEntityManager() {
-        System.out.println("SignalsEntityManager() called.");
+    public LocationTypeManager() {
+        System.out.println("LocationTypeManager() called.");
     }
 
-    public void fetchSignalsEntities(String includeTypes) {
-        SignalsEntityIterator iter = new SignalsEntityIterator(new RestClient(signalsConfig), includeTypes);
+    public void fetchSignalsEntities() {
+        LocationTypeIterator iter = new LocationTypeIterator(new RestClient(signalsConfig));
 
         while(iter.hasNext()) {
-            SignalsEntity entity = iter.next();
-            entity.dump();
-            save(entity);
+            LocationType lt = iter.next();
+            lt.dump();
+            save(lt);
         }
     }
 
-    public void save(SignalsEntity entity) {
-        this.em.merge(entity);
+    public void save(LocationType lt) {
+        this.em.merge(lt);
     }
 
 }

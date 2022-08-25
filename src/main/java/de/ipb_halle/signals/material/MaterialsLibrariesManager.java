@@ -15,13 +15,18 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals;
+package de.ipb_halle.signals.material;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+
+import de.ipb_halle.signals.Method;
+import de.ipb_halle.signals.RestClient;
+import de.ipb_halle.signals.SignalsConfig;
+import de.ipb_halle.signals.UnexpectedResponseCodeException;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -52,7 +57,7 @@ public class MaterialsLibrariesManager {
     private Iterator<JsonElement> fetch() {
         JsonElement jsonResult;
         try {
-            Client client = new Client(signalsConfig).setMethod(Method.GET)
+            RestClient client = new RestClient(signalsConfig).setMethod(Method.GET)
                 .setEndpoint("/materials/libraries")
                 .execute();
 
@@ -74,7 +79,8 @@ public class MaterialsLibrariesManager {
         Iterator<JsonElement> iter = fetch();
 
         while(iter.hasNext()) {
-            new MaterialsLibrary(iter.next()).dump();
+            MaterialsLibrary ml = MaterialsLibrary.createMaterialsLibrary(iter.next());
+            ml.dump();
         }
     }
 }

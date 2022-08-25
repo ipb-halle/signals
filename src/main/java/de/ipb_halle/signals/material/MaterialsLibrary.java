@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals;
+package de.ipb_halle.signals.material;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -41,15 +41,12 @@ public class MaterialsLibrary {
     
     private transient JsonElement json;
 
-    /**
-     * default constructor
-     */
-    public MaterialsLibrary() {
-    }
 
-    public MaterialsLibrary(JsonElement j) {
-        json = j;
-        id = json.getAsJsonObject().getAsJsonPrimitive("id").getAsString();
+    public static MaterialsLibrary createMaterialsLibrary(JsonElement j) {
+        MaterialsLibrary ml = new MaterialsLibrary();
+        ml.json = j;
+        ml.id = j.getAsJsonObject().getAsJsonPrimitive("id").getAsString();
+        return ml;
     }
 
     public void dump() {
