@@ -25,7 +25,7 @@ import com.google.gson.JsonPrimitive;
 
 import de.ipb_halle.signals.Method;
 import de.ipb_halle.signals.RestClient;
-import de.ipb_halle.signals.SignalsConfig;
+import de.ipb_halle.signals.RestClientFactory;
 import de.ipb_halle.signals.UnexpectedResponseCodeException;
 
 import java.io.IOException;
@@ -48,19 +48,19 @@ import javax.persistence.PersistenceContext;
 @Stateless
 public class LocationManager {
 
-    private final String LOCATION_ENDPOINT = "/inventory/location/%s";
+    public final String LOCATION_ENDPOINT = "/inventory/location/%s";
 
     @PersistenceContext(unitName="signalsDB")
     private EntityManager em;
 
-    @Resource(name="signalsConfig")
-    private SignalsConfig signalsConfig;
+    @Inject
+    private RestClientFactory restClientFactory;
     
 
 
     private JsonElement fetch(String id) {
         try {
-            RestClient client = new RestClient(signalsConfig)
+            RestClient client = restClientFactory.getRestClient() 
                 .setMethod(Method.GET)
                 .setEndpoint(String.format(LOCATION_ENDPOINT, id))
                 .execute();

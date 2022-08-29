@@ -10,6 +10,9 @@
         <non-jta-data-source>signalsDSNonJTA</non-jta-data-source>
 
         <class>de.ipb_halle.signals.SignalsEntity</class>
+        <class>de.ipb_halle.signals.location.Location</class>
+        <class>de.ipb_halle.signals.location.LocationType</class>
+        <class>de.ipb_halle.signals.material.MaterialsLibrary</class>
 
         <properties>
 

@@ -1,8 +1,15 @@
 <?xml version="1.0"?>
 <openejb>
+    <Resource id="testDS" type="javax.sql.DataSource">
+        jdbcDriver = org.hsqldb.jdbcDriver
+        jdbcUrl = jdbc:hsqldb:mem:signalstest;sql.syntax_pgs=true;sql.enforce_size=false
+        jtaManaged = true
+        userName = sa
+    </Resource>
     <Resource id="signalsConfig" class-name="de.ipb_halle.signals.SignalsConfig">
       apiKey = Honestly+we+would+not+like+to+disclose+the+API+Key+in+our+source+code==
       baseUrl = https://endpoint.somewhere.invalid/api/rest/v1.0
+      restClientClassName = de.ipb_halle.signals.MockRestClient
     </Resource>
 </openejb>
 

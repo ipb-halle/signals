@@ -58,14 +58,10 @@ public class RestClient {
     /**
      * constructor
      */
-    public RestClient(SignalsConfig config) {
-        apiKey = config.getApiKey();
-        baseUrl = config.getBaseUrl();
-        System.out.printf("BASE_URL: %s\n", baseUrl);
+    public RestClient() {
         urlParameterMap = new HashMap<> ();
         method = Method.GET;
     }
-
 
     public RestClient execute() throws IOException, MalformedURLException, UnexpectedResponseCodeException {
         HttpURLConnection urlConn = (HttpURLConnection) getURL().openConnection();
@@ -85,7 +81,7 @@ public class RestClient {
             while ((responseLine = br.readLine()) != null) {
                 sb.append(responseLine.trim());
             }
-            response = sb.toString();
+            setResponse(sb.toString());
         } 
 
         if (responseCode != HttpURLConnection.HTTP_OK) {
@@ -93,6 +89,10 @@ public class RestClient {
         }
 
         return this;
+    }
+
+    public Method getMethod() {
+        return method;
     }
 
     public String getResponse() {
@@ -103,7 +103,7 @@ public class RestClient {
         return responseCode;
     }
 
-    private URL getURL() throws MalformedURLException {
+    protected URL getURL() throws MalformedURLException {
         if (url != null) {
             return url;
         }
@@ -134,6 +134,16 @@ public class RestClient {
         return this;
     }
 
+    public RestClient setApiKey(String k) {
+        apiKey = k;
+        return this;
+    }
+
+    public RestClient setBaseUrl(String u) {
+        baseUrl = u;
+        return this;
+    }
+
     public RestClient setEndpoint(String path) {
         url = null;
         endpoint = path;
@@ -154,12 +164,19 @@ public class RestClient {
         return this;
     }
 
+    protected void setResponse(String r) {
+        response = r;
+    }
+
+    public RestClient setResponseMap(Map<String, String> map) {
+        throw new UnsupportedOperationException("method reserved for mocking");
+    }
+
     public RestClient setURL(String u) throws MalformedURLException {
         endpoint = null;
         urlParameterMap.clear();
         url = new URL(u);
         return this;
     }
-
 }
 

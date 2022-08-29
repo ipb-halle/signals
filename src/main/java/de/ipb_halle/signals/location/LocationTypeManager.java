@@ -25,7 +25,7 @@ import com.google.gson.JsonPrimitive;
 
 import de.ipb_halle.signals.Method;
 import de.ipb_halle.signals.RestClient;
-import de.ipb_halle.signals.SignalsConfig;
+import de.ipb_halle.signals.RestClientFactory;
 import de.ipb_halle.signals.UnexpectedResponseCodeException;
 
 import java.io.IOException;
@@ -48,12 +48,13 @@ import javax.persistence.PersistenceContext;
 @Stateless
 public class LocationTypeManager {
 
+    public final String LOCATION_TYPE_ENDPOINT = "/inventory/types";
+
     @PersistenceContext(unitName="signalsDB")
     private EntityManager em;
 
-    @Resource(name="signalsConfig")
-    private SignalsConfig signalsConfig;
-    
+    @Inject
+    private RestClientFactory restClientFactory;
 
     private class LocationTypeIterator implements Iterator<LocationType> {
         private RestClient client;
@@ -68,7 +69,7 @@ public class LocationTypeManager {
         private void initialFetch() {
             try {
                 client.setMethod(Method.GET)
-                    .setEndpoint("/inventory/types")
+                    .setEndpoint(LOCATION_TYPE_ENDPOINT)
                     .putUrlParameter("entityType","location")
                     .putUrlParameter("page[offset]", "1")
                     .putUrlParameter("page[limit]", "20")
@@ -137,7 +138,7 @@ public class LocationTypeManager {
     }
 
     public void fetchSignalsEntities() {
-        LocationTypeIterator iter = new LocationTypeIterator(new RestClient(signalsConfig));
+        LocationTypeIterator iter = new LocationTypeIterator(restClientFactory.getRestClient());
 
         while(iter.hasNext()) {
             LocationType lt = iter.next();

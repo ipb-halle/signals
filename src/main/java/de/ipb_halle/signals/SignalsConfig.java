@@ -27,9 +27,11 @@ public class SignalsConfig {
 
     private String apiKey;
     private String baseUrl;
+    private String restClientClassName;
 
     public String getApiKey() { return apiKey; }
     public String getBaseUrl() { return baseUrl; }
+    public String getRestClientClassName() { return restClientClassName; }
 
 }
 

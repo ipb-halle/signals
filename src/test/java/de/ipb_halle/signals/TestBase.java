@@ -58,6 +58,19 @@ public class TestBase {
     }
 
     /**
+     * add test data to the resultMap of the RestClientFactory.
+     * The RestClientFactory loads this map into the MockRestClients
+     * to enable them to return meaningful test data.
+     * @param factory the singleton RestClientFactory
+     * @param urlKey the concatenated HTTP method and the request url 
+     * @param stream an InputStream obtained by Class.getResourceAsStream() 
+     * and holding the expected test data
+     */
+    public static void prepareRestClients(RestClientFactory factory, String urlKey, InputStream stream) {
+        factory.addResponse(urlKey, readStream(stream));
+    }
+
+    /**
      * @param stream the InputStream as obtained from Class.getResourceAsStream()
      * @return the stream content 
      */

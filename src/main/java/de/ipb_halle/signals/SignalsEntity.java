@@ -70,4 +70,8 @@ public class SignalsEntity {
     public String getJsonString() {
         return json_string;
     }
+
+    public String getType() {
+        return type;
+    }
 }

@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals;
 
+import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,14 +28,39 @@ import static org.junit.Assert.assertThrows;
 
 public class SignalsEntityManagerTest {
 
-    private final String TEST_RESOURCE = "SignalsEntityTest001.json";
-    private final String id = "location:44ab8051-81fe-4f48-b251-8f629a89ddf4:ivt";
+    private final String TEST_RESOURCE_1 = "SignalsEntityManagerTest001.json";
+    private final String TEST_KEY_1 = 
+        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities?includeTypes=location&page%5Blimit%5D=20&page%5Boffset%5D=1";
+    private final String TEST_RESOURCE_2 = "SignalsEntityManagerTest002.json";
+    private final String TEST_KEY_2 =
+        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities?includeTypes=location&page[offset]=20&page[limit]=20";
+    private final String TEST_LOCATION_ID = "location:cfa1802a-6470-42b3-8c8b-9fe025c82717:ivt";
+
+    @Inject
+    private RestClientFactory restClientFactory;
+
+    @Inject
+    private SignalsEntityManager manager;
+
+    @Before
+    public void testSetup() {
+        TestBase.getTestContext(this);
+
+        TestBase.prepareRestClients(restClientFactory,
+            TEST_KEY_1,
+            getClass().getResourceAsStream(TEST_RESOURCE_1));
+        TestBase.prepareRestClients(restClientFactory,
+            TEST_KEY_2,
+            getClass().getResourceAsStream(TEST_RESOURCE_2));
+    }
+
 
     @Test
     public void entityTest() {
 
-        Signals signals = new Signals();
-        TestBase.getTestContext(signals);
+        manager.fetchSignalsEntities("location");
+        SignalsEntity entity = manager.loadById(TEST_LOCATION_ID);
 
+        assertEquals("entity type mismatch", entity.getType(), "location");
     }
 }

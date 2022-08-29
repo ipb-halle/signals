@@ -43,11 +43,13 @@ import javax.persistence.PersistenceContext;
 @Stateless
 public class SignalsEntityManager {
 
+    public final String SIGNALS_ENTITY_ENDPOINT = "/entities";
+
     @PersistenceContext(unitName="signalsDB")
     private EntityManager em;
 
-    @Resource(name="signalsConfig")
-    private SignalsConfig signalsConfig;
+    @Inject
+    private RestClientFactory restClientFactory;
     
 
     private class SignalsEntityIterator implements Iterator<SignalsEntity> {
@@ -63,7 +65,7 @@ public class SignalsEntityManager {
         private void initialFetch(String includeTypes) {
             try {
                 client.setMethod(Method.GET)
-                    .setEndpoint("/entities")
+                    .setEndpoint(SIGNALS_ENTITY_ENDPOINT)
                     .putUrlParameter("includeTypes", includeTypes)
                     .putUrlParameter("page[offset]", "1")
                     .putUrlParameter("page[limit]", "20")
@@ -132,13 +134,17 @@ public class SignalsEntityManager {
     }
 
     public void fetchSignalsEntities(String includeTypes) {
-        SignalsEntityIterator iter = new SignalsEntityIterator(new RestClient(signalsConfig), includeTypes);
+        SignalsEntityIterator iter = new SignalsEntityIterator(restClientFactory.getRestClient(), includeTypes);
 
         while(iter.hasNext()) {
             SignalsEntity entity = iter.next();
             entity.dump();
             save(entity);
         }
+    }
+
+    public SignalsEntity loadById(String id) {
+        return this.em.find(SignalsEntity.class, id);
     }
 
     public void save(SignalsEntity entity) {

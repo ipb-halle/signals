@@ -25,7 +25,7 @@ import com.google.gson.JsonPrimitive;
 
 import de.ipb_halle.signals.Method;
 import de.ipb_halle.signals.RestClient;
-import de.ipb_halle.signals.SignalsConfig;
+import de.ipb_halle.signals.RestClientFactory;
 import de.ipb_halle.signals.UnexpectedResponseCodeException;
 
 import java.io.IOException;
@@ -48,17 +48,19 @@ import javax.persistence.PersistenceContext;
 @Stateless
 public class MaterialsLibrariesManager {
 
+    public final String MATERIALS_LIBRARIES_ENDPOINT = "/materials/libraries";
+
     @PersistenceContext(unitName="signalsDB")
     private EntityManager em;
 
-    @Resource(name="signalsConfig")
-    private SignalsConfig signalsConfig;
+    @Inject
+    private RestClientFactory restClientFactory;
     
     private Iterator<JsonElement> fetch() {
         JsonElement jsonResult;
         try {
-            RestClient client = new RestClient(signalsConfig).setMethod(Method.GET)
-                .setEndpoint("/materials/libraries")
+            RestClient client = restClientFactory.getRestClient().setMethod(Method.GET)
+                .setEndpoint(MATERIALS_LIBRARIES_ENDPOINT)
                 .execute();
 
             jsonResult = JsonParser.parseString(client.getResponse());
