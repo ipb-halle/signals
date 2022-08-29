@@ -138,7 +138,6 @@ public class SignalsEntityManager {
 
         while(iter.hasNext()) {
             SignalsEntity entity = iter.next();
-            entity.dump();
             save(entity);
         }
     }

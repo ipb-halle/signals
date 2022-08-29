@@ -48,7 +48,7 @@ import javax.persistence.PersistenceContext;
 @Stateless
 public class LocationManager {
 
-    public final String LOCATION_ENDPOINT = "/inventory/location/%s";
+    public final String LOCATION_ENDPOINT = "/inventory/locations/%s";
 
     @PersistenceContext(unitName="signalsDB")
     private EntityManager em;
@@ -92,6 +92,10 @@ public class LocationManager {
         Location loc = Location.createLocation(fetch(id));
         save(loc);
         return loc;
+    }
+
+    public Location loadById(String id) {
+        return this.em.find(Location.class, id);
     }
 
     public void save(Location loc) {

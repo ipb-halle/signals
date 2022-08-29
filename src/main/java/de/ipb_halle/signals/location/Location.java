@@ -89,6 +89,7 @@ public class Location {
         loc.json = j;
         loc.json_string = j.toString();
 
+        loc.barcode = attributes.getAsJsonPrimitive("barcode").getAsString();
         loc.name = attributes.getAsJsonPrimitive("name").getAsString();
         loc.description = attributes.getAsJsonPrimitive("description").getAsString();
         loc.grid = attributes.getAsJsonPrimitive("isGrid").getAsBoolean();
