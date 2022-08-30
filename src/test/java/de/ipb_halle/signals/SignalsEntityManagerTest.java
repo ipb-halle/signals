@@ -47,13 +47,13 @@ public class SignalsEntityManagerTest {
     private final String TEST_LOCATION_ID = "location:cfa1802a-6470-42b3-8c8b-9fe025c82717:ivt";
 
     @Inject
-    private RestClientFactory restClientFactory;
+    private MockRestClient mockRestClient;
 
     @Inject
     private SignalsEntityManager manager;
 
     @Module
-    @Classes(cdi = true, value = { RestClientFactory.class, RestClient.class,
+    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
         SignalsEntity.class, SignalsEntityManager.class })
     public EjbJar app() {
         return new EjbJar();
@@ -71,10 +71,10 @@ public class SignalsEntityManagerTest {
 
     @Before
     public void testSetup() {
-        TestBase.prepareRestClients(restClientFactory,
+        TestBase.prepareRestClients(mockRestClient,
             TEST_KEY_1,
             getClass().getResourceAsStream(TEST_RESOURCE_1));
-        TestBase.prepareRestClients(restClientFactory,
+        TestBase.prepareRestClients(mockRestClient,
             TEST_KEY_2,
             getClass().getResourceAsStream(TEST_RESOURCE_2));
     }

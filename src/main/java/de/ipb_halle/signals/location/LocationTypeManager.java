@@ -25,7 +25,6 @@ import com.google.gson.JsonPrimitive;
 
 import de.ipb_halle.signals.Method;
 import de.ipb_halle.signals.RestClient;
-import de.ipb_halle.signals.RestClientFactory;
 import de.ipb_halle.signals.UnexpectedResponseCodeException;
 
 import java.io.IOException;
@@ -34,7 +33,6 @@ import java.net.MalformedURLException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -54,7 +52,7 @@ public class LocationTypeManager {
     private EntityManager em;
 
     @Inject
-    private RestClientFactory restClientFactory;
+    private RestClient restClient;
 
     private class LocationTypeIterator implements Iterator<LocationType> {
         private RestClient client;
@@ -129,7 +127,7 @@ public class LocationTypeManager {
     }
 
     public void fetchLocationTypes() {
-        LocationTypeIterator iter = new LocationTypeIterator(restClientFactory.getRestClient());
+        LocationTypeIterator iter = new LocationTypeIterator(restClient);
 
         while(iter.hasNext()) {
             LocationType lt = iter.next();

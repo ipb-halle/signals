@@ -25,7 +25,6 @@ import com.google.gson.JsonPrimitive;
 
 import de.ipb_halle.signals.Method;
 import de.ipb_halle.signals.RestClient;
-import de.ipb_halle.signals.RestClientFactory;
 import de.ipb_halle.signals.UnexpectedResponseCodeException;
 
 import java.io.IOException;
@@ -34,7 +33,6 @@ import java.net.MalformedURLException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -54,21 +52,18 @@ public class LocationManager {
     private EntityManager em;
 
     @Inject
-    private RestClientFactory restClientFactory;
+    private RestClient restClient;
     
 
 
     private JsonElement fetch(String id) {
         try {
-            RestClient client = restClientFactory.getRestClient() 
-                .setMethod(Method.GET)
+            restClient.setMethod(Method.GET)
                 .setEndpoint(String.format(LOCATION_ENDPOINT, id))
                 .execute();
 
-            JsonElement jsonResult = JsonParser.parseString(client.getResponse());
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
             return jsonResult.getAsJsonObject().get("data");
-
-//          System.out.println(client.getResponse());
 
         } catch(UnexpectedResponseCodeException ue) {
             System.out.println("Unexpected code");

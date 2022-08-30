@@ -29,7 +29,6 @@ import java.net.MalformedURLException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -49,7 +48,7 @@ public class SignalsEntityManager {
     private EntityManager em;
 
     @Inject
-    private RestClientFactory restClientFactory;
+    private RestClient restClient;
     
 
     private class SignalsEntityIterator implements Iterator<SignalsEntity> {
@@ -134,7 +133,7 @@ public class SignalsEntityManager {
     }
 
     public void fetchSignalsEntities(String includeTypes) {
-        SignalsEntityIterator iter = new SignalsEntityIterator(restClientFactory.getRestClient(), includeTypes);
+        SignalsEntityIterator iter = new SignalsEntityIterator(restClient, includeTypes);
 
         while(iter.hasNext()) {
             SignalsEntity entity = iter.next();

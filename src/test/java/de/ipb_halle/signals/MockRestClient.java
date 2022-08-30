@@ -24,20 +24,21 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.StringJoiner;
 
-import javax.ejb.embeddable.EJBContainer;
+import javax.ejb.LocalBean;
+import javax.ejb.Stateful;
 import javax.inject.Inject;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import org.apache.openejb.OpenEjbContainer;
 import org.apache.openejb.api.LocalClient;
 
+@LocalBean
+public class MockRestClient extends RestClientImpl {
 
-public class MockRestClient extends RestClient {
+    private static Map<String, String> responseMap = new HashMap<> ();
 
-    private Map<String, String> responseMap;
-
-    public MockRestClient() {
-        responseMap = new HashMap<> ();
+    public void addResponse(String key, String value) {
+        responseMap.put(key, value);
     }
 
     @Override
@@ -51,12 +52,6 @@ public class MockRestClient extends RestClient {
             throw new NullPointerException("MockRestClient not configured for key: ".concat(key));
         }
         setResponse(response);
-        return this;
-    }
-
-    @Override
-    public RestClient setResponseMap(Map<String, String> map) {
-        responseMap = map;
         return this;
     }
 }

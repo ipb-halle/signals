@@ -17,8 +17,8 @@
  */
 package de.ipb_halle.signals.location;
 
-import de.ipb_halle.signals.RestClientFactory;
-import de.ipb_halle.signals.RestClient;
+import de.ipb_halle.signals.MockRestClient;
+import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
 import java.util.Properties;
 import javax.inject.Inject;
@@ -50,13 +50,13 @@ public class LocationManagerTest {
     private final String TEST_LOCATION_NAME = "R-ABC";
 
     @Inject
-    private RestClientFactory restClientFactory;
+    private MockRestClient mockRestClient;
 
     @Inject
     private LocationManager manager;
 
     @Module
-    @Classes(cdi = true, value = { RestClientFactory.class, RestClient.class,
+    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
         Location.class, LocationManager.class })
     public EjbJar app() {
         return new EjbJar();
@@ -74,7 +74,7 @@ public class LocationManagerTest {
 
     @Before
     public void testSetup() {
-        TestBase.prepareRestClients(restClientFactory,
+        TestBase.prepareRestClients(mockRestClient,
             TEST_KEY_1,
             getClass().getResourceAsStream(TEST_RESOURCE_1));
     }
