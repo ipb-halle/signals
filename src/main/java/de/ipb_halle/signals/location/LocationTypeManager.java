@@ -71,14 +71,12 @@ public class LocationTypeManager {
                 client.setMethod(Method.GET)
                     .setEndpoint(LOCATION_TYPE_ENDPOINT)
                     .putUrlParameter("entityType","location")
-                    .putUrlParameter("page[offset]", "1")
+                    .putUrlParameter("page[offset]", "0")
                     .putUrlParameter("page[limit]", "20")
                     .execute();
 
                 jsonResult = JsonParser.parseString(client.getResponse());
                 jsonIterator = jsonResult.getAsJsonObject().getAsJsonArray("data").iterator();
-
-//              System.out.println(client.getResponse());
 
             } catch(UnexpectedResponseCodeException ue) {
                 System.out.println("Unexpected code");
@@ -130,27 +128,22 @@ public class LocationTypeManager {
         }
     }
 
-    /**
-     * default constructor
-     */
-    public LocationTypeManager() {
-        System.out.println("LocationTypeManager() called.");
-    }
-
-    public void fetchSignalsEntities() {
+    public void fetchLocationTypes() {
         LocationTypeIterator iter = new LocationTypeIterator(restClientFactory.getRestClient());
 
         while(iter.hasNext()) {
             LocationType lt = iter.next();
-            lt.dump();
             save(lt);
         }
+    }
+
+    public LocationType loadById(String id) {
+        return this.em.find(LocationType.class, id);
     }
 
     public void save(LocationType lt) {
         this.em.merge(lt);
     }
-
 }
 
 

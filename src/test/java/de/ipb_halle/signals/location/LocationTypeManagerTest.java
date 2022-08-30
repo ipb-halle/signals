@@ -30,8 +30,6 @@ import org.apache.openejb.jee.EjbJar;
 import org.apache.openejb.junit.ApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
-import org.apache.openejb.testing.Descriptor;
-import org.apache.openejb.testing.Descriptors;
 import org.apache.openejb.testing.Module;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
 
@@ -40,24 +38,23 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 
 @RunWith(ApplicationComposer.class)
-public class LocationManagerTest {
+public class LocationTypeManagerTest {
 
-    private final String TEST_RESOURCE_1 = "LocationManagerTest001.json";
+    private final String TEST_RESOURCE_1 = "LocationTypeManagerTest001.json";
     private final String TEST_KEY_1 = 
-        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/locations/cfa1802a-6470-42b3-8c8b-9fe025c82717";
-    private final String TEST_LOCATION_ID = "cfa1802a-6470-42b3-8c8b-9fe025c82717";
-    private final String TEST_LOCATION_BARCODE = "0000000005";
-    private final String TEST_LOCATION_NAME = "R-ABC";
+        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/types?page%5Blimit%5D=20&page%5Boffset%5D=0&entityType=location";
+    private final String TEST_LOCATION_TYPE_ID = "017929f3-cd0e-466c-ac94-c21ce5fe8c31";
+    private final String TEST_LOCATION_TYPE_NAME = "Cabinet";
 
     @Inject
     private RestClientFactory restClientFactory;
 
     @Inject
-    private LocationManager manager;
+    private LocationTypeManager manager;
 
     @Module
     @Classes(cdi = true, value = { RestClientFactory.class, RestClient.class,
-        Location.class, LocationManager.class })
+        LocationType.class, LocationTypeManager.class })
     public EjbJar app() {
         return new EjbJar();
     }
@@ -79,14 +76,12 @@ public class LocationManagerTest {
             getClass().getResourceAsStream(TEST_RESOURCE_1));
     }
 
-
     @Test
-    public void locationManagerTest() {
+    public void locationTypeManagerTest() {
 
-        Location loc = manager.fetchLocation(TEST_LOCATION_ID);
-        assertEquals("Location name mismatch", loc.getName(), TEST_LOCATION_NAME);
+        manager.fetchLocationTypes();
 
-        loc = manager.loadById(TEST_LOCATION_ID);
-        assertEquals("Location barcode mismatch", loc.getBarcode(), TEST_LOCATION_BARCODE);
+        LocationType lt = manager.loadById(TEST_LOCATION_TYPE_ID);
+        assertEquals("LocationType name mismatch", lt.getName(), TEST_LOCATION_TYPE_NAME);
     }
 }

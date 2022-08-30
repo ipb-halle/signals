@@ -47,12 +47,6 @@ public class LocationType {
 
     private transient JsonElement json;
 
-    /**
-     * default constructor
-     */
-    public LocationType() {
-    }
-
     public static LocationType createLocationType(JsonElement j) {
         LocationType lt = new LocationType();
         JsonObject attributes = j.getAsJsonObject().getAsJsonObject("attributes");

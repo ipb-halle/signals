@@ -5,6 +5,13 @@ CREATE TABLE signalsentity (
     json_string VARCHAR
 );
 
+CREATE TABLE locationtype (
+    id VARCHAR NOT NULL PRIMARY KEY,
+    name VARCHAR,
+    description VARCHAR,
+    json_string VARCHAR
+);
+
 CREATE TABLE location (
     id VARCHAR NOT NULL PRIMARY KEY,
     barcode VARCHAR,

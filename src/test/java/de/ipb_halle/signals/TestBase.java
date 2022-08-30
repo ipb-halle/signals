@@ -21,40 +21,41 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
-
+import java.util.Arrays;
 import java.util.Properties;
-import javax.ejb.embeddable.EJBContainer;
-import javax.inject.Inject;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import org.apache.openejb.OpenEjbContainer;
-import org.apache.openejb.api.LocalClient;
-
+import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
 
 public class TestBase {
 
-    /*
-     * Obtain a EJB context and bind-inject a bean to it
-     * @param bean the bean 
-     * @return the context
+    /**
+     * provide the ejb configuration
+     * @return a properties object
      */
-    public static Context getTestContext(Object bean) {
-        try {
+    public static Properties configuration() {
+        Properties properties = new Properties();
+        properties.put("openejb.configuration", TestBase.class.getResource("/test-openejb.xml").getFile());
+        return properties;
+    }
 
-            Properties properties = new Properties();
-            properties.put(Context.INITIAL_CONTEXT_FACTORY, "org.apache.openejb.client.LocalInitialContextFactory");
-            properties.put("openejb.configuration", TestBase.class.getResource("/test-openejb.xml").getFile());
-
-            EJBContainer container = EJBContainer.createEJBContainer(properties);
-            Context ctx = container.getContext();
-
-            ctx.bind("inject", bean);
-            return ctx;
-
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+    /**
+     * create a PersistenceUnit using the provided entities
+     * @param entities array of JPA entity classes to be handled by the PersistenceUnit
+     * @return configured PersistenceUnit
+     */
+    public static PersistenceUnit persistence(String [] entities) {
+        PersistenceUnit unit = new PersistenceUnit("signalsDB");
+        unit.setJtaDataSource("testDS");
+        unit.setNonJtaDataSource("testDSNonJTA");
+        unit.setProvider("org.hibernate.jpa.HibernatePersistenceProvider");
+        unit.getClazz().addAll(Arrays.asList(entities)); 
+        unit.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
+        unit.setProperty("hibernate.connection.driver_class", "org.hsqldb.jdbcDriver");
+        unit.setProperty("javax.persistence.schema-generation.database.action", "create-drop");
+        unit.setProperty("javax.persistence.schema-generation.create-script-source", "schema.sql");
+        unit.setProperty("javax.persistence.schema-generation.drop-script-source", "drop_schema.sql");
+        unit.setProperty("hibernate.hbm2ddl.import_files_sql_extractor", "org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor");
+        unit.setProperty("tomee.jpa.cdi", "false");
+        return unit;
     }
 
     /**

@@ -81,13 +81,6 @@ public class LocationManager {
         return null;
     }
 
-    /**
-     * default constructor
-     */
-    public LocationManager() {
-        System.out.println("LocationManager() called.");
-    }
-
     public Location fetchLocation(String id) {
         Location loc = Location.createLocation(fetch(id));
         save(loc);

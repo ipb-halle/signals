@@ -3,6 +3,7 @@
     <classes/>
     <packages>
         <package>de.ipb_halle.signals</package>
+        <package>de.ipb_halle.signals.location</package>
     </packages>
 </scan>
 

@@ -17,15 +17,25 @@
  */
 package de.ipb_halle.signals;
 
+import java.util.Properties;
 import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import org.apache.openejb.jee.EjbJar;
+import org.apache.openejb.junit.ApplicationComposer;
+import org.apache.openejb.testing.Classes;
+import org.apache.openejb.testing.Configuration;
+import org.apache.openejb.testing.Module;
+import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 
 
+@RunWith(ApplicationComposer.class)
 public class SignalsEntityManagerTest {
 
     private final String TEST_RESOURCE_1 = "SignalsEntityManagerTest001.json";
@@ -42,10 +52,25 @@ public class SignalsEntityManagerTest {
     @Inject
     private SignalsEntityManager manager;
 
+    @Module
+    @Classes(cdi = true, value = { RestClientFactory.class, RestClient.class,
+        SignalsEntity.class, SignalsEntityManager.class })
+    public EjbJar app() {
+        return new EjbJar();
+    }
+
+    @Module
+    public PersistenceUnit persistence() {
+        return TestBase.persistence(new String[]{ SignalsEntity.class.getName()});
+    }
+
+    @Configuration
+    public Properties configuration() {
+        return TestBase.configuration();
+    }
+
     @Before
     public void testSetup() {
-        TestBase.getTestContext(this);
-
         TestBase.prepareRestClients(restClientFactory,
             TEST_KEY_1,
             getClass().getResourceAsStream(TEST_RESOURCE_1));
