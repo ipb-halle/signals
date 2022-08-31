@@ -27,6 +27,18 @@ CREATE TABLE locations (
     json_string VARCHAR
 );
 
+CREATE TABLE roles (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name VARCHAR,
+    description VARCHAR,
+    json_string VARCHAR
+);
+
+CREATE TABLE role_privileges (
+    role_id INTEGER NOT NULL REFERENCES roles(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    privilege VARCHAR NOT NULL
+);
+
 CREATE TABLE users (
     id INTEGER NOT NULL PRIMARY KEY,
     alias VARCHAR,
@@ -37,5 +49,6 @@ CREATE TABLE users (
     first_name VARCHAR,
     last_login_at TIMESTAMP,
     organization VARCHAR,
-    user_name VARCHAR
+    user_name VARCHAR,
+    json_string VARCHAR
 );

@@ -4,6 +4,7 @@
     <packages>
         <package>de.ipb_halle.signals</package>
         <package>de.ipb_halle.signals.location</package>
+        <package>de.ipb_halle.signals.users</package>
     </packages>
 </scan>
 
