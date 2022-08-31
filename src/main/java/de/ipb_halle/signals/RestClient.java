@@ -43,6 +43,8 @@ public interface RestClient {
 
     public RestClient putUrlParameter(String key, String value); 
 
+    public RestClient reset();
+
     public RestClient setEndpoint(String path);
 
     public RestClient setHeader(String key, String value);

@@ -1,0 +1,109 @@
+/*
+ * IPB Signals client
+ * Copyright 2022 Leibniz-Institut f. Pflanzenbiochemie
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+package de.ipb_halle.signals.users;
+
+import de.ipb_halle.signals.MockRestClient;
+import de.ipb_halle.signals.SignalsConfig;
+import de.ipb_halle.signals.TestBase;
+import java.util.Iterator;
+import java.util.Properties;
+import javax.inject.Inject;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import org.apache.openejb.jee.EjbJar;
+import org.apache.openejb.junit.ApplicationComposer;
+import org.apache.openejb.testing.Classes;
+import org.apache.openejb.testing.Configuration;
+import org.apache.openejb.testing.Descriptor;
+import org.apache.openejb.testing.Descriptors;
+import org.apache.openejb.testing.Module;
+import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThrows;
+
+@RunWith(ApplicationComposer.class)
+public class UserManagerTest {
+
+    private final String TEST_RESOURCE_1 = "UserManagerTest001.json";
+    private final String TEST_KEY_1 = 
+        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users?page%5Blimit%5D=20&q=ThreeLast&page%5Boffset%5D=0&enabled=true";
+    private final String TEST_RESOURCE_2 = "UserManagerTest002.json";
+    private final String TEST_KEY_2 =
+        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/107";
+
+
+    private final int TEST_USER1_ID = 102;
+    private final String TEST_USER1_ALIAS = "USR3";
+    private final String TEST_USER1_FIRST_NAME = "ThreeFirst";
+    private final String TEST_USER1_LAST_NAME = "ThreeLast";
+    private final int TEST_USER2_ID = 107;
+    private final String TEST_USER2_LAST_NAME = "FourLast";
+
+    @Inject
+    private MockRestClient mockRestClient;
+
+    @Inject
+    private UserManager manager;
+
+    @Module
+    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
+        User.class, UserManager.class })
+    public EjbJar app() {
+        return new EjbJar();
+    }
+
+    @Module
+    public PersistenceUnit persistence() {
+        return TestBase.persistence(new String[]{ User.class.getName() });
+    }
+
+    @Configuration
+    public Properties configuration() {
+        return TestBase.configuration();
+    }
+
+    @Before
+    public void testSetup() {
+        TestBase.prepareRestClients(mockRestClient,
+            TEST_KEY_1,
+            getClass().getResourceAsStream(TEST_RESOURCE_1));
+        TestBase.prepareRestClients(mockRestClient,
+            TEST_KEY_2,
+            getClass().getResourceAsStream(TEST_RESOURCE_2));
+    }
+
+
+    @Test
+    public void userManagerTest() {
+
+        manager.fetchUsers(TEST_USER1_LAST_NAME, true);
+        User user = manager.loadById(TEST_USER1_ID);
+
+        assertEquals("user alias mismatch", user.getAlias(), TEST_USER1_ALIAS);
+        assertEquals("user first name mismatch", user.getFirstName(), TEST_USER1_FIRST_NAME);
+        assertEquals("user last name mismatch", user.getLastName(), TEST_USER1_LAST_NAME);
+
+        user = manager.fetchUser(TEST_USER2_ID);
+        assertEquals("user last name mismatch", user.getLastName(),TEST_USER2_LAST_NAME);
+    }
+}

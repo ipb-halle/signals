@@ -139,6 +139,12 @@ public class RestClientImpl implements RestClient {
         return this;
     }
 
+    public RestClient reset() {
+        urlParameterMap = new HashMap<> ();
+        method = Method.GET;
+        return this;
+    }
+
     public RestClient setEndpoint(String path) {
         url = null;
         endpoint = path;

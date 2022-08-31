@@ -48,6 +48,7 @@ CREATE TABLE users (
     is_enabled BOOLEAN NOT NULL DEFAULT FALSE,
     first_name VARCHAR,
     last_login_at TIMESTAMP,
+    last_name VARCHAR,
     organization VARCHAR,
     user_name VARCHAR,
     json_string VARCHAR

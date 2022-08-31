@@ -68,7 +68,7 @@ public class RoleManager {
 
         private void initialFetch() {
             try {
-                client.setMethod(Method.GET)
+                client.reset()
                     .setEndpoint(ROLES_ENDPOINT)
                     .execute();
 
@@ -127,7 +127,7 @@ public class RoleManager {
 
     private JsonElement fetch(int id) {
         try {
-            restClient.setMethod(Method.GET)
+            restClient.reset()
                 .setEndpoint(String.format(ROLE_ENDPOINT, id))
                 .execute();
 

@@ -83,7 +83,7 @@ public class UserManager {
 
         private void initialFetch(String query, Boolean enabled) {
             try {
-                client.setMethod(Method.GET)
+                client.reset()
                     .setEndpoint(USERS_ENDPOINT)
                     .putUrlParameter("page[offset]", "0")
                     .putUrlParameter("page[limit]", "20");
@@ -151,7 +151,7 @@ public class UserManager {
 
     private JsonElement fetch(int id) {
         try {
-            restClient.setMethod(Method.GET)
+            restClient.reset()
                 .setEndpoint(String.format(USER_ENDPOINT, id))
                 .execute();
 
