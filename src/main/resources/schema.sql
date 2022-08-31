@@ -1,18 +1,18 @@
 
-CREATE TABLE signalsentity (
+CREATE TABLE signalsentities (
     id VARCHAR NOT NULL PRIMARY KEY,
     type VARCHAR,
     json_string VARCHAR
 );
 
-CREATE TABLE locationtype (
+CREATE TABLE location_types (
     id VARCHAR NOT NULL PRIMARY KEY,
     name VARCHAR,
     description VARCHAR,
     json_string VARCHAR
 );
 
-CREATE TABLE location (
+CREATE TABLE locations (
     id VARCHAR NOT NULL PRIMARY KEY,
     barcode VARCHAR,
     name VARCHAR,
@@ -25,4 +25,17 @@ CREATE TABLE location (
     ancestor_id VARCHAR,
     ancestor_name VARCHAR,
     json_string VARCHAR
+);
+
+CREATE TABLE users (
+    id INTEGER NOT NULL PRIMARY KEY,
+    alias VARCHAR,
+    country VARCHAR,
+    created_at TIMESTAMP,
+    email VARCHAR,
+    is_enabled BOOLEAN NOT NULL DEFAULT FALSE,
+    first_name VARCHAR,
+    last_login_at TIMESTAMP,
+    organization VARCHAR,
+    user_name VARCHAR
 );

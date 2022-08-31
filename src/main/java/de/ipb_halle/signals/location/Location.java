@@ -25,12 +25,14 @@ import com.google.gson.JsonPrimitive;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 /** 
  * Single signals entity (entities API endpoint) 
  */
 
 @Entity
+@Table(name="locations")
 public class Location {
 
     @Id

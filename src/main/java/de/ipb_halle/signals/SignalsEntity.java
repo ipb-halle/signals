@@ -25,12 +25,14 @@ import com.google.gson.JsonPrimitive;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 /** 
  * Single signals entity (entities API endpoint) 
  */
 
 @Entity
+@Table(name="signalsentities")
 public class SignalsEntity {
 
     @Id
@@ -44,17 +46,13 @@ public class SignalsEntity {
 
     private transient JsonElement json;
 
-    /**
-     * default constructor
-     */
-    public SignalsEntity() {
-    }
-
-    public SignalsEntity(JsonElement j) {
-        json = j;
-        id = json.getAsJsonObject().getAsJsonPrimitive("id").getAsString();
-        type = json.getAsJsonObject().getAsJsonObject("attributes").getAsJsonPrimitive("type").getAsString();
-        json_string = json.toString();
+    public static SignalsEntity createSignalsEntity(JsonElement json) {
+        SignalsEntity entity = new SignalsEntity();
+        entity.json = json;
+        entity.id = json.getAsJsonObject().getAsJsonPrimitive("id").getAsString();
+        entity.type = json.getAsJsonObject().getAsJsonObject("attributes").getAsJsonPrimitive("type").getAsString();
+        entity.json_string = json.toString();
+        return entity;
     }
 
     public void dump() {

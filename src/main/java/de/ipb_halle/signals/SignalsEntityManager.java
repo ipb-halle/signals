@@ -119,7 +119,7 @@ public class SignalsEntityManager {
 
         public SignalsEntity next() {
             if (hasNext()) {
-                return new SignalsEntity(jsonIterator.next());
+                return SignalsEntity.createSignalsEntity(jsonIterator.next());
             }
             throw new NoSuchElementException();
         }

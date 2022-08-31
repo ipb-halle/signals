@@ -15,11 +15,13 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals;
+package de.ipb_halle.signals.users;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
+import de.ipb_halle.signals.TestBase;
+import java.text.DateFormat;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -27,20 +29,28 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 
 
-public class SignalsEntityTest {
+public class UserTest {
 
-    private final String TEST_RESOURCE = "SignalsEntityTest001.json";
-    private final String id = "location:44ab8051-81fe-4f48-b251-8f629a89ddf4:ivt";
+    private final String TEST_RESOURCE = "UserTest001.json";
+    private final int id = 116;
+    private final String userName = "user.two@someplace.invalid";
+    private final long created = 1654850485098L;
+    private final long lastLogin = 1660721583522L;
 
     @Test
-    public void entityTest() {
+    public void userTest() {
 
         String test = TestBase.readStream(
                     getClass().getResourceAsStream(TEST_RESOURCE));
         JsonElement j = JsonParser.parseString(test);
-        SignalsEntity entity = SignalsEntity.createSignalsEntity(j);
+        User user = User.createUser(j);
 
-        assertEquals("id matches", id, entity.getId());
-        assertEquals("json string matches", test, entity.getJsonString());
+        assertEquals("id matches", id, (int) user.getId());
+        assertEquals("createdAt date matches", created, user.getCreatedAt().getTime());
+        assertEquals("lastLoginAt date matches", lastLogin, user.getLastLoginAt().getTime());
+        assertEquals("userName matches", userName, user.getUserName());
+
+        System.out.printf("User.CreatedAt: %s\n", user.getDateFormat().format(user.getCreatedAt()));
+        System.out.printf("User.LastLoginAt: %s\n", user.getDateFormat().format(user.getLastLoginAt()));
     }
 }
