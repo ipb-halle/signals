@@ -15,13 +15,14 @@
       ldapAttrFirstName = givenName
       ldapAttrLastName = sn
       ldapAttrMemberOf = memberOf
-      ldapBaseDN = dc=DOMAIN,dc=COUNTRY
+      ldapBaseDNs = ou=firstOU,dc=DOMAIN,dc=COUNTRY;...
       ldapContextProviderURL = ldap://ldap.somewhere.invalid:PORT
       ldapContextReferral = follow
-      ldapFilterGroupDN = ou=SNB_groupOU,...,dc=DOMAIN,dc=COUNTRY
+      ldapFilterGroupDN = ou=SNB_groupOU,...,dc=DOMAIN,dc=COUNTRY;...
       ldapFilterRoleDN = ou=SNB_roleOU,...,dc=DOMAIN,dc=COUNTRY
-      ldapFilterUsers = (&amp;(objectClass=person)(mail=@))
-      ldapSecurityPrinzipal = test
+      ldapFilterUser  = (&amp;(objectCategory=person)(mail=@))
+      ldapFilterUsers = (objectCategory=person)
+      ldapSecurityPrincipal = test
       ldapSecurityCredentials = 0000
       ldapSecurityAuthentication = simple
     </Resource>

@@ -34,13 +34,14 @@ public class SignalsConfig {
     private String ldapAttrFirstName;                   // givenName
     private String ldapAttrLastName;                    // sn
     private String ldapAttrMemberOf;                    // memberOf
-    private String ldapBaseDN;                          // dc=<domain>,dc=<country>
+    private String ldapBaseDNs;                         // dc=<domain>,dc=<country>;...
     private String ldapContextProviderURL;              // ldap://<server>:<port>
     private String ldapContextReferral;                 // follow
     private String ldapFilterGroupDN;                   // ou=<SNB group OU>,...,dc=<domain>,dc=<country>
     private String ldapFilterRoleDN;                    // ou=<SNB role OU>,...,dc=<domain>,dc=<country>
-    private String ldapFilterUsers;                     // (&(objectClass=person)(mail=@))
-    private String ldapSecurityPrinzipal;               //
+    private String ldapFilterUser;                      // (&(objectClass=person)(mail=@))
+    private String ldapFilterUsers;                     // (objectClass=person)
+    private String ldapSecurityPrincipal;               //
     private String ldapSecurityCredentials;             //
     private String ldapSecurityAuthentication;          // simple
 
@@ -54,13 +55,14 @@ public class SignalsConfig {
     public String getLdapAttrFirstName() { return ldapAttrFirstName; }
     public String getLdapAttrLastName() { return ldapAttrLastName; }
     public String getLdapAttrMemberOf() { return ldapAttrMemberOf; }
-    public String getLdapBaseDN() { return ldapBaseDN; }
+    public String getLdapBaseDNs() { return ldapBaseDNs; }
     public String getLdapContextProviderURL() { return ldapContextProviderURL; }
     public String getLdapContextReferral() { return ldapContextReferral; }
     public String getLdapFilterGroupDN() { return ldapFilterGroupDN; }
     public String getLdapFilterRoleDN() { return ldapFilterRoleDN; }
+    public String getLdapFilterUser() { return ldapFilterUser; }
     public String getLdapFilterUsers() { return ldapFilterUsers; }
-    public String getLdapSecurityPrinzipal() { return ldapSecurityPrinzipal; }
+    public String getLdapSecurityPrincipal() { return ldapSecurityPrincipal; }
     public String getLdapSecurityCredentials() { return ldapSecurityCredentials; }
     public String getLdapSecurityAuthentication() { return ldapSecurityAuthentication; }
 

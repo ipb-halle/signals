@@ -17,7 +17,7 @@
  */
 package de.ipb_halle.signals.users;
 
-import java.util.List;
+import java.util.Set;
 import javax.ejb.Local;
 
 /** 
@@ -32,18 +32,17 @@ public interface LdapClient {
      */
     public Group getGroup(String groupDN);
 
-
     /**
      * @param groupDN a distinguished group name
      * @return the list of users, who are members of that group, including nested memberships
      */
-    public List<String> getMembers(String groupDN);
+    public Set<String> getMembers(String groupDN);
 
     /**
      * @param userDN a distinguished user name
      * @return a list of (nested) group memberships for the given user
      */
-    public List<String> getMemberships(String userDN);
+    public Set<String> getMemberships(String userDN);
 
     /**
      * @param userDN a distinguished user name
@@ -55,6 +54,6 @@ public interface LdapClient {
      * @param baseDN the base DN for searching users
      * @return a list of distinguished user names
      */
-    public List<String> getUsers(String baseDN);
+    public Set<String> getUsers(String baseDN);
 
 }

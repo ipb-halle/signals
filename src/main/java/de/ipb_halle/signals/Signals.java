@@ -17,7 +17,13 @@
  */
 package de.ipb_halle.signals;
 
+import de.ipb_halle.signals.users.LdapClient;
+
+import java.util.Iterator;
 import java.util.Properties;
+import java.util.HashSet;
+import java.util.Set;
+import javax.annotation.Resource;
 import javax.ejb.embeddable.EJBContainer;
 import javax.inject.Inject;
 import javax.naming.Context;
@@ -33,8 +39,40 @@ import org.apache.openejb.api.LocalClient;
 @LocalClient
 public class Signals {
 
+    @Resource
+    private SignalsConfig signalsConfig;
+
     @Inject 
     private SignalsEntityManager signalsMgr;
+
+    @Inject
+    private LdapClient ldapClient;
+
+    public void doIt() {
+
+//          signalsMgr.fetchSignalsEntities("location");
+
+/*
+            String[] baseDNs = signalsConfig.getLdapBaseDNs().split(";");
+            Set<String> users = new HashSet<> ();
+            for(String baseDN : baseDNs) {
+                users.addAll(ldapClient.getUsers(baseDN)); 
+            }
+            dumpSet(users);
+*/
+/*
+            Set<String> groups = ldapClient.getMemberships(super_secret_dn);
+            dumpSet(groups);
+*/
+
+    }
+
+    private void dumpSet(Set<String> set) {
+        Iterator<String> iter = set.iterator();
+        while(iter.hasNext()) {
+            System.out.println(iter.next());
+        }
+    }
 
     public static void runClient(String fname) {
         try {
@@ -49,7 +87,7 @@ public class Signals {
             Signals signals = new Signals();
             ctx.bind("inject", signals);
 
-            signals.signalsMgr.fetchSignalsEntities("location");
+            signals.doIt();
 
         } catch(Exception e) {
             e.printStackTrace();
