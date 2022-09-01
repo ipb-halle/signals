@@ -27,11 +27,42 @@ public class SignalsConfig {
 
     private String apiKey;
     private String baseUrl;
-    private String restClientClassName;
+
+    private String ldapAttrAlias;                       // ...
+    private String ldapAttrGroupName;                   // cn
+    private String ldapAttrEmail;                       // mail
+    private String ldapAttrFirstName;                   // givenName
+    private String ldapAttrLastName;                    // sn
+    private String ldapAttrMemberOf;                    // memberOf
+    private String ldapBaseDN;                          // dc=<domain>,dc=<country>
+    private String ldapContextProviderURL;              // ldap://<server>:<port>
+    private String ldapContextReferral;                 // follow
+    private String ldapFilterGroupDN;                   // ou=<SNB group OU>,...,dc=<domain>,dc=<country>
+    private String ldapFilterRoleDN;                    // ou=<SNB role OU>,...,dc=<domain>,dc=<country>
+    private String ldapFilterUsers;                     // (&(objectClass=person)(mail=@))
+    private String ldapSecurityPrinzipal;               //
+    private String ldapSecurityCredentials;             //
+    private String ldapSecurityAuthentication;          // simple
+
 
     public String getApiKey() { return apiKey; }
     public String getBaseUrl() { return baseUrl; }
-    public String getRestClientClassName() { return restClientClassName; }
+
+    public String getLdapAttrAlias() { return ldapAttrAlias; }
+    public String getLdapAttrGroupName() { return ldapAttrGroupName; }
+    public String getLdapAttrEmail() { return ldapAttrEmail; }
+    public String getLdapAttrFirstName() { return ldapAttrFirstName; }
+    public String getLdapAttrLastName() { return ldapAttrLastName; }
+    public String getLdapAttrMemberOf() { return ldapAttrMemberOf; }
+    public String getLdapBaseDN() { return ldapBaseDN; }
+    public String getLdapContextProviderURL() { return ldapContextProviderURL; }
+    public String getLdapContextReferral() { return ldapContextReferral; }
+    public String getLdapFilterGroupDN() { return ldapFilterGroupDN; }
+    public String getLdapFilterRoleDN() { return ldapFilterRoleDN; }
+    public String getLdapFilterUsers() { return ldapFilterUsers; }
+    public String getLdapSecurityPrinzipal() { return ldapSecurityPrinzipal; }
+    public String getLdapSecurityCredentials() { return ldapSecurityCredentials; }
+    public String getLdapSecurityAuthentication() { return ldapSecurityAuthentication; }
 
 }
 

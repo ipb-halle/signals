@@ -53,3 +53,15 @@ CREATE TABLE users (
     user_name VARCHAR,
     json_string VARCHAR
 );
+
+CREATE TABLE groups (
+    id INTEGER NOT NULL PRIMARY KEY,
+    created_at TIMESTAMP,
+    edited_at TIMESTAMP,
+    description VARCHAR,
+    digest VARCHAR,
+    name VARCHAR,
+    is_system BOOLEAN,
+    type VARCHAR,
+    json_string VARCHAR
+);
