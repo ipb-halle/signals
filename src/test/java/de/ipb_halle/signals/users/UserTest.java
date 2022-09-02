@@ -45,7 +45,7 @@ public class UserTest {
         JsonElement j = JsonParser.parseString(test);
 
         UserRestService svc = new UserRestService();
-        User user = svc.createUser(j);
+        User user = svc.createEntity(j);
 
         assertEquals("id matches", id, (int) user.getId());
         assertEquals("createdAt date matches", created, user.getCreatedAt().getTime());

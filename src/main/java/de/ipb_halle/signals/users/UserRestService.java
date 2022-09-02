@@ -25,6 +25,8 @@ import com.google.gson.JsonPrimitive;
 
 import de.ipb_halle.signals.Method;
 import de.ipb_halle.signals.RestClient;
+import de.ipb_halle.signals.RestResultIterator;
+import de.ipb_halle.signals.RestService;
 import de.ipb_halle.signals.UnexpectedResponseCodeException;
 
 import java.io.IOException;
@@ -34,7 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import javax.ejb.Stateless;
+import javax.ejb.Local;
 import javax.inject.Inject;
 
 
@@ -42,8 +44,8 @@ import javax.inject.Inject;
  * Signals API REST service for users
  */
 
-@Stateless
-public class UserRestService {
+@Local
+public class UserRestService implements RestService<User> {
 
     /*
      * Parameter 'q' is a String and it is used to 
@@ -68,87 +70,10 @@ public class UserRestService {
     private RestClient restClient;
     
 
-    private class UserIterator implements Iterator<User> {
-        private RestClient client;
-        private JsonElement jsonResult;
-        private Iterator<JsonElement> jsonIterator;
-
-        public UserIterator(RestClient c, String query, Boolean enabled) {
-            client = c;
-            initialFetch(query, enabled);
-        }
-
-        private void initialFetch(String query, Boolean enabled) {
-            try {
-                client.reset()
-                    .setEndpoint(USERS_ENDPOINT)
-                    .putUrlParameter("page[offset]", "0")
-                    .putUrlParameter("page[limit]", "20");
-
-                if (query != null) {
-                    client.putUrlParameter("q", query);
-                }
-                if (enabled != null) {
-                    client.putUrlParameter("enabled", enabled ? "true" : "false");
-                }
-                client.execute();
-
-                jsonResult = JsonParser.parseString(client.getResponse());
-                jsonIterator = jsonResult.getAsJsonObject().getAsJsonArray("data").iterator();
-
-            } catch(UnexpectedResponseCodeException ue) {
-                System.out.println("Unexpected code");
-            } catch(MalformedURLException me) {
-                System.out.println("Malformed URL");
-            } catch(IOException ioe) {
-                System.out.println("IOException");
-                ioe.printStackTrace();
-            }
-        }
-
-        private void fetchPage(String url) {
-            try {
-                client.setURL(url)
-                    .execute();
-
-                jsonResult = JsonParser.parseString(client.getResponse());
-                jsonIterator = jsonResult.getAsJsonObject().getAsJsonArray("data").iterator();
-
-            } catch(UnexpectedResponseCodeException ue) {
-                System.out.println("Unexpected code");
-            } catch(MalformedURLException me) {
-                System.out.println("Malformed URL");
-            } catch(IOException ioe) {
-                System.out.println("IOException");
-                ioe.printStackTrace();
-            }
-        }
-
-        public boolean hasNext() {
-            if (jsonIterator.hasNext()) {
-                return true;
-            }
-            JsonObject links = jsonResult.getAsJsonObject().getAsJsonObject("links");
-            if (links.has("next")) {
-                
-                fetchPage(links.getAsJsonPrimitive("next").getAsString());
-                return jsonIterator.hasNext();
-            }
-            return false;
-        }
-
-        public User next() {
-            if (hasNext()) {
-                return createUser(jsonIterator.next());
-            }
-            throw new NoSuchElementException();
-        }
-    }
-
     /**
      * deserialize user
      */
-    protected User createUser(JsonElement j) {
+    public User createEntity(JsonElement j) {
         JsonObject attributes = j.getAsJsonObject().getAsJsonObject("attributes");
 
         User user = new User();
@@ -168,27 +93,6 @@ public class UserRestService {
         return user;
     }
 
-
-    private JsonElement fetch(int id) {
-        try {
-            restClient.reset()
-                .setEndpoint(String.format(USER_ENDPOINT, id))
-                .execute();
-
-            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
-            return jsonResult.getAsJsonObject().get("data");
-
-        } catch(UnexpectedResponseCodeException ue) {
-            System.out.println("Unexpected code");
-        } catch(MalformedURLException me) {
-            System.out.println("Malformed URL");
-        } catch(IOException ioe) {
-            System.out.println("IOException");
-            ioe.printStackTrace();
-        }
-        return null;
-    }
-
     /**
      * POST -- create user
      */
@@ -201,7 +105,7 @@ public class UserRestService {
                 .execute(RestClient.HTTP_CREATED);
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
-            return createUser(jsonResult.getAsJsonObject().get("data"));
+            return createEntity(jsonResult.getAsJsonObject().get("data"));
 
         } catch(UnexpectedResponseCodeException ue) {
             System.out.println("Unexpected code");
@@ -218,14 +122,41 @@ public class UserRestService {
      * GET user by id 
      */
     public User doGetUser(int id) {
-        return createUser(fetch(id));
+        try {
+            restClient.reset()
+                .setEndpoint(String.format(USER_ENDPOINT, id))
+                .execute();
+
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
+            return createEntity(jsonResult.getAsJsonObject().get("data"));
+
+        } catch(UnexpectedResponseCodeException ue) {
+            System.out.println("Unexpected code");
+        } catch(MalformedURLException me) {
+            System.out.println("Malformed URL");
+        } catch(IOException ioe) {
+            System.out.println("IOException");
+            ioe.printStackTrace();
+        }
+        return null;
     }
 
     /**
      * GET users -- obtain list of users 
      */
     public List<User> doGetUsers(String query, Boolean enabled) {
-        UserIterator iter = new UserIterator(restClient, query,  enabled);
+        restClient.reset()
+            .setMethod(Method.GET)
+            .setEndpoint(USERS_ENDPOINT);
+
+        if (query != null) {
+            restClient.putUrlParameter("q", query);
+        }
+        if (enabled != null) {
+            restClient.putUrlParameter("enabled", enabled ? "true" : "false");
+        }
+
+        RestResultIterator<User> iter = new RestResultIterator<> (restClient, this, true); 
         ArrayList<User> users = new ArrayList<> ();
 
         while(iter.hasNext()) {
