@@ -38,7 +38,7 @@ public class SignalsEntity {
     @Id
     private String id;
 
-    @Column
+    @Column(name="snb_type")
     private String type;
 
     @Column

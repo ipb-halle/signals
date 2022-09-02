@@ -23,22 +23,22 @@ import javax.persistence.PersistenceContext;
 
 
 /** 
- * DB service for roles
+ * DB service for groups
  */
 
 @Stateless
-public class RoleDbService {
+public class GroupDbService {
 
 
     @PersistenceContext(unitName="signalsDB")
     private EntityManager em;
 
-    public Role loadById(int id) {
-        return this.em.find(Role.class, id);
+    public Group loadById(int id) {
+        return this.em.find(Group.class, id);
     }
 
-    public void save(Role r) {
-        this.em.merge(r);
+    public void save(Group g) {
+        this.em.merge(g);
     }
 }
 

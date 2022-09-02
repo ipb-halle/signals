@@ -50,10 +50,10 @@ public class Location {
     @Column
     private boolean grid;
 
-    @Column
+    @Column(name="grid_rows")
     private Integer rows;
 
-    @Column
+    @Column(name="grid_columns")
     private Integer columns;
 
     @Column(name="type_id")

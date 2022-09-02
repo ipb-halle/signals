@@ -104,6 +104,10 @@ public class RestClientImpl implements RestClient {
         return method;
     }
 
+    protected String getRequestData() {
+        return requestData;
+    }
+
     public String getResponse() {
         return response;
     }

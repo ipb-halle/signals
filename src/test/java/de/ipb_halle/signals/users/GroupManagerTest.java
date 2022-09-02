@@ -1,0 +1,100 @@
+/*
+ * IPB Signals client
+ * Copyright 2022 Leibniz-Institut f. Pflanzenbiochemie
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+package de.ipb_halle.signals.users;
+
+import de.ipb_halle.signals.MockRestClient;
+import de.ipb_halle.signals.SignalsConfig;
+import de.ipb_halle.signals.TestBase;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+import javax.inject.Inject;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import org.apache.openejb.jee.EjbJar;
+import org.apache.openejb.junit.ApplicationComposer;
+import org.apache.openejb.testing.Classes;
+import org.apache.openejb.testing.Configuration;
+import org.apache.openejb.testing.Descriptor;
+import org.apache.openejb.testing.Descriptors;
+import org.apache.openejb.testing.Module;
+import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThrows;
+
+@RunWith(ApplicationComposer.class)
+public class GroupManagerTest {
+
+    private final String TEST_RESOURCE_1 = "GroupManagerTest001.json";
+    private final String TEST_KEY_1 = 
+        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/groups";
+    private final int TEST_GROUP_ID = 132;
+    private final String TEST_GROUP_DESCRIPTION = "Research Group 1, Gamma department";
+    private final String TEST_GROUP_NAME = "RG Gamma 1";
+    private final String TEST_GROUP_TYPE = "group";
+    private final boolean TEST_GROUP_SYSTEM = true;
+
+    @Inject
+    private MockRestClient mockRestClient;
+
+    @Inject
+    private GroupManager manager;
+
+    @Module
+    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
+        Group.class, GroupDbService.class, GroupManager.class, GroupRestService.class })
+    public EjbJar app() {
+        return new EjbJar();
+    }
+
+    @Module
+    public PersistenceUnit persistence() {
+        return TestBase.persistence(new String[]{ Group.class.getName() });
+    }
+
+    @Configuration
+    public Properties configuration() {
+        return TestBase.configuration();
+    }
+
+    @Before
+    public void testSetup() {
+        TestBase.prepareRestClients(mockRestClient,
+            TEST_KEY_1,
+            getClass().getResourceAsStream(TEST_RESOURCE_1));
+    }
+
+
+    @Test
+    public void groupManagerTest() {
+
+        List<Group> groups = manager.getSnbGroups();
+        manager.save(groups);
+        Group group = manager.getDbGroup(TEST_GROUP_ID);
+
+        assertEquals("Group name mismatch", group.getName(), TEST_GROUP_NAME);
+        assertEquals("Group description mismatch", group.getDescription(), TEST_GROUP_DESCRIPTION);
+        assertEquals("Group type mismatch", group.getType(), TEST_GROUP_TYPE);
+        assertEquals("Group systemGroup mismatch", group.isSystem(), TEST_GROUP_SYSTEM);
+    }
+}

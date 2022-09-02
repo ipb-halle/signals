@@ -1,7 +1,7 @@
 
 CREATE TABLE signalsentities (
     id VARCHAR NOT NULL PRIMARY KEY,
-    type VARCHAR,
+    snb_type VARCHAR,
     json_string VARCHAR
 );
 
@@ -18,8 +18,8 @@ CREATE TABLE locations (
     name VARCHAR,
     description VARCHAR,
     grid BOOLEAN,
-    rows INTEGER,
-    columns INTEGER,
+    grid_rows INTEGER,
+    grid_columns INTEGER,
     type_id VARCHAR,
     type_name VARCHAR,
     ancestor_id VARCHAR,
@@ -62,6 +62,6 @@ CREATE TABLE groups (
     digest VARCHAR,
     name VARCHAR,
     is_system BOOLEAN,
-    type VARCHAR,
+    snb_type VARCHAR,
     json_string VARCHAR
 );

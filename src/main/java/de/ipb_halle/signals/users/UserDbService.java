@@ -17,9 +17,6 @@
  */
 package de.ipb_halle.signals.users;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;

@@ -157,7 +157,7 @@ public class UserRestService {
         user.setCountry(attributes.getAsJsonPrimitive(User.ATTR_COUNTRY).getAsString());
         user.setCreatedAt(user.parseDate(attributes.getAsJsonPrimitive(User.ATTR_CREATED_AT).getAsString()));
         user.setEmail(attributes.getAsJsonPrimitive(User.ATTR_EMAIL).getAsString());
-        user.setEnabled(attributes.getAsJsonPrimitive(User.ATTR_EMAIL).getAsBoolean());
+        user.setEnabled(attributes.getAsJsonPrimitive(User.ATTR_ENABLED).getAsBoolean());
         user.setFirstName(attributes.getAsJsonPrimitive(User.ATTR_FIRST_NAME).getAsString());
         user.setJsonString(j.toString());
         user.setLastLoginAt(user.parseDate(attributes.getAsJsonPrimitive(User.ATTR_LAST_LOGIN).getAsString()));

@@ -17,11 +17,6 @@
  */
 package de.ipb_halle.signals.users;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -75,40 +70,19 @@ public class Group {
     @Column(name="is_system")
     private boolean system;
 
-    @Column
+    @Column(name="snb_type")
     private String type;
 
-    @Column
-    private String json_string;
+    @Column(name="json_string")
+    private String jsonString;
 
     private transient SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-    private transient JsonElement json;
-
-
-    public static Group createGroup(JsonElement j) {
-        Group group = new Group();
-        JsonObject attributes = j.getAsJsonObject().getAsJsonObject("attributes");
-
-        group.id = j.getAsJsonObject().getAsJsonPrimitive("id").getAsInt();
-        group.json = j;
-        group.json_string = j.toString();
-
-        group.createdAt = group.parseDate(attributes.getAsJsonPrimitive(ATTR_CREATED_AT).getAsString());
-        group.description = attributes.getAsJsonPrimitive(ATTR_DESCRIPTION).getAsString();
-        // digest
-        // eid
-        group.editedAt = group.parseDate(attributes.getAsJsonPrimitive(ATTR_EDITED_AT).getAsString());
-        // flags
-        group.name = attributes.getAsJsonPrimitive(ATTR_NAME).getAsString();
-        group.system = attributes.getAsJsonPrimitive(ATTR_SYSTEM).getAsBoolean();
-        group.type = attributes.getAsJsonPrimitive(ATTR_TYPE).getAsString();
-
-        return group;
-    }
 
     public void dump() {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("Group(%d) --> %s\n", id, name));
+        sb.append(String.format("Description: %s\n", description));
+        sb.append((jsonString != null) ? jsonString : "");
         sb.append("\n==============================================================");
         System.out.println(sb.toString());
     }
@@ -129,12 +103,16 @@ public class Group {
         return editedAt;
     }
 
+    public String getJsonString() {
+        return jsonString;
+    }
+
     public String getName() {
         return name;
     }
 
-    public String getJsonString() {
-        return json_string;
+    public String getType() {
+        return type;
     }
 
     public boolean isSystem() {
@@ -149,8 +127,8 @@ public class Group {
         return new Date();
     }
 
-    public void setId(Integer id) {
-        id = id;
+    public void setId(Integer i) {
+        id = i;
     }
 
     public void setCreatedAt(Date d) {
@@ -165,11 +143,19 @@ public class Group {
         editedAt = d;
     }
 
+    public void setJsonString(String j) {
+        jsonString = j;
+    }
+
     public void setName(String n) {
         name = n;
     }
 
     public void setSystem(boolean b) {
         system = b;
+    }
+
+    public void setType(String t) {
+        type = t;
     }
 }

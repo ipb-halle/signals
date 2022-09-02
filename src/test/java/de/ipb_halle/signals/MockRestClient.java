@@ -49,6 +49,11 @@ public class MockRestClient extends RestClientImpl {
                 .toString();
         String response = responseMap.get(key);
         if (response == null) {
+            if (getRequestData() != null) {
+                System.out.println("\n*\n* DUMP REQUEST DATA\n*");
+                System.out.println(getRequestData());
+                System.out.println("\n*\n* \n*");
+            }
             throw new NullPointerException("MockRestClient not configured for key: ".concat(key));
         }
         setResponse(response);
