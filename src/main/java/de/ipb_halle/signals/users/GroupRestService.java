@@ -25,6 +25,8 @@ import com.google.gson.JsonPrimitive;
 
 import de.ipb_halle.signals.Method;
 import de.ipb_halle.signals.RestClient;
+import de.ipb_halle.signals.RestResultIterator;
+import de.ipb_halle.signals.RestService;
 import de.ipb_halle.signals.UnexpectedResponseCodeException;
 
 import java.io.IOException;
@@ -34,7 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import javax.ejb.Stateless;
+import javax.ejb.Local;
 import javax.inject.Inject;
 
 
@@ -42,8 +44,8 @@ import javax.inject.Inject;
  * Signals API REST service for groups
  */
 
-@Stateless
-public class GroupRestService {
+@Local
+public class GroupRestService implements RestService<Group> {
 
     public final String GROUPS_ENDPOINT = "/groups";
     public final String GROUP_ENDPOINT = "/groups/%d";
@@ -52,52 +54,10 @@ public class GroupRestService {
     @Inject
     private RestClient restClient;
     
-
-    private class GroupIterator implements Iterator<Group> {
-        private RestClient client;
-        private JsonElement jsonResult;
-        private Iterator<JsonElement> jsonIterator;
-
-        public GroupIterator(RestClient c) {
-            client = c;
-            initialFetch();
-        }
-
-        private void initialFetch() {
-            try {
-                client.reset()
-                    .setEndpoint(GROUPS_ENDPOINT)
-                    .execute();
-
-                jsonResult = JsonParser.parseString(client.getResponse());
-                jsonIterator = jsonResult.getAsJsonObject().getAsJsonArray("data").iterator();
-
-            } catch(UnexpectedResponseCodeException ue) {
-                System.out.println("Unexpected code");
-            } catch(MalformedURLException me) {
-                System.out.println("Malformed URL");
-            } catch(IOException ioe) {
-                System.out.println("IOException");
-                ioe.printStackTrace();
-            }
-        }
-
-        public boolean hasNext() {
-            return jsonIterator.hasNext();
-        }
-
-        public Group next() {
-            if (hasNext()) {
-                return createGroup(jsonIterator.next());
-            }
-            throw new NoSuchElementException();
-        }
-    }
-
     /**
      * deserialize group
      */
-    protected Group createGroup(JsonElement j) {
+    public Group createEntity(JsonElement j) {
         JsonObject attributes = j.getAsJsonObject().getAsJsonObject("attributes");
 
         Group group = new Group();
@@ -124,26 +84,6 @@ public class GroupRestService {
         return null;
     }
 
-    private JsonElement fetch(int id) {
-        try {
-            restClient.reset()
-                .setEndpoint(String.format(GROUP_ENDPOINT, id))
-                .execute();
-
-            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
-            return jsonResult.getAsJsonObject().get("data");
-
-        } catch(UnexpectedResponseCodeException ue) {
-            System.out.println("Unexpected code");
-        } catch(MalformedURLException me) {
-            System.out.println("Malformed URL");
-        } catch(IOException ioe) {
-            System.out.println("IOException");
-            ioe.printStackTrace();
-        }
-        return null;
-    }
-
     /**
      * POST -- create group
      */
@@ -156,7 +96,7 @@ public class GroupRestService {
                 .execute(RestClient.HTTP_CREATED);
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
-            return createGroup(jsonResult.getAsJsonObject().get("data"));
+            return createEntity(jsonResult.getAsJsonObject().get("data"));
 
         } catch(UnexpectedResponseCodeException ue) {
             System.out.println("Unexpected code");
@@ -173,14 +113,33 @@ public class GroupRestService {
      * GET group by id 
      */
     public Group doGetGroup(int id) {
-        return createGroup(fetch(id));
+        try {
+            restClient.reset()
+                .setEndpoint(String.format(GROUP_ENDPOINT, id))
+                .execute();
+
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
+            return createEntity(jsonResult.getAsJsonObject().get("data"));
+
+        } catch(UnexpectedResponseCodeException ue) {
+            System.out.println("Unexpected code");
+        } catch(MalformedURLException me) {
+            System.out.println("Malformed URL");
+        } catch(IOException ioe) {
+            System.out.println("IOException");
+            ioe.printStackTrace();
+        }
+        return null;
     }
 
     /**
      * GET groups -- obtain list of groups 
      */
     public List<Group> doGetGroups() {
-        GroupIterator iter = new GroupIterator(restClient);
+        restClient.reset()
+            .setEndpoint(GROUPS_ENDPOINT);
+
+        RestResultIterator<Group> iter = new RestResultIterator<> (restClient, this, false);
         ArrayList<Group> groups = new ArrayList<> ();
 
         while(iter.hasNext()) {
