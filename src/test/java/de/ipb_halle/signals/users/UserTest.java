@@ -49,8 +49,5 @@ public class UserTest {
         assertEquals("createdAt date matches", created, user.getCreatedAt().getTime());
         assertEquals("lastLoginAt date matches", lastLogin, user.getLastLoginAt().getTime());
         assertEquals("userName matches", userName, user.getUserName());
-
-        System.out.printf("User.CreatedAt: %s\n", user.getDateFormat().format(user.getCreatedAt()));
-        System.out.printf("User.LastLoginAt: %s\n", user.getDateFormat().format(user.getLastLoginAt()));
     }
 }

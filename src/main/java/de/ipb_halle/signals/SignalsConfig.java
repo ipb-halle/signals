@@ -28,15 +28,24 @@ public class SignalsConfig {
     private String apiKey;
     private String baseUrl;
 
+    private String groupAttrDescription;                // default description
+
+    private String ldapAttrAccountExpirationDate;       // accountExpires
     private String ldapAttrAlias;                       // ...
-    private String ldapAttrGroupName;                   // cn
+    private String ldapAttrCreatedAt;                   // whenCreated
     private String ldapAttrEmail;                       // mail
     private String ldapAttrFirstName;                   // givenName
+    private String ldapAttrGroupName;                   // cn
     private String ldapAttrLastName;                    // sn
     private String ldapAttrMemberOf;                    // memberOf
+    private String ldapAttrMembers;                     // member
+    private String ldapAttrObjectClass;                 // objectClass
+    private String ldapAttrObjectClassGroup;            // group
+    private String ldapAttrUserName;                    // mail
     private String ldapBaseDNs;                         // dc=<domain>,dc=<country>;...
     private String ldapContextProviderURL;              // ldap://<server>:<port>
     private String ldapContextReferral;                 // follow
+    private String ldapDateFormatString;                // yyyy...  -> 20040119134348.0Z
     private String ldapFilterGroupDN;                   // ou=<SNB group OU>,...,dc=<domain>,dc=<country>
     private String ldapFilterRoleDN;                    // ou=<SNB role OU>,...,dc=<domain>,dc=<country>
     private String ldapFilterUser;                      // (&(objectClass=person)(mail=@))
@@ -45,19 +54,30 @@ public class SignalsConfig {
     private String ldapSecurityCredentials;             //
     private String ldapSecurityAuthentication;          // simple
 
+    private String userAttrCountry;                     // default country
+    private String userAttrOrganization;                // default organization
 
     public String getApiKey() { return apiKey; }
     public String getBaseUrl() { return baseUrl; }
 
+    public String getGroupAttrDescription() { return groupAttrDescription; }
+
+    public String getLdapAttrAccountExpirationDate() { return ldapAttrAccountExpirationDate; }
     public String getLdapAttrAlias() { return ldapAttrAlias; }
-    public String getLdapAttrGroupName() { return ldapAttrGroupName; }
+    public String getLdapAttrCreatedAt() { return ldapAttrCreatedAt; }
     public String getLdapAttrEmail() { return ldapAttrEmail; }
     public String getLdapAttrFirstName() { return ldapAttrFirstName; }
+    public String getLdapAttrGroupName() { return ldapAttrGroupName; }
     public String getLdapAttrLastName() { return ldapAttrLastName; }
     public String getLdapAttrMemberOf() { return ldapAttrMemberOf; }
+    public String getLdapAttrMembers() { return ldapAttrMembers; }
+    public String getLdapAttrObjectClass() { return ldapAttrObjectClass; }
+    public String getLdapAttrObjectClassGroup() { return ldapAttrObjectClassGroup; }
+    public String getLdapAttrUserName() { return ldapAttrUserName; }
     public String getLdapBaseDNs() { return ldapBaseDNs; }
     public String getLdapContextProviderURL() { return ldapContextProviderURL; }
     public String getLdapContextReferral() { return ldapContextReferral; }
+    public String getLdapDateFormatString() { return ldapDateFormatString; }
     public String getLdapFilterGroupDN() { return ldapFilterGroupDN; }
     public String getLdapFilterRoleDN() { return ldapFilterRoleDN; }
     public String getLdapFilterUser() { return ldapFilterUser; }
@@ -66,6 +86,8 @@ public class SignalsConfig {
     public String getLdapSecurityCredentials() { return ldapSecurityCredentials; }
     public String getLdapSecurityAuthentication() { return ldapSecurityAuthentication; }
 
+    public String getUserAttrCountry() { return userAttrCountry; }
+    public String getUserAttrOrganization() { return userAttrOrganization; }
 }
 
 

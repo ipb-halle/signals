@@ -9,15 +9,23 @@
     <Resource id="signalsConfig" class-name="de.ipb_halle.signals.SignalsConfig">
       apiKey = Honestly+we+would+not+like+to+disclose+the+API+Key+in+our+source+code==
       baseUrl = https://endpoint.somewhere.invalid/api/rest/v1.0
+      groupAttrDescription = LDAP managed group
+      ldapAttrAccountExpirationDate = accountExpires
       ldapAttrAlias = initials
+      ldapAttrCreatedAt = whenCreated
       ldapAttrGroupName = cn
       ldapAttrEmail = mail
       ldapAttrFirstName = givenName
       ldapAttrLastName = sn
       ldapAttrMemberOf = memberOf
+      ldapAttrMembers = member
+      ldapAttrObjectClass = objectClass
+      ldapAttrObjectClassGroup = group 
+      ldapAttrUserName = mail
       ldapBaseDNs = ou=firstOU,dc=DOMAIN,dc=COUNTRY;...
       ldapContextProviderURL = ldap://ldap.somewhere.invalid:PORT
       ldapContextReferral = follow
+      ldapDateFormatString = yyyyMMddHHmmss.S'Z'
       ldapFilterGroupDN = ou=SNB_groupOU,...,dc=DOMAIN,dc=COUNTRY;...
       ldapFilterRoleDN = ou=SNB_roleOU,...,dc=DOMAIN,dc=COUNTRY
       ldapFilterUser  = (&amp;(objectCategory=person)(mail=@))
@@ -25,6 +33,8 @@
       ldapSecurityPrincipal = test
       ldapSecurityCredentials = 0000
       ldapSecurityAuthentication = simple
+      userAttrCountry = Germany
+      userAttrOrganization = testOrg
     </Resource>
 </openejb>
 

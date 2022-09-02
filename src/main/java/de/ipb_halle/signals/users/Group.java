@@ -117,8 +117,16 @@ public class Group {
         return id;
     }
 
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
     public String getDescription() {
         return description;
+    }
+
+    public Date getEditedAt() {
+        return editedAt;
     }
 
     public String getName() {
@@ -145,11 +153,23 @@ public class Group {
         id = id;
     }
 
+    public void setCreatedAt(Date d) {
+        createdAt = d;
+    }
+
     public void setDescription(String d) { 
         description = d;
     }
 
+    public void setEditedAt(Date d) {
+        editedAt = d;
+    }
+
     public void setName(String n) {
         name = n;
+    }
+
+    public void setSystem(boolean b) {
+        system = b;
     }
 }

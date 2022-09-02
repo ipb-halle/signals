@@ -18,6 +18,7 @@
 package de.ipb_halle.signals;
 
 import de.ipb_halle.signals.users.LdapClient;
+import de.ipb_halle.signals.users.User;
 
 import java.util.Iterator;
 import java.util.Properties;
@@ -53,18 +54,28 @@ public class Signals {
 //          signalsMgr.fetchSignalsEntities("location");
 
 /*
-            String[] baseDNs = signalsConfig.getLdapBaseDNs().split(";");
-            Set<String> users = new HashSet<> ();
-            for(String baseDN : baseDNs) {
-                users.addAll(ldapClient.getUsers(baseDN)); 
-            }
+            System.out.println("Users\n=====");
+            Set<String> users = ldapClient.getUsers(null);
             dumpSet(users);
-*/
-/*
-            Set<String> groups = ldapClient.getMemberships(super_secret_dn);
+
+            Set<String> groups = ldapClient.getMemberships("SOME USER DN");
+            System.out.println("Group memberships\n=================");
+            dumpSet(ldapClient.filterDNs(groups, LdapClient.FilterType.GROUP));
+            System.out.println("Role memberships\n================");
+            dumpSet(ldapClient.filterDNs(groups, LdapClient.FilterType.ROLE));
+
+            User u = ldapClient.getUser("SOME USER DN");
+            u.dump();
+
+            System.out.println("User by name\n============");
+            users = ldapClient.getUsers("SOME EMAIL ADDRESS");
+            dumpSet(users);
+
+            System.out.println("Members of Group\n================");
+            groups = ldapClient.getMembers("SOME GROUP DN");
+            System.out.println("Members");
             dumpSet(groups);
 */
-
     }
 
     private void dumpSet(Set<String> set) {

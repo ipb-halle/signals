@@ -91,6 +91,14 @@ public class User {
     private transient JsonElement json;
     private transient SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
+    /**
+     * default constructor
+     */
+    public User() {
+        createdAt = new Date(0);
+        lastLoginAt = new Date(0);
+    }
+
     public static User createUser(JsonElement j) {
         User user = new User();
         JsonObject attributes = j.getAsJsonObject().getAsJsonObject("attributes");
@@ -114,9 +122,16 @@ public class User {
     }
 
     public void dump() {
-        System.out.println("User" + id);
-        System.out.println(json.toString());
-        System.out.println("==============================================================");
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("User(%d): %s, %s\n", id, lastName, firstName));
+        sb.append(String.format("  Alias: %s    User name: %s\n", alias, userName));
+        sb.append(String.format("  Email: %s    Country: %s\n", email, country));
+        sb.append(String.format("  Organization: %s   Enabled: %s\n", organization, enabled ? "True" : "False"));
+        sb.append(String.format("  Created at: %s\n", dateFormat.format(createdAt)));
+        sb.append(String.format("  Last login: %s\n", dateFormat.format(lastLoginAt)));
+        sb.append((json != null) ? json.toString() : "");
+        sb.append("==============================================================");
+        System.out.println(sb.toString());
     }
 
     public Integer getId() {

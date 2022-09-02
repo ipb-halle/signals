@@ -19,8 +19,13 @@ package de.ipb_halle.signals.users;
 
 import de.ipb_halle.signals.SignalsConfig;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -35,10 +40,19 @@ import javax.naming.directory.*;
 import javax.naming.ldap.LdapName;
 
 /** 
- * Ldap client reader for Signals tool 
+ * Ldap client reader for Signals tool.
+ * The current implementation was created to fit IPB needs. It therefore 
+ * depends on AD peculiarities and is not platform neutral.  It should be 
+ * straightforward however, to adjust it to other flavours of LDAP. 
+ * As IPB does not possess other LDAP instances for testing and has 
+ * no use case, the introduction of an abstraction layer (LdapClientImplAD, etc.)
+ * is deemed unnecessary.
  */
 @Local
 public class LdapClientImpl implements LdapClient {
+
+    // offset in 100 nanosecond intervals for 1601-01-01
+    private final long TIME_OFFSET_AD = 116444768080000000L;
 
     @Resource
     SignalsConfig signalsConfig;
@@ -57,32 +71,72 @@ public class LdapClientImpl implements LdapClient {
     }
 
     /**
-     * Filter the group memberships. Only matching groups kept to
-     * prevent inflation of groups and to leaking of internal information.
+     * Filter a set of distinguished names. Only DNs matching the filter pattern
+     * will be kept. This prevents inflation of groups in the dependend system 
+     * (SNB) and to leaking of internal information.
      *
-     * @param dn the distinguished name of the group
-     * @return true if the group dn passes the filter
+     * @param distinguishedNames a set of distinguished names
+     * @param filterType 
+     * @return a filtered set of distinguished names according to the ldapFilterGroupDN setting
      */
-    private boolean filterGroup(String dn) {
-        String filter = signalsConfig.getLdapFilterGroupDN();
+    public Set<String> filterDNs(Set<String> distinguishedNames, FilterType type) {
+        Set<String> results = new HashSet<> ();
+        String[] filters = getDnFilters(type);
 
         try {
-            LdapName name = new LdapName(dn);
-
-            try {
+            for (String filter : filters) {
                 LdapName filterName = new LdapName(filter);
+                Iterator<String> dnIter = distinguishedNames.iterator();
+                while(dnIter.hasNext()) {
+                    try {
+                        String dn = dnIter.next();
+                        LdapName name = new LdapName(dn);
 
-                return name.startsWith(filterName);
-            } catch (InvalidNameException f) {
-                // this.logger.warn("filterGroup() invalid filter expression:" + filter);
-                f.printStackTrace();
-                return false;
+                        if (name.startsWith(filterName)) {
+                            results.add(dn);
+                        }
+                     } catch (InvalidNameException f) {
+                         // this.logger.warn("filterGroup() invalid name: " + dn);
+                         f.printStackTrace();
+                     }
+                }
             }
         } catch (InvalidNameException e) {
-            // this.logger.warn("filterGroup() invalid name: " + dn);
+            // this.logger.warn("filterGroup() invalid filter expression:" + filter);
             e.printStackTrace();
-            return false;
         }
+        return results;
+    }
+
+    /**
+     * Tries to parse the user or group creation date.
+     * Defaults to current time. Possibly an AD specific implementation.
+     * @param attrs the attribute set
+     * @return the account creation date
+     */
+    private Date getCreatedAt(Attributes attrs) throws NamingException {
+        DateFormat dateFormat = new SimpleDateFormat(signalsConfig.getLdapDateFormatString());
+        try {
+            return dateFormat.parse(attrs
+                    .get(signalsConfig.getLdapAttrCreatedAt())
+                    .get()
+                    .toString());
+        } catch(ParseException pe) {
+            // silently ignore date
+        }
+        return new Date();
+    }
+
+    private String[] getDnFilters(FilterType type) {
+        switch(type) {
+            case GROUP:
+                return new String[] { signalsConfig.getLdapFilterGroupDN() };
+            case ROLE:
+                return new String[] { signalsConfig.getLdapFilterRoleDN() };
+            case USER:
+                return signalsConfig.getLdapBaseDNs().split(";");
+        }
+        throw new IllegalArgumentException("unrecognized type");
     }
 
     /**
@@ -90,6 +144,25 @@ public class LdapClientImpl implements LdapClient {
      * @return a corresponding Group object
      */
     public Group getGroup(String groupDN) {
+        try {
+            DirContext ctx = new InitialDirContext(ldapEnv);
+            try {
+                Attributes attrs = ctx.getAttributes(groupDN);
+
+                Group group = new Group();
+                group.setCreatedAt(getCreatedAt(attrs));
+                group.setName(attrs.get(signalsConfig.getLdapAttrGroupName()).get().toString());
+
+                group.setDescription(signalsConfig.getGroupAttrDescription());
+                group.setSystem(true);
+
+                return group;
+            } finally {
+                ctx.close();
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }                                                
         return null;
     }
 
@@ -98,12 +171,44 @@ public class LdapClientImpl implements LdapClient {
      * @return the list of users, who are members of that group, including nested memberships
      */
     public Set<String> getMembers(String groupDN) {
-        return null;
+        Set<String> groupCache = new HashSet<> ();
+        Set<String> users = new HashSet<> ();
+        getMembers(users, groupCache, groupDN);
+        return users;
+    }
+
+    private void getMembers(Set<String> users, Set<String> groupCache, String groupDN) {
+        try {
+            DirContext ctx = new InitialDirContext(ldapEnv);
+            try {
+                BasicAttribute membersAttr = (BasicAttribute) ctx
+                        .getAttributes(groupDN)
+                        .get(signalsConfig.getLdapAttrMembers());
+
+                if (membersAttr != null) {
+                    NamingEnumeration<?> membersEnumeration = membersAttr.getAll();
+                    while (membersEnumeration.hasMore()) {
+                        String dn = membersEnumeration.next().toString();
+                        if (isGroup(dn)) {
+                            if (groupCache.add(dn)) {
+                                getMembers(users, groupCache, dn);
+                            }
+                        } else {
+                            users.add(dn);
+                        }
+                    }
+                }
+            } finally {
+                ctx.close();
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * @param userDN a distinguished user name
-     * @return a list of (nested) group memberships for the given user
+     * @return the list of (nested) group memberships for the given user
      */
     public Set<String> getMemberships(String objDN) {
         Set<String> groups = new HashSet<> ();
@@ -111,11 +216,16 @@ public class LdapClientImpl implements LdapClient {
         return groups;
     }
 
+    /**
+     * recursively resolve memberships
+     * @param groups the set to hold discovered distinguished group names
+     * @param objDN the distinguished object, for which memberships are to be discovered
+     */
     private void getMemberships(Set<String> groups, String objDN) {
         try {
             DirContext ctx = new InitialDirContext(ldapEnv);
             try {
-                BasicAttribute memberOfAttr =  (BasicAttribute) ctx
+                BasicAttribute memberOfAttr = (BasicAttribute) ctx
                         .getAttributes(objDN)
                         .get(signalsConfig.getLdapAttrMemberOf());
 
@@ -142,38 +252,113 @@ public class LdapClientImpl implements LdapClient {
      * @return a corresponding User object
      */
     public User getUser(String userDN) {
+        try {
+            DirContext ctx = new InitialDirContext(ldapEnv); 
+            try {
+                Attributes attrs = ctx.getAttributes(userDN);
+
+                User user = new User();
+                user.setAlias(attrs.get(signalsConfig.getLdapAttrAlias()).get().toString());
+                user.setCountry(signalsConfig.getUserAttrCountry());
+                user.setCreatedAt(getCreatedAt(attrs));
+                user.setEmail(attrs.get(signalsConfig.getLdapAttrEmail()).get().toString());
+                user.setEnabled(getUserExpiration(attrs));
+                user.setFirstName(attrs.get(signalsConfig.getLdapAttrFirstName()).get().toString());
+                user.setLastName(attrs.get(signalsConfig.getLdapAttrLastName()).get().toString());
+                user.setOrganization(signalsConfig.getUserAttrOrganization());
+                user.setUserName(attrs.get(signalsConfig.getLdapAttrUserName()).get().toString());
+
+                return user;
+            } finally {
+                ctx.close();
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        } 
         return null;
     }
 
     /**
-     * @param baseDN the base DN for searching users
-     * @return a list of distinguished user names
+     * determine expiration status of account according to account expiration date
+     * 
+     * NOTE: This is an AD specific implementation!
+     *
+     * @param attr LDAP attribute set
+     * @return enabled state 
      */
-    public Set<String> getUsers(String baseDN) {
+    private boolean getUserExpiration(Attributes attrs) throws NamingException {
+        String value = attrs.get(signalsConfig
+                .getLdapAttrAccountExpirationDate()).get().toString();
         try {
-            DirContext ctx = new InitialDirContext(ldapEnv);
+            long millis = (Long.parseLong(value) - TIME_OFFSET_AD) / 10000;
+            if (millis < new Date().getTime()) {
+                return false;
+            }
+        } catch(NumberFormatException nfe) {
+            System.out.printf("Evaluation of expiration date failed: %s", value);
+            nfe.printStackTrace();
+        }
+        return true;
+    }
+
+    /**
+     * @param filterValue the value for the filter to search 
+     * for specific users. Usually a email address. Can be null
+     * to search for all users.
+     * @return a set of distinguished user names.
+     */
+    public Set<String> getUsers(String filterValue) {
+        Set<String> users = new HashSet<> ();
+        String[] baseDNs = signalsConfig.getLdapBaseDNs().split(";");
+        for(String baseDN : baseDNs) {
+            getUsers(users, baseDN, filterValue);
+        }
+        return users;
+    }
+
+    private void getUsers(Set<String> users, String baseDN, String filterValue) {
+        String filter = signalsConfig.getLdapFilterUsers();
+        if (filterValue != null) {
+            // select a specific user
+            filter = signalsConfig.getLdapFilterUser().replaceAll("@", filterValue);
+        }
+        try {
+            DirContext ctx = new InitialDirContext(ldapEnv); 
             try {
-                Set<String> users = new HashSet<> ();
                 SearchControls searchControls = new SearchControls();
                 searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
                 NamingEnumeration<SearchResult> search = ctx.search(baseDN, 
-                        signalsConfig.getLdapFilterUsers(),
+                        filter,
                         searchControls);
 
                 while (search.hasMore()) {
                     String dn = search.next().getNameInNamespace();
                     users.add(dn);
-                    System.out.println(dn);
-//                  users.add(search.next().getNameInNamespace());
                 }
                 search.close();
-                return users;
             } finally {
                 ctx.close();
             }
         } catch(Exception e) {
             e.printStackTrace();
         }
-        return null;
+    }
+
+    private boolean isGroup(String dn) {
+        try {
+            DirContext ctx = new InitialDirContext(ldapEnv);
+            try {
+                BasicAttribute objectClassAttr = (BasicAttribute) ctx
+                        .getAttributes(dn)
+                        .get(signalsConfig.getLdapAttrObjectClass());
+
+                return objectClassAttr.contains(signalsConfig.getLdapAttrObjectClassGroup());
+            } finally {
+                ctx.close();
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
