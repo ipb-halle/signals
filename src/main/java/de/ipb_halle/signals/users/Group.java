@@ -43,16 +43,16 @@ import javax.persistence.Table;
 @Table(name="groups")
 public class Group {
 
-    private final static String ATTR_ID = "id";
-    private final static String ATTR_CREATED_AT= "createdAt";
-    private final static String ATTR_DESCRIPTION = "description";
-    private final static String ATTR_DIGEST = "digest";
-    private final static String ATTR_EDITED_AT= "editedAt";
-    private final static String ATTR_EID = "eid";
-    private final static String ATTR_FLAGS = "flags";
-    private final static String ATTR_NAME = "name";
-    private final static String ATTR_SYSTEM = "isSystem";
-    private final static String ATTR_TYPE = "type";
+    public final static String ATTR_ID = "id";
+    public final static String ATTR_CREATED_AT= "createdAt";
+    public final static String ATTR_DESCRIPTION = "description";
+    public final static String ATTR_DIGEST = "digest";
+    public final static String ATTR_EDITED_AT= "editedAt";
+    public final static String ATTR_EID = "eid";
+    public final static String ATTR_FLAGS = "flags";
+    public final static String ATTR_NAME = "name";
+    public final static String ATTR_SYSTEM = "isSystem";
+    public final static String ATTR_TYPE = "type";
 
     @Id
     private Integer id;

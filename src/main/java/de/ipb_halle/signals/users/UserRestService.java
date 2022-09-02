@@ -139,10 +139,33 @@ public class UserRestService {
 
         public User next() {
             if (hasNext()) {
-                return User.createUser(jsonIterator.next());
+                return createUser(jsonIterator.next());
             }
             throw new NoSuchElementException();
         }
+    }
+
+    /**
+     * deserialize user
+     */
+    protected User createUser(JsonElement j) {
+        JsonObject attributes = j.getAsJsonObject().getAsJsonObject("attributes");
+
+        User user = new User();
+        user.setId(attributes.getAsJsonPrimitive(User.ATTR_ID).getAsInt());
+        user.setAlias(attributes.getAsJsonPrimitive(User.ATTR_ALIAS).getAsString());
+        user.setCountry(attributes.getAsJsonPrimitive(User.ATTR_COUNTRY).getAsString());
+        user.setCreatedAt(user.parseDate(attributes.getAsJsonPrimitive(User.ATTR_CREATED_AT).getAsString()));
+        user.setEmail(attributes.getAsJsonPrimitive(User.ATTR_EMAIL).getAsString());
+        user.setEnabled(attributes.getAsJsonPrimitive(User.ATTR_EMAIL).getAsBoolean());
+        user.setFirstName(attributes.getAsJsonPrimitive(User.ATTR_FIRST_NAME).getAsString());
+        user.setJsonString(j.toString());
+        user.setLastLoginAt(user.parseDate(attributes.getAsJsonPrimitive(User.ATTR_LAST_LOGIN).getAsString()));
+        user.setLastName(attributes.getAsJsonPrimitive(User.ATTR_LAST_NAME).getAsString());
+        user.setOrganization(attributes.getAsJsonPrimitive(User.ATTR_ORGANIZATION).getAsString());
+        user.setUserName(attributes.getAsJsonPrimitive(User.ATTR_USER_NAME).getAsString());
+
+        return user;
     }
 
 
@@ -174,11 +197,11 @@ public class UserRestService {
             restClient.reset()
                 .setMethod(Method.POST)
                 .setEndpoint(USERS_ENDPOINT)
-                .setRequestData(user.prepareJsonString())
+                .setRequestData(prepareJsonString(user))
                 .execute(RestClient.HTTP_CREATED);
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
-            return User.createUser(jsonResult.getAsJsonObject().get("data"));
+            return createUser(jsonResult.getAsJsonObject().get("data"));
 
         } catch(UnexpectedResponseCodeException ue) {
             System.out.println("Unexpected code");
@@ -195,8 +218,7 @@ public class UserRestService {
      * GET user by id 
      */
     public User doGetUser(int id) {
-        User user = User.createUser(fetch(id));
-        return user;
+        return createUser(fetch(id));
     }
 
     /**
@@ -210,6 +232,53 @@ public class UserRestService {
             users.add(iter.next());
         }
         return users;
+    }
+
+    protected String prepareJsonString(User user) {
+        JsonObject attributes = new JsonObject();
+        attributes.addProperty(User.ATTR_ALIAS, user.getAlias());
+        attributes.addProperty(User.ATTR_COUNTRY, user.getCountry());
+        attributes.addProperty(User.ATTR_EMAIL, user.getEmail());
+        attributes.addProperty(User.ATTR_FIRST_NAME, user.getFirstName());
+        attributes.addProperty(User.ATTR_LAST_NAME, user.getLastName());
+        attributes.addProperty(User.ATTR_ORGANIZATION, user.getOrganization());
+        if (user.getRoles() != null) {
+            attributes.add(User.ATTR_ROLES, prepareRoles(user));
+        }
+/*
+        if (user.getSystemGroups() != null) {
+            attributes.add(User.ATTR_SYSTEM_GROUPS, prepareSystemGroups(user));
+        }
+*/
+
+        JsonObject data = new JsonObject();
+        data.add("attributes", attributes);
+
+        JsonObject obj = new JsonObject();
+        obj.add("data", data);
+        return obj.toString();
+    }
+
+    private JsonArray prepareRoles(User user) {
+        JsonArray roles = new JsonArray();
+        for (Role roleObj : user.getRoles()) {
+            JsonObject role = new JsonObject();
+            role.addProperty(Role.ATTR_ID, roleObj.getId());
+            role.addProperty(Role.ATTR_NAME, roleObj.getName());
+            roles.add(role);
+        }
+        return roles;
+    }
+
+    private JsonArray prepareSystemGroups(User user) {
+        JsonArray systemGroups = new JsonArray();
+        for (Group groupObj : user.getSystemGroups()) {
+            JsonObject systemGroup = new JsonObject();
+            systemGroup.addProperty(Group.ATTR_ID, groupObj.getId());
+            systemGroup.addProperty(Group.ATTR_NAME, groupObj.getName());
+            systemGroups.add(systemGroup);
+        }
+        return systemGroups;
     }
 }
 

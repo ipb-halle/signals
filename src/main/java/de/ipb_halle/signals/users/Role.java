@@ -46,12 +46,12 @@ import javax.persistence.Table;
 @Table(name="roles")
 public class Role {
 
-    private final static String ATTR_ID = "id";
-    private final static String ATTR_COUNTS = "counts";
-    private final static String ATTR_DESCRIPTION = "description";
-    private final static String ATTR_FLAGS = "flags";
-    private final static String ATTR_NAME = "name";
-    private final static String ATTR_PRIVILEGES = "privileges";
+    public final static String ATTR_ID = "id";
+    public final static String ATTR_COUNTS = "counts";
+    public final static String ATTR_DESCRIPTION = "description";
+    public final static String ATTR_FLAGS = "flags";
+    public final static String ATTR_NAME = "name";
+    public final static String ATTR_PRIVILEGES = "privileges";
 
     @Id
     private Integer id;

@@ -25,6 +25,7 @@ import com.google.gson.JsonPrimitive;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -39,17 +40,19 @@ import javax.persistence.Table;
 @Table(name="users")
 public class User {
 
-    private final static String ATTR_ID = "userId";
-    private final static String ATTR_ALIAS = "alias";
-    private final static String ATTR_COUNTRY = "country";
-    private final static String ATTR_CREATED_AT = "createdAt";
-    private final static String ATTR_EMAIL = "email";
-    private final static String ATTR_ENABLED = "isEnabled";
-    private final static String ATTR_FIRST_NAME = "firstName";
-    private final static String ATTR_LAST_LOGIN = "lastLoginAt";
-    private final static String ATTR_LAST_NAME = "lastName";
-    private final static String ATTR_ORGANIZATION = "organization";
-    private final static String ATTR_USER_NAME = "userName";
+    public final static String ATTR_ID = "userId";
+    public final static String ATTR_ALIAS = "alias";
+    public final static String ATTR_COUNTRY = "country";
+    public final static String ATTR_CREATED_AT = "createdAt";
+    public final static String ATTR_EMAIL = "email";
+    public final static String ATTR_ENABLED = "isEnabled";
+    public final static String ATTR_FIRST_NAME = "firstName";
+    public final static String ATTR_LAST_LOGIN = "lastLoginAt";
+    public final static String ATTR_LAST_NAME = "lastName";
+    public final static String ATTR_ORGANIZATION = "organization";
+    public final static String ATTR_ROLES = "roles";
+    public final static String ATTR_SYSTEM_GROUPS = "systemGroups";
+    public final static String ATTR_USER_NAME = "userName";
     
     
     @Id
@@ -85,11 +88,12 @@ public class User {
     @Column(name="user_name")
     private String userName;
 
-    @Column
-    private String json_string;
+    @Column(name="json_string")
+    private String jsonString;
 
-    private transient JsonElement json;
     private transient SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    private transient Set<Role> roles;
+    private transient Set<Group> systemGroups;
 
     /**
      * default constructor
@@ -97,28 +101,6 @@ public class User {
     public User() {
         createdAt = new Date(0);
         lastLoginAt = new Date(0);
-    }
-
-    public static User createUser(JsonElement j) {
-        User user = new User();
-        JsonObject attributes = j.getAsJsonObject().getAsJsonObject("attributes");
-
-        user.id = j.getAsJsonObject().getAsJsonPrimitive("id").getAsInt();
-        user.json = j;
-        user.json_string = j.toString();
-
-        user.alias = attributes.getAsJsonPrimitive(ATTR_ALIAS).getAsString();
-        user.country = attributes.getAsJsonPrimitive(ATTR_COUNTRY).getAsString();
-        user.createdAt = user.parseDate(attributes.getAsJsonPrimitive(ATTR_CREATED_AT).getAsString());
-        user.email = attributes.getAsJsonPrimitive(ATTR_EMAIL).getAsString();
-        user.enabled = attributes.getAsJsonPrimitive(ATTR_EMAIL).getAsBoolean();
-        user.firstName = attributes.getAsJsonPrimitive(ATTR_FIRST_NAME).getAsString();
-        user.lastLoginAt = user.parseDate(attributes.getAsJsonPrimitive(ATTR_LAST_LOGIN).getAsString());
-        user.lastName = attributes.getAsJsonPrimitive(ATTR_LAST_NAME).getAsString();
-        user.organization = attributes.getAsJsonPrimitive(ATTR_ORGANIZATION).getAsString();
-        user.userName = attributes.getAsJsonPrimitive(ATTR_USER_NAME).getAsString();
-
-        return user;
     }
 
     public void dump() {
@@ -129,8 +111,8 @@ public class User {
         sb.append(String.format("  Organization: %s   Enabled: %s\n", organization, enabled ? "True" : "False"));
         sb.append(String.format("  Created at: %s\n", dateFormat.format(createdAt)));
         sb.append(String.format("  Last login: %s\n", dateFormat.format(lastLoginAt)));
-        sb.append((json != null) ? json.toString() : "");
-        sb.append("==============================================================");
+        sb.append((jsonString != null) ? jsonString : "");
+        sb.append("\n==============================================================");
         System.out.println(sb.toString());
     }
 
@@ -162,6 +144,10 @@ public class User {
         return firstName;
     }
 
+    public String getJsonString() {
+        return jsonString;
+    }
+
     public Date getLastLoginAt() {
         return lastLoginAt;
     }
@@ -174,12 +160,16 @@ public class User {
         return organization;
     }
 
-    public String getUserName() {
-        return userName;
+    public Set<Role> getRoles() {
+        return roles;
     }
 
-    public String getJsonString() {
-        return json_string;
+    public Set<Group> getSystemGroups() {
+        return systemGroups;
+    }
+
+    public String getUserName() {
+        return userName;
     }
 
     public Boolean isEnabled() {
@@ -194,33 +184,9 @@ public class User {
         return new Date();
     }
 
-    public String prepareJsonString() {
-        JsonObject attributes = new JsonObject();
-        attributes.addProperty(ATTR_ALIAS, alias);
-        attributes.addProperty(ATTR_COUNTRY, country);
-        attributes.addProperty(ATTR_EMAIL, email);
-        attributes.addProperty(ATTR_FIRST_NAME, firstName);
-        attributes.addProperty(ATTR_LAST_NAME, lastName);
-        attributes.addProperty(ATTR_ORGANIZATION, organization);
-/*      JsonArray roles = new JsonArray();
-        for (Role roleObj : roleObjects) {
-            JsonObject role = new JsonObject();
-            role.addProperty(Role.ATTR_ID, roleObj.getId());
-            role.addProperty(Role.ATTR_NAME, roleObj.getName());
-            roles.add(role);
-        }
-        attributes.addProperty(ATTR_ROLES, roles);
- */
-        JsonObject data = new JsonObject();
-        data.add("attributes", attributes);
 
-        JsonObject obj = new JsonObject();
-        obj.add("data", data);
-        return obj.toString();
-    }
-
-    public void setId(Integer id) {
-        id = id;
+    public void setId(Integer i) {
+        id = i;
     }
 
     public void setAlias(String a) { 
@@ -247,6 +213,10 @@ public class User {
         firstName = f;
     }
 
+    public void setJsonString(String j) {
+        jsonString = j;
+    }
+
     public void setLastLoginAt(Date d) {
         lastLoginAt = d;
     }
@@ -257,6 +227,14 @@ public class User {
 
     public void setOrganization(String o) {
         organization = o;
+    }
+
+    public void setRoles(Set<Role> r) {
+        roles = r;
+    }
+
+    public void setSystemGroups(Set<Group> g) {
+        systemGroups = g;
     }
 
     public void setUserName(String u) {
