@@ -169,13 +169,13 @@ public class UserManager {
         return null;
     }
 
-    public User fetchUser(int id) {
+    public User doGetUser(int id) {
         User user = User.createUser(fetch(id));
         save(user);
         return user;
     }
 
-    public void fetchUsers(String query, Boolean enabled) {
+    public void doGetUsers(String query, Boolean enabled) {
         UserIterator iter = new UserIterator(restClient, query,  enabled);
 
         while(iter.hasNext()) {

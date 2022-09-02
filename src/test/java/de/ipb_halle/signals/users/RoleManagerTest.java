@@ -85,7 +85,7 @@ public class RoleManagerTest {
     @Test
     public void roleManagerTest() {
 
-        manager.fetchRoles();
+        manager.doGetRoles();
         Role role = manager.loadById(TEST_ROLE_ID);
 
         assertEquals("Role name mismatch", role.getName(), TEST_ROLE_NAME);

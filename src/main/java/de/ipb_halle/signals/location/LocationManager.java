@@ -76,7 +76,7 @@ public class LocationManager {
         return null;
     }
 
-    public Location fetchLocation(String id) {
+    public Location doGetLocation(String id) {
         Location loc = Location.createLocation(fetch(id));
         save(loc);
         return loc;

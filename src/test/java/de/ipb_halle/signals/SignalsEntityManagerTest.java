@@ -83,7 +83,7 @@ public class SignalsEntityManagerTest {
     @Test
     public void entityTest() {
 
-        manager.fetchSignalsEntities("location");
+        manager.doGet("location");
         SignalsEntity entity = manager.loadById(TEST_LOCATION_ID);
 
         assertEquals("entity type mismatch", entity.getType(), "location");

@@ -51,7 +51,7 @@ public class Signals {
 
     public void doIt() {
 
-//          signalsMgr.fetchSignalsEntities("location");
+//          signalsMgr.doGet("location");
 
 /*
             System.out.println("Users\n=====");

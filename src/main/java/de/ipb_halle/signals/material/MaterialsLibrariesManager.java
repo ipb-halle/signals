@@ -75,7 +75,7 @@ public class MaterialsLibrariesManager {
         return null; 
     }
 
-    public void fetchMaterialsLibraries() {
+    public void doGetMaterialsLibraries() {
         Iterator<JsonElement> iter = fetch();
 
         while(iter.hasNext()) {

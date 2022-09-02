@@ -83,7 +83,7 @@ public class LocationManagerTest {
     @Test
     public void locationManagerTest() {
 
-        Location loc = manager.fetchLocation(TEST_LOCATION_ID);
+        Location loc = manager.doGetLocation(TEST_LOCATION_ID);
         assertEquals("Location name mismatch", loc.getName(), TEST_LOCATION_NAME);
 
         loc = manager.loadById(TEST_LOCATION_ID);

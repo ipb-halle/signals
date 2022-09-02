@@ -145,13 +145,13 @@ public class RoleManager {
         return null;
     }
 
-    public Role fetchRole(int id) {
+    public Role doGetRole(int id) {
         Role role = Role.createRole(fetch(id));
         save(role);
         return role;
     }
 
-    public void fetchRoles() {
+    public void doGetRoles() {
         RoleIterator iter = new RoleIterator(restClient);
 
         while(iter.hasNext()) {

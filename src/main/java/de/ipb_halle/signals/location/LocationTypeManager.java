@@ -126,7 +126,7 @@ public class LocationTypeManager {
         }
     }
 
-    public void fetchLocationTypes() {
+    public void doGetLocationTypes() {
         LocationTypeIterator iter = new LocationTypeIterator(restClient);
 
         while(iter.hasNext()) {

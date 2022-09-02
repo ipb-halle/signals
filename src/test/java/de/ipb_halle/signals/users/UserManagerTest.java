@@ -96,14 +96,14 @@ public class UserManagerTest {
     @Test
     public void userManagerTest() {
 
-        manager.fetchUsers(TEST_USER1_LAST_NAME, true);
+        manager.doGetUsers(TEST_USER1_LAST_NAME, true);
         User user = manager.loadById(TEST_USER1_ID);
 
         assertEquals("user alias mismatch", user.getAlias(), TEST_USER1_ALIAS);
         assertEquals("user first name mismatch", user.getFirstName(), TEST_USER1_FIRST_NAME);
         assertEquals("user last name mismatch", user.getLastName(), TEST_USER1_LAST_NAME);
 
-        user = manager.fetchUser(TEST_USER2_ID);
+        user = manager.doGetUser(TEST_USER2_ID);
         assertEquals("user last name mismatch", user.getLastName(),TEST_USER2_LAST_NAME);
     }
 }

@@ -132,7 +132,7 @@ public class SignalsEntityManager {
         System.out.println("SignalsEntityManager() called.");
     }
 
-    public void fetchSignalsEntities(String includeTypes) {
+    public void doGet(String includeTypes) {
         SignalsEntityIterator iter = new SignalsEntityIterator(restClient, includeTypes);
 
         while(iter.hasNext()) {
