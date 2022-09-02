@@ -194,6 +194,31 @@ public class User {
         return new Date();
     }
 
+    public String prepareJsonString() {
+        JsonObject attributes = new JsonObject();
+        attributes.addProperty(ATTR_ALIAS, alias);
+        attributes.addProperty(ATTR_COUNTRY, country);
+        attributes.addProperty(ATTR_EMAIL, email);
+        attributes.addProperty(ATTR_FIRST_NAME, firstName);
+        attributes.addProperty(ATTR_LAST_NAME, lastName);
+        attributes.addProperty(ATTR_ORGANIZATION, organization);
+/*      JsonArray roles = new JsonArray();
+        for (Role roleObj : roleObjects) {
+            JsonObject role = new JsonObject();
+            role.addProperty(Role.ATTR_ID, roleObj.getId());
+            role.addProperty(Role.ATTR_NAME, roleObj.getName());
+            roles.add(role);
+        }
+        attributes.addProperty(ATTR_ROLES, roles);
+ */
+        JsonObject data = new JsonObject();
+        data.add("attributes", attributes);
+
+        JsonObject obj = new JsonObject();
+        obj.add("data", data);
+        return obj.toString();
+    }
+
     public void setId(Integer id) {
         id = id;
     }

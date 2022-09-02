@@ -54,7 +54,7 @@ public class RestClientImpl implements RestClient {
 
     private String endpoint;
     private Method method;
-    private String query;
+    private String requestData;
     private String response;
     private int responseCode;
     private URL url;
@@ -69,13 +69,17 @@ public class RestClientImpl implements RestClient {
     }
 
     public RestClient execute() throws IOException, MalformedURLException, UnexpectedResponseCodeException {
+        return execute(HttpURLConnection.HTTP_OK);
+    }
+
+    public RestClient execute(int expectedResponseCode) throws IOException, MalformedURLException, UnexpectedResponseCodeException {
         HttpURLConnection urlConn = (HttpURLConnection) getURL().openConnection();
         urlConn.setRequestMethod(method.toString());
         urlConn.setRequestProperty("accept", "application/vnd.api+json");
         urlConn.setRequestProperty("X-API-KEY", signalsConfig.getApiKey());
 
-        if (query != null) {
-            urlConn.getOutputStream().write(query.getBytes(UTF8));
+        if (requestData != null) {
+            urlConn.getOutputStream().write(requestData.getBytes(UTF8));
         }
 
         responseCode = urlConn.getResponseCode();
@@ -89,7 +93,7 @@ public class RestClientImpl implements RestClient {
             setResponse(sb.toString());
         } 
 
-        if (responseCode != HttpURLConnection.HTTP_OK) {
+        if (responseCode != expectedResponseCode) {
             throw new UnexpectedResponseCodeException();
         }
 
@@ -140,8 +144,9 @@ public class RestClientImpl implements RestClient {
     }
 
     public RestClient reset() {
-        urlParameterMap = new HashMap<> ();
         method = Method.GET;
+        requestData = null;
+        urlParameterMap = new HashMap<> ();
         return this;
     }
 
@@ -155,13 +160,13 @@ public class RestClientImpl implements RestClient {
         return this;
     }
 
-    public RestClient setQuery(String q) {
-        query = q;
+    public RestClient setMethod(Method m) {
+        this.method = m;
         return this;
     }
 
-    public RestClient setMethod(Method m) {
-        this.method = m;
+    public RestClient setRequestData(String data) {
+        requestData = data;
         return this;
     }
 

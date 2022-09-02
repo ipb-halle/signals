@@ -169,12 +169,43 @@ public class UserManager {
         return null;
     }
 
+    /**
+     * POST -- create user
+     */
+    public User doCreateUser(User user) {
+        try {
+            restClient.reset()
+                .setMethod(Method.POST)
+                .setEndpoint(USERS_ENDPOINT)
+                .setRequestData(user.prepareJsonString())
+                .execute(RestClient.HTTP_CREATED);
+
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
+            return User.createUser(jsonResult.getAsJsonObject().get("data"));
+
+        } catch(UnexpectedResponseCodeException ue) {
+            System.out.println("Unexpected code");
+        } catch(MalformedURLException me) {
+            System.out.println("Malformed URL");
+        } catch(IOException ioe) {
+            System.out.println("IOException");
+            ioe.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * GET user by id and save it to the database
+     */
     public User doGetUser(int id) {
         User user = User.createUser(fetch(id));
         save(user);
         return user;
     }
 
+    /**
+     * GET users -- obtain list of users and save them to the database
+     */
     public void doGetUsers(String query, Boolean enabled) {
         UserIterator iter = new UserIterator(restClient, query,  enabled);
 

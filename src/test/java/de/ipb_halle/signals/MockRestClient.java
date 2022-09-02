@@ -42,7 +42,7 @@ public class MockRestClient extends RestClientImpl {
     }
 
     @Override
-    public RestClient execute() throws IOException, MalformedURLException, UnexpectedResponseCodeException {
+    public RestClient execute(int expectedResponseCode) throws IOException, MalformedURLException, UnexpectedResponseCodeException {
         StringJoiner sj = new StringJoiner(":");
         String key = sj.add(getMethod().toString())
                 .add(getURL().toString())
