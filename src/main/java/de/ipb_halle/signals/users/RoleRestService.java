@@ -25,6 +25,8 @@ import com.google.gson.JsonPrimitive;
 
 import de.ipb_halle.signals.Method;
 import de.ipb_halle.signals.RestClient;
+import de.ipb_halle.signals.RestResultIterator;
+import de.ipb_halle.signals.RestService;
 import de.ipb_halle.signals.UnexpectedResponseCodeException;
 
 import java.io.IOException;
@@ -35,7 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import javax.ejb.Stateless;
+import javax.ejb.Local;
 import javax.inject.Inject;
 
 
@@ -43,85 +45,16 @@ import javax.inject.Inject;
  * Signals REST API service for roles
  */
 
-@Stateless
-public class RoleRestService {
+@Local
+public class RoleRestService implements RestService<Role> {
 
     public final String ROLES_ENDPOINT = "/roles";
     public final String ROLE_ENDPOINT = "/roles/%d";
 
     @Inject
     private RestClient restClient;
-    
 
-    private class RoleIterator implements Iterator<Role> {
-        private RestClient client;
-        private JsonElement jsonResult;
-        private Iterator<JsonElement> jsonIterator;
-
-        public RoleIterator(RestClient c) {
-            client = c;
-            initialFetch();
-        }
-
-        private void initialFetch() {
-            try {
-                client.reset()
-                    .setEndpoint(ROLES_ENDPOINT)
-                    .execute();
-
-                jsonResult = JsonParser.parseString(client.getResponse());
-                jsonIterator = jsonResult.getAsJsonObject().getAsJsonArray("data").iterator();
-
-            } catch(UnexpectedResponseCodeException ue) {
-                System.out.println("Unexpected code");
-            } catch(MalformedURLException me) {
-                System.out.println("Malformed URL");
-            } catch(IOException ioe) {
-                System.out.println("IOException");
-                ioe.printStackTrace();
-            }
-        }
-
-        private void fetchPage(String url) {
-            try {
-                client.setURL(url)
-                    .execute();
-
-                jsonResult = JsonParser.parseString(client.getResponse());
-                jsonIterator = jsonResult.getAsJsonObject().getAsJsonArray("data").iterator();
-
-            } catch(UnexpectedResponseCodeException ue) {
-                System.out.println("Unexpected code");
-            } catch(MalformedURLException me) {
-                System.out.println("Malformed URL");
-            } catch(IOException ioe) {
-                System.out.println("IOException");
-                ioe.printStackTrace();
-            }
-        }
-
-        public boolean hasNext() {
-            if (jsonIterator.hasNext()) {
-                return true;
-            }
-            JsonObject links = jsonResult.getAsJsonObject().getAsJsonObject("links");
-            if (links.has("next")) {
-                
-                fetchPage(links.getAsJsonPrimitive("next").getAsString());
-                return jsonIterator.hasNext();
-            }
-            return false;
-        }
-
-        public Role next() {
-            if (hasNext()) {
-                return createRole(jsonIterator.next());
-            }
-            throw new NoSuchElementException();
-        }
-    }
-
-    private Role createRole(JsonElement j) {
+    public Role createEntity(JsonElement j) {
         JsonObject attributes = j.getAsJsonObject().getAsJsonObject("attributes");
 
         Role role = new Role();
@@ -134,14 +67,14 @@ public class RoleRestService {
         return role;
     }
 
-    private JsonElement fetch(int id) {
+    public Role doGetRole(int id) {
         try {
             restClient.reset()
                 .setEndpoint(String.format(ROLE_ENDPOINT, id))
                 .execute();
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
-            return jsonResult.getAsJsonObject().get("data");
+            return createEntity(jsonResult.getAsJsonObject().get("data"));
 
         } catch(UnexpectedResponseCodeException ue) {
             System.out.println("Unexpected code");
@@ -154,14 +87,13 @@ public class RoleRestService {
         return null;
     }
 
-    public Role doGetRole(int id) {
-        return createRole(fetch(id));
-    }
-
     public List<Role> doGetRoles() {
-        List<Role> roles = new ArrayList<> ();
-        RoleIterator iter = new RoleIterator(restClient);
+        restClient.reset()
+            .setMethod(Method.GET)
+            .setEndpoint(ROLES_ENDPOINT);
 
+        RestResultIterator<Role> iter = new RestResultIterator<> (restClient, this, false);
+        List<Role> roles = new ArrayList<> ();
         while(iter.hasNext()) {
             roles.add(iter.next());
         }
@@ -176,4 +108,3 @@ public class RoleRestService {
         }
     }
 }
-
