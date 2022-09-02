@@ -21,6 +21,7 @@ import de.ipb_halle.signals.MockRestClient;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 import javax.inject.Inject;
 import org.junit.Before;
@@ -59,7 +60,7 @@ public class RoleManagerTest {
 
     @Module
     @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
-        Role.class, RolePriv.class, RoleManager.class })
+        Role.class, RolePriv.class, RoleDbService.class, RoleManager.class, RoleRestService.class })
     public EjbJar app() {
         return new EjbJar();
     }
@@ -85,8 +86,9 @@ public class RoleManagerTest {
     @Test
     public void roleManagerTest() {
 
-        manager.doGetRoles();
-        Role role = manager.loadById(TEST_ROLE_ID);
+        List<Role> roles = manager.getSnbRoles();
+        manager.save(roles);
+        Role role = manager.getDbRole(TEST_ROLE_ID);
 
         assertEquals("Role name mismatch", role.getName(), TEST_ROLE_NAME);
         assertEquals("Role description mismatch", role.getDescription(), TEST_ROLE_DESCRIPTION);

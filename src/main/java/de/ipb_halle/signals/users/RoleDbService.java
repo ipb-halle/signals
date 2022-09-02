@@ -17,40 +17,30 @@
  */
 package de.ipb_halle.signals.users;
 
-import java.util.List;
+import java.util.Iterator;
 
 import javax.ejb.Stateless;
-import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 
 /** 
- * Manager for signals roles
+ * DB service for roles
  */
 
 @Stateless
-public class RoleManager {
+public class RoleDbService {
 
-    @Inject
-    private RoleDbService dbService;
 
-    @Inject
-    private RoleRestService restService;
-    
-    public Role getDbRole(int id) {
-        return dbService.loadById(id);
+    @PersistenceContext(unitName="signalsDB")
+    private EntityManager em;
+
+    public Role loadById(int id) {
+        return this.em.find(Role.class, id);
     }
 
-    public Role getSnbRole(int id) {
-        return restService.doGetRole(id);
-    }
-
-    public List<Role> getSnbRoles() {
-        return restService.doGetRoles();
-    }
-
-    public void save(List<Role> roles) {
-        for (Role r : roles) {
-            dbService.save(r);
-        }
+    public void save(Role r) {
+        this.em.merge(r);
     }
 }
+

@@ -17,11 +17,6 @@
  */
 package de.ipb_halle.signals.users;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;

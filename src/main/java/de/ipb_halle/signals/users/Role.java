@@ -66,10 +66,8 @@ public class Role {
     @JoinColumn(name = "role_id")
     private Set<RolePriv> privileges;
 
-    @Column
-    private String json_string;
-
-    private transient JsonElement json;
+    @Column(name="json_string")
+    private String jsonString;
 
     public Role() {
         privileges = new HashSet<> ();
@@ -78,21 +76,6 @@ public class Role {
     public Role addPrivilege(RolePrivilege p) {
         privileges.add(new RolePriv(id,p));
         return this;
-    }
-
-    public static Role createRole(JsonElement j) {
-        Role role = new Role();
-        JsonObject attributes = j.getAsJsonObject().getAsJsonObject("attributes");
-
-        role.id = j.getAsJsonObject().getAsJsonPrimitive("id").getAsInt();
-        role.json = j;
-        role.json_string = j.toString();
-
-        role.description = attributes.getAsJsonPrimitive(ATTR_DESCRIPTION).getAsString();
-        role.name = attributes.getAsJsonPrimitive(ATTR_NAME).getAsString();
-        role.parsePrivileges(attributes.getAsJsonObject(ATTR_PRIVILEGES));
-
-        return role;
     }
 
     public void dump() {
@@ -133,31 +116,27 @@ public class Role {
     }
 
     public String getJsonString() {
-        return json_string;
+        return jsonString;
     }
 
     public boolean hasPrivilege(RolePrivilege p) {
         return privileges.contains(new RolePriv(id, p));
     }
 
-    public void parsePrivileges(JsonObject json) {
-        for(String key : json.keySet()) {
-            if (json.getAsJsonPrimitive(key).getAsBoolean()) {
-                privileges.add(new RolePriv(id, RolePrivilege.valueOf(key)));
-            }
-        }
-    }
-
     public void removePrivilege(RolePrivilege p) {
         privileges.remove(p);
     }
 
-    public void setId(Integer id) {
-        id = id;
+    public void setId(Integer i) {
+        id = i;
     }
 
     public void setDescription(String d) { 
         description = d;
+    }
+
+    public void setJsonString(String j) {
+        jsonString = j;
     }
 
     public void setName(String n) {
