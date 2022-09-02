@@ -17,43 +17,32 @@
  */
 package de.ipb_halle.signals.users;
 
-import java.util.List;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 
 /** 
- * The UserManager can fetch users from Signals Notebook and from LDAP,
- * store them in an SQL databas and synchronize among the various sources.
+ * Database Service for users
  */
 
 @Stateless
-public class UserManager {
+public class UserDbService {
 
-    @Inject
-    private UserDbService dbService;
+    @PersistenceContext(unitName="signalsDB")
+    private EntityManager em;
 
-    @Inject
-    private UserRestService restService;
 
-    @Inject
-    private LdapClient ldapClient;
-
-    public User getDbUser(int id) {
-        return dbService.loadById(id);
+    public User loadById(int id) {
+        return this.em.find(User.class, id);
     }
 
-    public User getSnbUser(int id) {
-        return restService.doGetUser(id);
-    }
-
-    public List<User> getSnbUsers(String query, boolean enabled) {
-        return restService.doGetUsers(query, enabled);
-    }
-
-    public void save(List<User> users) {
-        for (User u : users) {
-            dbService.save(u);
-        }
+    public void save(User u) {
+        this.em.merge(u);
     }
 }
+

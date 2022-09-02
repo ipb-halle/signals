@@ -21,6 +21,7 @@ import de.ipb_halle.signals.MockRestClient;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 import javax.inject.Inject;
 import org.junit.Before;
@@ -66,8 +67,8 @@ public class UserManagerTest {
     private UserManager manager;
 
     @Module
-    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
-        User.class, UserManager.class })
+    @Classes(cdi = true, value = { MockRestClient.class, MockLdapClient.class, SignalsConfig.class,
+        User.class, UserDbService.class, UserManager.class, UserRestService.class })
     public EjbJar app() {
         return new EjbJar();
     }
@@ -96,14 +97,15 @@ public class UserManagerTest {
     @Test
     public void userManagerTest() {
 
-        manager.doGetUsers(TEST_USER1_LAST_NAME, true);
-        User user = manager.loadById(TEST_USER1_ID);
+        List<User> users = manager.getSnbUsers(TEST_USER1_LAST_NAME, true);
+        manager.save(users);
+        User user = manager.getDbUser(TEST_USER1_ID);
 
         assertEquals("user alias mismatch", user.getAlias(), TEST_USER1_ALIAS);
         assertEquals("user first name mismatch", user.getFirstName(), TEST_USER1_FIRST_NAME);
         assertEquals("user last name mismatch", user.getLastName(), TEST_USER1_LAST_NAME);
 
-        user = manager.doGetUser(TEST_USER2_ID);
+        user = manager.getSnbUser(TEST_USER2_ID);
         assertEquals("user last name mismatch", user.getLastName(),TEST_USER2_LAST_NAME);
     }
 }
