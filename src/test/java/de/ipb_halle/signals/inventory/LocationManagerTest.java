@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.location;
+package de.ipb_halle.signals.inventory;
 
 import de.ipb_halle.signals.MockRestClient;
 import de.ipb_halle.signals.SignalsConfig;
@@ -57,7 +57,7 @@ public class LocationManagerTest {
 
     @Module
     @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
-        Location.class, LocationManager.class })
+        Location.class, LocationDbService.class, LocationManager.class, LocationRestService.class })
     public EjbJar app() {
         return new EjbJar();
     }
@@ -83,10 +83,11 @@ public class LocationManagerTest {
     @Test
     public void locationManagerTest() {
 
-        Location loc = manager.doGetLocation(TEST_LOCATION_ID);
+        Location loc = manager.getSnbLocation(TEST_LOCATION_ID);
+        manager.save(loc);
         assertEquals("Location name mismatch", loc.getName(), TEST_LOCATION_NAME);
 
-        loc = manager.loadById(TEST_LOCATION_ID);
+        loc = manager.getDbLocation(TEST_LOCATION_ID);
         assertEquals("Location barcode mismatch", loc.getBarcode(), TEST_LOCATION_BARCODE);
     }
 }

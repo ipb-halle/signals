@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.location;
+package de.ipb_halle.signals.inventory;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -25,6 +25,7 @@ import com.google.gson.JsonPrimitive;
 
 import de.ipb_halle.signals.Method;
 import de.ipb_halle.signals.RestClient;
+import de.ipb_halle.signals.RestService;
 import de.ipb_halle.signals.UnexpectedResponseCodeException;
 
 import java.io.IOException;
@@ -33,27 +34,38 @@ import java.net.MalformedURLException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import javax.ejb.Stateless;
+import javax.ejb.Local;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 
 /** 
  * Manager for signals locations (inventory/location API endpoint) 
  */
 
-@Stateless
-public class LocationManager {
+@Local
+public class LocationRestService implements RestService<Location> {
 
     public final String LOCATION_ENDPOINT = "/inventory/locations/%s";
-
-    @PersistenceContext(unitName="signalsDB")
-    private EntityManager em;
 
     @Inject
     private RestClient restClient;
     
+    public Location createEntity(JsonElement j) {
+        JsonObject attributes = j.getAsJsonObject().getAsJsonObject("attributes");
+
+        Location loc = new Location();
+        loc.setId(j.getAsJsonObject().getAsJsonPrimitive(Location.ATTR_ID).getAsString());
+        loc.setBarcode(attributes.getAsJsonPrimitive(Location.ATTR_BARCODE).getAsString());
+        loc.setName(attributes.getAsJsonPrimitive(Location.ATTR_NAME).getAsString());
+        loc.setDescription(attributes.getAsJsonPrimitive(Location.ATTR_DESCRIPTION).getAsString());
+        loc.setGrid(attributes.getAsJsonPrimitive(Location.ATTR_GRID).getAsBoolean());
+        loc.setJsonString(j.toString());
+        loc.setTypeId(attributes.getAsJsonPrimitive(Location.ATTR_TYPE_ID).getAsString());
+        loc.setTypeName(attributes.getAsJsonPrimitive(Location.ATTR_TYPE_NAME).getAsString());
+
+        parseAncestor(loc, attributes.getAsJsonArray(Location.ATTR_ANCESTORS));
+        return loc;
+    }
 
 
     private JsonElement fetch(String id) {
@@ -77,18 +89,17 @@ public class LocationManager {
     }
 
     public Location doGetLocation(String id) {
-        Location loc = Location.createLocation(fetch(id));
-        save(loc);
-        return loc;
+        return createEntity(fetch(id));
     }
 
-    public Location loadById(String id) {
-        return this.em.find(Location.class, id);
+    public void parseAncestor(Location loc, JsonArray ancestors) {
+        if (ancestors.size() > 0) {
+            JsonObject obj = ancestors.get(0).getAsJsonObject();
+            loc.setAncestorId(obj.getAsJsonPrimitive(Location.ATTR_ANCESTOR_ID).getAsString());
+            loc.setAncestorName(obj.getAsJsonPrimitive(Location.ATTR_ANCESTOR_NAME).getAsString());
+            return;
+        }
+        loc.setAncestorId(null);
+        loc.setAncestorName(null);
     }
-
-    public void save(Location loc) {
-        this.em.merge(loc);
-    }
-
 }
-

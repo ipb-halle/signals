@@ -15,12 +15,7 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.location;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+package de.ipb_halle.signals.inventory;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,8 +27,12 @@ import javax.persistence.Table;
  */
 
 @Entity
-@Table(name="location_types")
-public class LocationType {
+@Table(name="container_types")
+public class ContainerType {
+
+    public final static String ATTR_ID = "id";
+    public final static String ATTR_DESCRIPTION = "description";
+    public final static String ATTR_NAME = "name";
 
     @Id
     private String id;
@@ -44,27 +43,12 @@ public class LocationType {
     @Column
     private String description;
 
-    @Column
-    private String json_string;
+    @Column(name="json_string")
+    private String jsonString;
 
-    private transient JsonElement json;
-
-    public static LocationType createLocationType(JsonElement j) {
-        LocationType lt = new LocationType();
-        JsonObject attributes = j.getAsJsonObject().getAsJsonObject("attributes");
-
-        lt.id = j.getAsJsonObject().getAsJsonPrimitive("id").getAsString();
-        lt.json = j;
-        lt.json_string = j.toString();
-
-        lt.name = attributes.getAsJsonPrimitive("name").getAsString();
-        lt.description = attributes.getAsJsonPrimitive("description").getAsString();
-        return lt;
-    }
 
     public void dump() {
-        System.out.println("LocationType " + id);
-        System.out.println(json.toString());
+        System.out.printf("ContainerType(%s): %s\n", id, name);
         System.out.println("==============================================================");
     }
 
@@ -81,11 +65,11 @@ public class LocationType {
     }
 
     public String getJsonString() {
-        return json_string;
+        return jsonString;
     }
 
-    public void setId(String id) {
-        id = id;
+    public void setId(String i) {
+        id = i;
     }
 
     public void setName(String n) {
@@ -94,5 +78,9 @@ public class LocationType {
 
     public void setDescription(String d) {
         description = d;
+    }
+
+    public void setJsonString(String j) {
+        jsonString = j;
     }
 }

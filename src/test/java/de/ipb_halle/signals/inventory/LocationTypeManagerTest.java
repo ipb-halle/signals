@@ -15,11 +15,12 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.location;
+package de.ipb_halle.signals.inventory;
 
 import de.ipb_halle.signals.MockRestClient;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
+import java.util.List;
 import java.util.Properties;
 import javax.inject.Inject;
 import org.junit.Before;
@@ -53,8 +54,8 @@ public class LocationTypeManagerTest {
     private LocationTypeManager manager;
 
     @Module
-    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
-        LocationType.class, LocationTypeManager.class })
+    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class, // RestResultIterator.class, RestService.class,
+        LocationType.class, LocationTypeDbService.class, LocationTypeManager.class, LocationTypeRestService.class })
     public EjbJar app() {
         return new EjbJar();
     }
@@ -79,9 +80,10 @@ public class LocationTypeManagerTest {
     @Test
     public void locationTypeManagerTest() {
 
-        manager.doGetLocationTypes();
+        List<LocationType> ltypes = manager.getSnbLocationTypes();
+        manager.save(ltypes);
 
-        LocationType lt = manager.loadById(TEST_LOCATION_TYPE_ID);
+        LocationType lt = manager.getDbLocationType(TEST_LOCATION_TYPE_ID);
         assertEquals("LocationType name mismatch", lt.getName(), TEST_LOCATION_TYPE_NAME);
     }
 }

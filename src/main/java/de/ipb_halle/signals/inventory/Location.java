@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.location;
+package de.ipb_halle.signals.inventory;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -34,6 +34,17 @@ import javax.persistence.Table;
 @Entity
 @Table(name="locations")
 public class Location {
+
+    public final static String ATTR_ID = "id";
+    public final static String ATTR_ANCESTORS = "ancestors";
+    public final static String ATTR_ANCESTOR_ID = "id";
+    public final static String ATTR_ANCESTOR_NAME = "name";
+    public final static String ATTR_BARCODE = "barcode";
+    public final static String ATTR_DESCRIPTION = "description";
+    public final static String ATTR_GRID = "isGrid";
+    public final static String ATTR_NAME = "name";
+    public final static String ATTR_TYPE_ID = "typeId";
+    public final static String ATTR_TYPE_NAME = "typeName";
 
     @Id
     private String id;
@@ -68,8 +79,8 @@ public class Location {
     @Column(name="ancestor_name")
     private String ancestorName;
 
-    @Column
-    private String json_string;
+    @Column(name="json_string")
+    private String jsonString;
 
 
     private transient LocationType type;
@@ -81,25 +92,6 @@ public class Location {
      */
     public Location() {
         grid = false;
-    }
-
-    public static Location createLocation(JsonElement j) {
-        Location loc = new Location();
-        JsonObject attributes = j.getAsJsonObject().getAsJsonObject("attributes");
-
-        loc.id = j.getAsJsonObject().getAsJsonPrimitive("id").getAsString();
-        loc.json = j;
-        loc.json_string = j.toString();
-
-        loc.barcode = attributes.getAsJsonPrimitive("barcode").getAsString();
-        loc.name = attributes.getAsJsonPrimitive("name").getAsString();
-        loc.description = attributes.getAsJsonPrimitive("description").getAsString();
-        loc.grid = attributes.getAsJsonPrimitive("isGrid").getAsBoolean();
-        loc.typeId = attributes.getAsJsonPrimitive("typeId").getAsString();
-        loc.typeId = attributes.getAsJsonPrimitive("typeName").getAsString();
-
-        loc.setAncestor(attributes.getAsJsonArray("ancestors"));
-        return loc;
     }
 
     public void dump() {
@@ -124,24 +116,24 @@ public class Location {
         return barcode;
     }
 
-    public String getName() {
-        return name;
+    public Integer getColumns() {
+        return columns;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public boolean isGrid() {
-        return grid;
+    public String getJsonString() {
+        return jsonString;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Integer getRows() {
         return rows;
-    }
-
-    public Integer getColumns() {
-        return columns;
     }
 
     public String getTypeId() {
@@ -152,38 +144,34 @@ public class Location {
         return typeName;
     }
 
-    public String getJsonString() {
-        return json_string;
+    public boolean isGrid() {
+        return grid;
     }
 
-    public void setAncestor(JsonArray ancestors) {
-        if (ancestors.size() > 0) {
-            JsonObject obj = ancestors.get(0).getAsJsonObject();
-            ancestorId = obj.getAsJsonPrimitive("id").getAsString();
-            ancestorName = obj.getAsJsonPrimitive("name").getAsString();
-            return;
-        }
-        ancestor = null;
-        ancestorId = null;
-        ancestorName = null;
-    }
-
-    public void setId(String id) {
-        id = id;
+    public void setId(String i) {
+        id = i;
     }
 
     public void setAncestor(Location l) {
-        ancestor = l;
         ancestorId = l.getAncestorId();
         ancestorName = l.getAncestorName();
+    }
+
+    public void setAncestorId(String id) {
+        ancestorId = id;
+    }
+
+    public void setAncestorName(String n) {
+        ancestorName = n;
     }
 
     public void setBarcode(String b) {
         barcode = b;
     }
 
-    public void setName(String n) {
-        name = n;
+    public void setColumns(Integer col) {
+        columns = col;
+        grid = true;
     }
 
     public void setDescription(String d) {
@@ -194,9 +182,12 @@ public class Location {
         grid = g;
     }
 
-    public void setColumns(Integer col) {
-        columns = col;
-        grid = true;
+    public void setJsonString(String j) {
+        jsonString = j;
+    }
+
+    public void setName(String n) {
+        name = n;
     }
 
     public void setRows(Integer r) {
@@ -209,5 +200,12 @@ public class Location {
         typeId = t.getId();
         typeName = t.getName();
     }
-    
+
+    public void setTypeId(String i) {
+        typeId = i;
+    }
+
+    public void setTypeName(String n) {
+        typeName = n;
+    }
 }
