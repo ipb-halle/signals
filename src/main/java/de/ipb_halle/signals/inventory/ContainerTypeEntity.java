@@ -17,80 +17,58 @@
  */
 package de.ipb_halle.signals.inventory;
 
-import de.ipb_halle.signals.entity.Attachment;
-import de.ipb_halle.signals.entity.FieldDefinition;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /** 
- * Container Type DTO
+ * Container type entity
  */
 
-public class ContainerType {
+@Entity
+@Table(name="container_types")
+public class ContainerTypeEntity {
 
-    public final static String ATTR_ID = "id";
-    public final static String ATTR_ATTACHMENTS = "attachments";
-    public final static String ATTR_CREATED_AT = "createdAt";
-    public final static String ATTR_DESCRIPTION = "description";
-    public final static String ATTR_FIELDS = "fields";
-    public final static String ATTR_IN_USE = "inUse";
-    public final static String ATTR_MOVABLE = "isMovable";
-    public final static String ATTR_NAME = "name";
-    public final static String ATTR_TYPE = "entityType";
-    public final static String ATTR_UPDATED_AT = "updatedAt";
 
+    @Id
     private String id;
 
-    private Set<Attachment> attachments;
-
+    @Column(name="created_at")
     private Date createdAt;
 
+    @Column
     private String description;
 
-    private Set<FieldDefinition> fieldDefinitions;
-
+    @Column(name="in_use")
     private boolean inUse;
 
+    @Column
     private boolean movable;
     
+    @Column
     private String name;
 
+    @Column(name="json_string")
     private String jsonString;
 
+    @Column(name="updated_at")
     private Date updatedAt;
 
     /**
      * default constructor
      */
-    public ContainerType() {
+    public ContainerTypeEntity() {
         createdAt = new Date();
         updatedAt = new Date();
-        attachments = new HashSet<> ();
-        fieldDefinitions = new HashSet<> ();
-    }
-
-    public void dump() {
-        System.out.printf("ContainerType(%s): %s\n", id, name);
-        System.out.println("==============================================================");
     }
 
     public String getId() {
         return id;
     }
 
-    public void addAttachment(Attachment a) {
-        attachments.add(a);
-    }
-
-    public void addFieldDefinition(FieldDefinition f) {
-        fieldDefinitions.add(f);
-    }
-
-    public Set<Attachment> getAttachments() {
-        return attachments;
-    }
 
     public Date getCreatedAt() {
         return createdAt;
@@ -98,10 +76,6 @@ public class ContainerType {
 
     public String getDescription() {
         return description;
-    }
-
-    public Set<FieldDefinition> getFieldDefinitions() {
-        return fieldDefinitions;
     }
 
     public String getJsonString() {
@@ -124,20 +98,8 @@ public class ContainerType {
         return movable;
     }
 
-    public void removeAttachment(Attachment a) {
-        attachments.remove(a);
-    }
-
-    public void removeFieldDefinition(FieldDefinition f) {
-        fieldDefinitions.remove(f);       
-    }
-
     public void setId(String i) {
         id = i;
-    }
-
-    public void setAttachments(Set<Attachment> a) {
-        attachments = a;
     }
 
     public void setCreatedAt(Date d) {
@@ -146,10 +108,6 @@ public class ContainerType {
 
     public void setDescription(String d) {
         description = d;
-    }
-
-    public void setFieldDefinitions(Set<FieldDefinition> fd) {
-        fieldDefinitions = fd;
     }
 
     public void setMovable(boolean m) {

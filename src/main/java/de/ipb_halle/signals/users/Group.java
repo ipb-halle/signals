@@ -17,8 +17,6 @@
  */
 package de.ipb_halle.signals.users;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.persistence.CascadeType;
@@ -76,8 +74,6 @@ public class Group {
     @Column(name="json_string")
     private String jsonString;
 
-    private transient SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-
     public void dump() {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("Group(%d) --> %s\n", id, name));
@@ -117,14 +113,6 @@ public class Group {
 
     public boolean isSystem() {
         return system;
-    }
-
-    public Date parseDate(String ds) {
-        try {
-            return dateFormat.parse(ds);
-        } catch(Exception e) {
-        }
-        return new Date();
     }
 
     public void setId(Integer i) {

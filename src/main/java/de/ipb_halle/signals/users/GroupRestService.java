@@ -25,6 +25,7 @@ import com.google.gson.JsonPrimitive;
 
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
+import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestResultIterator;
 import de.ipb_halle.signals.rest.RestService;
 import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
@@ -32,6 +33,7 @@ import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -62,11 +64,11 @@ public class GroupRestService implements RestService<Group> {
 
         Group group = new Group();
         group.setId(attributes.getAsJsonPrimitive(Group.ATTR_ID).getAsInt());
-        group.setCreatedAt(group.parseDate(attributes.getAsJsonPrimitive(Group.ATTR_CREATED_AT).getAsString()));
+        group.setCreatedAt(RestHelper.parseDate(attributes, Group.ATTR_CREATED_AT, new Date()));
         group.setDescription(getOptionalStringAttribute(attributes, Group.ATTR_DESCRIPTION));
         // digest
         // eid
-        group.setEditedAt(group.parseDate(attributes.getAsJsonPrimitive(Group.ATTR_EDITED_AT).getAsString()));
+        group.setEditedAt(RestHelper.parseDate(attributes, Group.ATTR_EDITED_AT, new Date()));
         //flags
         group.setJsonString(j.toString());
         group.setName(attributes.getAsJsonPrimitive(Group.ATTR_NAME).getAsString());

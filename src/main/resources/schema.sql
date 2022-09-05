@@ -65,3 +65,32 @@ CREATE TABLE groups (
     snb_type VARCHAR,
     json_string VARCHAR
 );
+
+CREATE TABLE field_definitions (
+    id VARCHAR NOT NULL PRIMARY KEY,
+    attribute_list_eid VARCHAR,
+    default_unit VARCHAR,
+    description VARCHAR,
+    field_type VARCHAR,
+    hidden VARCHAR,
+    key VARCHAR,
+    required VARCHAR,
+    title VARCHAR,
+    user_defined VARCHAR
+);
+
+CREATE TABLE field_measures (
+    field_id VARCHAR NOT NULL REFERENCES field_definitions(id),
+    measure VARCHAR NOT NULL
+);
+
+CREATE TABLE attachments (
+    id VARCHAR NOT NULL PRIMARY KEY,
+    created_at TIMESTAMP,
+    entity_id VARCHAR,
+    entity_type VARCHAR,
+    file_name VARCHAR,
+    template BOOLEAN,
+    updated_at TIMESTAMP
+    version_id VARCHAR
+);

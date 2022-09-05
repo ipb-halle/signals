@@ -17,8 +17,7 @@
  */
 package de.ipb_halle.signals.users;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import de.ipb_halle.signals.rest.RestHelper;
 import java.util.Date;
 import java.util.Set;
 
@@ -86,7 +85,6 @@ public class User {
     @Column(name="json_string")
     private String jsonString;
 
-    private transient SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     private transient Set<Role> roles;
     private transient Set<Group> systemGroups;
 
@@ -104,8 +102,8 @@ public class User {
         sb.append(String.format("  Alias: %s    User name: %s\n", alias, userName));
         sb.append(String.format("  Email: %s    Country: %s\n", email, country));
         sb.append(String.format("  Organization: %s   Enabled: %s\n", organization, enabled ? "True" : "False"));
-        sb.append(String.format("  Created at: %s\n", dateFormat.format(createdAt)));
-        sb.append(String.format("  Last login: %s\n", dateFormat.format(lastLoginAt)));
+        sb.append(String.format("  Created at: %s\n", RestHelper.formatDate(createdAt)));
+        sb.append(String.format("  Last login: %s\n", RestHelper.formatDate(lastLoginAt)));
         sb.append((jsonString != null) ? jsonString : "");
         sb.append("\n==============================================================");
         System.out.println(sb.toString());
@@ -125,10 +123,6 @@ public class User {
 
     public Date getCreatedAt() {
         return createdAt;
-    }
-
-    public DateFormat getDateFormat() {
-        return dateFormat;
     }
 
     public String getEmail() {
@@ -170,15 +164,6 @@ public class User {
     public Boolean isEnabled() {
         return enabled;
     }
-
-    public Date parseDate(String ds) {
-        try {
-            return dateFormat.parse(ds);
-        } catch(Exception e) {
-        }
-        return new Date();
-    }
-
 
     public void setId(Integer i) {
         id = i;
