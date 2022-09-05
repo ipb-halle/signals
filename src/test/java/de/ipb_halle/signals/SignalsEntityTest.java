@@ -38,7 +38,8 @@ public class SignalsEntityTest {
         String test = TestBase.readStream(
                     getClass().getResourceAsStream(TEST_RESOURCE));
         JsonElement j = JsonParser.parseString(test);
-        SignalsEntity entity = SignalsEntity.createSignalsEntity(j);
+        SignalsEntityRestService svc = new SignalsEntityRestService ();
+        SignalsEntity entity = svc.createEntity(j);
 
         assertEquals("id matches", id, entity.getId());
         assertEquals("json string matches", test, entity.getJsonString());

@@ -17,9 +17,9 @@
  */
 package de.ipb_halle.signals.inventory;
 
-import de.ipb_halle.signals.MockRestClient;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
+import de.ipb_halle.signals.rest.MockRestClient;
 import java.util.Properties;
 import javax.inject.Inject;
 import org.junit.Before;

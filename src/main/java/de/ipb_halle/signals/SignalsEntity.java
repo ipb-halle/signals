@@ -35,29 +35,22 @@ import javax.persistence.Table;
 @Table(name="signalsentities")
 public class SignalsEntity {
 
+    public final static String ATTR_ID = "id";
+    public final static String ATTR_TYPE = "type";
+
     @Id
     private String id;
 
     @Column(name="snb_type")
     private String type;
 
-    @Column
-    private String json_string;
+    @Column(name="json_string")
+    private String jsonString;
 
-    private transient JsonElement json;
-
-    public static SignalsEntity createSignalsEntity(JsonElement json) {
-        SignalsEntity entity = new SignalsEntity();
-        entity.json = json;
-        entity.id = json.getAsJsonObject().getAsJsonPrimitive("id").getAsString();
-        entity.type = json.getAsJsonObject().getAsJsonObject("attributes").getAsJsonPrimitive("type").getAsString();
-        entity.json_string = json.toString();
-        return entity;
-    }
 
     public void dump() {
         System.out.println(id + " --> " + type);
-        System.out.println(json.toString());
+        System.out.println(jsonString);
         System.out.println("==============================================================");
     }
 
@@ -66,10 +59,22 @@ public class SignalsEntity {
     }
 
     public String getJsonString() {
-        return json_string;
+        return jsonString;
     }
 
     public String getType() {
         return type;
+    }
+
+    public void setId(String i) {
+        id = i;
+    }
+
+    public void setJsonString(String j) {
+        jsonString = j;
+    }
+
+    public void setType(String t) {
+        type = t;
     }
 }

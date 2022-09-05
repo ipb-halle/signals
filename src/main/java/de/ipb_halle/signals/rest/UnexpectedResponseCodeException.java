@@ -15,17 +15,13 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals;
-
-import com.google.gson.JsonElement;
-import javax.ejb.Local;
+package de.ipb_halle.signals.rest;
 
 /** 
- * Rest service 
+ * Exception to be thrown in case of unexpected server response
  */
-@Local
-public interface RestService<T> {
 
-    public T createEntity(JsonElement j);
+public class UnexpectedResponseCodeException extends Exception {
 
 }
+

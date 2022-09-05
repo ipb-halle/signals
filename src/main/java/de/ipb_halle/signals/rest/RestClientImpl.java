@@ -15,13 +15,15 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals;
+package de.ipb_halle.signals.rest;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+
+import de.ipb_halle.signals.SignalsConfig;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

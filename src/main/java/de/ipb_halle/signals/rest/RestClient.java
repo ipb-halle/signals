@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals;
+package de.ipb_halle.signals.rest;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

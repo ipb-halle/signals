@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals;
+package de.ipb_halle.signals.rest;
 
 public enum Method {
 

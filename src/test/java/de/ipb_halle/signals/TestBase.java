@@ -17,6 +17,8 @@
  */
 package de.ipb_halle.signals;
 
+import de.ipb_halle.signals.rest.MockRestClient;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;

@@ -17,6 +17,8 @@
  */
 package de.ipb_halle.signals;
 
+import de.ipb_halle.signals.rest.MockRestClient;
+import java.util.List;
 import java.util.Properties;
 import javax.inject.Inject;
 import org.junit.Before;
@@ -40,7 +42,7 @@ public class SignalsEntityManagerTest {
 
     private final String TEST_RESOURCE_1 = "SignalsEntityManagerTest001.json";
     private final String TEST_KEY_1 = 
-        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities?includeTypes=location&page%5Blimit%5D=20&page%5Boffset%5D=1";
+        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities?includeTypes=location&page%5Blimit%5D=20&page%5Boffset%5D=0";
     private final String TEST_RESOURCE_2 = "SignalsEntityManagerTest002.json";
     private final String TEST_KEY_2 =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities?includeTypes=location&page[offset]=20&page[limit]=20";
@@ -54,7 +56,8 @@ public class SignalsEntityManagerTest {
 
     @Module
     @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
-        SignalsEntity.class, SignalsEntityManager.class })
+        SignalsEntity.class, SignalsEntityDbService.class, SignalsEntityManager.class,
+        SignalsEntityRestService.class })
     public EjbJar app() {
         return new EjbJar();
     }
@@ -83,8 +86,9 @@ public class SignalsEntityManagerTest {
     @Test
     public void entityTest() {
 
-        manager.doGet("location");
-        SignalsEntity entity = manager.loadById(TEST_LOCATION_ID);
+        List<SignalsEntity> entities = manager.getSnbEntities("location");
+        manager.save(entities);
+        SignalsEntity entity = manager.getDbEntity(TEST_LOCATION_ID);
 
         assertEquals("entity type mismatch", entity.getType(), "location");
     }

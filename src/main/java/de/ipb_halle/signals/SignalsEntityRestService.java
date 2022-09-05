@@ -15,11 +15,12 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.inventory;
+package de.ipb_halle.signals;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
 import de.ipb_halle.signals.rest.Method;
@@ -36,47 +37,46 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import javax.ejb.Stateless;
+import javax.ejb.Local;
 import javax.inject.Inject;
 
 
 /** 
- * Rest service for container types 
+ * Manager for signals entities (entities API endpoint) 
  */
 
-@Stateless
-public class ContainerTypeRestService implements RestService<ContainerType> {
+@Local
+public class SignalsEntityRestService implements RestService<SignalsEntity> {
 
-    public final String CONTAINER_TYPE_ENDPOINT = "/inventory/types";
+    public final String SIGNALS_ENTITY_ENDPOINT = "/entities";
+    public final String PARAMETER_INCLUDE_TYPES = "includeTypes";
 
     @Inject
     private RestClient restClient;
+    
 
-    public ContainerType createEntity(JsonElement j) {
-        ContainerType ct = new ContainerType();
-        JsonObject attributes = j.getAsJsonObject().getAsJsonObject("attributes");
+    public SignalsEntity createEntity(JsonElement json) {
+        SignalsEntity entity = new SignalsEntity();
+        JsonObject attributes = json.getAsJsonObject().getAsJsonObject("attributes");
 
-        ct.setId(j.getAsJsonObject().getAsJsonPrimitive(ContainerType.ATTR_ID).getAsString());
-        ct.setDescription(attributes.getAsJsonPrimitive(ContainerType.ATTR_DESCRIPTION).getAsString());
-        ct.setJsonString(j.toString());
-        ct.setName(attributes.getAsJsonPrimitive(ContainerType.ATTR_NAME).getAsString());
-        return ct;
+        entity.setId(json.getAsJsonObject().getAsJsonPrimitive(SignalsEntity.ATTR_ID).getAsString());
+        entity.setType(attributes.getAsJsonPrimitive(SignalsEntity.ATTR_TYPE).getAsString());
+        entity.setJsonString(json.toString());
+        return entity;
     }
 
-    public List<ContainerType> doGetContainerTypes() {
-        List<ContainerType> containerTypes = new ArrayList<> ();
+    public List<SignalsEntity> doGetEntities(String includeTypes) {
         restClient.reset()
             .setMethod(Method.GET)
-            .setEndpoint(CONTAINER_TYPE_ENDPOINT)
-            .putUrlParameter("entityType","container");
+            .setEndpoint(SIGNALS_ENTITY_ENDPOINT)
+            .putUrlParameter(PARAMETER_INCLUDE_TYPES, includeTypes);
 
-        RestResultIterator<ContainerType> iter = new RestResultIterator<> (restClient, this, true);
+        RestResultIterator<SignalsEntity> iter = new RestResultIterator<> (restClient, this, true); 
+        List<SignalsEntity> entities = new ArrayList<> ();
 
         while(iter.hasNext()) {
-            containerTypes.add(iter.next());
+            entities.add(iter.next());
         }
-        return containerTypes;
+        return entities;
     }
 }
-
-

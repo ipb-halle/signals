@@ -23,11 +23,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
-import de.ipb_halle.signals.Method;
-import de.ipb_halle.signals.RestClient;
-import de.ipb_halle.signals.RestResultIterator;
-import de.ipb_halle.signals.RestService;
-import de.ipb_halle.signals.UnexpectedResponseCodeException;
+import de.ipb_halle.signals.rest.Method;
+import de.ipb_halle.signals.rest.RestClient;
+import de.ipb_halle.signals.rest.RestResultIterator;
+import de.ipb_halle.signals.rest.RestService;
+import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
 
 import java.io.IOException;
 import java.net.MalformedURLException;

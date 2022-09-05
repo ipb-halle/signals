@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.material;
+package de.ipb_halle.signals.materials;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -31,27 +31,37 @@ import javax.persistence.Id;
  */
 
 @Entity
-public class MaterialsLibrary {
+public class Library {
+
+    public final static String ATTR_ID = "id";
 
     @Id
     private String id;
 
-    @Column
-    private String json_string;
+    @Column(name="json_string")
+    private String jsonString;
     
     private transient JsonElement json;
 
 
-    public static MaterialsLibrary createMaterialsLibrary(JsonElement j) {
-        MaterialsLibrary ml = new MaterialsLibrary();
-        ml.json = j;
-        ml.id = j.getAsJsonObject().getAsJsonPrimitive("id").getAsString();
-        return ml;
+    public static Library createEntity(JsonElement j) {
+        Library lib = new Library();
+        lib.setId(j.getAsJsonObject().getAsJsonPrimitive(Library.ATTR_ID).getAsString());
+        lib.setJsonString(j.toString());
+        return lib;
     }
 
     public void dump() {
         System.out.println(id);
-        System.out.println(json.toString());
+        System.out.println(jsonString);
         System.out.println("============================================================");
+    }
+
+    public void setId(String i) {
+        id = i;
+    }
+
+    public void setJsonString(String j) {
+        jsonString = j;
     }
 }

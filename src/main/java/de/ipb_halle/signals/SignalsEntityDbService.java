@@ -17,11 +17,31 @@
  */
 package de.ipb_halle.signals;
 
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+
 /** 
- * Exception to be thrown in case of unexpected server response
+ * Database service for signals entities
  */
 
-public class UnexpectedResponseCodeException extends Exception {
+@Stateless
+public class SignalsEntityDbService {
+
+
+    @PersistenceContext(unitName="signalsDB")
+    private EntityManager em;
+
+    public SignalsEntity loadById(String id) {
+        return this.em.find(SignalsEntity.class, id);
+    }
+
+    public void save(SignalsEntity entity) {
+        this.em.merge(entity);
+    }
 
 }
+
 
