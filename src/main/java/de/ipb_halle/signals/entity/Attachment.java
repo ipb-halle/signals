@@ -66,7 +66,7 @@ public class Attachment {
     @Column(name="version_id")
     private String versionId;
 
-    public String getAttachmentId() {
+    public String getId() {
         return id;
     }
 
@@ -98,7 +98,7 @@ public class Attachment {
         return template;
     }
 
-    public Attachment setAttachmentId(String i) {
+    public Attachment setId(String i) {
         id = i;
         return this;
     }

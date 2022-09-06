@@ -21,6 +21,7 @@ import de.ipb_halle.signals.entity.Attachment;
 import de.ipb_halle.signals.entity.FieldDefinition;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -69,6 +70,35 @@ public class ContainerType {
         updatedAt = new Date();
         attachments = new HashSet<> ();
         fieldDefinitions = new HashSet<> ();
+    }
+
+    public  ContainerType(ContainerTypeEntity cte, List<Attachment> a, List<FieldDefinition> fd) {
+        id = cte.getId();
+        createdAt = cte.getCreatedAt();
+        description = cte.getDescription();
+        inUse = cte.isInUse();
+        jsonString = cte.getJsonString();
+        movable = cte.isMovable();
+        name = cte.getName();
+        updatedAt = cte.getUpdatedAt();
+
+        attachments = new HashSet<> ();
+        fieldDefinitions = new HashSet<> ();
+        attachments.addAll(a);
+        fieldDefinitions.addAll(fd);
+    }
+
+    public ContainerTypeEntity createEntity() {
+        ContainerTypeEntity cte = new ContainerTypeEntity()
+            .setId(id)
+            .setCreatedAt(createdAt)
+            .setDescription(description)
+            .setInUse(inUse)
+            .setJsonString(jsonString)
+            .setMovable(movable)
+            .setName(name)
+            .setUpdatedAt(updatedAt);
+        return cte;
     }
 
     public void dump() {

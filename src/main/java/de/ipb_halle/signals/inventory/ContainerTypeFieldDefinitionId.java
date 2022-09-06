@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.users;
+package de.ipb_halle.signals.inventory;
 
 import java.io.Serializable;
 import javax.persistence.Embeddable;
@@ -24,27 +24,27 @@ import javax.persistence.Embeddable;
  * SNB role privileges
  */
 @Embeddable
-public class RolePrivId implements Serializable {
+public class ContainerTypeFieldDefinitionId implements Serializable {
     private final static long serialVersionUID = 1L;
 
-    private Integer role_id;
+    private String container_type_id;
 
-    private RolePrivilege privilege;
+    private String field_definition_id;
 
 
-    public Integer getRoleId() { 
-        return role_id; 
+    public String getContainerTypeId() { 
+        return container_type_id; 
     }
 
-    public RolePrivilege getRolePrivilege() {
-        return privilege;
+    public String getFieldDefinitionId() {
+        return field_definition_id;
     }
 
-    public void setRoleId(Integer id) {
-        role_id = id;
+    public void setContainerTypeId(String id) {
+        container_type_id = id;
     }
 
-    public void setRolePrivilege(RolePrivilege p) {
-        privilege = p;
+    public void setFieldDefinitionId(String id) {
+        field_definition_id = id;
     }
 }

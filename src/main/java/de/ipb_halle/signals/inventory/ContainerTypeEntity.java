@@ -98,35 +98,43 @@ public class ContainerTypeEntity {
         return movable;
     }
 
-    public void setId(String i) {
+    public ContainerTypeEntity setId(String i) {
         id = i;
+        return this;
     }
 
-    public void setCreatedAt(Date d) {
+    public ContainerTypeEntity setCreatedAt(Date d) {
         createdAt = d;
+        return this;
     }
 
-    public void setDescription(String d) {
+    public ContainerTypeEntity setDescription(String d) {
         description = d;
+        return this;
     }
 
-    public void setMovable(boolean m) {
+    public ContainerTypeEntity setMovable(boolean m) {
         movable = m;
+        return this;
     }
 
-    public void setInUse(boolean u) {
+    public ContainerTypeEntity setInUse(boolean u) {
         inUse = u;
+        return this;
     }
 
-    public void setJsonString(String j) {
+    public ContainerTypeEntity setJsonString(String j) {
         jsonString = j;
+        return this;
     }
 
-    public void setName(String n) {
+    public ContainerTypeEntity setName(String n) {
         name = n;
+        return this;
     }
 
-    public void setUpdatedAt(Date u) {
+    public ContainerTypeEntity setUpdatedAt(Date u) {
         updatedAt = u;
+        return this;
     }
 }

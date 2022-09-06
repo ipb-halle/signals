@@ -17,25 +17,28 @@
  */
 package de.ipb_halle.signals.entity;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 
 /** 
- * Mapping between Quality and SNB measure
+ * DB service for attachments
  */
 
-public class MeasureMapper{
+@Stateless
+public class AttachmentDbService {
 
-    private static Map<String, Quality> map;
 
-    static {
-        map = new HashMap<> ();
-        for (Quality q : Quality.values()) {
-            map.put(q.getSnbMeasure(), q);
-        }
+    @PersistenceContext(unitName="signalsDB")
+    private EntityManager em;
+
+    public Attachment loadById(String id) {
+        return this.em.find(Attachment.class, id);
     }
 
-    public static Quality getQuality(String measure) {
-        return map.get(measure);
+    public void save(Attachment a) {
+        this.em.merge(a);
     }
 }
+

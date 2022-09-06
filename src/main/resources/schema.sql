@@ -91,6 +91,30 @@ CREATE TABLE attachments (
     entity_type VARCHAR,
     file_name VARCHAR,
     template BOOLEAN,
-    updated_at TIMESTAMP
+    updated_at TIMESTAMP,
     version_id VARCHAR
 );
+
+CREATE TABLE container_types (
+    id VARCHAR NOT NULL PRIMARY KEY,
+    created_at TIMESTAMP,
+    description VARCHAR,
+    in_use BOOLEAN,
+    movable BOOLEAN,
+    name VARCHAR,
+    json_string VARCHAR,
+    updated_at TIMESTAMP
+);
+
+CREATE TABLE container_type_attachments (
+    container_type_id VARCHAR NOT NULL REFERENCES container_types (id),
+    attachment_id VARCHAR NOT NULL REFERENCES attachments (id),
+    PRIMARY KEY (container_type_id, attachment_id)
+);
+
+CREATE TABLE container_type_fields (
+    container_type_id VARCHAR NOT NULL REFERENCES container_types (id),
+    field_definition_id VARCHAR NOT NULL REFERENCES field_definitions (id),
+    PRIMARY KEY (container_type_id, field_definition_id)
+);
+

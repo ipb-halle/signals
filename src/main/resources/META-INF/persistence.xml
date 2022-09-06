@@ -10,9 +10,18 @@
         <non-jta-data-source>signalsDSNonJTA</non-jta-data-source>
 
         <class>de.ipb_halle.signals.SignalsEntity</class>
-        <class>de.ipb_halle.signals.location.Location</class>
-        <class>de.ipb_halle.signals.location.LocationType</class>
+        <class>de.ipb_halle.signals.entity.Attachment</class>
+        <class>de.ipb_halle.signals.entity.FieldDefinition</class>
+        <class>de.ipb_halle.signals.inventory.ContainerType</class>
+        <class>de.ipb_halle.signals.inventory.ContainerTypeAttachment</class>
+        <class>de.ipb_halle.signals.inventory.ContainerTypeFieldDefinition</class>
+        <class>de.ipb_halle.signals.inventory.Location</class>
+        <class>de.ipb_halle.signals.inventory.LocationType</class>
         <class>de.ipb_halle.signals.material.MaterialsLibrary</class>
+        <class>de.ipb_halle.signals.users.Group</class>
+        <class>de.ipb_halle.signals.users.Role</class>
+        <class>de.ipb_halle.signals.users.RolePriv</class>
+        <class>de.ipb_halle.signals.users.User</class>
 
         <properties>
 

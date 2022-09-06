@@ -15,27 +15,36 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.entity;
+package de.ipb_halle.signals.inventory;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.Serializable;
+import javax.persistence.Embeddable;
 
 /** 
- * Mapping between Quality and SNB measure
+ * SNB role privileges
  */
+@Embeddable
+public class ContainerTypeAttachmentId implements Serializable {
+    private final static long serialVersionUID = 1L;
 
-public class MeasureMapper{
+    private String container_type_id;
 
-    private static Map<String, Quality> map;
+    private String attachment_id;
 
-    static {
-        map = new HashMap<> ();
-        for (Quality q : Quality.values()) {
-            map.put(q.getSnbMeasure(), q);
-        }
+
+    public String getContainerTypeId() { 
+        return container_type_id; 
     }
 
-    public static Quality getQuality(String measure) {
-        return map.get(measure);
+    public String getAttachmentId() {
+        return attachment_id;
+    }
+
+    public void setContainerTypeId(String id) {
+        container_type_id = id;
+    }
+
+    public void setAttachmentId(String id) {
+        attachment_id = id;
     }
 }
