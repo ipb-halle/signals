@@ -45,6 +45,8 @@ public class FieldDefinition {
     public final static String ATTR_HIDDEN = "hidden";
     public final static String ATTR_KEY = "key";
     public final static String ATTR_MEASURES = "measures";
+    public final static String ATTR_MULTISELECT = "multiSelect";
+    public final static String ATTR_OPTIONS = "options";
     public final static String ATTR_REQUIRED = "isRequired";
     public final static String ATTR_TITLE = "title";
     public final static String ATTR_FIELD_TYPE = "type";
@@ -71,6 +73,13 @@ public class FieldDefinition {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch=FetchType.EAGER)
     @JoinColumn(name = "field_id")
     private Set<FieldMeasure> measures;
+
+    @Column(name="multiselect")
+    private Boolean multiSelect;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch=FetchType.EAGER)
+    @JoinColumn(name = "field_id")
+    private Set<FieldOption> options;
     
     @Column
     private Boolean required;
@@ -87,11 +96,21 @@ public class FieldDefinition {
      */
     public FieldDefinition() {
         measures = new HashSet<> ();
+        options = new HashSet<> ();
     }
 
     public FieldDefinition addMeasure(Quality q) {
         measures.add(new FieldMeasure(id, q));
         return this;
+    }
+
+    public FieldDefinition addOption(String o) {
+        options.add(new FieldOption(id, o));
+        return this;
+    }
+
+    public void dump() {
+        System.out.printf("FieldDefinition(%s): %s\n", id, title);
     }
 
     public String getId() {
@@ -118,12 +137,20 @@ public class FieldDefinition {
         return measures;
     }
 
+    public Set<FieldOption> getOptions() {
+        return options;
+    }
+
     public String getTitle() {
         return title;
     }
 
     public Boolean isHidden() {
         return hidden;
+    }
+
+    public Boolean isMultiSelect() {
+        return multiSelect;
     }
 
     public Boolean isRequired() {
@@ -136,6 +163,10 @@ public class FieldDefinition {
 
     public void removeMeasure(FieldMeasure m) {
         measures.remove(m);
+    }
+
+    public void removeOption(FieldOption o) {
+        options.remove(o);
     }
 
     public FieldDefinition setId(String i) {
@@ -170,6 +201,16 @@ public class FieldDefinition {
 
     public FieldDefinition setMeasures(Set<FieldMeasure> m) {
         measures = m;
+        return this;
+    }
+
+    public FieldDefinition setMultiSelect(Boolean b) {
+        multiSelect = b;
+        return this;
+    }
+
+    public FieldDefinition setOptions(Set<FieldOption> o) {
+        options = o;
         return this;
     }
 

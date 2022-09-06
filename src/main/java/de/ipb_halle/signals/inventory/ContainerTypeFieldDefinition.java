@@ -18,8 +18,9 @@
 package de.ipb_halle.signals.inventory;
 
 import java.io.Serializable;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 
@@ -28,21 +29,23 @@ import javax.persistence.Table;
  */
 
 @Entity
+@IdClass(ContainerTypeFieldDefinitionId.class)
 @Table(name="container_type_fields")
 public class ContainerTypeFieldDefinition {
 
-    @EmbeddedId
-    private ContainerTypeFieldDefinitionId id;
+    @Id
+    private String container_type_id; 
+
+    @Id
+    private String field_definition_id;
 
 
     public ContainerTypeFieldDefinition() {
-        id = new ContainerTypeFieldDefinitionId();
     }
 
     public ContainerTypeFieldDefinition(String ct, String fd) {
-        id = new ContainerTypeFieldDefinitionId();
-        id.setContainerTypeId(ct);
-        id.setFieldDefinitionId(fd);
+        setContainerTypeId(ct);
+        setFieldDefinitionId(fd);
     }
 
     @Override
@@ -51,16 +54,16 @@ public class ContainerTypeFieldDefinition {
             return false;
         } 
         ContainerTypeFieldDefinition other = (ContainerTypeFieldDefinition) o;
-        return (id.getContainerTypeId() == other.getContainerTypeId())
-            && (id.getFieldDefinitionId() == other.getFieldDefinitionId());
+        return (getContainerTypeId() == other.getContainerTypeId())
+            && (getFieldDefinitionId() == other.getFieldDefinitionId());
     }
 
     public String getContainerTypeId() {
-        return id.getContainerTypeId();
+        return container_type_id;
     }
 
     public String getFieldDefinitionId() {
-        return id.getFieldDefinitionId();
+        return field_definition_id;
     }
 
     @Override
@@ -69,12 +72,12 @@ public class ContainerTypeFieldDefinition {
     }
 
     public ContainerTypeFieldDefinition setContainerTypeId(String ct) {
-        id.setContainerTypeId(ct);
+        container_type_id = ct;
         return this;
     }
 
     public ContainerTypeFieldDefinition setFieldDefinitionId(String fd) {
-        id.setFieldDefinitionId(fd);
+        field_definition_id = fd;
         return this;
     }
 }

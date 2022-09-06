@@ -57,6 +57,10 @@ public class FieldDefinitionRestService implements RestService<FieldDefinition> 
             parseMeasures(def.getAsJsonArray(FieldDefinition.ATTR_MEASURES), fd);
         }
 
+        if (def.has(FieldDefinition.ATTR_OPTIONS)) {
+            parseOptions(def.getAsJsonArray(FieldDefinition.ATTR_OPTIONS), fd);
+        }
+
         return fd;
     }
 
@@ -67,6 +71,14 @@ public class FieldDefinitionRestService implements RestService<FieldDefinition> 
             String measure = j.getAsJsonPrimitive(Quality.ATTR_MEASURE).getAsString();
             Quality q = MeasureMapper.getQuality(measure); 
             fd.addMeasure(q);
+        }
+    }
+
+    private void parseOptions(JsonArray jArray, FieldDefinition fd) {
+        Iterator<JsonElement> iter = jArray.iterator();
+        while (iter.hasNext()) {
+            String option = iter.next().getAsJsonPrimitive().getAsString();
+            fd.addOption(option);
         }
     }
 }

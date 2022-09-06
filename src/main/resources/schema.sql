@@ -74,6 +74,7 @@ CREATE TABLE field_definitions (
     field_type VARCHAR,
     hidden VARCHAR,
     key VARCHAR,
+    multiselect BOOLEAN,
     required VARCHAR,
     title VARCHAR,
     user_defined VARCHAR
@@ -81,7 +82,14 @@ CREATE TABLE field_definitions (
 
 CREATE TABLE field_measures (
     field_id VARCHAR NOT NULL REFERENCES field_definitions(id),
-    measure VARCHAR NOT NULL
+    measure VARCHAR NOT NULL,
+    PRIMARY KEY (field_id, measure)
+);
+
+CREATE TABLE field_options (
+    field_id VARCHAR NOT NULL REFERENCES field_definitions(id),
+    option VARCHAR NOT NULL,
+    PRIMARY KEY (field_id, option)
 );
 
 CREATE TABLE attachments (

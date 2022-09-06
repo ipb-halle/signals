@@ -18,33 +18,15 @@
 package de.ipb_halle.signals.inventory;
 
 import java.io.Serializable;
-import javax.persistence.Embeddable;
 
 /** 
- * SNB role privileges
+ * Field definitions for container types. This class solely exists 
+ * for JPA purposes (compound Id).
  */
-@Embeddable
 public class ContainerTypeFieldDefinitionId implements Serializable {
     private final static long serialVersionUID = 1L;
 
     private String container_type_id;
 
     private String field_definition_id;
-
-
-    public String getContainerTypeId() { 
-        return container_type_id; 
-    }
-
-    public String getFieldDefinitionId() {
-        return field_definition_id;
-    }
-
-    public void setContainerTypeId(String id) {
-        container_type_id = id;
-    }
-
-    public void setFieldDefinitionId(String id) {
-        field_definition_id = id;
-    }
 }

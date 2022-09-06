@@ -32,12 +32,34 @@ public class RolePrivId implements Serializable {
     private RolePrivilege privilege;
 
 
+    @Override
+    public boolean equals(Object o) {
+        if ((o == null) || (getClass() != o.getClass())) {
+            return false;
+        }
+        RolePrivId other = (RolePrivId) o;
+        return (getRoleId() == other.getRoleId())
+            && (getRolePrivilege() == other.getRolePrivilege());
+    }
+
     public Integer getRoleId() { 
         return role_id; 
     }
 
     public RolePrivilege getRolePrivilege() {
         return privilege;
+    }
+
+    @Override
+    public int hashCode() {
+        int hc = 0;
+        if (role_id != null) {
+            hc = role_id.hashCode();
+        }
+        if (privilege != null) {
+            hc += privilege.hashCode();
+        }
+        return hc;
     }
 
     public void setRoleId(Integer id) {

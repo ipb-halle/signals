@@ -18,33 +18,15 @@
 package de.ipb_halle.signals.inventory;
 
 import java.io.Serializable;
-import javax.persistence.Embeddable;
 
 /** 
- * SNB role privileges
+ * Attachment to container type compound id. This class solely exists for 
+ * JPA purposes.
  */
-@Embeddable
 public class ContainerTypeAttachmentId implements Serializable {
     private final static long serialVersionUID = 1L;
 
     private String container_type_id;
 
     private String attachment_id;
-
-
-    public String getContainerTypeId() { 
-        return container_type_id; 
-    }
-
-    public String getAttachmentId() {
-        return attachment_id;
-    }
-
-    public void setContainerTypeId(String id) {
-        container_type_id = id;
-    }
-
-    public void setAttachmentId(String id) {
-        attachment_id = id;
-    }
 }

@@ -17,17 +17,16 @@
  */
 package de.ipb_halle.signals.entity;
 
+import java.io.Serializable;
+
 
 /** 
- * Field types as defined by SNB Swagger API
+ * SNB field options (This class exists solely for JPA purposes)
  */
+public class FieldOptionId implements Serializable {
+    private final static long serialVersionUID = 1L;
 
-public enum FieldType {
+    private String field_id;
 
-    attributeList,
-    datetime,
-    list,
-    text,
-    unit,
-    user
+    private String option;
 }

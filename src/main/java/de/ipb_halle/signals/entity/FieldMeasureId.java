@@ -19,39 +19,13 @@ package de.ipb_halle.signals.entity;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
 /** 
- * SNB field measures (Qualities)
+ * JPA compound Id class for field definition measures
  */
-@Embeddable
 public class FieldMeasureId implements Serializable {
     private final static long serialVersionUID = 1L;
 
     private String field_id;
 
     private Quality measure;
-
-
-    public String getFieldId() { 
-        return field_id; 
-    }
-
-    public Quality getMeasure() {
-        return measure;
-    }
-
-    public void setFieldId(String id) {
-        field_id = id;
-    }
-
-    public void setMeasure(Quality m) {
-        measure = m;
-    }
 }

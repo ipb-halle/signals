@@ -18,8 +18,12 @@
 package de.ipb_halle.signals.inventory;
 
 import java.io.Serializable;
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 
@@ -28,21 +32,23 @@ import javax.persistence.Table;
  */
 
 @Entity
+@IdClass(ContainerTypeAttachmentId.class)
 @Table(name="container_type_attachments")
 public class ContainerTypeAttachment {
 
-    @EmbeddedId
-    private ContainerTypeAttachmentId id;
+    @Id
+    private String container_type_id;
+
+    @Id
+    private String attachment_id;
 
 
     public ContainerTypeAttachment() {
-        id = new ContainerTypeAttachmentId();
     }
 
     public ContainerTypeAttachment(String ct, String ai) {
-        id = new ContainerTypeAttachmentId();
-        id.setContainerTypeId(ct);
-        id.setAttachmentId(ai);
+        container_type_id = ct;
+        attachment_id = ai;
     }
 
     @Override
@@ -51,16 +57,16 @@ public class ContainerTypeAttachment {
             return false;
         } 
         ContainerTypeAttachment other = (ContainerTypeAttachment) o;
-        return (id.getContainerTypeId() == other.getContainerTypeId())
-            && (id.getAttachmentId() == other.getAttachmentId());
+        return (getContainerTypeId() == other.getContainerTypeId())
+            && (getAttachmentId() == other.getAttachmentId());
     }
 
     public String getContainerTypeId() {
-        return id.getContainerTypeId();
+        return container_type_id;
     }
 
     public String getAttachmentId() {
-        return id.getAttachmentId();
+        return attachment_id;
     }
 
     @Override
@@ -69,12 +75,12 @@ public class ContainerTypeAttachment {
     }
 
     public ContainerTypeAttachment setContainerTypeId(String ct) {
-        id.setContainerTypeId(ct);
+        container_type_id = ct;
         return this;
     }
 
     public ContainerTypeAttachment setAttachmentId(String a) {
-        id.setAttachmentId(a);
+        attachment_id = a;
         return this;
     }
 }

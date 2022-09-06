@@ -48,7 +48,7 @@ public class Attachment {
     @Column(name="created_at")
     private Date createdAt;
 
-    @Column(name="endity_id")
+    @Column(name="entity_id")
     private String entityId;
 
     @Column(name="entity_type")
@@ -60,11 +60,15 @@ public class Attachment {
     @Column
     private Boolean template;
 
-    @Column
+    @Column(name="updated_at")
     private Date updatedAt;
 
     @Column(name="version_id")
     private String versionId;
+
+    public void dump() {
+        System.out.printf("Attachment(%s): %s\n", id, fileName);
+    }
 
     public String getId() {
         return id;

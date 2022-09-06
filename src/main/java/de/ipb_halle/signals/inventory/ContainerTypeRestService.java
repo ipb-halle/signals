@@ -22,6 +22,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import de.ipb_halle.signals.entity.Attachment;
+import de.ipb_halle.signals.entity.AttachmentRestService;
+import de.ipb_halle.signals.entity.FieldDefinition;
+import de.ipb_halle.signals.entity.FieldDefinitionRestService;
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.RestResultIterator;
@@ -36,7 +40,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import javax.ejb.Stateless;
+import javax.ejb.Local;
 import javax.inject.Inject;
 
 
@@ -44,7 +48,7 @@ import javax.inject.Inject;
  * Rest service for container types 
  */
 
-@Stateless
+@Local
 public class ContainerTypeRestService implements RestService<ContainerType> {
 
     public final String CONTAINER_TYPE_ENDPOINT = "/inventory/types";
@@ -60,6 +64,13 @@ public class ContainerTypeRestService implements RestService<ContainerType> {
         ct.setDescription(attributes.getAsJsonPrimitive(ContainerType.ATTR_DESCRIPTION).getAsString());
         ct.setJsonString(j.toString());
         ct.setName(attributes.getAsJsonPrimitive(ContainerType.ATTR_NAME).getAsString());
+        if (attributes.has(ContainerType.ATTR_ATTACHMENTS)) {
+            parseAttachments(attributes.getAsJsonArray(ContainerType.ATTR_ATTACHMENTS), ct);
+        }
+        if (attributes.has(ContainerType.ATTR_FIELDS)) {
+            parseFieldDefinitions(attributes.getAsJsonArray(ContainerType.ATTR_FIELDS), ct);
+        }
+
         return ct;
     }
 
@@ -76,6 +87,22 @@ public class ContainerTypeRestService implements RestService<ContainerType> {
             containerTypes.add(iter.next());
         }
         return containerTypes;
+    }
+
+    private void parseAttachments(JsonArray j, ContainerType ct) {
+        Iterator<JsonElement> iter = j.iterator();
+        AttachmentRestService svc = new AttachmentRestService();
+        while (iter.hasNext()) {
+            ct.addAttachment(svc.createEntity(iter.next()));
+        }
+    }
+
+    private void parseFieldDefinitions(JsonArray j, ContainerType ct) {
+        Iterator<JsonElement> iter = j.iterator();
+        FieldDefinitionRestService svc = new FieldDefinitionRestService();
+        while (iter.hasNext()) {
+            ct.addFieldDefinition(svc.createEntity(iter.next()));
+        }
     }
 }
 
