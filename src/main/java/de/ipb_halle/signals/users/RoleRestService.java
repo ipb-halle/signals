@@ -25,6 +25,7 @@ import com.google.gson.JsonPrimitive;
 
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
+import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestResultIterator;
 import de.ipb_halle.signals.rest.RestService;
 import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
@@ -55,11 +56,11 @@ public class RoleRestService implements RestService<Role> {
     private RestClient restClient;
 
     public Role createEntity(JsonElement j) {
-        JsonObject attributes = j.getAsJsonObject().getAsJsonObject("attributes");
+        JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
         Role role = new Role();
         role.setDescription(attributes.getAsJsonPrimitive(Role.ATTR_DESCRIPTION).getAsString());
-        role.setId(j.getAsJsonObject().getAsJsonPrimitive("id").getAsInt());
+        role.setId(j.getAsJsonObject().getAsJsonPrimitive(RestHelper.ATTR_ID).getAsInt());
         role.setJsonString(j.toString());
         role.setName(attributes.getAsJsonPrimitive(Role.ATTR_NAME).getAsString());
         parsePrivileges(attributes.getAsJsonObject(Role.ATTR_PRIVILEGES), role);
@@ -74,7 +75,7 @@ public class RoleRestService implements RestService<Role> {
                 .execute();
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
-            return createEntity(jsonResult.getAsJsonObject().get("data"));
+            return createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
 
         } catch(UnexpectedResponseCodeException ue) {
             System.out.println("Unexpected code");

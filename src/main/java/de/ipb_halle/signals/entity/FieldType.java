@@ -24,10 +24,29 @@ package de.ipb_halle.signals.entity;
 
 public enum FieldType {
 
-    attributeList,
-    datetime,
-    list,
-    text,
-    unit,
-    user
+    ATTRIBUTELIST,
+    CAS_NUMBER,
+    CHEMICAL_DRAWING,
+    DATETIME,
+    DECIMAL,
+    LINK,
+    LIST,
+    MASS,
+    MOLECULAR_FORMULA,
+    MOLECULAR_MASS,
+    PERCENTAGE,
+    TEXT,
+    UNIT,
+    USER;
+
+    /**
+     * Return a FieldType corresponding to a given String. As 
+     * the SNB Swagger API uses mixed casing, the String will be
+     * converted to all uppercase before looking up the FieldType.
+     * @param v the string 
+     * @return the corresponding FieldType
+     */
+    public static FieldType valueOfAnyCase(String v) {
+        return valueOf(v.toUpperCase());
+    }
 }

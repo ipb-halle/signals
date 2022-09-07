@@ -60,10 +60,10 @@ public class GroupRestService implements RestService<Group> {
      * deserialize group
      */
     public Group createEntity(JsonElement j) {
-        JsonObject attributes = j.getAsJsonObject().getAsJsonObject("attributes");
+        JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
         Group group = new Group();
-        group.setId(attributes.getAsJsonPrimitive(Group.ATTR_ID).getAsInt());
+        group.setId(attributes.getAsJsonPrimitive(RestHelper.ATTR_ID).getAsInt());
         group.setCreatedAt(RestHelper.parseDate(attributes, Group.ATTR_CREATED_AT, new Date()));
         group.setDescription(getOptionalStringAttribute(attributes, Group.ATTR_DESCRIPTION));
         // digest
@@ -98,7 +98,7 @@ public class GroupRestService implements RestService<Group> {
                 .execute(RestClient.HTTP_CREATED);
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
-            return createEntity(jsonResult.getAsJsonObject().get("data"));
+            return createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
 
         } catch(UnexpectedResponseCodeException ue) {
             System.out.println("Unexpected code");
@@ -121,7 +121,7 @@ public class GroupRestService implements RestService<Group> {
                 .execute();
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
-            return createEntity(jsonResult.getAsJsonObject().get("data"));
+            return createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
 
         } catch(UnexpectedResponseCodeException ue) {
             System.out.println("Unexpected code");
@@ -157,10 +157,10 @@ public class GroupRestService implements RestService<Group> {
         attributes.addProperty(Group.ATTR_SYSTEM, group.isSystem());
 
         JsonObject data = new JsonObject();
-        data.add("attributes", attributes);
+        data.add(RestHelper.ATTR_ATTRIBUTES, attributes);
 
         JsonObject obj = new JsonObject();
-        obj.add("data", data);
+        obj.add(RestHelper.ATTR_DATA, data);
         return obj.toString();
     }
 }

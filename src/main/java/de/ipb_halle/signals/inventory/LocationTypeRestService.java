@@ -24,6 +24,7 @@ import com.google.gson.JsonPrimitive;
 
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
+import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestResultIterator;
 import de.ipb_halle.signals.rest.RestService;
 import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
@@ -55,9 +56,9 @@ public class LocationTypeRestService implements RestService<LocationType> {
 
     public LocationType createEntity(JsonElement j) {
         LocationType lt = new LocationType();
-        JsonObject attributes = j.getAsJsonObject().getAsJsonObject("attributes");
+        JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
-        lt.setId(attributes.getAsJsonPrimitive(LocationType.ATTR_ID).getAsString());
+        lt.setId(attributes.getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
         lt.setDescription(attributes.getAsJsonPrimitive(LocationType.ATTR_DESCRIPTION).getAsString());
         lt.setJsonString(j.toString());
         lt.setName(attributes.getAsJsonPrimitive(LocationType.ATTR_NAME).getAsString());

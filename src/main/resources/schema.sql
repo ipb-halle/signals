@@ -69,12 +69,15 @@ CREATE TABLE groups (
 CREATE TABLE field_definitions (
     id VARCHAR NOT NULL PRIMARY KEY,
     attribute_list_eid VARCHAR,
+    calculated BOOLEAN,
     default_unit VARCHAR,
+    defined_by VARCHAR,
     description VARCHAR,
     field_type VARCHAR,
     hidden VARCHAR,
     key VARCHAR,
     multiselect BOOLEAN,
+    read_only BOOLEAN,
     required VARCHAR,
     title VARCHAR,
     user_defined VARCHAR

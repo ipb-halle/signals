@@ -30,7 +30,6 @@ import javax.persistence.Table;
 @Table(name="location_types")
 public class LocationType {
 
-    public final static String ATTR_ID = "id";
     public final static String ATTR_DESCRIPTION = "description";
     public final static String ATTR_NAME = "name";
 

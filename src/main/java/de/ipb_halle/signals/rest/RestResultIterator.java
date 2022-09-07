@@ -63,7 +63,7 @@ public class RestResultIterator<T> implements Iterator {
             client.execute();
 
             jsonResult = JsonParser.parseString(client.getResponse());
-            jsonIterator = jsonResult.getAsJsonObject().getAsJsonArray("data").iterator();
+            jsonIterator = jsonResult.getAsJsonObject().getAsJsonArray(RestHelper.ATTR_DATA).iterator();
 
         } catch(UnexpectedResponseCodeException ue) {
             System.out.println("Unexpected code");
@@ -82,7 +82,7 @@ public class RestResultIterator<T> implements Iterator {
                 .execute();
 
             jsonResult = JsonParser.parseString(client.getResponse());
-            jsonIterator = jsonResult.getAsJsonObject().getAsJsonArray("data").iterator();
+            jsonIterator = jsonResult.getAsJsonObject().getAsJsonArray(RestHelper.ATTR_DATA).iterator();
 
         } catch(UnexpectedResponseCodeException ue) {
             System.out.println("Unexpected code");

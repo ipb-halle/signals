@@ -25,6 +25,7 @@ import com.google.gson.JsonPrimitive;
 
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
+import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestService;
 import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
 
@@ -51,10 +52,10 @@ public class LocationRestService implements RestService<Location> {
     private RestClient restClient;
     
     public Location createEntity(JsonElement j) {
-        JsonObject attributes = j.getAsJsonObject().getAsJsonObject("attributes");
+        JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
         Location loc = new Location();
-        loc.setId(j.getAsJsonObject().getAsJsonPrimitive(Location.ATTR_ID).getAsString());
+        loc.setId(j.getAsJsonObject().getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
         loc.setBarcode(attributes.getAsJsonPrimitive(Location.ATTR_BARCODE).getAsString());
         loc.setName(attributes.getAsJsonPrimitive(Location.ATTR_NAME).getAsString());
         loc.setDescription(attributes.getAsJsonPrimitive(Location.ATTR_DESCRIPTION).getAsString());
@@ -75,7 +76,7 @@ public class LocationRestService implements RestService<Location> {
                 .execute();
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
-            return jsonResult.getAsJsonObject().get("data");
+            return jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA);
 
         } catch(UnexpectedResponseCodeException ue) {
             System.out.println("Unexpected code");

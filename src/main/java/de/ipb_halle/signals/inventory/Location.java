@@ -35,7 +35,6 @@ import javax.persistence.Table;
 @Table(name="locations")
 public class Location {
 
-    public final static String ATTR_ID = "id";
     public final static String ATTR_ANCESTORS = "ancestors";
     public final static String ATTR_ANCESTOR_ID = "id";
     public final static String ATTR_ANCESTOR_NAME = "name";

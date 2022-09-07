@@ -25,6 +25,7 @@ import com.google.gson.JsonPrimitive;
 
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
+import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestResultIterator;
 import de.ipb_halle.signals.rest.RestService;
 import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
@@ -57,10 +58,10 @@ public class SignalsEntityRestService implements RestService<SignalsEntity> {
 
     public SignalsEntity createEntity(JsonElement json) {
         SignalsEntity entity = new SignalsEntity();
-        JsonObject attributes = json.getAsJsonObject().getAsJsonObject("attributes");
+        JsonObject attributes = json.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
-        entity.setId(json.getAsJsonObject().getAsJsonPrimitive(SignalsEntity.ATTR_ID).getAsString());
-        entity.setType(attributes.getAsJsonPrimitive(SignalsEntity.ATTR_TYPE).getAsString());
+        entity.setId(json.getAsJsonObject().getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
+        entity.setType(attributes.getAsJsonPrimitive(RestHelper.ATTR_TYPE).getAsString());
         entity.setJsonString(json.toString());
         return entity;
     }

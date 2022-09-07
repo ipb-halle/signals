@@ -39,14 +39,30 @@ import java.util.Iterator;
 public class FieldDefinitionRestService implements RestService<FieldDefinition> {
 
 
-    public FieldDefinition createEntity(JsonElement j) {
+    public FieldDefinition createEntity(JsonElement json) {
         FieldDefinition fd = new FieldDefinition();
-        fd.setId(j.getAsJsonObject().getAsJsonPrimitive(FieldDefinition.ATTR_ID).getAsString());
-        JsonObject def = j.getAsJsonObject().getAsJsonObject(FieldDefinition.ATTR_DEFINITION);
+        JsonObject j = json.getAsJsonObject();
+        fd.setId(j.getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
 
+        if (j.has(FieldDefinition.ATTR_DEFINITION)) {
+            parseDefinition(j.getAsJsonObject(FieldDefinition.ATTR_DEFINITION), fd);
+        } else {
+            fd.setAttributeListEid(RestHelper.parseString(j, FieldDefinition.ATTR_ATTRIBUTE));
+            fd.setCalculated(RestHelper.parseBool(j, FieldDefinition.ATTR_CALCULATED));
+            fd.setDefinedBy(RestHelper.parseString(j, FieldDefinition.ATTR_DEFINED_BY));
+            fd.setHidden(RestHelper.parseBool(j, FieldDefinition.ATTR_HIDDEN));
+            fd.setFieldType(FieldType.valueOfAnyCase(RestHelper.parseString(j, FieldDefinition.ATTR_DATA_TYPE)));
+            fd.setRequired(RestHelper.parseBool(j, FieldDefinition.ATTR_MANDATORY));
+            fd.setTitle(RestHelper.parseString(j, RestHelper.ATTR_NAME));
+        }
+        return fd;
+    }
+
+    private void parseDefinition(JsonObject def, FieldDefinition fd) {
         fd.setAttributeListEid(RestHelper.parseString(def, FieldDefinition.ATTR_ATTRIBUTE_LIST_EID));
         fd.setDefaultUnit(RestHelper.parseString(def, FieldDefinition.ATTR_DEFAULT_UNIT));
-        fd.setFieldType(FieldType.valueOf(RestHelper.parseString(def, FieldDefinition.ATTR_FIELD_TYPE))); 
+        fd.setDefinedBy(RestHelper.parseString(def, FieldDefinition.ATTR_DEFINED_BY));
+        fd.setFieldType(FieldType.valueOfAnyCase(RestHelper.parseString(def, FieldDefinition.ATTR_FIELD_TYPE))); 
         fd.setHidden(RestHelper.parseBool(def, FieldDefinition.ATTR_HIDDEN));
         fd.setKey(RestHelper.parseString(def, FieldDefinition.ATTR_KEY));
         fd.setRequired(RestHelper.parseBool(def, FieldDefinition.ATTR_REQUIRED));
@@ -60,8 +76,6 @@ public class FieldDefinitionRestService implements RestService<FieldDefinition> 
         if (def.has(FieldDefinition.ATTR_OPTIONS)) {
             parseOptions(def.getAsJsonArray(FieldDefinition.ATTR_OPTIONS), fd);
         }
-
-        return fd;
     }
 
     private void parseMeasures(JsonArray jArray, FieldDefinition fd) {

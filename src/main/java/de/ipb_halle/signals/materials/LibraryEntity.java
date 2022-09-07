@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals;
+package de.ipb_halle.signals.materials;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -28,29 +28,20 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 /** 
- * Single signals entity (entities API endpoint) 
+ * material library db entity
  */
 
 @Entity
-@Table(name="signalsentities")
-public class SignalsEntity {
+@Table(name="libraries")
+public class LibraryEntity {
+
 
     @Id
     private String id;
 
-    @Column(name="snb_type")
-    private String type;
-
     @Column(name="json_string")
     private String jsonString;
-
-
-    public void dump() {
-        System.out.println(id + " --> " + type);
-        System.out.println(jsonString);
-        System.out.println("==============================================================");
-    }
-
+    
     public String getId() {
         return id;
     }
@@ -59,19 +50,11 @@ public class SignalsEntity {
         return jsonString;
     }
 
-    public String getType() {
-        return type;
-    }
-
     public void setId(String i) {
         id = i;
     }
 
     public void setJsonString(String j) {
         jsonString = j;
-    }
-
-    public void setType(String t) {
-        type = t;
     }
 }

@@ -76,10 +76,10 @@ public class UserRestService implements RestService<User> {
      * deserialize user
      */
     public User createEntity(JsonElement j) {
-        JsonObject attributes = j.getAsJsonObject().getAsJsonObject("attributes");
+        JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
         User user = new User();
-        user.setId(attributes.getAsJsonPrimitive(User.ATTR_ID).getAsInt());
+        user.setId(attributes.getAsJsonPrimitive(User.ATTR_USER_ID).getAsInt());
         user.setAlias(attributes.getAsJsonPrimitive(User.ATTR_ALIAS).getAsString());
         user.setCountry(attributes.getAsJsonPrimitive(User.ATTR_COUNTRY).getAsString());
         user.setCreatedAt(RestHelper.parseDate(attributes, User.ATTR_CREATED_AT, new Date()));
@@ -107,7 +107,7 @@ public class UserRestService implements RestService<User> {
                 .execute(RestClient.HTTP_CREATED);
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
-            return createEntity(jsonResult.getAsJsonObject().get("data"));
+            return createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
 
         } catch(UnexpectedResponseCodeException ue) {
             System.out.println("Unexpected code");
@@ -130,7 +130,7 @@ public class UserRestService implements RestService<User> {
                 .execute();
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
-            return createEntity(jsonResult.getAsJsonObject().get("data"));
+            return createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
 
         } catch(UnexpectedResponseCodeException ue) {
             System.out.println("Unexpected code");
@@ -185,10 +185,10 @@ public class UserRestService implements RestService<User> {
 */
 
         JsonObject data = new JsonObject();
-        data.add("attributes", attributes);
+        data.add(RestHelper.ATTR_ATTRIBUTES, attributes);
 
         JsonObject obj = new JsonObject();
-        obj.add("data", data);
+        obj.add(RestHelper.ATTR_DATA, data);
         return obj.toString();
     }
 
@@ -196,7 +196,7 @@ public class UserRestService implements RestService<User> {
         JsonArray roles = new JsonArray();
         for (Role roleObj : user.getRoles()) {
             JsonObject role = new JsonObject();
-            role.addProperty(Role.ATTR_ID, roleObj.getId());
+            role.addProperty(RestHelper.ATTR_ID, roleObj.getId());
             role.addProperty(Role.ATTR_NAME, roleObj.getName());
             roles.add(role);
         }
@@ -207,7 +207,7 @@ public class UserRestService implements RestService<User> {
         JsonArray systemGroups = new JsonArray();
         for (Group groupObj : user.getSystemGroups()) {
             JsonObject systemGroup = new JsonObject();
-            systemGroup.addProperty(Group.ATTR_ID, groupObj.getId());
+            systemGroup.addProperty(RestHelper.ATTR_ID, groupObj.getId());
             systemGroup.addProperty(Group.ATTR_NAME, groupObj.getName());
             systemGroups.add(systemGroup);
         }

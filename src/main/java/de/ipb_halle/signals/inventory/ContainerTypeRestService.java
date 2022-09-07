@@ -28,6 +28,7 @@ import de.ipb_halle.signals.entity.FieldDefinition;
 import de.ipb_halle.signals.entity.FieldDefinitionRestService;
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
+import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestResultIterator;
 import de.ipb_halle.signals.rest.RestService;
 import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
@@ -58,9 +59,9 @@ public class ContainerTypeRestService implements RestService<ContainerType> {
 
     public ContainerType createEntity(JsonElement j) {
         ContainerType ct = new ContainerType();
-        JsonObject attributes = j.getAsJsonObject().getAsJsonObject("attributes");
+        JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
-        ct.setId(j.getAsJsonObject().getAsJsonPrimitive(ContainerType.ATTR_ID).getAsString());
+        ct.setId(j.getAsJsonObject().getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
         ct.setDescription(attributes.getAsJsonPrimitive(ContainerType.ATTR_DESCRIPTION).getAsString());
         ct.setJsonString(j.toString());
         ct.setName(attributes.getAsJsonPrimitive(ContainerType.ATTR_NAME).getAsString());

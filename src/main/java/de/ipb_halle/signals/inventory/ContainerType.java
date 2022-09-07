@@ -31,7 +31,6 @@ import java.util.Set;
 
 public class ContainerType {
 
-    public final static String ATTR_ID = "id";
     public final static String ATTR_ATTACHMENTS = "attachments";
     public final static String ATTR_CREATED_AT = "createdAt";
     public final static String ATTR_DESCRIPTION = "description";

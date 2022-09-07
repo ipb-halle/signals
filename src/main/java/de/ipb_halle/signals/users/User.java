@@ -34,7 +34,6 @@ import javax.persistence.Table;
 @Table(name="users")
 public class User {
 
-    public final static String ATTR_ID = "userId";
     public final static String ATTR_ALIAS = "alias";
     public final static String ATTR_COUNTRY = "country";
     public final static String ATTR_CREATED_AT = "createdAt";
@@ -46,6 +45,7 @@ public class User {
     public final static String ATTR_ORGANIZATION = "organization";
     public final static String ATTR_ROLES = "roles";
     public final static String ATTR_SYSTEM_GROUPS = "systemGroups";
+    public final static String ATTR_USER_ID = "userId";
     public final static String ATTR_USER_NAME = "userName";
     
     

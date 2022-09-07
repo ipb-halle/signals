@@ -17,32 +17,29 @@
  */
 package de.ipb_halle.signals.materials;
 
-import java.util.List;
+
 import javax.ejb.Stateless;
-import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 
 /** 
- * Manager for signals entities (entities API endpoint) 
+ * DB service for material libraries
  */
 
 @Stateless
-public class LibraryManager {
+public class LibraryDbService {
 
-    @Inject
-    private LibraryDbService dbService;
+    @PersistenceContext(unitName="signalsDB")
+    private EntityManager em;
 
-    @Inject
-    private LibraryRestService restService;
     
-    public List<Library> getSnbLibraries() {
-        return restService.doGetLibraries();
+    public Library loadById(String id) {
+//      return em.find(Library.class, id);
+        return null;
     }
 
-    public void save(List<Library> libraries) {
-        for (Library lib : libraries) {
-            dbService.save(lib);
-        }
+    public void save(Library lib) {
+//      em.merge(lib);
     }
 }
-
-

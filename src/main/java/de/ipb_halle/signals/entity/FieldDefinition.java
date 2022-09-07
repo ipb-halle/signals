@@ -38,29 +38,46 @@ import javax.persistence.Table;
 public class FieldDefinition {
 
 
-    public final static String ATTR_ID = "id";
     public final static String ATTR_ATTRIBUTE_LIST_EID = "attributeListEid";
+    public final static String ATTR_ATTRIBUTE = "attribute";
+    public final static String ATTR_CALCULATED = "calculated";
+    public final static String ATTR_DATA_TYPE = "dataType";
     public final static String ATTR_DEFAULT_UNIT = "defaultUnit";
+    public final static String ATTR_DEFINED_BY = "definedBy";
     public final static String ATTR_DEFINITION = "definition";
+    public final static String ATTR_FIELD_TYPE = "type";
     public final static String ATTR_HIDDEN = "hidden";
     public final static String ATTR_KEY = "key";
     public final static String ATTR_MEASURES = "measures";
     public final static String ATTR_MULTISELECT = "multiSelect";
     public final static String ATTR_OPTIONS = "options";
+    public final static String ATTR_READ_ONLY = "readOnly";
     public final static String ATTR_REQUIRED = "isRequired";
+    public final static String ATTR_MANDATORY = "mandatory";
     public final static String ATTR_TITLE = "title";
-    public final static String ATTR_FIELD_TYPE = "type";
     public final static String ATTR_USER_DEFINED = "isUserDefined";
 
     @Id
     private String id;
 
+    /**
+     * referred by ATTR_ATTRIBUTE_LIST_EID and ATTR_ATTRIBUTE
+     */
     @Column(name="attribute_list_eid")
     private String attributeListEid;
+
+    @Column
+    private Boolean calculated;
 
     @Column(name="default_unit")
     private String defaultUnit;
 
+    @Column(name="defined_by")
+    private String definedBy;
+
+    /**
+     * referred by ATTR_FIELD_TYPE and ATTR_DATA_TYPE
+     */
     @Column(name="field_type")
     private FieldType fieldType;
 
@@ -81,6 +98,11 @@ public class FieldDefinition {
     @JoinColumn(name = "field_id")
     private Set<FieldOption> options;
     
+    @Column(name="read_only")
+    private Boolean readOnly;
+    /**
+     * referred by ATTR_REQUIRED and ATTR_MANDATORY
+     */
     @Column
     private Boolean required;
 
@@ -121,8 +143,16 @@ public class FieldDefinition {
         return attributeListEid;
     }
 
+    public Boolean getCalculated() {
+        return calculated;
+    }
+
     public String getDefaultUnit() {
         return defaultUnit;
+    }
+
+    public String getDefinedBy() {
+        return definedBy;
     }
 
     public FieldType getFieldType() {
@@ -153,6 +183,10 @@ public class FieldDefinition {
         return multiSelect;
     }
 
+    public Boolean isReadOnly() {
+        return readOnly;
+    }
+
     public Boolean isRequired() {
         return required;
     }
@@ -179,8 +213,18 @@ public class FieldDefinition {
         return this;
     }
 
+    public FieldDefinition setCalculated(Boolean c) {
+        calculated = c;
+        return this;
+    }
+
     public FieldDefinition setDefaultUnit(String u) {
         defaultUnit = u;
+        return this;
+    }
+
+    public FieldDefinition setDefinedBy(String d) {
+        definedBy = d;
         return this;
     }
 
@@ -211,6 +255,11 @@ public class FieldDefinition {
 
     public FieldDefinition setOptions(Set<FieldOption> o) {
         options = o;
+        return this;
+    }
+
+    public FieldDefinition setReadOnly(Boolean r) {
+        readOnly = r;
         return this;
     }
 

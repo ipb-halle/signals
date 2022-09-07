@@ -31,11 +31,13 @@ public class MeasureMapper{
     static {
         map = new HashMap<> ();
         for (Quality q : Quality.values()) {
-            map.put(q.getSnbMeasure(), q);
+            map.put(q.getSnbMeasure().toUpperCase(), q);
         }
     }
 
+    /**
+     */
     public static Quality getQuality(String measure) {
-        return map.get(measure);
+        return map.get(measure.toUpperCase());
     }
 }

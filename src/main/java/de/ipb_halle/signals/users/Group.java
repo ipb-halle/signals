@@ -36,7 +36,6 @@ import javax.persistence.Table;
 @Table(name="groups")
 public class Group {
 
-    public final static String ATTR_ID = "id";
     public final static String ATTR_CREATED_AT= "createdAt";
     public final static String ATTR_DESCRIPTION = "description";
     public final static String ATTR_DIGEST = "digest";

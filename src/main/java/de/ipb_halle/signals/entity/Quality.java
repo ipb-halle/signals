@@ -26,17 +26,19 @@ import java.util.HashMap;
  * @author fbroda
  */
 public enum Quality {
+
     PIECES("ea", "count", "Count"),
     LENGTH("m", "length", "Length"),
     AREA("m^2", "area", "Area"),
     VOLUME("m^3", "volume", "Volume"),
     MASS("kg", "mass", "Mass"),
     DENSITY("kg/m^3", "density", "Density"),
-    AMOUNT_OF_SUBSTANCE("mol", "mol", "mol"),
+    AMOUNT_OF_SUBSTANCE("mol", "amount_of_substance", "Amount"),
     MOLAR_MASS("kg/mol", "molar mass", "molar mass"),
-    MOLAR_CONCENTRATION("mol/m^3", "molar conc.", "molar conc."),
-    PERCENT_CONCENTRATION("[1]", "percent", "percent"),
-    MASS_CONCENTRATION("kg/m^3", "mass conc.", "mass conc.");
+    MOLAR_CONCENTRATION("mol/m^3", "molarity.", "Molarity"),
+    PERCENT_CONCENTRATION("[1]", "fraction", "Percentage"),
+    MASS_CONCENTRATION("kg/m^3", "mass conc.", "mass conc."),
+    CELL_COUNT_MASS("[1]", "integer", "Cell Count Mass");
 
     /*
      * Do not change this to Unit, because this will clash with the static block in

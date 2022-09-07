@@ -44,7 +44,6 @@ import javax.persistence.Table;
 @Table(name="roles")
 public class Role {
 
-    public final static String ATTR_ID = "id";
     public final static String ATTR_COUNTS = "counts";
     public final static String ATTR_DESCRIPTION = "description";
     public final static String ATTR_FLAGS = "flags";

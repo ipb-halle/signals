@@ -34,6 +34,13 @@ public class RestHelper {
 
     public final static String SNB_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
+    // common attribute names
+    public final static String ATTR_ATTRIBUTES = "attributes";
+    public final static String ATTR_DATA = "data";
+    public final static String ATTR_ID = "id";
+    public final static String ATTR_NAME = "name";
+    public final static String ATTR_TYPE = "type";
+
     public static String formatDate(Date d) {
         DateFormat df = new SimpleDateFormat(SNB_DATE_FORMAT);
         return df.format(d);
