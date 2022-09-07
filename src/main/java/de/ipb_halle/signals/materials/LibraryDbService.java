@@ -17,10 +17,20 @@
  */
 package de.ipb_halle.signals.materials;
 
+import de.ipb_halle.signals.entity.FieldDefinitionDbService;
+import de.ipb_halle.signals.entity.FieldDefinition;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 
 /** 
@@ -30,16 +40,59 @@ import javax.persistence.PersistenceContext;
 @Stateless
 public class LibraryDbService {
 
+    public final String ASSET = "A";
+    public final String BATCH = "B";
+    public final String LIBRARY_ID = "library_id";
+    public final String LIBRARY_FIELD_TYPE = "library_field_type";
+
+    @Inject 
+    private FieldDefinitionDbService fieldService;
+
     @PersistenceContext(unitName="signalsDB")
     private EntityManager em;
 
+    private List<FieldDefinition> loadFieldDefinitions(String id, String type) {
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<LibraryFieldDefinition> criteriaQuery = builder.createQuery(LibraryFieldDefinition.class);
+        Root<LibraryFieldDefinition> root = criteriaQuery.from(LibraryFieldDefinition.class);
+        criteriaQuery.select(root);
+
+        List<Predicate> predicates = new ArrayList<Predicate> ();
+        predicates.add(builder.equal(root.get(LIBRARY_ID), id));
+        predicates.add(builder.equal(root.get(LIBRARY_FIELD_TYPE), type));
+
+        criteriaQuery.where(builder.and(predicates.toArray(new Predicate[]{})));
+
+        List<FieldDefinition> result = new ArrayList<> ();
+        for (LibraryFieldDefinition fd : em.createQuery(criteriaQuery).getResultList()) {
+            result.add(fieldService.loadById(fd.getFieldDefinitionId()));
+        }
+        return result;
+    }
+
     
     public Library loadById(String id) {
-//      return em.find(Library.class, id);
-        return null;
+        LibraryEntity entity = em.find(LibraryEntity.class, id);
+        return new Library(entity, 
+            loadFieldDefinitions(ASSET, id),
+            loadFieldDefinitions(BATCH, id));
     }
 
     public void save(Library lib) {
-//      em.merge(lib);
+        LibraryEntity le = lib.createEntity();
+        em.merge(le);
+        saveFieldDefinitions(lib.getAssetFieldDefinitions(), le.getId(), ASSET);
+        saveFieldDefinitions(lib.getBatchFieldDefinitions(), le.getId(), BATCH);
+    }
+
+    private void saveFieldDefinitions(Set<FieldDefinition> fieldDefinitions, String libraryId, String type) {
+        for (FieldDefinition fd : fieldDefinitions) {
+            fieldService.save(fd);
+            LibraryFieldDefinition libFD = new LibraryFieldDefinition()
+                .setLibraryId(libraryId)
+                .setFieldDefinitionId(fd.getId())
+                .setType(type);
+            em.merge(libFD);
+        }
     }
 }

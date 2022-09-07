@@ -71,14 +71,13 @@ public class LibraryRestService implements RestService<Library> {
         if (attributes.has(Library.ATTR_BATCHES)) {
             parseBatch(j.getAsJsonObject(Library.ATTR_BATCHES), lib);
         }
+        parseChangeRecords(attributes, lib);
 
-        // displayImage
-        // created
-        // edited
-        // digest
-        // displayTable
-        // materialsSampleMapping
-        // entityFlags
+        lib.setDigest(RestHelper.parseString(attributes, RestHelper.ATTR_DIGEST));
+        lib.setDisplayImage(RestHelper.getAsJsonString(attributes, Library.ATTR_DISPLAY_IMAGE));
+        lib.setDisplayTable(RestHelper.getAsJsonString(attributes, Library.ATTR_DISPLAY_TABLE));
+        lib.setEntityFlags(RestHelper.getAsJsonString(attributes, Library.ATTR_ENTITY_FLAGS));
+        lib.setMaterialsSampleMapping(RestHelper.getAsJsonString(attributes, Library.ATTR_MATERIALS_SAMPLE_MAPPING));
         return lib;
     }
     
@@ -117,13 +116,13 @@ public class LibraryRestService implements RestService<Library> {
     private void parseAsset(JsonObject j, Library lib) {
         lib.setAssetDisplayName(RestHelper.parseString(j, Library.ATTR_ASSET_DISPLAY_NAME));
         lib.setAssetNameFieldId(RestHelper.parseString(j, Library.ATTR_ASSET_NAME_FIELD_ID));
+        lib.setAssetNumberingFormat(RestHelper.parseString(RestHelper.getPrimitiveFromPath(j, Library.ATTR_NUMBERING_FORMAT)));
 
         if (j.has(Library.ATTR_ASSET_FIELDS)) {
             parseAssetFields(j.getAsJsonArray(Library.ATTR_ASSET_FIELDS), lib);
         }
 
-        // parse uniqueness
-        // parse numbering
+        lib.setUniqueness(RestHelper.getAsJsonString(j, Library.ATTR_ASSET_UNIQUENESS));
     }
 
     private void parseAssetFields(JsonArray jArray, Library lib) {
@@ -136,10 +135,10 @@ public class LibraryRestService implements RestService<Library> {
 
     private void parseBatch(JsonObject j, Library lib) {
         lib.setBatchDisplayName(RestHelper.parseString(j, Library.ATTR_BATCH_DISPLAY_NAME));
+        lib.setBatchNumberingFormat(RestHelper.parseString(RestHelper.getPrimitiveFromPath(j, Library.ATTR_NUMBERING_FORMAT)));
         if (j.has(Library.ATTR_BATCH_FIELDS)) {
             parseBatchFields(j.getAsJsonArray(Library.ATTR_BATCH_FIELDS), lib);
         }
-        // parse numbering
     }
 
     private void parseBatchFields(JsonArray jArray, Library lib) {
@@ -148,5 +147,12 @@ public class LibraryRestService implements RestService<Library> {
         while (iterator.hasNext()) {
             lib.addBatchFieldDefinition(svc.createEntity(iterator.next()));
         }
+    }
+
+    private void parseChangeRecords(JsonObject json, Library lib) {
+        lib.setCreatedAt(RestHelper.parseDate(RestHelper.getPrimitiveFromPath(json, Library.ATTR_PATH_CREATED_AT)));
+        lib.setCreatedBy(RestHelper.parseInt(RestHelper.getPrimitiveFromPath(json, Library.ATTR_PATH_CREATED_BY)));
+        lib.setEditedAt(RestHelper.parseDate(RestHelper.getPrimitiveFromPath(json, Library.ATTR_PATH_EDITED_AT)));
+        lib.setEditedBy(RestHelper.parseInt(RestHelper.getPrimitiveFromPath(json, Library.ATTR_PATH_EDITED_BY)));
     }
 }

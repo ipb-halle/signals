@@ -19,6 +19,8 @@ package de.ipb_halle.signals.materials;
 
 import de.ipb_halle.signals.entity.FieldDefinition;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /** 
@@ -32,41 +34,110 @@ public class Library {
     public final static String ATTR_ASSET_NAME_FIELD_ID = "assetNameFieldId";
     public final static String ATTR_ASSET_DISPLAY_NAME = "displayName";
     public final static String ATTR_ASSET_FIELDS = "fields";
-    public final static String ATTR_ASSET_NUMBERING = "numbering";
     public final static String ATTR_BATCHES = "batches";
     public final static String ATTR_BATCH_DISPLAY_NAME = "displayName";
     public final static String ATTR_BATCH_FIELDS = "fields";
-    public final static String ATTR_BATCH_NUMBERING = "numbering"; 
     public final static String ATTR_DISPLAY_IMAGE = "displayImage";
     public final static String ATTR_ENABLED = "enabled";
-    public final static String ATTR_CREATED = "created";
-    public final static String ATTR_DIGEST = "digest";
-    public final static String ATTR_EDITED = "edited";
+    public final static String ATTR_ENTITY_FLAGS = "entityFlags";
+    public final static String ATTR_NUMBERING_FORMAT = "numbering.format";
+    public final static String ATTR_PATH_CREATED_AT = "created.at";
+    public final static String ATTR_PATH_CREATED_BY = "created.by.data.id";
+    public final static String ATTR_PATH_EDITED_AT = "edited.at";
+    public final static String ATTR_PATH_EDITED_BY = "edited.by.data.id";
     public final static String ATTR_DISPLAY_TABLE = "displayTable";
     public final static String ATTR_MATERIALS_SAMPLE_MAPPING = "materialsSampleMapping";
-    public final static String ATTR_ENTITY_FLAGS = "entityFlags";
     
 
-    private String id;
 
     private String assetDisplayName;
     private Set<FieldDefinition> assetFieldDefinitions;
     private String assetNameFieldId;
-    private String assetNumbering;
+    private String assetNumberingFormat;
 
     private String batchDisplayName;
     private Set<FieldDefinition> batchFieldDefinitions;
-    private String batchNumbering;
+    private String batchNumberingFormat;
 
+    private Date createdAt;
+    private Integer createdBy;
+    private String digest;
+    private String displayImage;                // JSON
+    private String displayTable;                // JSON
+    private Date editedAt;
+    private Integer editedBy;
     private Boolean enabled;
+    private String entityFlags;                 // JSON
 
-    private String jsonString;
+    private String id;
+    private String jsonString;                  // JSON
+    private String materialsSampleMapping;      // JSON
     private String name;
-
+    private String uniqueness;                  // JSON
     
+    /**
+     * default constructor
+     */
+    public Library() {
+        assetFieldDefinitions = new HashSet<> ();
+        batchFieldDefinitions = new HashSet<> ();
+    }
+
+    public Library (LibraryEntity le, List<FieldDefinition> assetFD, List<FieldDefinition> batchFD) {
+        id = le.getId();
+
+        assetDisplayName = getAssetDisplayName();
+        assetNameFieldId = getAssetNameFieldId();
+        assetNumberingFormat = getAssetNumberingFormat() ;
+        batchDisplayName = getBatchDisplayName();
+        batchNumberingFormat = getBatchNumberingFormat() ;
+        createdAt = getCreatedAt();
+        createdBy = getCreatedBy();
+        digest = getDigest();
+        displayImage = getDisplayImage();
+        displayTable = getDisplayTable();
+        editedAt = getEditedAt();
+        editedBy = getEditedBy();
+        enabled = isEnabled();
+        entityFlags = getEntityFlags();
+        jsonString = getJsonString();
+        materialsSampleMapping = getMaterialsSampleMapping();
+        name = getName();
+        uniqueness = getUniqueness();
+
+        assetFieldDefinitions = new HashSet<> ();
+        assetFieldDefinitions.addAll(assetFD);
+        batchFieldDefinitions = new HashSet<> ();
+        batchFieldDefinitions.addAll(batchFD);
+    }
+
+    public LibraryEntity createEntity() {
+        LibraryEntity entity = new LibraryEntity()
+            .setId(id)
+            .setAssetDisplayName(assetDisplayName)
+            .setAssetNameFieldId(assetNameFieldId)
+            .setAssetNumberingFormat(assetNumberingFormat)
+            .setBatchDisplayName(batchDisplayName)
+            .setBatchNumberingFormat(batchNumberingFormat)
+            .setCreatedAt(createdAt)
+            .setCreatedBy(createdBy)
+            .setDigest(digest)
+            .setDisplayImage(displayImage)
+            .setDisplayTable(displayTable)
+            .setEditedAt(editedAt)
+            .setEditedBy(editedBy)
+            .setEnabled(enabled)
+            .setEntityFlags(entityFlags)
+            .setJsonString(jsonString)
+            .setMaterialsSampleMapping(materialsSampleMapping)
+            .setName(name)
+            .setUniqueness(uniqueness);
+
+        return entity;
+    }
 
     public void dump() {
-        System.out.printf("Library(%s): ...\n", id);
+        System.out.printf("Library(%s): %s\n", id, name);
         System.out.println(jsonString);
         System.out.println("============================================================");
     }
@@ -91,8 +162,8 @@ public class Library {
         return assetNameFieldId;
     }
 
-    public String getAssetNumbering()  {
-        return assetNumbering;
+    public String getAssetNumberingFormat()  {
+        return assetNumberingFormat;
     }
 
     public String getBatchDisplayName() {
@@ -103,8 +174,40 @@ public class Library {
         return batchFieldDefinitions;
     }
 
-    public String getBatchNumbering()  {
-        return assetNumbering;
+    public String getBatchNumberingFormat()  {
+        return batchNumberingFormat;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public Integer getCreatedBy() {
+        return createdBy;
+    }
+
+    public String getDigest() {
+        return digest;
+    }
+
+    public String getDisplayImage() {
+        return displayImage;
+    }
+
+    public String getDisplayTable() {
+        return displayTable;
+    }
+
+    public Date getEditedAt() {
+        return editedAt;
+    }
+
+    public Integer getEditedBy() {
+        return editedBy;
+    }
+
+    public String getEntityFlags() {
+        return entityFlags;
     }
 
     public String getId() {
@@ -115,17 +218,20 @@ public class Library {
         return jsonString;
     }
 
+    public String getMaterialsSampleMapping() {
+        return materialsSampleMapping;
+    }
+
     public String getName() {
         return name;
     }
 
-    public Boolean isEnabled() {
-        return enabled;
+    public String getUniqueness() {
+        return uniqueness;
     }
 
-    public Library setId(String i) {
-        id = i;
-        return this;
+    public Boolean isEnabled() {
+        return enabled;
     }
 
     public Library setAssetDisplayName(String n) {
@@ -143,8 +249,8 @@ public class Library {
         return this;
     }
 
-    public Library setAssetNumbering(String n)  {
-        assetNumbering = n;
+    public Library setAssetNumberingFormat(String n)  {
+        assetNumberingFormat = n;
         return this;
     }
 
@@ -158,8 +264,43 @@ public class Library {
         return this;
     }
 
-    public Library setBatchNumbering(String n)  {
-        assetNumbering = n;
+    public Library setBatchNumberingFormat(String n)  {
+        batchNumberingFormat = n;
+        return this;
+    }
+
+    public Library setCreatedAt(Date d) {
+        createdAt = d;
+        return this;
+    }
+
+    public Library setCreatedBy(Integer u) {
+        createdBy = u;
+        return this;
+    }
+
+    public Library setDigest(String d) {
+        digest = d;
+        return this;
+    }
+
+    public Library setDisplayImage(String d) {
+        displayImage = d;
+        return this;
+    }
+
+    public Library setDisplayTable(String d) {
+        displayTable = d;
+        return this;
+    }
+
+    public Library setEditedAt(Date d) {
+        editedAt = d;
+        return this;
+    }
+
+    public Library setEditedBy(Integer u) {
+        editedBy = u;
         return this;
     }
 
@@ -168,8 +309,23 @@ public class Library {
         return this;
     }
 
+    public Library setEntityFlags(String f) {
+        entityFlags = f;
+        return this;
+    }
+
+    public Library setId(String i) {
+        id = i;
+        return this;
+    }
+
     public Library setJsonString(String j) {
         jsonString = j;
+        return this;
+    }
+
+    public Library setMaterialsSampleMapping(String m) {
+        materialsSampleMapping = m;
         return this;
     }
 
@@ -178,4 +334,8 @@ public class Library {
         return this;
     }
 
+    public Library setUniqueness(String u) {
+        uniqueness = u;
+        return this;
+    }
 }

@@ -129,3 +129,32 @@ CREATE TABLE container_type_fields (
     PRIMARY KEY (container_type_id, field_definition_id)
 );
 
+CREATE TABLE libraries (
+    id VARCHAR NOT NULL PRIMARY KEY,
+    assetDisplayName VARCHAR,
+    asset_name_field_id VARCHAR,
+    asset_numbering_format VARCHAR,
+    batch_display_name VARCHAR,
+    batch_numbering VARCHAR,
+    created_at TIMESTAMP,
+    created_by INTEGER,
+    digest VARCHAR,
+    display_image VARCHAR,
+    display_table VARCHAR,
+    edited_at TIMESTAMP,
+    edited_by INTEGER,
+    enabled BOOLEAN,
+    entity_flags VARCHAR,
+    json_string VARCHAR,
+    materials_sample_mapping VARCHAR,
+    name VARCHAR,
+    uniqueness VARCHAR,
+);
+
+CREATE TABLE library_fields (
+    library_id VARCHAR NOT NULL REFERENCES libraries (id),
+    field_definition_id VARCHAR NOT NULL REFERENCES field_definitions (id),
+    type VARCHAR NOT NULL,
+    PRIMARY KEY (library_id, field_definition_id, type)
+);
+

@@ -37,6 +37,7 @@ public class RestHelper {
     // common attribute names
     public final static String ATTR_ATTRIBUTES = "attributes";
     public final static String ATTR_DATA = "data";
+    public final static String ATTR_DIGEST = "digest";
     public final static String ATTR_ID = "id";
     public final static String ATTR_NAME = "name";
     public final static String ATTR_TYPE = "type";
@@ -46,13 +47,84 @@ public class RestHelper {
         return df.format(d);
     }
 
+    public static String getAsJsonString(JsonObject json, String attribute) {
+        return getAsJsonString(json, attribute, null);
+    }
+
+    public static String getAsJsonString(JsonObject json, String attribute, String dflt) {
+        if (jsonHas(json, attribute)) {
+            return json.get(attribute).toString();
+        }
+        return dflt;
+    }
+
+
+    private static JsonElement getFromPath(JsonElement json, String[] paths, int index, int last) {
+        String element = paths[index];
+        if (json.isJsonObject()) {
+            JsonObject obj = json.getAsJsonObject();
+            if (obj.has(element)) {
+                if (index < last) {
+                    return getFromPath(obj.get(element), paths, index + 1, last);
+                } else {
+                    return obj.get(element);
+                }
+            }
+        }
+        return null;
+    }
+
+    public static JsonElement getFromPath(JsonElement json, String path) {
+        String[] elements = path.split("\\.");
+        return getFromPath(json, elements, 0, elements.length - 1);
+    }
+
+    public static JsonPrimitive getPrimitiveFromPath(JsonElement json, String path) {
+        JsonElement elem = getFromPath(json, path);
+        if ((elem != null) && elem.isJsonPrimitive()) {
+            return elem.getAsJsonPrimitive();
+        }
+        return null;
+    }
+
+    private static boolean jsonHas(JsonObject json, String attribute) {
+        return (json != null) && json.has(attribute);
+    }
+
+    public static Boolean parseBool(JsonPrimitive json) {
+        return parseBool(json, null);
+    }
+
+    public static Boolean parseBool(JsonPrimitive json, Boolean dflt) {
+        if (json != null) {
+            return json.getAsBoolean();
+        }
+        return dflt;
+    }
+
     public static Boolean parseBool(JsonObject json, String attribute) {
         return parseBool(json, attribute, null);
     }
 
     public static Boolean parseBool(JsonObject json, String attribute, Boolean dflt) {
-        if (json.has(attribute)) {
+        if (jsonHas(json, attribute)) {
             return json.getAsJsonPrimitive(attribute).getAsBoolean();
+        }
+        return dflt;
+    }
+
+
+    public static Date parseDate(JsonPrimitive json) {
+        return parseDate(json, null);
+    }
+
+    public static Date parseDate(JsonPrimitive json, Date dflt) {
+        if (json != null) {
+            DateFormat df = new SimpleDateFormat(SNB_DATE_FORMAT);
+            try {
+                return df.parse(json.getAsString());
+            } catch(Exception e) {
+            }
         }
         return dflt;
     }
@@ -62,12 +134,19 @@ public class RestHelper {
     }
 
     public static Date parseDate(JsonObject json, String attribute, Date dflt) {
-        if (json.has(attribute)) {
-            DateFormat df = new SimpleDateFormat(SNB_DATE_FORMAT);
-            try {
-                return df.parse(json.getAsJsonPrimitive(attribute).getAsString());
-            } catch(Exception e) {
-            }
+        if (jsonHas(json, attribute)) {
+            return parseDate(json.getAsJsonPrimitive(attribute), dflt);
+        }
+        return dflt;
+    }
+
+    public static Integer parseInt(JsonPrimitive json) {
+        return parseInt(json, null);
+    }
+
+    public static Integer parseInt(JsonPrimitive json, Integer dflt) {
+        if (json != null) {
+            return json.getAsInt();     
         }
         return dflt;
     }
@@ -77,19 +156,29 @@ public class RestHelper {
     }
 
     public static Integer parseInt(JsonObject json, String attribute, Integer dflt) {
-        if (json.has(attribute)) {
+        if (jsonHas(json, attribute)) {
             return json.getAsJsonPrimitive(attribute).getAsInt();
         }
         return dflt;
     }
 
+    public static String parseString(JsonPrimitive json) {
+        return parseString(json, null);
+    }
+
+    public static String parseString(JsonPrimitive json, String dflt) {
+        if (json != null) {
+            return json.getAsString();
+        }
+        return dflt;
+    }
 
     public static String parseString(JsonObject json, String attribute) {
         return parseString(json, attribute, null);
     }
 
     public static String parseString(JsonObject json, String attribute, String dflt) {
-        if (json.has(attribute)) {
+        if (jsonHas(json, attribute)) {
             return json.getAsJsonPrimitive(attribute).getAsString();
         }
         return dflt;
