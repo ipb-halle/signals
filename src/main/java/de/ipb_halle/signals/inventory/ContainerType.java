@@ -100,9 +100,8 @@ public class ContainerType {
         return cte;
     }
 
-    public void dump() {
-        System.out.printf("ContainerType(%s): %s\n", id, name);
-        System.out.println("==============================================================");
+    public String dump() {
+        return String.format("ContainerType(%s): %s\n", id, name);
     }
 
     public String getId() {

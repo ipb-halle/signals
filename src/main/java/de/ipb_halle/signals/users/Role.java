@@ -75,7 +75,7 @@ public class Role {
         return this;
     }
 
-    public void dump() {
+    public String dump() {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("Role(%d) --> %s\n", id, name));
         sb.append("Privileges: ");
@@ -93,7 +93,7 @@ public class Role {
             }
         }
         sb.append("\n==============================================================");
-        System.out.println(sb.toString());
+        return sb.toString();
     }
 
     public Integer getId() {

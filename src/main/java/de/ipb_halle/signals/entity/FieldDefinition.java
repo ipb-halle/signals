@@ -140,8 +140,8 @@ public class FieldDefinition {
         return this;
     }
 
-    public void dump() {
-        System.out.printf("FieldDefinition(%s): %s\n", id, title);
+    public String dump() {
+        return String.format("FieldDefinition(%s): %s\n", id, title);
     }
 
     public String getId() {

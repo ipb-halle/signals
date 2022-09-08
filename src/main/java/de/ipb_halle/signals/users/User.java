@@ -96,7 +96,7 @@ public class User {
         lastLoginAt = new Date(0);
     }
 
-    public void dump() {
+    public String dump() {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("User(%d): %s, %s\n", id, lastName, firstName));
         sb.append(String.format("  Alias: %s    User name: %s\n", alias, userName));
@@ -105,8 +105,7 @@ public class User {
         sb.append(String.format("  Created at: %s\n", RestHelper.formatDate(createdAt)));
         sb.append(String.format("  Last login: %s\n", RestHelper.formatDate(lastLoginAt)));
         sb.append((jsonString != null) ? jsonString : "");
-        sb.append("\n==============================================================");
-        System.out.println(sb.toString());
+         return sb.toString();
     }
 
     public Integer getId() {

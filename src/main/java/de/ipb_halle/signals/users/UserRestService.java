@@ -41,6 +41,9 @@ import java.util.NoSuchElementException;
 import javax.ejb.Local;
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /** 
  * Signals API REST service for users
@@ -67,11 +70,12 @@ public class UserRestService implements RestService<User> {
     public final String USERS_ENDPOINT = "/users";
     public final String USER_ENDPOINT = "/users/%d";
 
+    private Logger logger = LoggerFactory.getLogger(UserRestService.class.getName());
+
 
     @Inject
     private RestClient restClient;
     
-
     /**
      * deserialize user
      */
@@ -110,12 +114,11 @@ public class UserRestService implements RestService<User> {
             return createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
 
         } catch(UnexpectedResponseCodeException ue) {
-            System.out.println("Unexpected code");
+            logger.warn("Unexpected code");
         } catch(MalformedURLException me) {
-            System.out.println("Malformed URL");
+            logger.warn("Malformed URL");
         } catch(IOException ioe) {
-            System.out.println("IOException");
-            ioe.printStackTrace();
+            logger.warn("IOException", (Throwable) ioe);
         }
         return null;
     }
@@ -133,12 +136,11 @@ public class UserRestService implements RestService<User> {
             return createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
 
         } catch(UnexpectedResponseCodeException ue) {
-            System.out.println("Unexpected code");
+            logger.warn("Unexpected code");
         } catch(MalformedURLException me) {
-            System.out.println("Malformed URL");
+            logger.warn("Malformed URL");
         } catch(IOException ioe) {
-            System.out.println("IOException");
-            ioe.printStackTrace();
+            logger.warn("IOException", (Throwable) ioe);
         }
         return null;
     }

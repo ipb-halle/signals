@@ -45,10 +45,11 @@ public class LocationType {
     @Column(name="json_string")
     private String jsonString;
 
-    public void dump() {
-        System.out.printf("LocationType(%s): %s\n", id, name);
-        System.out.println(jsonString);
-        System.out.println("==============================================================");
+    public String dump() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("LocationType(%s): %s\n", id, name));
+        sb.append(jsonString);
+        return sb.toString();
     }
 
     public String getId() {

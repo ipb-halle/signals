@@ -65,7 +65,7 @@ public class Signals {
             dumpSet(ldapClient.filterDNs(groups, LdapClient.FilterType.ROLE));
 
             User u = ldapClient.getUser("SOME USER DN");
-            u.dump();
+            System.out.println(u.dump());
 
             System.out.println("User by name\n============");
             users = ldapClient.getUsers("SOME EMAIL ADDRESS");

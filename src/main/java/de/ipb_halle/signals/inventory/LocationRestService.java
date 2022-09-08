@@ -31,13 +31,13 @@ import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
 import javax.ejb.Local;
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** 
  * Manager for signals locations (inventory/location API endpoint) 
@@ -50,6 +50,8 @@ public class LocationRestService implements RestService<Location> {
 
     @Inject
     private RestClient restClient;
+
+    private Logger logger = LoggerFactory.getLogger(LocationRestService.class.getName());
     
     public Location createEntity(JsonElement j) {
         JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
@@ -79,12 +81,11 @@ public class LocationRestService implements RestService<Location> {
             return jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA);
 
         } catch(UnexpectedResponseCodeException ue) {
-            System.out.println("Unexpected code");
+           logger.warn("Unexpected code");
         } catch(MalformedURLException me) {
-            System.out.println("Malformed URL");
+            logger.warn("Malformed URL");
         } catch(IOException ioe) {
-            System.out.println("IOException");
-            ioe.printStackTrace();
+            logger.warn("IOException",  (Throwable) ioe);
         }
         return null;
     }

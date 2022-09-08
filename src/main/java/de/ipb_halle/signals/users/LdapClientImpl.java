@@ -39,6 +39,9 @@ import javax.naming.NamingException;
 import javax.naming.directory.*;
 import javax.naming.ldap.LdapName;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /** 
  * Ldap client reader for Signals tool.
  * The current implementation was created to fit IPB needs. It therefore 
@@ -58,6 +61,8 @@ public class LdapClientImpl implements LdapClient {
     SignalsConfig signalsConfig;
 
     private Hashtable<String, String> ldapEnv;
+
+    private Logger logger = LoggerFactory.getLogger(LdapClientImpl.class.getName());
 
     @PostConstruct
     private void initialize() {
@@ -83,27 +88,25 @@ public class LdapClientImpl implements LdapClient {
         Set<String> results = new HashSet<> ();
         String[] filters = getDnFilters(type);
 
-        try {
-            for (String filter : filters) {
+        for (String filter : filters) {
+            try {
                 LdapName filterName = new LdapName(filter);
                 Iterator<String> dnIter = distinguishedNames.iterator();
                 while(dnIter.hasNext()) {
+                    String dn = dnIter.next();
                     try {
-                        String dn = dnIter.next();
                         LdapName name = new LdapName(dn);
 
                         if (name.startsWith(filterName)) {
                             results.add(dn);
                         }
                      } catch (InvalidNameException f) {
-                         // this.logger.warn("filterGroup() invalid name: " + dn);
-                         f.printStackTrace();
+                         logger.warn("filterGroup() invalid name: '{}'", dn);
                      }
                 }
+            } catch (InvalidNameException e) {
+                logger.warn("filterGroup() invalid filter expression '{}'", filter);
             }
-        } catch (InvalidNameException e) {
-            // this.logger.warn("filterGroup() invalid filter expression:" + filter);
-            e.printStackTrace();
         }
         return results;
     }
@@ -161,7 +164,7 @@ public class LdapClientImpl implements LdapClient {
                 ctx.close();
             }
         } catch(Exception e) {
-            e.printStackTrace();
+            logger.warn("getGroup() caught an Exception: ", (Throwable) e);
         }                                                
         return null;
     }
@@ -202,7 +205,7 @@ public class LdapClientImpl implements LdapClient {
                 ctx.close();
             }
         } catch(Exception e) {
-            e.printStackTrace();
+            logger.warn("getMembers() caught an Exception: ", (Throwable) e);
         }
     }
 
@@ -243,7 +246,7 @@ public class LdapClientImpl implements LdapClient {
                 ctx.close();
             }
         } catch(Exception e) {
-            e.printStackTrace();
+            logger.warn("getMemberships() caught an Exception: ", (Throwable) e);
         }
     }
 
@@ -273,7 +276,7 @@ public class LdapClientImpl implements LdapClient {
                 ctx.close();
             }
         } catch(Exception e) {
-            e.printStackTrace();
+            logger.warn("getUser() caught an Exception: ", (Throwable) e);
         } 
         return null;
     }
@@ -295,8 +298,8 @@ public class LdapClientImpl implements LdapClient {
                 return false;
             }
         } catch(NumberFormatException nfe) {
-            System.out.printf("Evaluation of expiration date failed: %s", value);
-            nfe.printStackTrace();
+            logger.warn("Evaluation of expiration date '{}' failed.", value);
+            logger.warn("stack trace:", (Throwable) nfe);
         }
         return true;
     }
@@ -340,7 +343,7 @@ public class LdapClientImpl implements LdapClient {
                 ctx.close();
             }
         } catch(Exception e) {
-            e.printStackTrace();
+            logger.warn("getUsers() caught an Exception: ", (Throwable) e);
         }
     }
 
@@ -357,7 +360,7 @@ public class LdapClientImpl implements LdapClient {
                 ctx.close();
             }
         } catch(Exception e) {
-            e.printStackTrace();
+            logger.warn("isGroup() caught an Exception: ", (Throwable) e);
         }
         return false;
     }

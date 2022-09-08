@@ -66,8 +66,8 @@ public class Attachment {
     @Column(name="version_id")
     private String versionId;
 
-    public void dump() {
-        System.out.printf("Attachment(%s): %s\n", id, fileName);
+    public String dump() {
+        return String.format("Attachment(%s): %s\n", id, fileName);
     }
 
     public String getId() {

@@ -93,10 +93,11 @@ public class Location {
         grid = false;
     }
 
-    public void dump() {
-        System.out.println("Location " + id);
-        System.out.println(json.toString());
-        System.out.println("==============================================================");
+    public String dump() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("Location(%s): ...",id));
+        sb.append(json.toString());
+        return sb.toString();
     }
 
     public String getId() {

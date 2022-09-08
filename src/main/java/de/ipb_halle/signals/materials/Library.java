@@ -136,10 +136,11 @@ public class Library {
         return entity;
     }
 
-    public void dump() {
-        System.out.printf("Library(%s): %s\n", id, name);
-        System.out.println(jsonString);
-        System.out.println("============================================================");
+    public String dump() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("Library(%s): %s\n", id, name));
+        sb.append(jsonString);
+        return sb.toString();
     }
 
     public void addAssetFieldDefinition(FieldDefinition fd) {

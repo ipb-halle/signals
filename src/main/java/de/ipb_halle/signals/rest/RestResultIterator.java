@@ -25,9 +25,11 @@ import com.google.gson.JsonPrimitive;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /** 
@@ -40,6 +42,8 @@ public class RestResultIterator<T> implements Iterator {
     private RestService<T> service;
     private JsonElement jsonResult;
     private Iterator<JsonElement> jsonIterator;
+
+    private Logger logger = LoggerFactory.getLogger(RestResultIterator.class.getName());
 
     /**
      * constructor
@@ -66,18 +70,16 @@ public class RestResultIterator<T> implements Iterator {
             jsonIterator = jsonResult.getAsJsonObject().getAsJsonArray(RestHelper.ATTR_DATA).iterator();
 
         } catch(UnexpectedResponseCodeException ue) {
-            System.out.println("Unexpected code");
+            logger.warn("Unexpected code");
         } catch(MalformedURLException me) {
-            System.out.println("Malformed URL");
+            logger.warn("Malformed URL");
         } catch(IOException ioe) {
-            System.out.println("IOException");
-            ioe.printStackTrace();
+            logger.warn("IOException", (Throwable) ioe);
         }
     }
 
     private void fetchPage(String url) {
         try {
-            System.out.println("fetchPage");
             client.setURL(url)
                 .execute();
 
@@ -85,12 +87,11 @@ public class RestResultIterator<T> implements Iterator {
             jsonIterator = jsonResult.getAsJsonObject().getAsJsonArray(RestHelper.ATTR_DATA).iterator();
 
         } catch(UnexpectedResponseCodeException ue) {
-            System.out.println("Unexpected code");
+            logger.warn("Unexpected code");
         } catch(MalformedURLException me) {
-            System.out.println("Malformed URL");
+            logger.warn("Malformed URL");
         } catch(IOException ioe) {
-            System.out.println("IOException");
-            ioe.printStackTrace();
+            logger.warn("IOException", (Throwable) ioe);
         }
     }
 

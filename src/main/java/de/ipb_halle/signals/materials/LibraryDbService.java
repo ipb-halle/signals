@@ -33,6 +33,8 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** 
  * DB service for material libraries
@@ -52,6 +54,9 @@ public class LibraryDbService {
     @PersistenceContext(unitName="signalsDB")
     private EntityManager em;
 
+    private Logger logger = LoggerFactory.getLogger(LibraryDbService.class.getName());
+
+
     private List<FieldDefinition> loadFieldDefinitions(String id, String type) {
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<LibraryFieldDefinition> criteriaQuery = builder.createQuery(LibraryFieldDefinition.class);
@@ -66,9 +71,7 @@ public class LibraryDbService {
 
         List<FieldDefinition> result = new ArrayList<> ();
         for (LibraryFieldDefinition fd : em.createQuery(criteriaQuery).getResultList()) {
-
-            System.out.printf("LOAD: lib: %s  fd: %s  type: %s\n", id, fd.getFieldDefinitionId(), fd.getType());
-
+            logger.debug("Load library field: lib={}, fd={}, type={}", id, fd.getFieldDefinitionId(), fd.getType());
             result.add(fieldService.loadById(fd.getFieldDefinitionId()));
         }
         return result;
@@ -76,7 +79,7 @@ public class LibraryDbService {
 
     
     public Library loadById(String id) {
-        System.out.printf("LOAD LIBRARY: %s\n", id);
+        logger.debug("Load library: id={}", id);
         LibraryEntity entity = em.find(LibraryEntity.class, id);
         return new Library(entity, 
             loadFieldDefinitions(id, ASSET),
@@ -84,7 +87,7 @@ public class LibraryDbService {
     }
 
     public void save(Library lib) {
-        System.out.printf("STORE LIBRARY: %s\n", lib.getId());
+        logger.debug("Store library: id={}", lib.getId());
         LibraryEntity le = lib.createEntity();
         em.merge(le);
         saveFieldDefinitions(lib.getAssetFieldDefinitions(), le.getId(), ASSET);
@@ -99,7 +102,7 @@ public class LibraryDbService {
                 .setFieldDefinitionId(fd.getId())
                 .setType(type);
             em.merge(libFD);
-            System.out.printf("STORE: lib: %s  fd: %s  type: %s\n", libraryId, fd.getId(), type);
+            logger.debug("Stored library field: lib={} fd={} type={}", libraryId, fd.getId(), type);
         }
     }
 }

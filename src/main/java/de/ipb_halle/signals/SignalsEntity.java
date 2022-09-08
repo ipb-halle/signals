@@ -45,10 +45,11 @@ public class SignalsEntity {
     private String jsonString;
 
 
-    public void dump() {
-        System.out.println(id + " --> " + type);
-        System.out.println(jsonString);
-        System.out.println("==============================================================");
+    public String dump() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("SignalsEntity(%s) --> %s\n", id,  type));
+        sb.append(jsonString);
+        return sb.toString();
     }
 
     public String getId() {

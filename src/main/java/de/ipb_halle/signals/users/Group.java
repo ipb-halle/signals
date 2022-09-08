@@ -73,13 +73,12 @@ public class Group {
     @Column(name="json_string")
     private String jsonString;
 
-    public void dump() {
+    public String dump() {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("Group(%d) --> %s\n", id, name));
         sb.append(String.format("Description: %s\n", description));
         sb.append((jsonString != null) ? jsonString : "");
-        sb.append("\n==============================================================");
-        System.out.println(sb.toString());
+        return sb.toString();
     }
 
     public Integer getId() {
