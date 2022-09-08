@@ -86,24 +86,24 @@ public class Library {
     public Library (LibraryEntity le, List<FieldDefinition> assetFD, List<FieldDefinition> batchFD) {
         id = le.getId();
 
-        assetDisplayName = getAssetDisplayName();
-        assetNameFieldId = getAssetNameFieldId();
-        assetNumberingFormat = getAssetNumberingFormat() ;
-        batchDisplayName = getBatchDisplayName();
-        batchNumberingFormat = getBatchNumberingFormat() ;
-        createdAt = getCreatedAt();
-        createdBy = getCreatedBy();
-        digest = getDigest();
-        displayImage = getDisplayImage();
-        displayTable = getDisplayTable();
-        editedAt = getEditedAt();
-        editedBy = getEditedBy();
-        enabled = isEnabled();
-        entityFlags = getEntityFlags();
-        jsonString = getJsonString();
-        materialsSampleMapping = getMaterialsSampleMapping();
-        name = getName();
-        uniqueness = getUniqueness();
+        assetDisplayName = le.getAssetDisplayName();
+        assetNameFieldId = le.getAssetNameFieldId();
+        assetNumberingFormat = le.getAssetNumberingFormat() ;
+        batchDisplayName = le.getBatchDisplayName();
+        batchNumberingFormat = le.getBatchNumberingFormat() ;
+        createdAt = le.getCreatedAt();
+        createdBy = le.getCreatedBy();
+        digest = le.getDigest();
+        displayImage = le.getDisplayImage();
+        displayTable = le.getDisplayTable();
+        editedAt = le.getEditedAt();
+        editedBy = le.getEditedBy();
+        enabled = le.isEnabled();
+        entityFlags = le.getEntityFlags();
+        jsonString = le.getJsonString();
+        materialsSampleMapping = le.getMaterialsSampleMapping();
+        name = le.getName();
+        uniqueness = le.getUniqueness();
 
         assetFieldDefinitions = new HashSet<> ();
         assetFieldDefinitions.addAll(assetFD);

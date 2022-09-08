@@ -39,6 +39,9 @@ import java.util.Iterator;
 public class FieldDefinitionRestService implements RestService<FieldDefinition> {
 
 
+    /**
+     * ATTR_COLLECTION currently not implemented!
+     */
     public FieldDefinition createEntity(JsonElement json) {
         FieldDefinition fd = new FieldDefinition();
         JsonObject j = json.getAsJsonObject();
@@ -50,10 +53,17 @@ public class FieldDefinitionRestService implements RestService<FieldDefinition> 
             fd.setAttributeListEid(RestHelper.parseString(j, FieldDefinition.ATTR_ATTRIBUTE));
             fd.setCalculated(RestHelper.parseBool(j, FieldDefinition.ATTR_CALCULATED));
             fd.setDefinedBy(RestHelper.parseString(j, FieldDefinition.ATTR_DEFINED_BY));
-            fd.setHidden(RestHelper.parseBool(j, FieldDefinition.ATTR_HIDDEN));
             fd.setFieldType(FieldType.valueOfAnyCase(RestHelper.parseString(j, FieldDefinition.ATTR_DATA_TYPE)));
+            fd.setHidden(RestHelper.parseBool(j, FieldDefinition.ATTR_HIDDEN));
             fd.setRequired(RestHelper.parseBool(j, FieldDefinition.ATTR_MANDATORY));
             fd.setTitle(RestHelper.parseString(j, RestHelper.ATTR_NAME));
+
+            if (j.has(FieldDefinition.ATTR_MEASURE_OPTIONS)) {
+                parseMeasures(j.getAsJsonArray(FieldDefinition.ATTR_MEASURE_OPTIONS), fd);
+            }
+            if (j.has(FieldDefinition.ATTR_OPTIONS)) {
+                parseOptions(j.getAsJsonArray(FieldDefinition.ATTR_OPTIONS), fd);
+            }
         }
         return fd;
     }

@@ -28,4 +28,19 @@ public class FieldMeasureId implements Serializable {
     private String field_id;
 
     private Quality measure;
+
+    @Override
+    public boolean equals(Object o) {
+        if ((o == null) || (getClass() != o.getClass())) {
+            return false;
+        } 
+        FieldMeasureId other = (FieldMeasureId) o;
+        return (field_id == other.field_id)
+            && (measure == other.measure);
+    }
+
+    @Override
+    public int hashCode() {
+        return field_id.hashCode() + measure.hashCode();
+    }
 }

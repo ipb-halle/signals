@@ -61,7 +61,7 @@ public class RestHelper {
 
     private static JsonElement getFromPath(JsonElement json, String[] paths, int index, int last) {
         String element = paths[index];
-        if (json.isJsonObject()) {
+        if ((json != null) && json.isJsonObject()) {
             JsonObject obj = json.getAsJsonObject();
             if (obj.has(element)) {
                 if (index < last) {

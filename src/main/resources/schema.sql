@@ -131,7 +131,7 @@ CREATE TABLE container_type_fields (
 
 CREATE TABLE libraries (
     id VARCHAR NOT NULL PRIMARY KEY,
-    assetDisplayName VARCHAR,
+    asset_display_name VARCHAR,
     asset_name_field_id VARCHAR,
     asset_numbering_format VARCHAR,
     batch_display_name VARCHAR,

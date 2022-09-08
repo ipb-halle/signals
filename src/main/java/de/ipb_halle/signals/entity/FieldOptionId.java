@@ -29,4 +29,19 @@ public class FieldOptionId implements Serializable {
     private String field_id;
 
     private String option;
+
+    @Override
+    public boolean equals(Object o) {
+        if ((o == null) || (getClass() != o.getClass())) {
+            return false;
+        } 
+        FieldOptionId other = (FieldOptionId) o;
+        return (field_id == other.field_id)
+            && (option == other.option);
+    }
+
+    @Override
+    public int hashCode() {
+        return field_id.hashCode() + option.hashCode();
+    }
 }

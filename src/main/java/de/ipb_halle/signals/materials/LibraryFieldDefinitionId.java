@@ -31,4 +31,20 @@ public class LibraryFieldDefinitionId implements Serializable {
     private String field_definition_id;
 
     private String type;
+
+    @Override
+    public boolean equals(Object o) {
+        if ((o == null) || (getClass() != o.getClass())) { 
+            return false;
+        } 
+        LibraryFieldDefinitionId other = (LibraryFieldDefinitionId) o;
+        return (library_id == other.library_id)
+            && (field_definition_id == other.field_definition_id)
+            && (type == other.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return library_id.hashCode() + field_definition_id.hashCode() + type.hashCode();
+    }
 }

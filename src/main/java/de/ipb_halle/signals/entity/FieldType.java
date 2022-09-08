@@ -24,11 +24,15 @@ package de.ipb_halle.signals.entity;
 
 public enum FieldType {
 
+    ATTACHED_FILE,
+    ATTRIBUTE,
     ATTRIBUTELIST,
     CAS_NUMBER,
     CHEMICAL_DRAWING,
     DATETIME,
     DECIMAL,
+    DENSITY,
+    EXTERNAL_LINK,
     LINK,
     LIST,
     MASS,
@@ -37,7 +41,8 @@ public enum FieldType {
     PERCENTAGE,
     TEXT,
     UNIT,
-    USER;
+    USER,
+    VARIABLE_MEASURE;
 
     /**
      * Return a FieldType corresponding to a given String. As 

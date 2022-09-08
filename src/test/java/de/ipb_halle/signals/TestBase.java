@@ -51,6 +51,9 @@ public class TestBase {
         unit.setProvider("org.hibernate.jpa.HibernatePersistenceProvider");
         unit.getClazz().addAll(Arrays.asList(entities)); 
         unit.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
+//      unit.setProperty("hibernate.show_sql", "true");
+//      unit.setProperty("hibernate.format_sql", "true");
+//      unit.setProperty("hibernate.use_sql_comments", "true");
         unit.setProperty("hibernate.connection.driver_class", "org.hsqldb.jdbcDriver");
         unit.setProperty("javax.persistence.schema-generation.database.action", "create-drop");
         unit.setProperty("javax.persistence.schema-generation.create-script-source", "schema.sql");

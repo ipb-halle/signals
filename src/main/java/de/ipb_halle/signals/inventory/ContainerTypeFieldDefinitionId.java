@@ -29,4 +29,19 @@ public class ContainerTypeFieldDefinitionId implements Serializable {
     private String container_type_id;
 
     private String field_definition_id;
+
+    @Override
+    public boolean equals(Object o) {
+        if ((o == null) || (getClass() != o.getClass())) {
+            return false;
+        } 
+        ContainerTypeFieldDefinitionId other = (ContainerTypeFieldDefinitionId) o;
+        return (container_type_id == other.container_type_id)
+            && (field_definition_id == other.field_definition_id);
+    }
+
+    @Override
+    public int hashCode() {
+        return container_type_id.hashCode() + field_definition_id.hashCode();
+    }
 }

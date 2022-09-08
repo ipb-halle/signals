@@ -35,7 +35,7 @@ public enum Quality {
     DENSITY("kg/m^3", "density", "Density"),
     AMOUNT_OF_SUBSTANCE("mol", "amount_of_substance", "Amount"),
     MOLAR_MASS("kg/mol", "molar mass", "molar mass"),
-    MOLAR_CONCENTRATION("mol/m^3", "molarity.", "Molarity"),
+    MOLAR_CONCENTRATION("mol/m^3", "molarity", "Molarity"),
     PERCENT_CONCENTRATION("[1]", "fraction", "Percentage"),
     MASS_CONCENTRATION("kg/m^3", "mass conc.", "mass conc."),
     CELL_COUNT_MASS("[1]", "integer", "Cell Count Mass");

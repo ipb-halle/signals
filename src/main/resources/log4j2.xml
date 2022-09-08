@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="info">
+
+  <Appenders>
+
+    <Console name="Console" target="SYSTEM_OUT">
+<!--
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %m%n"/>
+-->
+      <PatternLayout pattern="[%-5level] %m%n"/>
+    </Console>
+
+  </Appenders>
+
+  <Loggers>
+
+    <Logger name="de.ipb_halle" level="info" additivity="false">
+      <AppenderRef ref="Console" level="info"/>
+    </Logger>
+
+    <!-- set level to debug to log SQL statements -->
+    <Logger name="org.hibernate.SQL" level="warn" additivity="false">
+      <AppenderRef ref="Console" level="warn"/>
+    </Logger>
+
+    <!-- set level to trace to log bind parameters -->
+    <Logger name="org.hibernate.type" level="warn" additivity="false">
+      <AppenderRef ref="Console" level="warn"/>
+    </Logger>
+
+    <Root level="error">
+      <AppenderRef ref="Console"/>
+    </Root>
+
+  </Loggers>
+
+</Configuration>
+

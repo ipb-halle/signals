@@ -38,6 +38,10 @@ public class MeasureMapper{
     /**
      */
     public static Quality getQuality(String measure) {
-        return map.get(measure.toUpperCase());
+        Quality q = map.get(measure.toUpperCase());
+        if (q == null) {
+            throw new NullPointerException(String.format("No mapping found for measure %s", measure));
+        }
+        return q;
     }
 }

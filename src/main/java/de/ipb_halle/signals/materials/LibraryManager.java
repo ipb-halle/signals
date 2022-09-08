@@ -34,6 +34,10 @@ public class LibraryManager {
     @Inject
     private LibraryRestService restService;
     
+    public Library getDbLibrary(String id) {
+        return dbService.loadById(id);
+    }
+
     public List<Library> getSnbLibraries() {
         return restService.doGetLibraries();
     }

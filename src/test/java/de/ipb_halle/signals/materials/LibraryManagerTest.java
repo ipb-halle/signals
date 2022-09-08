@@ -15,12 +15,10 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.inventory;
+package de.ipb_halle.signals.materials;
 
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
-import de.ipb_halle.signals.entity.Attachment;
-import de.ipb_halle.signals.entity.AttachmentDbService;
 import de.ipb_halle.signals.entity.FieldDefinition;
 import de.ipb_halle.signals.entity.FieldDefinitionDbService;
 import de.ipb_halle.signals.rest.MockRestClient;
@@ -44,42 +42,36 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 
 @RunWith(ApplicationComposer.class)
-public class ContainerTypeManagerTest {
+public class LibraryManagerTest {
 
-    private final String TEST_RESOURCE_1 = "ContainerTypeManagerTest001.json";
+    private final String TEST_RESOURCE_1 = "LibraryManagerTest001.json";
     private final String TEST_KEY_1 = 
-        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/types?page%5Blimit%5D=20&page%5Boffset%5D=0&entityType=container";
-    private final String TEST_CONTAINER_TYPE_ID = "b17da130-259d-4009-b99e-49e9352b3b89";
-    private final String TEST_CONTAINER_TYPE_NAME = "Bottle";
-    private final String TEST_CONTAINER_ATTACHMENT_ID = "7e38bb31-4860-4d6f-b481-e83ba32d27fb";
-    private final String TEST_CONTAINER_ATTACHMENT_FILE_NAME = "DefaultImage_Container_Bottle.png";
-    private final String TEST_CONTAINER_FIELD_ID = "PE_INV_SYSTEM_Barcode";
-    private final String TEST_CONTAINER_FIELD_KEY = "Barcode";
+        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/materials/libraries";
+    private final String TEST_LIBRARY_ID = "6215104dab0ad27bf79429ff";
+    private final String TEST_LIBRARY_NAME = "Reagents (SNB)";
+    private final int TEST_LIBRARY_ASSET_FIELD_COUNT = 12;
+    private final String TEST_LIBRARY_ASSET_FIELD_ID = "6215104dab0ad27bf79429f7";
+    private final String TEST_LIBRARY_ASSET_FIELD_TITLE = "Chemical Name";
 
     @Inject
     private MockRestClient mockRestClient;
 
     @Inject
-    private ContainerTypeManager manager;
+    private LibraryManager manager;
 
     @Module
     @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class, 
-        Attachment.class, AttachmentDbService.class, 
         FieldDefinition.class, FieldDefinitionDbService.class, 
-        ContainerType.class, ContainerTypeEntity.class, 
-        ContainerTypeAttachment.class, ContainerTypeAttachmentId.class,
-        ContainerTypeFieldDefinition.class, ContainerTypeFieldDefinitionId.class,
-        ContainerTypeDbService.class, ContainerTypeManager.class, ContainerTypeRestService.class })
+        Library.class, LibraryEntity.class, 
+        LibraryFieldDefinition.class, LibraryFieldDefinitionId.class,
+        LibraryDbService.class, LibraryManager.class, LibraryRestService.class })
     public EjbJar app() {
         return new EjbJar();
     }
 
     @Module
     public PersistenceUnit persistence() {
-        return TestBase.persistence(new String[]{ ContainerType.class.getName(), 
-                ContainerTypeFieldDefinition.class.getName(), FieldDefinition.class.getName(),
-                ContainerTypeAttachment.class.getName(), Attachment.class.getName()
-            });
+        return TestBase.persistence(new String[]{ Library.class.getName(), LibraryFieldDefinition.class.getName(), FieldDefinition.class.getName() });
     }
 
     @Configuration
@@ -94,15 +86,6 @@ public class ContainerTypeManagerTest {
             getClass().getResourceAsStream(TEST_RESOURCE_1));
     }
 
-    private Attachment getAttachmentById(Set<Attachment> aSet, String id) {
-        for (Attachment a : aSet) {
-            if (a.getId().equals(id)) {
-                return a;
-            }
-        }
-        return null;
-    }
-
     private FieldDefinition getFieldDefinitionById(Set<FieldDefinition> fdSet, String id) {
         for (FieldDefinition fd : fdSet) {
             if (fd.getId().equals(id)) {
@@ -113,24 +96,21 @@ public class ContainerTypeManagerTest {
     }
 
     @Test
-    public void containerTypeManagerTest() {
+    public void libraryManagerTest() {
 
-        List<ContainerType> ctypes = manager.getSnbContainerTypes();
-        manager.save(ctypes);
+        List<Library> libraries = manager.getSnbLibraries();
+        manager.save(libraries);
 
-        ContainerType ct = manager.getDbContainerType(TEST_CONTAINER_TYPE_ID);
-        assertEquals("ContainerType name mismatch", ct.getName(), TEST_CONTAINER_TYPE_NAME);
-
-        // attachments
-        Attachment a = getAttachmentById(
-                ct.getAttachments(), 
-                TEST_CONTAINER_ATTACHMENT_ID);
-        assertEquals("Attachment file name matches", TEST_CONTAINER_ATTACHMENT_FILE_NAME, a.getFileName());
+        Library lib = manager.getDbLibrary(TEST_LIBRARY_ID);
+        assertEquals("Library name mismatch", TEST_LIBRARY_NAME, lib.getName());
 
         // field definitions
+        assertEquals("Asset field count matches", TEST_LIBRARY_ASSET_FIELD_COUNT, 
+                lib.getAssetFieldDefinitions().size());
+
         FieldDefinition fd = getFieldDefinitionById(
-                ct.getFieldDefinitions(), 
-                TEST_CONTAINER_FIELD_ID);
-        assertEquals("Field definition key matches", TEST_CONTAINER_FIELD_KEY, fd.getKey());
+                lib.getAssetFieldDefinitions(), 
+                TEST_LIBRARY_ASSET_FIELD_ID);
+        assertEquals("Asset field definition key matches", TEST_LIBRARY_ASSET_FIELD_TITLE, fd.getTitle());
     }
 }

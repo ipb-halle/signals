@@ -41,6 +41,7 @@ public class FieldDefinition {
     public final static String ATTR_ATTRIBUTE_LIST_EID = "attributeListEid";
     public final static String ATTR_ATTRIBUTE = "attribute";
     public final static String ATTR_CALCULATED = "calculated";
+    public final static String ATTR_COLLECTION = "collection";  // could be the same as type=list?
     public final static String ATTR_DATA_TYPE = "dataType";
     public final static String ATTR_DEFAULT_UNIT = "defaultUnit";
     public final static String ATTR_DEFINED_BY = "definedBy";
@@ -48,6 +49,7 @@ public class FieldDefinition {
     public final static String ATTR_FIELD_TYPE = "type";
     public final static String ATTR_HIDDEN = "hidden";
     public final static String ATTR_KEY = "key";
+    public final static String ATTR_MEASURE_OPTIONS = "measureOptions";
     public final static String ATTR_MEASURES = "measures";
     public final static String ATTR_MULTISELECT = "multiSelect";
     public final static String ATTR_OPTIONS = "options";
@@ -87,6 +89,9 @@ public class FieldDefinition {
     @Column
     private String key;
 
+    /**
+     * referred by ATTR_MEASURE_OPTIONS and ATTR_MEASURES
+     */
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch=FetchType.EAGER)
     @JoinColumn(name = "field_id")
     private Set<FieldMeasure> measures;
@@ -100,12 +105,16 @@ public class FieldDefinition {
     
     @Column(name="read_only")
     private Boolean readOnly;
+
     /**
      * referred by ATTR_REQUIRED and ATTR_MANDATORY
      */
     @Column
     private Boolean required;
 
+    /**
+     * referred by ATTR_TITLE and RestHelper.ATTR_NAME
+     */
     @Column
     private String title; 
 

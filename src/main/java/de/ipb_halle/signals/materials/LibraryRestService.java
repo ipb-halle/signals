@@ -61,15 +61,15 @@ public class LibraryRestService implements RestService<Library> {
         JsonObject attributes  = j.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
         lib.setId(RestHelper.parseString(j, RestHelper.ATTR_ID));
-        lib.setName(RestHelper.parseString(j, RestHelper.ATTR_NAME));
         lib.setEnabled(RestHelper.parseBool(j, Library.ATTR_ENABLED));
         lib.setJsonString(j.toString());
 
+        lib.setName(RestHelper.parseString(attributes, RestHelper.ATTR_NAME));
         if (attributes.has(Library.ATTR_ASSETS)) {
-            parseAsset(j.getAsJsonObject(Library.ATTR_ASSETS), lib);
+            parseAsset(attributes.getAsJsonObject(Library.ATTR_ASSETS), lib);
         }
         if (attributes.has(Library.ATTR_BATCHES)) {
-            parseBatch(j.getAsJsonObject(Library.ATTR_BATCHES), lib);
+            parseBatch(attributes.getAsJsonObject(Library.ATTR_BATCHES), lib);
         }
         parseChangeRecords(attributes, lib);
 

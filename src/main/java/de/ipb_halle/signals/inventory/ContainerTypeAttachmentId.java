@@ -29,4 +29,19 @@ public class ContainerTypeAttachmentId implements Serializable {
     private String container_type_id;
 
     private String attachment_id;
+
+    @Override
+    public boolean equals(Object o) {
+        if ((o == null) || (getClass() != o.getClass())) {
+            return false;
+        } 
+        ContainerTypeAttachmentId other = (ContainerTypeAttachmentId) o;
+        return (container_type_id == other.container_type_id)
+            && (attachment_id == other.attachment_id);
+    }
+
+    @Override
+    public int hashCode() {
+        return container_type_id.hashCode() + attachment_id.hashCode();
+    }
 }

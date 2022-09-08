@@ -26,6 +26,7 @@ import java.util.Set;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -43,7 +44,7 @@ public class LibraryDbService {
     public final String ASSET = "A";
     public final String BATCH = "B";
     public final String LIBRARY_ID = "library_id";
-    public final String LIBRARY_FIELD_TYPE = "library_field_type";
+    public final String LIBRARY_FIELD_TYPE = "type";
 
     @Inject 
     private FieldDefinitionDbService fieldService;
@@ -65,6 +66,9 @@ public class LibraryDbService {
 
         List<FieldDefinition> result = new ArrayList<> ();
         for (LibraryFieldDefinition fd : em.createQuery(criteriaQuery).getResultList()) {
+
+            System.out.printf("LOAD: lib: %s  fd: %s  type: %s\n", id, fd.getFieldDefinitionId(), fd.getType());
+
             result.add(fieldService.loadById(fd.getFieldDefinitionId()));
         }
         return result;
@@ -72,13 +76,15 @@ public class LibraryDbService {
 
     
     public Library loadById(String id) {
+        System.out.printf("LOAD LIBRARY: %s\n", id);
         LibraryEntity entity = em.find(LibraryEntity.class, id);
         return new Library(entity, 
-            loadFieldDefinitions(ASSET, id),
-            loadFieldDefinitions(BATCH, id));
+            loadFieldDefinitions(id, ASSET),
+            loadFieldDefinitions(id, BATCH));
     }
 
     public void save(Library lib) {
+        System.out.printf("STORE LIBRARY: %s\n", lib.getId());
         LibraryEntity le = lib.createEntity();
         em.merge(le);
         saveFieldDefinitions(lib.getAssetFieldDefinitions(), le.getId(), ASSET);
@@ -93,6 +99,7 @@ public class LibraryDbService {
                 .setFieldDefinitionId(fd.getId())
                 .setType(type);
             em.merge(libFD);
+            System.out.printf("STORE: lib: %s  fd: %s  type: %s\n", libraryId, fd.getId(), type);
         }
     }
 }
