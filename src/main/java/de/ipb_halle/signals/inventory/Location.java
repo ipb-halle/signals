@@ -17,11 +17,6 @@
  */
 package de.ipb_halle.signals.inventory;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -84,7 +79,6 @@ public class Location {
 
     private transient LocationType type;
     private transient Location ancestor;
-    private transient JsonElement json;
 
     /**
      * default constructor
@@ -96,7 +90,7 @@ public class Location {
     public String dump() {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("Location(%s): ...",id));
-        sb.append(json.toString());
+        sb.append(jsonString);
         return sb.toString();
     }
 
