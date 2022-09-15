@@ -67,6 +67,9 @@ public class ContainerRestService implements RestService<Container> {
         ct.setDigest(RestHelper.parseString(attributes, RestHelper.ATTR_DIGEST));
         ct.setContainerTypeId(RestHelper.parseString(attributes, Container.ATTR_CONTAINER_TYPE_ID));
         ct.setContainerTypeName(RestHelper.parseString(attributes, Container.ATTR_CONTAINER_TYPE_NAME));
+        ct.setLocation(new LocationReference().setId(
+            RestHelper.parseString(
+            RestHelper.getPrimitiveFromPath(attributes, Container.ATTR_LOCATION_ID))));
         ct.setName(RestHelper.parseString(attributes, RestHelper.ATTR_NAME));
         ct.setUnit(Unit.getUnit(RestHelper.parseString(attributes, Container.ATTR_UNIT)));
 

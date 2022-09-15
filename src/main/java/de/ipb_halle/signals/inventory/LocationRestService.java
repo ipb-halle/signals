@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  */
 
 @Local
-public class LocationRestService implements RestService<Location> {
+public class LocationRestService implements RestService<LocationEntity> {
 
     public final String LOCATION_ENDPOINT = "/inventory/locations/%s";
 
@@ -53,21 +53,21 @@ public class LocationRestService implements RestService<Location> {
 
     private Logger logger = LoggerFactory.getLogger(LocationRestService.class.getName());
     
-    public Location createEntity(JsonElement json) {
+    public LocationEntity createEntity(JsonElement json) {
         JsonObject j = json.getAsJsonObject();
         JsonObject attributes = j.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
-        Location loc = new Location();
+        LocationEntity loc = new LocationEntity();
         loc.setId(RestHelper.parseString(j, RestHelper.ATTR_ID));
-        loc.setBarcode(RestHelper.parseString(attributes, Location.ATTR_BARCODE));
-        loc.setName(RestHelper.parseString(attributes, Location.ATTR_NAME));
-        loc.setDescription(RestHelper.parseString(attributes, Location.ATTR_DESCRIPTION));
-        loc.setGrid(RestHelper.parseBool(attributes, Location.ATTR_GRID));
+        loc.setBarcode(RestHelper.parseString(attributes, LocationEntity.ATTR_BARCODE));
+        loc.setName(RestHelper.parseString(attributes, LocationEntity.ATTR_NAME));
+        loc.setDescription(RestHelper.parseString(attributes, LocationEntity.ATTR_DESCRIPTION));
+        loc.setGrid(RestHelper.parseBool(attributes, LocationEntity.ATTR_GRID));
         loc.setJsonString(j.toString());
-        loc.setTypeId(RestHelper.parseString(attributes, Location.ATTR_TYPE_ID));
-        loc.setTypeName(RestHelper.parseString(attributes, Location.ATTR_TYPE_NAME));
+        loc.setTypeId(RestHelper.parseString(attributes, LocationEntity.ATTR_TYPE_ID));
+        loc.setTypeName(RestHelper.parseString(attributes, LocationEntity.ATTR_TYPE_NAME));
 
-        parseAncestor(attributes.getAsJsonArray(Location.ATTR_ANCESTORS), loc);
+        parseAncestor(attributes.getAsJsonArray(LocationEntity.ATTR_ANCESTORS), loc);
         return loc;
     }
 
@@ -91,15 +91,15 @@ public class LocationRestService implements RestService<Location> {
         return null;
     }
 
-    public Location doGetLocation(String id) {
+    public LocationEntity doGetLocation(String id) {
         return createEntity(fetch(id));
     }
 
-    public void parseAncestor(JsonArray ancestors, Location loc) {
+    public void parseAncestor(JsonArray ancestors, LocationEntity loc) {
         if (ancestors.size() > 0) {
             JsonObject obj = ancestors.get(0).getAsJsonObject();
-            loc.setAncestorId(RestHelper.parseString(obj, Location.ATTR_ANCESTOR_ID));
-            loc.setAncestorName(RestHelper.parseString(obj, Location.ATTR_ANCESTOR_NAME));
+            loc.setAncestorId(RestHelper.parseString(obj, LocationEntity.ATTR_ANCESTOR_ID));
+            loc.setAncestorName(RestHelper.parseString(obj, LocationEntity.ATTR_ANCESTOR_NAME));
             return;
         }
         loc.setAncestorId(null);

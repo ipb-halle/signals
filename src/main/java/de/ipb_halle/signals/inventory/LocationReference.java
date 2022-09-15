@@ -17,29 +17,23 @@
  */
 package de.ipb_halle.signals.inventory;
 
-import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
-
 /** 
- * Database service for locations
+ * Location reference 
  */
+public class LocationReference implements Location {
 
-@Stateless
-public class LocationDbService {
+    private String id;
 
-    @PersistenceContext(unitName="signalsDB")
-    private EntityManager em;
-
-
-    public LocationEntity loadById(String id) {
-        return this.em.find(LocationEntity.class, id);
+    public String dump() {
+        return String.format("Location reference(%s)", id);
     }
 
-    public void save(LocationEntity loc) {
-        this.em.merge(loc);
+    public String getId() {
+        return id;
     }
 
+    public Location setId(String i) {
+        id = i;
+        return this;
+    }
 }
-

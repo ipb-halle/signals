@@ -57,7 +57,7 @@ public class LocationManagerTest {
 
     @Module
     @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
-        Location.class, LocationDbService.class, LocationManager.class, LocationRestService.class })
+        LocationEntity.class, LocationDbService.class, LocationManager.class, LocationRestService.class })
     public EjbJar app() {
         return new EjbJar();
     }
@@ -83,7 +83,7 @@ public class LocationManagerTest {
     @Test
     public void locationManagerTest() {
 
-        Location loc = manager.getSnbLocation(TEST_LOCATION_ID);
+        LocationEntity loc = manager.getSnbLocation(TEST_LOCATION_ID);
         manager.save(loc);
         assertEquals("Location name mismatch", TEST_LOCATION_NAME, loc.getName());
 

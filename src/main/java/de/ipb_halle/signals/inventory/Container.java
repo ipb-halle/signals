@@ -64,7 +64,6 @@ public class Container {
     private Set<FieldValue> fieldValues;
     private String jsonString;
     private Location location;
-    private String locationId;
     private Set<MaterialReference> materials;
     private String name;
     private Date updatedAt;
@@ -97,7 +96,7 @@ public class Container {
         createdAt = ce.getCreatedAt();
         createdBy = new UserReference().setId(ce.getCreatedBy());
         jsonString = ce.getJsonString();
-        locationId = ce.getLocationId();
+        location = new LocationReference().setId(ce.getLocationId());
         name = ce.getName();
         unit = Unit.getUnit(ce.getUnit());
         updatedAt = ce.getUpdatedAt();
@@ -118,7 +117,7 @@ public class Container {
             .setCreatedBy(createdBy.getId())
             .setDigest(digest) 
             .setJsonString(jsonString)
-            .setLocationId(locationId)
+            .setLocationId(location.getId())
             .setName(name)
             .setUnit(unit.getUnit())
             .setUpdatedAt(updatedAt)
@@ -185,8 +184,8 @@ public class Container {
         return jsonString;
     }
 
-    public String getLocationId() {
-        return locationId;
+    public Location getLocation() {
+        return location;
     }
 
     public Set<MaterialReference> getMaterials() {
@@ -261,8 +260,8 @@ public class Container {
         jsonString = j;
     }
 
-    public void setLocationId(String i) {
-        locationId = i;
+    public void setLocation(Location l) {
+        location = l;
     }
 
     public void setMaterials(Set<MaterialReference> ms) {

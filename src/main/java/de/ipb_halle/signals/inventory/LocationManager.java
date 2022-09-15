@@ -36,15 +36,15 @@ public class LocationManager {
     private LocationRestService restService;
 
 
-    public Location getSnbLocation(String id) {
+    public LocationEntity getSnbLocation(String id) {
         return restService.doGetLocation(id);
     }
 
-    public Location getDbLocation(String id) {
+    public LocationEntity getDbLocation(String id) {
         return dbService.loadById(id);
     }
 
-    public void save(Location loc) {
+    public void save(LocationEntity loc) {
         dbService.save(loc);
     }
 }
