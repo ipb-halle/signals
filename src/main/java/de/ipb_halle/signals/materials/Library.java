@@ -18,6 +18,8 @@
 package de.ipb_halle.signals.materials;
 
 import de.ipb_halle.signals.entity.FieldDefinition;
+import de.ipb_halle.signals.users.User;
+import de.ipb_halle.signals.users.UserReference;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -60,12 +62,12 @@ public class Library {
     private String batchNumberingFormat;
 
     private Date createdAt;
-    private Integer createdBy;
+    private User createdBy;
     private String digest;
     private String displayImage;                // JSON
     private String displayTable;                // JSON
     private Date editedAt;
-    private Integer editedBy;
+    private User editedBy;
     private Boolean enabled;
     private String entityFlags;                 // JSON
 
@@ -92,12 +94,12 @@ public class Library {
         batchDisplayName = le.getBatchDisplayName();
         batchNumberingFormat = le.getBatchNumberingFormat() ;
         createdAt = le.getCreatedAt();
-        createdBy = le.getCreatedBy();
+        createdBy = new UserReference().setId(le.getCreatedBy());
         digest = le.getDigest();
         displayImage = le.getDisplayImage();
         displayTable = le.getDisplayTable();
         editedAt = le.getEditedAt();
-        editedBy = le.getEditedBy();
+        editedBy = new UserReference().setId(le.getEditedBy());
         enabled = le.isEnabled();
         entityFlags = le.getEntityFlags();
         jsonString = le.getJsonString();
@@ -120,12 +122,12 @@ public class Library {
             .setBatchDisplayName(batchDisplayName)
             .setBatchNumberingFormat(batchNumberingFormat)
             .setCreatedAt(createdAt)
-            .setCreatedBy(createdBy)
+            .setCreatedBy(createdBy.getId())
             .setDigest(digest)
             .setDisplayImage(displayImage)
             .setDisplayTable(displayTable)
             .setEditedAt(editedAt)
-            .setEditedBy(editedBy)
+            .setEditedBy(editedBy.getId())
             .setEnabled(enabled)
             .setEntityFlags(entityFlags)
             .setJsonString(jsonString)
@@ -183,7 +185,7 @@ public class Library {
         return createdAt;
     }
 
-    public Integer getCreatedBy() {
+    public User getCreatedBy() {
         return createdBy;
     }
 
@@ -203,7 +205,7 @@ public class Library {
         return editedAt;
     }
 
-    public Integer getEditedBy() {
+    public User getEditedBy() {
         return editedBy;
     }
 
@@ -275,7 +277,7 @@ public class Library {
         return this;
     }
 
-    public Library setCreatedBy(Integer u) {
+    public Library setCreatedBy(User u) {
         createdBy = u;
         return this;
     }
@@ -300,7 +302,7 @@ public class Library {
         return this;
     }
 
-    public Library setEditedBy(Integer u) {
+    public Library setEditedBy(User u) {
         editedBy = u;
         return this;
     }

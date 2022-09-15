@@ -39,20 +39,20 @@ public class UserManager {
     @Inject
     private LdapClient ldapClient;
 
-    public User getDbUser(int id) {
+    public UserEntity getDbUser(int id) {
         return dbService.loadById(id);
     }
 
-    public User getSnbUser(int id) {
+    public UserEntity getSnbUser(int id) {
         return restService.doGetUser(id);
     }
 
-    public List<User> getSnbUsers(String query, boolean enabled) {
+    public List<UserEntity> getSnbUsers(String query, boolean enabled) {
         return restService.doGetUsers(query, enabled);
     }
 
-    public void save(List<User> users) {
-        for (User u : users) {
+    public void save(List<UserEntity> users) {
+        for (UserEntity u : users) {
             dbService.save(u);
         }
     }

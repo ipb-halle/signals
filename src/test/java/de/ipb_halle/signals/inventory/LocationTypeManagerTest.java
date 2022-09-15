@@ -84,6 +84,6 @@ public class LocationTypeManagerTest {
         manager.save(ltypes);
 
         LocationType lt = manager.getDbLocationType(TEST_LOCATION_TYPE_ID);
-        assertEquals("LocationType name mismatch", lt.getName(), TEST_LOCATION_TYPE_NAME);
+        assertEquals("LocationType name mismatch", TEST_LOCATION_TYPE_NAME, lt.getName());
     }
 }

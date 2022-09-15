@@ -17,29 +17,24 @@
  */
 package de.ipb_halle.signals.users;
 
-import javax.ejb.Stateless;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
 
 /** 
- * Database Service for users
+ * SNB user reference
  */
+public class UserReference implements User {
 
-@Stateless
-public class UserDbService {
+    private Integer id;
 
-    @PersistenceContext(unitName="signalsDB")
-    private EntityManager em;
-
-
-    public UserEntity loadById(int id) {
-        return this.em.find(UserEntity.class, id);
+    public String dump() {
+        return String.format("User reference(%s)", id);
     }
 
-    public void save(UserEntity u) {
-        this.em.merge(u);
+    public Integer getId() {
+        return id;
+    }
+
+    public User setId(Integer i) {
+        id = i;
+        return this;
     }
 }
-

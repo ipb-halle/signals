@@ -20,6 +20,9 @@ package de.ipb_halle.signals.inventory;
 import de.ipb_halle.signals.entity.FieldValue;
 import de.ipb_halle.signals.entity.Unit;
 import de.ipb_halle.signals.materials.Material;
+import de.ipb_halle.signals.materials.MaterialReference;
+import de.ipb_halle.signals.users.User;
+import de.ipb_halle.signals.users.UserReference;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -43,7 +46,6 @@ public class Container {
     public final static String ATTR_CREATED_BY = "relationships.createdBy.data.id";
     public final static String ATTR_FIELDS = "fields";
     public final static String ATTR_LOCATION_ID = "location.id";
-    public final static String ATTR_NAME = "name";
     public final static String ATTR_UNIT = "unit";
     public final static String ATTR_UPDATED_AT = "updatedAt";
     public final static String ATTR_UPDATED_BY = "relationships.updatedBy.data.id";
@@ -54,19 +56,19 @@ public class Container {
     private ContainerType containerType;
     private String containerTypeId;
     private String containerTypeName;
-    private String contentId;
-    private String contentType;
     private Integer coordinateX;
     private Integer coordinateY;
     private Date createdAt;
+    private User createdBy;
     private String digest;
     private Set<FieldValue> fieldValues;
     private String jsonString;
     private Location location;
     private String locationId;
-    private Set<Material> materials;
+    private Set<MaterialReference> materials;
     private String name;
     private Date updatedAt;
+    private User updatedBy;
     private Unit unit;
 
 
@@ -88,8 +90,18 @@ public class Container {
     // entity constructor
     public Container(ContainerEntity ce) {
         id = ce.getId();
+        amount = ce.getAmount();
         barcode = ce.getBarcode();
+        coordinateX = ce.getCoordinateX();
+        coordinateY = ce.getCoordinateY();
+        createdAt = ce.getCreatedAt();
+        createdBy = new UserReference().setId(ce.getCreatedBy());
         jsonString = ce.getJsonString();
+        locationId = ce.getLocationId();
+        name = ce.getName();
+        unit = Unit.getUnit(ce.getUnit());
+        updatedAt = ce.getUpdatedAt();
+        updatedBy = new UserReference().setId(ce.getUpdatedBy());
 
         fieldValues = new HashSet<> ();
         materials = new HashSet<> ();
@@ -97,14 +109,27 @@ public class Container {
 
     public ContainerEntity createEntity() {
         return new ContainerEntity()
-            .setId(id);
+            .setId(id)
+            .setAmount(amount)
+            .setBarcode(barcode)
+            .setCoordinateX(coordinateX)
+            .setCoordinateY(coordinateY)
+            .setCreatedAt(createdAt)
+            .setCreatedBy(createdBy.getId())
+            .setDigest(digest) 
+            .setJsonString(jsonString)
+            .setLocationId(locationId)
+            .setName(name)
+            .setUnit(unit.getUnit())
+            .setUpdatedAt(updatedAt)
+            .setUpdatedBy(updatedBy.getId());
     }
 
     public void addFieldValue(FieldValue v) {
         fieldValues.add(v);
     }
 
-    public void addMaterial(Material m) {
+    public void addMaterial(MaterialReference m) {
         materials.add(m);
     }
 
@@ -136,16 +161,12 @@ public class Container {
         return containerTypeName;
     }
 
-    public String getContentId() {
-        return contentId;
-    }
-
-    public String getContentType() {
-        return contentType;
-    }
-
     public Date getCreatedAt() {
         return createdAt;
+    }
+
+    public User getCreatedBy() {
+        return createdBy;
     }
 
     public String getDigest() {
@@ -168,7 +189,7 @@ public class Container {
         return locationId;
     }
 
-    public Set<Material> getMaterials() {
+    public Set<MaterialReference> getMaterials() {
         return materials;
     }
 
@@ -182,6 +203,10 @@ public class Container {
 
     public Date getUpdatedAt() {
         return updatedAt;
+    }
+
+    public User getUpdatedBy() {
+        return updatedBy;
     }
 
     public void setAmount(Double a) {
@@ -212,12 +237,12 @@ public class Container {
         containerTypeName = n;
     }
 
-    public void setContentId(String i) {
-        contentId = i;
-    }
-
     public void setCreatedAt(Date d) {
         createdAt = d;
+    }
+
+    public void setCreatedBy(User u) {
+        createdBy = u;
     }
 
     public void setDigest(String d) {
@@ -240,7 +265,7 @@ public class Container {
         locationId = i;
     }
 
-    public void setMaterials(Set<Material> ms) {
+    public void setMaterials(Set<MaterialReference> ms) {
         materials = ms;
     }
 
@@ -254,5 +279,9 @@ public class Container {
 
     public void setUpdatedAt(Date d) {
         updatedAt = d;
+    }
+
+    public void setUpdatedBy(User u) {
+        updatedBy = u;
     }
 }

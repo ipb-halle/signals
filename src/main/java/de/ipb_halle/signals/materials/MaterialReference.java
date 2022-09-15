@@ -15,31 +15,28 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.users;
-
-import javax.ejb.Stateless;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
+package de.ipb_halle.signals.materials;
 
 /** 
- * Database Service for users
+ * Material Reference, used by e.g. REST endpoints in place of the
+ * full Material object.
  */
+public class MaterialReference {
 
-@Stateless
-public class UserDbService {
+    private String id;
 
-    @PersistenceContext(unitName="signalsDB")
-    private EntityManager em;
-
-
-    public UserEntity loadById(int id) {
-        return this.em.find(UserEntity.class, id);
+    public String dump() {
+        return String.format("MaterialReference(%s)\n", id);
     }
 
-    public void save(UserEntity u) {
-        this.em.merge(u);
+    public String getId() {
+        return id;
+    }
+
+    public MaterialReference setId(String i) {
+        id = i;
+        return this;
     }
 }
+
 

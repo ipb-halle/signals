@@ -37,6 +37,9 @@ public class FieldValue implements Serializable {
 
     private final static long serialVersionUID = 1L;
 
+    public final static String ATTR_USER_VALUE = "content.user";
+    public final static String ATTR_IS_RAW_VALUE = "content.isRawValue";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -58,12 +61,12 @@ public class FieldValue implements Serializable {
         return id;
     }
 
-    public Boolean isRawValue() {
-        return rawValue;
-    }
-
     public String getValue() {
         return value;
+    }
+
+    public Boolean isRawValue() {
+        return rawValue;
     }
 
     public FieldValue setFieldDefinitionId(String i) {

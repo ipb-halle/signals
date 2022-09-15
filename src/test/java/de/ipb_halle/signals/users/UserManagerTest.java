@@ -68,14 +68,14 @@ public class UserManagerTest {
 
     @Module
     @Classes(cdi = true, value = { MockRestClient.class, MockLdapClient.class, SignalsConfig.class,
-        User.class, UserDbService.class, UserManager.class, UserRestService.class })
+        UserEntity.class, UserDbService.class, UserManager.class, UserRestService.class })
     public EjbJar app() {
         return new EjbJar();
     }
 
     @Module
     public PersistenceUnit persistence() {
-        return TestBase.persistence(new String[]{ User.class.getName() });
+        return TestBase.persistence(new String[]{ UserEntity.class.getName() });
     }
 
     @Configuration
@@ -97,15 +97,15 @@ public class UserManagerTest {
     @Test
     public void userManagerTest() {
 
-        List<User> users = manager.getSnbUsers(TEST_USER1_LAST_NAME, true);
+        List<UserEntity> users = manager.getSnbUsers(TEST_USER1_LAST_NAME, true);
         manager.save(users);
-        User user = manager.getDbUser(TEST_USER1_ID);
+        UserEntity user = manager.getDbUser(TEST_USER1_ID);
 
-        assertEquals("user alias mismatch", user.getAlias(), TEST_USER1_ALIAS);
-        assertEquals("user first name mismatch", user.getFirstName(), TEST_USER1_FIRST_NAME);
-        assertEquals("user last name mismatch", user.getLastName(), TEST_USER1_LAST_NAME);
+        assertEquals("user alias mismatch", TEST_USER1_ALIAS, user.getAlias());
+        assertEquals("user first name mismatch", TEST_USER1_FIRST_NAME, user.getFirstName());
+        assertEquals("user last name mismatch", TEST_USER1_LAST_NAME, user.getLastName());
 
         user = manager.getSnbUser(TEST_USER2_ID);
-        assertEquals("user last name mismatch", user.getLastName(),TEST_USER2_LAST_NAME);
+        assertEquals("user last name mismatch", TEST_USER2_LAST_NAME, user.getLastName());
     }
 }

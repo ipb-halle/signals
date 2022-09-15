@@ -29,6 +29,7 @@ import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestService;
 import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
+import de.ipb_halle.signals.users.UserReference;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -151,8 +152,12 @@ public class LibraryRestService implements RestService<Library> {
 
     private void parseChangeRecords(JsonObject json, Library lib) {
         lib.setCreatedAt(RestHelper.parseDate(RestHelper.getPrimitiveFromPath(json, Library.ATTR_PATH_CREATED_AT)));
-        lib.setCreatedBy(RestHelper.parseInt(RestHelper.getPrimitiveFromPath(json, Library.ATTR_PATH_CREATED_BY)));
+        lib.setCreatedBy(new UserReference().setId(
+                    RestHelper.parseInt(
+                    RestHelper.getPrimitiveFromPath(json, Library.ATTR_PATH_CREATED_BY))));
         lib.setEditedAt(RestHelper.parseDate(RestHelper.getPrimitiveFromPath(json, Library.ATTR_PATH_EDITED_AT)));
-        lib.setEditedBy(RestHelper.parseInt(RestHelper.getPrimitiveFromPath(json, Library.ATTR_PATH_EDITED_BY)));
+        lib.setEditedBy(new UserReference().setId(
+                    RestHelper.parseInt(
+                    RestHelper.getPrimitiveFromPath(json, Library.ATTR_PATH_EDITED_BY))));
     }
 }

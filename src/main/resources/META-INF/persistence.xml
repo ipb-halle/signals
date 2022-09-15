@@ -14,16 +14,18 @@
         <class>de.ipb_halle.signals.entity.FieldDefinition</class>
         <class>de.ipb_halle.signals.entity.FieldMeasure</class>
         <class>de.ipb_halle.signals.entity.FieldOption</class>
+        <class>de.ipb_halle.signals.inventory.Container</class>
         <class>de.ipb_halle.signals.inventory.ContainerType</class>
         <class>de.ipb_halle.signals.inventory.ContainerTypeAttachment</class>
         <class>de.ipb_halle.signals.inventory.ContainerTypeFieldDefinition</class>
         <class>de.ipb_halle.signals.inventory.Location</class>
         <class>de.ipb_halle.signals.inventory.LocationType</class>
+        <class>de.ipb_halle.signals.material.Material</class>
         <class>de.ipb_halle.signals.material.MaterialsLibrary</class>
         <class>de.ipb_halle.signals.users.Group</class>
         <class>de.ipb_halle.signals.users.Role</class>
         <class>de.ipb_halle.signals.users.RolePriv</class>
-        <class>de.ipb_halle.signals.users.User</class>
+        <class>de.ipb_halle.signals.users.UserEntity</class>
 
         <properties>
 

@@ -158,3 +158,25 @@ CREATE TABLE library_fields (
     PRIMARY KEY (library_id, field_definition_id, type)
 );
 
+CREATE TABLE materials (
+    id VARCHAR NOT NULL PRIMARY KEY
+);
+
+CREATE TABLE containers (
+    id VARCHAR NOT NULL PRIMARY KEY,
+    amount DOUBLE,
+    barcode VARCHAR,
+    container_type_id VARCHAR /* REFERENCES container_types(id) */,
+    coordinate_x INTEGER,
+    coordinate_y INTEGER,
+    created_at TIMESTAMP,
+    created_by INTEGER /* REFERENCES users(id) */,
+    digest VARCHAR,
+    json_string VARCHAR,
+    location_id VARCHAR,
+    material_id VARCHAR /* REFERENCES materials(id) */,
+    name VARCHAR,
+    updated_at TIMESTAMP,
+    updated_by INTEGER /* REFERENCES users(id) */,
+    unit VARCHAR
+);

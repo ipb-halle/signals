@@ -46,8 +46,8 @@ public class ContainerManagerTest {
     private final String TEST_KEY_1 = 
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/containers/ef16c7af-a763-49f2-b218-294ac02fc224";
     private final String TEST_CONTAINER_ID = "ef16c7af-a763-49f2-b218-294ac02fc224";
-    private final String TEST_CONTAINER_BARCODE = "0000000021";
-    private final String TEST_CONTAINER_NAME = "item0000000021";
+    private final String TEST_CONTAINER_BARCODE =  "0000000026";
+    private final String TEST_CONTAINER_NAME = "item00000021";
 
     @Inject
     private MockRestClient mockRestClient;
@@ -85,9 +85,9 @@ public class ContainerManagerTest {
 
         Container ct = manager.getSnbContainer(TEST_CONTAINER_ID);
         manager.save(ct);
-        assertEquals("Container name mismatch", ct.getName(), TEST_CONTAINER_NAME);
+        assertEquals("Container name mismatch", TEST_CONTAINER_NAME, ct.getName());
 
         ct = manager.getDbContainer(TEST_CONTAINER_ID);
-        assertEquals("Container barcode mismatch", ct.getBarcode(), TEST_CONTAINER_BARCODE);
+        assertEquals("Container barcode mismatch", TEST_CONTAINER_BARCODE, ct.getBarcode());
     }
 }

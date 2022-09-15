@@ -92,9 +92,9 @@ public class GroupManagerTest {
         manager.save(groups);
         Group group = manager.getDbGroup(TEST_GROUP_ID);
 
-        assertEquals("Group name mismatch", group.getName(), TEST_GROUP_NAME);
-        assertEquals("Group description mismatch", group.getDescription(), TEST_GROUP_DESCRIPTION);
-        assertEquals("Group type mismatch", group.getType(), TEST_GROUP_TYPE);
-        assertEquals("Group systemGroup mismatch", group.isSystem(), TEST_GROUP_SYSTEM);
+        assertEquals("Group name mismatch", TEST_GROUP_NAME, group.getName());
+        assertEquals("Group description mismatch", TEST_GROUP_DESCRIPTION, group.getDescription());
+        assertEquals("Group type mismatch", TEST_GROUP_TYPE, group.getType());
+        assertEquals("Group systemGroup mismatch", TEST_GROUP_SYSTEM, group.isSystem());
     }
 }

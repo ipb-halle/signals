@@ -67,7 +67,7 @@ public class LocationRestService implements RestService<Location> {
         loc.setTypeId(RestHelper.parseString(attributes, Location.ATTR_TYPE_ID));
         loc.setTypeName(RestHelper.parseString(attributes, Location.ATTR_TYPE_NAME));
 
-        parseAncestor(loc, attributes.getAsJsonArray(Location.ATTR_ANCESTORS));
+        parseAncestor(attributes.getAsJsonArray(Location.ATTR_ANCESTORS), loc);
         return loc;
     }
 
@@ -95,7 +95,7 @@ public class LocationRestService implements RestService<Location> {
         return createEntity(fetch(id));
     }
 
-    public void parseAncestor(Location loc, JsonArray ancestors) {
+    public void parseAncestor(JsonArray ancestors, Location loc) {
         if (ancestors.size() > 0) {
             JsonObject obj = ancestors.get(0).getAsJsonObject();
             loc.setAncestorId(RestHelper.parseString(obj, Location.ATTR_ANCESTOR_ID));

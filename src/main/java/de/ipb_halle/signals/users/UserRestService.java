@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  */
 
 @Local
-public class UserRestService implements RestService<User> {
+public class UserRestService implements RestService<UserEntity> {
 
     /*
      * Parameter 'q' is a String and it is used to 
@@ -79,22 +79,22 @@ public class UserRestService implements RestService<User> {
     /**
      * deserialize user
      */
-    public User createEntity(JsonElement j) {
+    public UserEntity createEntity(JsonElement j) {
         JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
-        User user = new User();
-        user.setId(attributes.getAsJsonPrimitive(User.ATTR_USER_ID).getAsInt());
-        user.setAlias(attributes.getAsJsonPrimitive(User.ATTR_ALIAS).getAsString());
-        user.setCountry(attributes.getAsJsonPrimitive(User.ATTR_COUNTRY).getAsString());
-        user.setCreatedAt(RestHelper.parseDate(attributes, User.ATTR_CREATED_AT, new Date()));
-        user.setEmail(attributes.getAsJsonPrimitive(User.ATTR_EMAIL).getAsString());
-        user.setEnabled(attributes.getAsJsonPrimitive(User.ATTR_ENABLED).getAsBoolean());
-        user.setFirstName(attributes.getAsJsonPrimitive(User.ATTR_FIRST_NAME).getAsString());
+        UserEntity user = new UserEntity();
+        user.setId(attributes.getAsJsonPrimitive(UserEntity.ATTR_USER_ID).getAsInt());
+        user.setAlias(attributes.getAsJsonPrimitive(UserEntity.ATTR_ALIAS).getAsString());
+        user.setCountry(attributes.getAsJsonPrimitive(UserEntity.ATTR_COUNTRY).getAsString());
+        user.setCreatedAt(RestHelper.parseDate(attributes, UserEntity.ATTR_CREATED_AT, new Date()));
+        user.setEmail(attributes.getAsJsonPrimitive(UserEntity.ATTR_EMAIL).getAsString());
+        user.setEnabled(attributes.getAsJsonPrimitive(UserEntity.ATTR_ENABLED).getAsBoolean());
+        user.setFirstName(attributes.getAsJsonPrimitive(UserEntity.ATTR_FIRST_NAME).getAsString());
         user.setJsonString(j.toString());
-        user.setLastLoginAt(RestHelper.parseDate(attributes, User.ATTR_LAST_LOGIN, new Date()));
-        user.setLastName(attributes.getAsJsonPrimitive(User.ATTR_LAST_NAME).getAsString());
-        user.setOrganization(attributes.getAsJsonPrimitive(User.ATTR_ORGANIZATION).getAsString());
-        user.setUserName(attributes.getAsJsonPrimitive(User.ATTR_USER_NAME).getAsString());
+        user.setLastLoginAt(RestHelper.parseDate(attributes, UserEntity.ATTR_LAST_LOGIN, new Date()));
+        user.setLastName(attributes.getAsJsonPrimitive(UserEntity.ATTR_LAST_NAME).getAsString());
+        user.setOrganization(attributes.getAsJsonPrimitive(UserEntity.ATTR_ORGANIZATION).getAsString());
+        user.setUserName(attributes.getAsJsonPrimitive(UserEntity.ATTR_USER_NAME).getAsString());
 
         return user;
     }
@@ -102,7 +102,7 @@ public class UserRestService implements RestService<User> {
     /**
      * POST -- create user
      */
-    public User doCreateUser(User user) {
+    public UserEntity doCreateUser(UserEntity user) {
         try {
             restClient.reset()
                 .setMethod(Method.POST)
@@ -126,7 +126,7 @@ public class UserRestService implements RestService<User> {
     /**
      * GET user by id 
      */
-    public User doGetUser(int id) {
+    public UserEntity doGetUser(int id) {
         try {
             restClient.reset()
                 .setEndpoint(String.format(USER_ENDPOINT, id))
@@ -148,7 +148,7 @@ public class UserRestService implements RestService<User> {
     /**
      * GET users -- obtain list of users 
      */
-    public List<User> doGetUsers(String query, Boolean enabled) {
+    public List<UserEntity> doGetUsers(String query, Boolean enabled) {
         restClient.reset()
             .setMethod(Method.GET)
             .setEndpoint(USERS_ENDPOINT);
@@ -160,8 +160,8 @@ public class UserRestService implements RestService<User> {
             restClient.putUrlParameter("enabled", enabled ? "true" : "false");
         }
 
-        RestResultIterator<User> iter = new RestResultIterator<> (restClient, this, true); 
-        ArrayList<User> users = new ArrayList<> ();
+        RestResultIterator<UserEntity> iter = new RestResultIterator<> (restClient, this, true); 
+        ArrayList<UserEntity> users = new ArrayList<> ();
 
         while(iter.hasNext()) {
             users.add(iter.next());
@@ -169,20 +169,20 @@ public class UserRestService implements RestService<User> {
         return users;
     }
 
-    protected String prepareJsonString(User user) {
+    protected String prepareJsonString(UserEntity user) {
         JsonObject attributes = new JsonObject();
-        attributes.addProperty(User.ATTR_ALIAS, user.getAlias());
-        attributes.addProperty(User.ATTR_COUNTRY, user.getCountry());
-        attributes.addProperty(User.ATTR_EMAIL, user.getEmail());
-        attributes.addProperty(User.ATTR_FIRST_NAME, user.getFirstName());
-        attributes.addProperty(User.ATTR_LAST_NAME, user.getLastName());
-        attributes.addProperty(User.ATTR_ORGANIZATION, user.getOrganization());
+        attributes.addProperty(UserEntity.ATTR_ALIAS, user.getAlias());
+        attributes.addProperty(UserEntity.ATTR_COUNTRY, user.getCountry());
+        attributes.addProperty(UserEntity.ATTR_EMAIL, user.getEmail());
+        attributes.addProperty(UserEntity.ATTR_FIRST_NAME, user.getFirstName());
+        attributes.addProperty(UserEntity.ATTR_LAST_NAME, user.getLastName());
+        attributes.addProperty(UserEntity.ATTR_ORGANIZATION, user.getOrganization());
         if (user.getRoles() != null) {
-            attributes.add(User.ATTR_ROLES, prepareRoles(user));
+            attributes.add(UserEntity.ATTR_ROLES, prepareRoles(user));
         }
 /*
         if (user.getSystemGroups() != null) {
-            attributes.add(User.ATTR_SYSTEM_GROUPS, prepareSystemGroups(user));
+            attributes.add(UserEntity.ATTR_SYSTEM_GROUPS, prepareSystemGroups(user));
         }
 */
 
@@ -194,7 +194,7 @@ public class UserRestService implements RestService<User> {
         return obj.toString();
     }
 
-    private JsonArray prepareRoles(User user) {
+    private JsonArray prepareRoles(UserEntity user) {
         JsonArray roles = new JsonArray();
         for (Role roleObj : user.getRoles()) {
             JsonObject role = new JsonObject();
@@ -205,7 +205,7 @@ public class UserRestService implements RestService<User> {
         return roles;
     }
 
-    private JsonArray prepareSystemGroups(User user) {
+    private JsonArray prepareSystemGroups(UserEntity user) {
         JsonArray systemGroups = new JsonArray();
         for (Group groupObj : user.getSystemGroups()) {
             JsonObject systemGroup = new JsonObject();

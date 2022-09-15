@@ -119,7 +119,7 @@ public class ContainerTypeManagerTest {
         manager.save(ctypes);
 
         ContainerType ct = manager.getDbContainerType(TEST_CONTAINER_TYPE_ID);
-        assertEquals("ContainerType name mismatch", ct.getName(), TEST_CONTAINER_TYPE_NAME);
+        assertEquals("ContainerType name mismatch", TEST_CONTAINER_TYPE_NAME, ct.getName());
 
         // attachments
         Attachment a = getAttachmentById(

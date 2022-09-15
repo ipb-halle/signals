@@ -85,9 +85,9 @@ public class LocationManagerTest {
 
         Location loc = manager.getSnbLocation(TEST_LOCATION_ID);
         manager.save(loc);
-        assertEquals("Location name mismatch", loc.getName(), TEST_LOCATION_NAME);
+        assertEquals("Location name mismatch", TEST_LOCATION_NAME, loc.getName());
 
         loc = manager.getDbLocation(TEST_LOCATION_ID);
-        assertEquals("Location barcode mismatch", loc.getBarcode(), TEST_LOCATION_BARCODE);
+        assertEquals("Location barcode mismatch", TEST_LOCATION_BARCODE, loc.getBarcode());
     }
 }

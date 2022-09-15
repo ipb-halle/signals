@@ -23,11 +23,15 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
+import de.ipb_halle.signals.entity.FieldValueRestService;
+import de.ipb_halle.signals.entity.Unit;
+import de.ipb_halle.signals.materials.MaterialReference;
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestService;
 import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
+import de.ipb_halle.signals.users.UserReference;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -57,20 +61,21 @@ public class ContainerRestService implements RestService<Container> {
         JsonObject j = json.getAsJsonObject();
         JsonObject attributes = j.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
-        Container loc = new Container();
-        loc.setId(RestHelper.parseString(j, RestHelper.ATTR_ID));
-        loc.setBarcode(RestHelper.parseString(attributes, Container.ATTR_BARCODE));
-        loc.setDigest(RestHelper.parseString(attributes, RestHelper.ATTR_DIGEST));
-        loc.setContainerTypeId(RestHelper.parseString(attributes, Container.ATTR_CONTAINER_TYPE_ID));
-        loc.setContainerTypeName(RestHelper.parseString(attributes, Container.ATTR_CONTAINER_TYPE_NAME));
-        loc.setCreatedAt(RestHelper.parseDate(attributes, Container.ATTR_CREATED_AT));
-        loc.setName(RestHelper.parseString(attributes, Container.ATTR_NAME));
-        loc.setUpdatedAt(RestHelper.parseDate(attributes, Container.ATTR_UPDATED_AT));
+        Container ct = new Container();
+        ct.setId(RestHelper.parseString(j, RestHelper.ATTR_ID));
+        ct.setBarcode(RestHelper.parseString(attributes, Container.ATTR_BARCODE));
+        ct.setDigest(RestHelper.parseString(attributes, RestHelper.ATTR_DIGEST));
+        ct.setContainerTypeId(RestHelper.parseString(attributes, Container.ATTR_CONTAINER_TYPE_ID));
+        ct.setContainerTypeName(RestHelper.parseString(attributes, Container.ATTR_CONTAINER_TYPE_NAME));
+        ct.setName(RestHelper.parseString(attributes, RestHelper.ATTR_NAME));
+        ct.setUnit(Unit.getUnit(RestHelper.parseString(attributes, Container.ATTR_UNIT)));
 
-        loc.setJsonString(j.toString());
+        ct.setJsonString(j.toString());
 
-//      parseFields(loc, attributes.getAsJsonArray(Container.ATTR_FIELDS));
-        return loc;
+        parseChangeRecords(attributes, ct);
+        parseFieldValues(attributes.getAsJsonArray(Container.ATTR_FIELDS), ct);
+        parseMaterials(attributes.getAsJsonArray(Container.ATTR_CONTENTS), ct);
+        return ct;
     }
 
 
@@ -95,5 +100,38 @@ public class ContainerRestService implements RestService<Container> {
 
     public Container doGetContainer(String id) {
         return createEntity(fetch(id));
+    }
+
+    private void parseChangeRecords(JsonObject json, Container ct) {
+        ct.setCreatedAt(RestHelper.parseDate(json, Container.ATTR_CREATED_AT));
+        ct.setCreatedBy(new UserReference().setId(
+                    RestHelper.parseInt(
+                    RestHelper.getPrimitiveFromPath(json, Container.ATTR_CREATED_BY))));
+        ct.setUpdatedAt(RestHelper.parseDate(json, Container.ATTR_UPDATED_AT));
+        ct.setUpdatedBy(new UserReference().setId(
+                    RestHelper.parseInt(
+                    RestHelper.getPrimitiveFromPath(json, Container.ATTR_UPDATED_BY))));
+    }
+
+
+    private void parseFieldValues(JsonArray jArray, Container ct) {
+        Iterator<JsonElement> iter = jArray.iterator();
+        FieldValueRestService svc = new FieldValueRestService();
+        while (iter.hasNext()) {
+            ct.addFieldValue(svc.createEntity(iter.next()));
+        }
+    }
+
+    private void parseMaterials(JsonArray jArray, Container ct) {
+        Iterator<JsonElement> iter = jArray.iterator();
+        while (iter.hasNext()) {
+            ct.addMaterial(
+                        new MaterialReference()
+                        .setId(
+                        RestHelper.parseString(
+                        RestHelper.getPrimitiveFromPath(
+                        iter.next(),
+                        Container.ATTR_CONTENT_ID))));
+        }
     }
 }

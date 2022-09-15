@@ -90,8 +90,8 @@ public class RoleManagerTest {
         manager.save(roles);
         Role role = manager.getDbRole(TEST_ROLE_ID);
 
-        assertEquals("Role name mismatch", role.getName(), TEST_ROLE_NAME);
-        assertEquals("Role description mismatch", role.getDescription(), TEST_ROLE_DESCRIPTION);
+        assertEquals("Role name mismatch", TEST_ROLE_NAME, role.getName());
+        assertEquals("Role description mismatch", TEST_ROLE_DESCRIPTION, role.getDescription());
         assertTrue("Role has privilege canViewMaterials", role.hasPrivilege(RolePrivilege.canViewMaterials));
     }
 }

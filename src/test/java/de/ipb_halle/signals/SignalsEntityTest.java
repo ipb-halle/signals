@@ -30,7 +30,7 @@ import static org.junit.Assert.assertThrows;
 public class SignalsEntityTest {
 
     private final String TEST_RESOURCE = "SignalsEntityTest001.json";
-    private final String id = "location:44ab8051-81fe-4f48-b251-8f629a89ddf4:ivt";
+    private final String TEST_ID = "location:44ab8051-81fe-4f48-b251-8f629a89ddf4:ivt";
 
     @Test
     public void entityTest() {
@@ -41,7 +41,7 @@ public class SignalsEntityTest {
         SignalsEntityRestService svc = new SignalsEntityRestService ();
         SignalsEntity entity = svc.createEntity(j);
 
-        assertEquals("id matches", id, entity.getId());
+        assertEquals("id matches", TEST_ID, entity.getId());
         assertEquals("json string matches", test, entity.getJsonString());
     }
 }

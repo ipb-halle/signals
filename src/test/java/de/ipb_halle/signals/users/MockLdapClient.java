@@ -41,7 +41,7 @@ public class MockLdapClient implements LdapClient {
         return new HashSet<String> ();
     }
 
-    public User getUser(String userDN) {
+    public UserEntity getUserEntity(String userDN) {
         return null;
     }
 

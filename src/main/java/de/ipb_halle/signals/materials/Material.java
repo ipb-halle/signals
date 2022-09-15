@@ -21,21 +21,10 @@ package de.ipb_halle.signals.materials;
  * Material DTO 
  */
 
-public class Material {
+public class Material extends MaterialReference {
 
-    private String id;
-
+    @Override
     public String dump() {
-        return String.format("Material(%s)\n", id);
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String i) {
-        id = i;
+        return String.format("Material(%s)\n", getId());
     }
 }
-
-

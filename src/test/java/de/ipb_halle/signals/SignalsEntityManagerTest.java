@@ -48,6 +48,8 @@ public class SignalsEntityManagerTest {
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities?includeTypes=location&page[offset]=20&page[limit]=20";
     private final String TEST_LOCATION_ID = "location:cfa1802a-6470-42b3-8c8b-9fe025c82717:ivt";
 
+    private final String TEST_ENTITY_TYPE = "location";
+
     @Inject
     private MockRestClient mockRestClient;
 
@@ -86,10 +88,10 @@ public class SignalsEntityManagerTest {
     @Test
     public void entityTest() {
 
-        List<SignalsEntity> entities = manager.getSnbEntities("location");
+        List<SignalsEntity> entities = manager.getSnbEntities(TEST_ENTITY_TYPE);
         manager.save(entities);
         SignalsEntity entity = manager.getDbEntity(TEST_LOCATION_ID);
 
-        assertEquals("entity type mismatch", entity.getType(), "location");
+        assertEquals("entity type mismatch", TEST_ENTITY_TYPE, entity.getType());
     }
 }
