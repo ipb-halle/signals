@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals.inventory;
 
+import de.ipb_halle.signals.inventory.LocationManager;
 import de.ipb_halle.signals.users.UserManager;
 
 import java.util.List;
@@ -42,7 +43,16 @@ public class ContainerManager {
     @Inject
     private UserManager userManager;
 
+    @Inject
+    private LocationManager locationManager;
+
     private Logger logger = LoggerFactory.getLogger(ContainerManager.class.getName());
+
+    public void augmentContainer(Container ct) {
+        ct.setCreatedBy(userManager.getUser(ct.getCreatedBy().getId()));
+        ct.setUpdatedBy(userManager.getUser(ct.getUpdatedBy().getId()));
+        ct.setLocation(locationManager.getLocation(ct.getLocation().getId(), true));
+    }
 
     public Container getDbContainer(String id) {
         return dbService.loadById(id);
@@ -52,13 +62,14 @@ public class ContainerManager {
         return restService.doGetContainer(id);
     }
 
-    public Container getContainer(String id) {
+    public Container getContainer(String id, boolean augmented) {
         Container ct = dbService.loadById(id);
         if (ct == null) {
             ct = restService.doGetContainer(id);
         }
-        ct.setCreatedBy(userManager.getUser(ct.getCreatedBy().getId()));
-        ct.setUpdatedBy(userManager.getUser(ct.getUpdatedBy().getId()));
+        if (augmented) {
+            augmentContainer(ct);
+        }
         return ct;
     }
 

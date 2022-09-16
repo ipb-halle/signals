@@ -14,7 +14,11 @@ CREATE TABLE location_types (
 
 CREATE TABLE locations (
     id VARCHAR NOT NULL PRIMARY KEY,
+    ancestor_id VARCHAR,
+    ancestor_name VARCHAR,
     barcode VARCHAR,
+    created_at DATE,
+    created_by INTEGER /* REFERENCES users(id) */,
     name VARCHAR,
     description VARCHAR,
     grid BOOLEAN,
@@ -22,8 +26,8 @@ CREATE TABLE locations (
     grid_columns INTEGER,
     type_id VARCHAR,
     type_name VARCHAR,
-    ancestor_id VARCHAR,
-    ancestor_name VARCHAR,
+    updated_at DATE,
+    updated_by INTEGER /* REFERENCES users(id) */,
     json_string VARCHAR
 );
 

@@ -19,12 +19,17 @@ package de.ipb_halle.signals.inventory;
 
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
+import de.ipb_halle.signals.inventory.LocationDbService;
+import de.ipb_halle.signals.inventory.LocationEntity;
+import de.ipb_halle.signals.inventory.LocationManager;
+import de.ipb_halle.signals.inventory.LocationRestService;
 import de.ipb_halle.signals.rest.MockRestClient;
 import de.ipb_halle.signals.users.MockLdapClient;
 import de.ipb_halle.signals.users.UserDbService;
 import de.ipb_halle.signals.users.UserRestService;
 import de.ipb_halle.signals.users.UserEntity;
 import de.ipb_halle.signals.users.UserManager;
+import java.util.Date;
 import java.util.Properties;
 import javax.inject.Inject;
 import org.junit.Before;
@@ -53,8 +58,12 @@ public class ContainerManagerTest {
     private final String TEST_CONTAINER_ID = "ef16c7af-a763-49f2-b218-294ac02fc224";
     private final String TEST_CONTAINER_BARCODE =  "0000000026";
     private final String TEST_CONTAINER_NAME = "item00000021";
-    private final Integer TEST_USER_ID = 116;
-    private final String TEST_USER_FIRST = "TwoFirst";
+    private final Integer TEST_USER1_ID = 116;
+    private final String TEST_USER1_FIRST = "TwoFirst";
+    private final Integer TEST_USER2_ID = 102;
+    private final String TEST_USER2_FIRST = "ThreeFirst";
+    private final String TEST_LOCATION_ID = "e13620f4-4933-4275-83cc-3194a4be6607";
+    private final String TEST_LOCATION_NAME = "Grid96Well_Test";
 
     @Inject
     private MockRestClient mockRestClient;
@@ -63,10 +72,14 @@ public class ContainerManagerTest {
     private UserManager userManager;
 
     @Inject
+    private LocationManager locationManager;
+
+    @Inject
     private ContainerManager manager;
 
     @Module
     @Classes(cdi = true, value = { MockLdapClient.class, MockRestClient.class, SignalsConfig.class,
+        LocationEntity.class, LocationDbService.class, LocationManager.class, LocationRestService.class,
         UserEntity.class, UserDbService.class, UserManager.class, UserRestService.class,
         Container.class, ContainerDbService.class, ContainerManager.class, ContainerRestService.class })
     public EjbJar app() {
@@ -91,11 +104,28 @@ public class ContainerManagerTest {
 
         UserEntity user = new UserEntity();
         user.setEnabled(true);
-        user.setFirstName(TEST_USER_FIRST);
+        user.setFirstName(TEST_USER1_FIRST);
         user.setLastName("TwoLast");
-        user.setId(TEST_USER_ID);
+        user.setId(TEST_USER1_ID);
         user.setEmail("user.two@someplace.invalid");
         userManager.save(user);
+
+        user = new UserEntity();
+        user.setEnabled(true);
+        user.setFirstName(TEST_USER2_FIRST);
+        user.setLastName("ThreeLast");
+        user.setId(TEST_USER2_ID);
+        user.setEmail("user.three@someplace.invalid");
+        userManager.save(user);
+
+        LocationEntity loc = new LocationEntity();
+        loc.setId(TEST_LOCATION_ID);
+        loc.setName(TEST_LOCATION_NAME);
+        loc.setCreatedAt(new Date(1000000000));
+        loc.setCreatedBy(TEST_USER1_ID);
+        loc.setUpdatedAt(new Date(1200000000));
+        loc.setUpdatedBy(TEST_USER2_ID);
+        locationManager.save(loc);
     }
 
 
@@ -106,9 +136,11 @@ public class ContainerManagerTest {
         manager.save(ct);
         assertEquals("Container name mismatch", TEST_CONTAINER_NAME, ct.getName());
 
-        ct = manager.getContainer(TEST_CONTAINER_ID);
+        ct = manager.getContainer(TEST_CONTAINER_ID, true);
         assertEquals("Container barcode mismatch", TEST_CONTAINER_BARCODE, ct.getBarcode());
-        assertEquals("Created by Id matches", TEST_USER_ID, ct.getCreatedBy().getId());
-        assertEquals("Created by first name matches", TEST_USER_FIRST, ((UserEntity) ct.getCreatedBy()).getFirstName());
+        assertEquals("Created by Id matches", TEST_USER1_ID, ct.getCreatedBy().getId());
+        assertEquals("Created by first name matches", TEST_USER1_FIRST, ((UserEntity) ct.getCreatedBy()).getFirstName());
+        assertEquals("Location name matches", TEST_LOCATION_NAME, ((LocationEntity) ct.getLocation()).getName());
+        assertEquals("Location updated by matches", TEST_USER2_ID, ((LocationEntity) ct.getLocation()).getUpdatedBy());
     }
 }

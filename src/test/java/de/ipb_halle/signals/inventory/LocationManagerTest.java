@@ -20,6 +20,10 @@ package de.ipb_halle.signals.inventory;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.rest.MockRestClient;
+import de.ipb_halle.signals.users.MockLdapClient;
+import de.ipb_halle.signals.users.UserDbService;
+import de.ipb_halle.signals.users.UserManager;
+import de.ipb_halle.signals.users.UserRestService;
 import java.util.Properties;
 import javax.inject.Inject;
 import org.junit.Before;
@@ -56,7 +60,8 @@ public class LocationManagerTest {
     private LocationManager manager;
 
     @Module
-    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
+    @Classes(cdi = true, value = { MockLdapClient.class, MockRestClient.class, SignalsConfig.class,
+        UserDbService.class, UserManager.class, UserRestService.class,
         LocationEntity.class, LocationDbService.class, LocationManager.class, LocationRestService.class })
     public EjbJar app() {
         return new EjbJar();

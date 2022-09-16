@@ -60,14 +60,19 @@ public class LocationRestService implements RestService<LocationEntity> {
         LocationEntity loc = new LocationEntity();
         loc.setId(RestHelper.parseString(j, RestHelper.ATTR_ID));
         loc.setBarcode(RestHelper.parseString(attributes, LocationEntity.ATTR_BARCODE));
+        loc.setCreatedAt(RestHelper.parseDate(attributes, LocationEntity.ATTR_CREATED_AT));
         loc.setName(RestHelper.parseString(attributes, LocationEntity.ATTR_NAME));
         loc.setDescription(RestHelper.parseString(attributes, LocationEntity.ATTR_DESCRIPTION));
         loc.setGrid(RestHelper.parseBool(attributes, LocationEntity.ATTR_GRID));
         loc.setJsonString(j.toString());
         loc.setTypeId(RestHelper.parseString(attributes, LocationEntity.ATTR_TYPE_ID));
         loc.setTypeName(RestHelper.parseString(attributes, LocationEntity.ATTR_TYPE_NAME));
+        loc.setUpdatedAt(RestHelper.parseDate(attributes, LocationEntity.ATTR_UPDATED_AT));
 
         parseAncestor(attributes.getAsJsonArray(LocationEntity.ATTR_ANCESTORS), loc);
+        parseChangeRecords(j, loc);
+
+        logger.info("*********** CreatedBy {} ******", loc.getCreatedBy());
         return loc;
     }
 
@@ -104,5 +109,12 @@ public class LocationRestService implements RestService<LocationEntity> {
         }
         loc.setAncestorId(null);
         loc.setAncestorName(null);
+    }
+
+    private void parseChangeRecords(JsonObject json, LocationEntity loc) {
+        loc.setCreatedBy(RestHelper.parseInt(
+                    RestHelper.getPrimitiveFromPath(json, LocationEntity.ATTR_CREATED_BY)));
+        loc.setUpdatedBy(RestHelper.parseInt(
+                    RestHelper.getPrimitiveFromPath(json, LocationEntity.ATTR_UPDATED_BY)));
     }
 }

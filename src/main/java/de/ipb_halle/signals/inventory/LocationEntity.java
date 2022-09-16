@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals.inventory;
 
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -34,11 +35,15 @@ public class LocationEntity implements Location {
     public final static String ATTR_ANCESTOR_ID = "id";
     public final static String ATTR_ANCESTOR_NAME = "name";
     public final static String ATTR_BARCODE = "barcode";
+    public final static String ATTR_CREATED_AT = "createdAt";
+    public final static String ATTR_CREATED_BY = "relationships.createdBy.data.id";
     public final static String ATTR_DESCRIPTION = "description";
     public final static String ATTR_GRID = "isGrid";
     public final static String ATTR_NAME = "name";
     public final static String ATTR_TYPE_ID = "typeId";
     public final static String ATTR_TYPE_NAME = "typeName";
+    public final static String ATTR_UPDATED_AT = "createdAt";
+    public final static String ATTR_UPDATED_BY = "relationships.updatedBy.data.id";
 
     @Id
     private String id;
@@ -61,6 +66,12 @@ public class LocationEntity implements Location {
     @Column(name="grid_columns")
     private Integer columns;
 
+    @Column(name="created_at")
+    private Date createdAt;
+
+    @Column(name="created_by")
+    private Integer createdBy;
+
     @Column(name="type_id")
     private String typeId;
 
@@ -76,6 +87,11 @@ public class LocationEntity implements Location {
     @Column(name="json_string")
     private String jsonString;
 
+    @Column(name="updated_at")
+    private Date updatedAt;
+
+    @Column(name="updated_by")
+    private Integer updatedBy;
 
     private transient LocationType type;
     private transient Location ancestor;
@@ -89,8 +105,7 @@ public class LocationEntity implements Location {
 
     public String dump() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("Location(%s): ...",id));
-        sb.append(jsonString);
+        sb.append(String.format("Location(%s): name=%s\n",id, name));
         return sb.toString();
     }
 
@@ -112,6 +127,14 @@ public class LocationEntity implements Location {
 
     public Integer getColumns() {
         return columns;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public Integer getCreatedBy() {
+        return createdBy;
     }
 
     public String getDescription() {
@@ -138,6 +161,14 @@ public class LocationEntity implements Location {
         return typeName;
     }
 
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public Integer getUpdatedBy() {
+        return updatedBy;
+    }
+
     public boolean isGrid() {
         return grid;
     }
@@ -162,6 +193,14 @@ public class LocationEntity implements Location {
     public void setColumns(Integer col) {
         columns = col;
         grid = true;
+    }
+
+    public void setCreatedAt(Date d) {
+        createdAt = d;
+    }
+
+    public void setCreatedBy(Integer u) {
+        createdBy = u;
     }
 
     public void setDescription(String d) {
@@ -197,5 +236,13 @@ public class LocationEntity implements Location {
 
     public void setTypeName(String n) {
         typeName = n;
+    }
+
+    public void setUpdatedAt(Date d) {
+        updatedAt = d;
+    }
+
+    public void setUpdatedBy(Integer u) {
+        updatedBy = u;
     }
 }

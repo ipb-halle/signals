@@ -17,9 +17,13 @@
  */
 package de.ipb_halle.signals.inventory;
 
+import de.ipb_halle.signals.users.UserManager;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /** 
@@ -35,6 +39,20 @@ public class LocationManager {
     @Inject
     private LocationRestService restService;
 
+    @Inject
+    private UserManager userManager;
+
+    private Logger logger =  LoggerFactory.getLogger(ContainerManager.class.getName());
+
+    public void augmentLocation(LocationEntity loc) {
+/*
+
+        cannot yet augment LocationEntity (need to introduce DTO) 
+
+        loc.setCreatedBy(userManager.getUser(loc.getCreatedBy().getId()));
+        loc.setUpdatedBy(userManager.getUser(loc.getUpdatedBy().getId()));
+*/
+    }
 
     public LocationEntity getSnbLocation(String id) {
         return restService.doGetLocation(id);
@@ -42,6 +60,17 @@ public class LocationManager {
 
     public LocationEntity getDbLocation(String id) {
         return dbService.loadById(id);
+    }
+
+    public LocationEntity getLocation(String id, boolean augmented) {
+        LocationEntity loc = dbService.loadById(id);
+        if (loc == null) {
+            loc = restService.doGetLocation(id);
+        }
+        if (augmented) {
+            augmentLocation(loc);
+        }
+        return loc;
     }
 
     public void save(LocationEntity loc) {
