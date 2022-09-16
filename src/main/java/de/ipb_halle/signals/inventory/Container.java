@@ -73,8 +73,10 @@ public class Container {
 
     public String dump() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("Container(%s): ...",id));
-        sb.append(jsonString);
+        sb.append(String.format("Container(%s): name=%s barcode=%s\n", id, name, barcode));
+        sb.append(String.format("  createdBy='%s', updatedBy='%s'\n", createdBy.dump(), updatedBy.dump()));
+        sb.append(String.format("  amount=%f, location='%s'\n", amount, location.dump()));
+//      sb.append(jsonString);
         return sb.toString();
     }
 

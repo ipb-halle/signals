@@ -17,9 +17,14 @@
  */
 package de.ipb_halle.signals.inventory;
 
+import de.ipb_halle.signals.users.UserManager;
+
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** 
  * Manager for containers 
@@ -34,12 +39,27 @@ public class ContainerManager {
     @Inject
     private ContainerRestService restService;
 
+    @Inject
+    private UserManager userManager;
+
+    private Logger logger = LoggerFactory.getLogger(ContainerManager.class.getName());
+
     public Container getDbContainer(String id) {
         return dbService.loadById(id);
     }
 
     public Container getSnbContainer(String id) {
         return restService.doGetContainer(id);
+    }
+
+    public Container getContainer(String id) {
+        Container ct = dbService.loadById(id);
+        if (ct == null) {
+            ct = restService.doGetContainer(id);
+        }
+        ct.setCreatedBy(userManager.getUser(ct.getCreatedBy().getId()));
+        ct.setUpdatedBy(userManager.getUser(ct.getUpdatedBy().getId()));
+        return ct;
     }
 
     public void save(Container c) {

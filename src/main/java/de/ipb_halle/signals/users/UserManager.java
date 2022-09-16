@@ -47,6 +47,14 @@ public class UserManager {
         return restService.doGetUser(id);
     }
 
+    public UserEntity getUser(int id) {
+        UserEntity u = dbService.loadById(id);
+        if (u == null) {
+            u = restService.doGetUser(id);
+        }
+        return u;
+    }
+
     public List<UserEntity> getSnbUsers(String query, boolean enabled) {
         return restService.doGetUsers(query, enabled);
     }
@@ -55,5 +63,9 @@ public class UserManager {
         for (UserEntity u : users) {
             dbService.save(u);
         }
+    }
+
+    public void save(UserEntity user) {
+        dbService.save(user);
     }
 }

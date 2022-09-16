@@ -72,12 +72,12 @@ public class ContainerRestService implements RestService<Container> {
             RestHelper.getPrimitiveFromPath(attributes, Container.ATTR_LOCATION_ID))));
         ct.setName(RestHelper.parseString(attributes, RestHelper.ATTR_NAME));
         ct.setUnit(Unit.getUnit(RestHelper.parseString(attributes, Container.ATTR_UNIT)));
-
-        ct.setJsonString(j.toString());
-
-        parseChangeRecords(attributes, ct);
         parseFieldValues(attributes.getAsJsonArray(Container.ATTR_FIELDS), ct);
         parseMaterials(attributes.getAsJsonArray(Container.ATTR_CONTENTS), ct);
+
+        ct.setJsonString(j.toString());
+        parseChangeRecords(j, ct);
+
         return ct;
     }
 

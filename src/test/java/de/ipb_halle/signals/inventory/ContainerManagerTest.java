@@ -20,6 +20,11 @@ package de.ipb_halle.signals.inventory;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.rest.MockRestClient;
+import de.ipb_halle.signals.users.MockLdapClient;
+import de.ipb_halle.signals.users.UserDbService;
+import de.ipb_halle.signals.users.UserRestService;
+import de.ipb_halle.signals.users.UserEntity;
+import de.ipb_halle.signals.users.UserManager;
 import java.util.Properties;
 import javax.inject.Inject;
 import org.junit.Before;
@@ -48,15 +53,21 @@ public class ContainerManagerTest {
     private final String TEST_CONTAINER_ID = "ef16c7af-a763-49f2-b218-294ac02fc224";
     private final String TEST_CONTAINER_BARCODE =  "0000000026";
     private final String TEST_CONTAINER_NAME = "item00000021";
+    private final Integer TEST_USER_ID = 116;
+    private final String TEST_USER_FIRST = "TwoFirst";
 
     @Inject
     private MockRestClient mockRestClient;
 
     @Inject
+    private UserManager userManager;
+
+    @Inject
     private ContainerManager manager;
 
     @Module
-    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
+    @Classes(cdi = true, value = { MockLdapClient.class, MockRestClient.class, SignalsConfig.class,
+        UserEntity.class, UserDbService.class, UserManager.class, UserRestService.class,
         Container.class, ContainerDbService.class, ContainerManager.class, ContainerRestService.class })
     public EjbJar app() {
         return new EjbJar();
@@ -77,6 +88,14 @@ public class ContainerManagerTest {
         TestBase.prepareRestClients(mockRestClient,
             TEST_KEY_1,
             getClass().getResourceAsStream(TEST_RESOURCE_1));
+
+        UserEntity user = new UserEntity();
+        user.setEnabled(true);
+        user.setFirstName(TEST_USER_FIRST);
+        user.setLastName("TwoLast");
+        user.setId(TEST_USER_ID);
+        user.setEmail("user.two@someplace.invalid");
+        userManager.save(user);
     }
 
 
@@ -87,7 +106,9 @@ public class ContainerManagerTest {
         manager.save(ct);
         assertEquals("Container name mismatch", TEST_CONTAINER_NAME, ct.getName());
 
-        ct = manager.getDbContainer(TEST_CONTAINER_ID);
+        ct = manager.getContainer(TEST_CONTAINER_ID);
         assertEquals("Container barcode mismatch", TEST_CONTAINER_BARCODE, ct.getBarcode());
+        assertEquals("Created by Id matches", TEST_USER_ID, ct.getCreatedBy().getId());
+        assertEquals("Created by first name matches", TEST_USER_FIRST, ((UserEntity) ct.getCreatedBy()).getFirstName());
     }
 }

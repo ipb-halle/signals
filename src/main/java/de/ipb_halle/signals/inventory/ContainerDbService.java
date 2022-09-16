@@ -35,6 +35,9 @@ public class ContainerDbService {
 
     public Container loadById(String id) {
         ContainerEntity entity = this.em.find(ContainerEntity.class, id);
+        if (entity == null) {
+            return null;
+        }
         return new Container(entity);
     }
 
