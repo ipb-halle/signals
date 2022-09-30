@@ -33,12 +33,19 @@ public class MockLdapClient implements LdapClient {
         return null;
     }
 
-    public Set<String> getMembers(String groupDN) {
+    public Set<String> getMembers(String groupDN, boolean nesting) {
         return new HashSet<String> ();
     }
 
-    public Set<String> getMemberships(String userDN) {
+    public  void getMembers(Set<String> users, Set<String> groups, String groupDN, boolean nesting) {
+    }
+
+    public Set<String> getMemberships(String userDN, boolean nesting) {
         return new HashSet<String> ();
+    }
+
+    public Role getRole(String roleDN) {
+        return null;
     }
 
     public UserEntity getUserEntity(String userDN) {

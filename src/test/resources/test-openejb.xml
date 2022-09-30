@@ -30,6 +30,9 @@
       ldapFilterRoleDN = ou=SNB_roleOU,...,dc=DOMAIN,dc=COUNTRY
       ldapFilterUser  = (&amp;(objectCategory=person)(mail=@))
       ldapFilterUsers = (objectCategory=person)
+      ldapManagedGroups = cn=SnbManagedGroups,ou=...,dc=DOMAIN,dc=COUNTRY
+      ldapManagedRoles = cn=SnbManagedRoles,ou=...,dc=DOMAIN,dc=COUNTRY
+      ldapManagedUsers = cn=SnbManagedUsers,ou=...,dc=DOMAIN,dc=COUNTRY
       ldapSecurityPrincipal = test
       ldapSecurityCredentials = 0000
       ldapSecurityAuthentication = simple

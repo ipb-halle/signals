@@ -17,9 +17,14 @@
  */
 package de.ipb_halle.signals.users;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 
 /** 
@@ -32,6 +37,22 @@ public class GroupDbService {
 
     @PersistenceContext(unitName="signalsDB")
     private EntityManager em;
+
+    /**
+     * @return a list of Groups 
+     */
+    public List<Group> load() {
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<Group> criteriaQuery = builder.createQuery(Group.class);
+        Root<Group> root = criteriaQuery.from(Group.class);
+        criteriaQuery.select(root);
+
+        List<Group> result = new ArrayList<> ();
+        for (Group group : em.createQuery(criteriaQuery).getResultList()) {
+            result.add(group); 
+        }
+        return result;
+    }
 
     public Group loadById(int id) {
         return this.em.find(Group.class, id);

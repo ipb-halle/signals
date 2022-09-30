@@ -50,6 +50,9 @@ public class SignalsConfig {
     private String ldapFilterRoleDN;                    // ou=<SNB role OU>,...,dc=<domain>,dc=<country>
     private String ldapFilterUser;                      // (&(objectClass=person)(mail=@))
     private String ldapFilterUsers;                     // (objectClass=person)
+    private String ldapManagedGroups;                   // group dn
+    private String ldapManagedRoles;                    // group dn
+    private String ldapManagedUsers;                    // group dn
     private String ldapSecurityPrincipal;               //
     private String ldapSecurityCredentials;             //
     private String ldapSecurityAuthentication;          // simple
@@ -82,6 +85,9 @@ public class SignalsConfig {
     public String getLdapFilterRoleDN() { return ldapFilterRoleDN; }
     public String getLdapFilterUser() { return ldapFilterUser; }
     public String getLdapFilterUsers() { return ldapFilterUsers; }
+    public String getLdapManagedGroups() { return ldapManagedGroups; }
+    public String getLdapManagedRoles() { return ldapManagedRoles; }
+    public String getLdapManagedUsers() { return ldapManagedUsers; }
     public String getLdapSecurityPrincipal() { return ldapSecurityPrincipal; }
     public String getLdapSecurityCredentials() { return ldapSecurityCredentials; }
     public String getLdapSecurityAuthentication() { return ldapSecurityAuthentication; }

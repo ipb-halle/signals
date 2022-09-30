@@ -17,23 +17,23 @@
  */
 package de.ipb_halle.signals.users;
 
-
 /** 
- * SNB user reference
+ * SNB role reference 
  */
-public class UserReference implements User {
+
+public class RoleReference implements IRole {
 
     private Integer id;
 
     public String dump() {
-        return String.format("User reference(%d)", id);
+        return String.format("Role reference(%d)", id);
     }
 
     public Integer getId() {
         return id;
     }
 
-    public User setId(Integer i) {
+    public IRole setId(Integer i) {
         id = i;
         return this;
     }

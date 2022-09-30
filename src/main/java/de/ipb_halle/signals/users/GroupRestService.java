@@ -74,6 +74,7 @@ public class GroupRestService implements RestService<Group> {
         // eid
         group.setEditedAt(RestHelper.parseDate(attributes, Group.ATTR_EDITED_AT, new Date()));
         //flags
+        group.setImmutable(true);
         group.setJsonString(j.toString());
         group.setName(attributes.getAsJsonPrimitive(Group.ATTR_NAME).getAsString());
         group.setSystem(attributes.getAsJsonPrimitive(Group.ATTR_SYSTEM).getAsBoolean());

@@ -23,8 +23,9 @@ import javax.inject.Inject;
 
 
 /** 
- * The UserManager can fetch users from Signals Notebook and from LDAP,
- * store them in an SQL databas and synchronize among the various sources.
+ * The UserManager can fetch users from Signals Notebook and 
+ * store them in an SQL database. This class provides some 
+ * convenience Methods for the AccessManager class.
  */
 
 @Stateless
@@ -35,9 +36,6 @@ public class UserManager {
 
     @Inject
     private UserRestService restService;
-
-    @Inject
-    private LdapClient ldapClient;
 
     public UserEntity getDbUser(int id) {
         return dbService.loadById(id);

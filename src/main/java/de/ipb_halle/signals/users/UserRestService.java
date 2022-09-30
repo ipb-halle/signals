@@ -69,6 +69,7 @@ public class UserRestService implements RestService<UserEntity> {
      */
     public final String USERS_ENDPOINT = "/users";
     public final String USER_ENDPOINT = "/users/%d";
+    public final String SYSTEMGROUPS_ENDPOINT = "/users/%d/systemGroups";
 
     private Logger logger = LoggerFactory.getLogger(UserRestService.class.getName());
 
@@ -90,12 +91,15 @@ public class UserRestService implements RestService<UserEntity> {
         user.setEmail(attributes.getAsJsonPrimitive(UserEntity.ATTR_EMAIL).getAsString());
         user.setEnabled(attributes.getAsJsonPrimitive(UserEntity.ATTR_ENABLED).getAsBoolean());
         user.setFirstName(attributes.getAsJsonPrimitive(UserEntity.ATTR_FIRST_NAME).getAsString());
+        user.setImmutable(true);
         user.setJsonString(j.toString());
         user.setLastLoginAt(RestHelper.parseDate(attributes, UserEntity.ATTR_LAST_LOGIN, new Date()));
         user.setLastName(attributes.getAsJsonPrimitive(UserEntity.ATTR_LAST_NAME).getAsString());
         user.setOrganization(attributes.getAsJsonPrimitive(UserEntity.ATTR_ORGANIZATION).getAsString());
         user.setUserName(attributes.getAsJsonPrimitive(UserEntity.ATTR_USER_NAME).getAsString());
 
+        JsonArray roles = RestHelper.getFromPath(j, UserEntity.ATTR_RELATIONSHIP_ROLES).getAsJsonArray();
+        parseRoles(user, roles);
         return user;
     }
 
@@ -121,6 +125,27 @@ public class UserRestService implements RestService<UserEntity> {
             logger.warn("IOException", (Throwable) ioe);
         }
         return null;
+    }
+
+    /**
+     * GET system group memberships
+     */
+    public void doGetSystemGroupMemberships(UserEntity user) {
+        try {
+            restClient.reset()
+                .setEndpoint(String.format(SYSTEMGROUPS_ENDPOINT, user.getId()))
+                .execute();
+
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
+            parseMemberships(user, jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA).getAsJsonArray());
+
+        } catch(UnexpectedResponseCodeException ue) {
+            logger.warn("Unexpected code");
+        } catch(MalformedURLException me) {
+            logger.warn("Malformed URL");
+        } catch(IOException ioe) {
+            logger.warn("IOException", (Throwable) ioe);
+        }
     }
 
     /**
@@ -169,6 +194,24 @@ public class UserRestService implements RestService<UserEntity> {
         return users;
     }
 
+    private void parseMemberships(UserEntity user, JsonArray jArray) {
+        Iterator<JsonElement> iter = jArray.iterator();
+        while (iter.hasNext()) {
+            JsonObject json = iter.next().getAsJsonObject();
+            user.addSystemGroup(new GroupReference()
+                .setId(RestHelper.parseInt(json, RestHelper.ATTR_ID)));
+        }
+    }
+
+    private void parseRoles(UserEntity user, JsonArray jArray) {
+        Iterator<JsonElement> iter = jArray.iterator();
+        while (iter.hasNext()) {
+            JsonObject json = iter.next().getAsJsonObject();
+            user.addRole(new RoleReference()
+                .setId(RestHelper.parseInt(json, RestHelper.ATTR_ID)));
+        }
+    }
+
     protected String prepareJsonString(UserEntity user) {
         JsonObject attributes = new JsonObject();
         attributes.addProperty(UserEntity.ATTR_ALIAS, user.getAlias());
@@ -196,10 +239,10 @@ public class UserRestService implements RestService<UserEntity> {
 
     private JsonArray prepareRoles(UserEntity user) {
         JsonArray roles = new JsonArray();
-        for (Role roleObj : user.getRoles()) {
+        for (IRole roleObj : user.getRoles()) {
             JsonObject role = new JsonObject();
             role.addProperty(RestHelper.ATTR_ID, roleObj.getId());
-            role.addProperty(Role.ATTR_NAME, roleObj.getName());
+            role.addProperty(Role.ATTR_NAME, ((Role) roleObj).getName());
             roles.add(role);
         }
         return roles;
@@ -207,10 +250,10 @@ public class UserRestService implements RestService<UserEntity> {
 
     private JsonArray prepareSystemGroups(UserEntity user) {
         JsonArray systemGroups = new JsonArray();
-        for (Group groupObj : user.getSystemGroups()) {
+        for (IGroup groupObj : user.getSystemGroups()) {
             JsonObject systemGroup = new JsonObject();
             systemGroup.addProperty(RestHelper.ATTR_ID, groupObj.getId());
-            systemGroup.addProperty(Group.ATTR_NAME, groupObj.getName());
+            systemGroup.addProperty(Group.ATTR_NAME, ((Group) groupObj).getName());
             systemGroups.add(systemGroup);
         }
         return systemGroups;

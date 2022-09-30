@@ -19,22 +19,23 @@ package de.ipb_halle.signals.users;
 
 
 /** 
- * SNB user reference
+ * SNB group reference
  */
-public class UserReference implements User {
+public class GroupReference implements IGroup {
 
     private Integer id;
 
     public String dump() {
-        return String.format("User reference(%d)", id);
+        return String.format("GroupReference(%d)\n", id);
     }
 
     public Integer getId() {
         return id;
     }
 
-    public User setId(Integer i) {
+    public IGroup setId(Integer i) {
         id = i;
         return this;
     }
 }
+

@@ -17,10 +17,15 @@
  */
 package de.ipb_halle.signals.users;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 /** 
  * DB service for roles
@@ -32,6 +37,22 @@ public class RoleDbService {
 
     @PersistenceContext(unitName="signalsDB")
     private EntityManager em;
+
+    /**
+     * @return a list of Roles
+     */
+    public List<Role> load() {
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<Role> criteriaQuery = builder.createQuery(Role.class);
+        Root<Role> root = criteriaQuery.from(Role.class);
+        criteriaQuery.select(root);
+
+        List<Role> result = new ArrayList<> ();
+        for (Role role: em.createQuery(criteriaQuery).getResultList()) {
+            result.add(role);
+        }
+        return result;
+    }
 
     public Role loadById(int id) {
         return this.em.find(Role.class, id);

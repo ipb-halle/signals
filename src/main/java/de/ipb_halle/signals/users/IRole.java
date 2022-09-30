@@ -17,24 +17,15 @@
  */
 package de.ipb_halle.signals.users;
 
-
 /** 
- * SNB user reference
+ * SNB role interface
  */
-public class UserReference implements User {
 
-    private Integer id;
+public interface IRole {
 
-    public String dump() {
-        return String.format("User reference(%d)", id);
-    }
+    public String dump();
 
-    public Integer getId() {
-        return id;
-    }
+    public Integer getId();
 
-    public User setId(Integer i) {
-        id = i;
-        return this;
-    }
+    public IRole setId(Integer i);
 }

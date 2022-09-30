@@ -154,6 +154,7 @@ public class LdapClientImpl implements LdapClient {
 
                 Group group = new Group();
                 group.setCreatedAt(getCreatedAt(attrs));
+                group.setImmutable(false);
                 group.setName(attrs.get(signalsConfig.getLdapAttrGroupName()).get().toString());
 
                 group.setDescription(signalsConfig.getGroupAttrDescription());
@@ -171,16 +172,23 @@ public class LdapClientImpl implements LdapClient {
 
     /**
      * @param groupDN a distinguished group name
+     * @param nesting true if nested memberships should be resolved
      * @return the list of users, who are members of that group, including nested memberships
      */
-    public Set<String> getMembers(String groupDN) {
+    public Set<String> getMembers(String groupDN, boolean nesting) {
         Set<String> groupCache = new HashSet<> ();
         Set<String> users = new HashSet<> ();
-        getMembers(users, groupCache, groupDN);
+        getMembers(users, groupCache, groupDN, nesting);
         return users;
     }
 
-    private void getMembers(Set<String> users, Set<String> groupCache, String groupDN) {
+    /**
+     * @param users a Set to collect DNs of discovered member users
+     * @param groups a Set to collect DNs of discovered member groups
+     * @param groupDN a distinguished group name
+     * @param nesting indicate whether nested memberships should be resolved
+     */
+    public void getMembers(Set<String> users, Set<String> groups, String groupDN, boolean nesting) {
         try {
             DirContext ctx = new InitialDirContext(ldapEnv);
             try {
@@ -193,8 +201,8 @@ public class LdapClientImpl implements LdapClient {
                     while (membersEnumeration.hasMore()) {
                         String dn = membersEnumeration.next().toString();
                         if (isGroup(dn)) {
-                            if (groupCache.add(dn)) {
-                                getMembers(users, groupCache, dn);
+                            if (groups.add(dn) && nesting) {
+                                getMembers(users, groups, dn, nesting);
                             }
                         } else {
                             users.add(dn);
@@ -210,12 +218,13 @@ public class LdapClientImpl implements LdapClient {
     }
 
     /**
-     * @param userDN a distinguished user name
+     * @param objDN a distinguished object name
+     * @param nesting true if nested memberships should be resolved
      * @return the list of (nested) group memberships for the given user
      */
-    public Set<String> getMemberships(String objDN) {
+    public Set<String> getMemberships(String objDN, boolean nesting) {
         Set<String> groups = new HashSet<> ();
-        getMemberships(groups, objDN);
+        getMemberships(groups, objDN, nesting);
         return groups;
     }
 
@@ -223,8 +232,9 @@ public class LdapClientImpl implements LdapClient {
      * recursively resolve memberships
      * @param groups the set to hold discovered distinguished group names
      * @param objDN the distinguished object, for which memberships are to be discovered
+     * @param nesting true if nested memberships should be resolved
      */
-    private void getMemberships(Set<String> groups, String objDN) {
+    private void getMemberships(Set<String> groups, String objDN, boolean nesting) {
         try {
             DirContext ctx = new InitialDirContext(ldapEnv);
             try {
@@ -237,8 +247,8 @@ public class LdapClientImpl implements LdapClient {
 
                     while (memberOfEnumeration.hasMore()) {
                         String dn = memberOfEnumeration.next().toString();
-                        if (groups.add(dn)) {
-                            getMemberships(groups, dn); 
+                        if (groups.add(dn) && nesting) {
+                            getMemberships(groups, dn, nesting);
                         }
                     }
                 }
@@ -248,6 +258,30 @@ public class LdapClientImpl implements LdapClient {
         } catch(Exception e) {
             logger.warn("getMemberships() caught an Exception: ", (Throwable) e);
         }
+    }
+
+    /**
+     * @param roleDN a distinguished LDAP group name for that role
+     * @return a corresponding Role object
+     */
+    public Role getRole(String roleDN) {
+        try {
+            DirContext ctx = new InitialDirContext(ldapEnv);
+            try {
+                Attributes attrs = ctx.getAttributes(roleDN);
+
+                Role role = new Role();
+                role.setName(attrs.get(signalsConfig.getLdapAttrGroupName()).get().toString());
+                role.setDescription(signalsConfig.getGroupAttrDescription());
+
+                return role;
+            } finally {
+                ctx.close();
+            }
+        } catch(Exception e) {
+            logger.warn("getRole() caught an Exception: ", (Throwable) e);
+        }
+        return null;
     }
 
     /**
@@ -267,6 +301,7 @@ public class LdapClientImpl implements LdapClient {
                 user.setEmail(attrs.get(signalsConfig.getLdapAttrEmail()).get().toString());
                 user.setEnabled(getUserExpiration(attrs));
                 user.setFirstName(attrs.get(signalsConfig.getLdapAttrFirstName()).get().toString());
+                user.setImmutable(false);
                 user.setLastName(attrs.get(signalsConfig.getLdapAttrLastName()).get().toString());
                 user.setOrganization(signalsConfig.getUserAttrOrganization());
                 user.setUserName(attrs.get(signalsConfig.getLdapAttrUserName()).get().toString());

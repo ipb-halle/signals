@@ -51,15 +51,33 @@ public interface LdapClient {
 
     /**
      * @param groupDN a distinguished group name
+     * @param nesting indicate whether nested memberships should be resolved
      * @return the list of users, who are members of that group, including nested memberships
      */
-    public Set<String> getMembers(String groupDN);
+    public Set<String> getMembers(String groupDN, boolean nesting);
+
+    /**
+     * @param users a Set to collect DNs of discovered member users
+     * @param groups a Set to collect DNs of discovered member groups
+     * @param groupDN a distinguished group name
+     * @param nesting indicate whether nested memberships should be resolved
+     */
+    public void getMembers(Set<String> users, Set<String> groups, String groupDN, boolean nesting);
+
 
     /**
      * @param userDN a distinguished user name
+     * @param nesting indicate whether nested memberships should be resolved
      * @return a list of (nested) group memberships for the given user
      */
-    public Set<String> getMemberships(String userDN);
+    public Set<String> getMemberships(String userDN, boolean nesting);
+
+
+    /**
+     * @param roleDN a distinguished LDAP group name for that role
+     * @return a corresponding Role object
+     */
+    public Role getRole(String roleDN);
 
     /**
      * @param userDN a distinguished user name

@@ -34,7 +34,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="groups")
-public class Group {
+public class Group implements IGroup {
 
     public final static String ATTR_CREATED_AT= "createdAt";
     public final static String ATTR_DESCRIPTION = "description";
@@ -60,6 +60,9 @@ public class Group {
 
     @Column(name="edited_at")
     private Date editedAt;
+
+    @Column
+    private boolean immutable;
 
     @Column
     private String name;
@@ -109,12 +112,17 @@ public class Group {
         return type;
     }
 
+    public boolean isImmutable() {
+        return immutable;
+    }
+
     public boolean isSystem() {
         return system;
     }
 
-    public void setId(Integer i) {
+    public IGroup setId(Integer i) {
         id = i;
+        return this;
     }
 
     public void setCreatedAt(Date d) {
@@ -127,6 +135,10 @@ public class Group {
 
     public void setEditedAt(Date d) {
         editedAt = d;
+    }
+
+    public void setImmutable(boolean i) {
+        immutable = i;
     }
 
     public void setJsonString(String j) {

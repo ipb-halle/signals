@@ -19,6 +19,7 @@ package de.ipb_halle.signals.users;
 
 import de.ipb_halle.signals.rest.RestHelper;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -43,6 +44,7 @@ public class UserEntity implements User {
     public final static String ATTR_LAST_LOGIN = "lastLoginAt";
     public final static String ATTR_LAST_NAME = "lastName";
     public final static String ATTR_ORGANIZATION = "organization";
+    public final static String ATTR_RELATIONSHIP_ROLES = "relationships.roles.data";
     public final static String ATTR_ROLES = "roles";
     public final static String ATTR_SYSTEM_GROUPS = "systemGroups";
     public final static String ATTR_USER_ID = "userId";
@@ -70,6 +72,9 @@ public class UserEntity implements User {
     @Column(name="first_name")
     private String firstName;
 
+    @Column
+    private boolean immutable;
+
     @Column(name="last_login_at")
     private Date lastLoginAt;
 
@@ -85,8 +90,8 @@ public class UserEntity implements User {
     @Column(name="json_string")
     private String jsonString;
 
-    private transient Set<Role> roles;
-    private transient Set<Group> systemGroups;
+    private transient Set<IRole> roles;
+    private transient Set<IGroup> systemGroups;
 
     /**
      * default constructor
@@ -94,12 +99,22 @@ public class UserEntity implements User {
     public UserEntity() {
         createdAt = new Date(0);
         lastLoginAt = new Date(0);
+        roles = new HashSet<> ();
+        systemGroups = new HashSet<> ();
+    }
+
+    public void addRole(IRole role) {
+        roles.add(role);
+    }
+
+    public void addSystemGroup(IGroup group) {
+        systemGroups.add(group);
     }
 
     public String dump() {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("User(%d): %s, %s\n", id, lastName, firstName));
-        sb.append(String.format("  Alias: %s    User name: %s\n", alias, userName));
+        sb.append(String.format("  Alias: %s    User name: %s  %s\n", alias, userName, immutable ? "immutable" : "managed"));
         sb.append(String.format("  Email: %s    Country: %s\n", email, country));
         sb.append(String.format("  Organization: %s   Enabled: %s\n", organization, enabled ? "True" : "False"));
         sb.append(String.format("  Created at: %s\n", RestHelper.formatDate(createdAt)));
@@ -148,11 +163,11 @@ public class UserEntity implements User {
         return organization;
     }
 
-    public Set<Role> getRoles() {
+    public Set<IRole> getRoles() {
         return roles;
     }
 
-    public Set<Group> getSystemGroups() {
+    public Set<IGroup> getSystemGroups() {
         return systemGroups;
     }
 
@@ -162,6 +177,10 @@ public class UserEntity implements User {
 
     public Boolean isEnabled() {
         return enabled;
+    }
+
+    public boolean isImmutable() {
+        return immutable;
     }
 
     public User setId(Integer i) {
@@ -193,6 +212,10 @@ public class UserEntity implements User {
         firstName = f;
     }
 
+    public void setImmutable(boolean i) {
+        immutable = i;
+    }
+
     public void setJsonString(String j) {
         jsonString = j;
     }
@@ -209,11 +232,11 @@ public class UserEntity implements User {
         organization = o;
     }
 
-    public void setRoles(Set<Role> r) {
+    public void setRoles(Set<IRole> r) {
         roles = r;
     }
 
-    public void setSystemGroups(Set<Group> g) {
+    public void setSystemGroups(Set<IGroup> g) {
         systemGroups = g;
     }
 

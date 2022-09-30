@@ -42,7 +42,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="roles")
-public class Role {
+public class Role implements IRole {
 
     public final static String ATTR_COUNTS = "counts";
     public final static String ATTR_DESCRIPTION = "description";
@@ -124,8 +124,9 @@ public class Role {
         privileges.remove(p);
     }
 
-    public void setId(Integer i) {
+    public IRole setId(Integer i) {
         id = i;
+        return this;
     }
 
     public void setDescription(String d) { 

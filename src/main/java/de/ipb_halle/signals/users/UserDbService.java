@@ -17,10 +17,15 @@
  */
 package de.ipb_halle.signals.users;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 
 /** 
@@ -32,6 +37,23 @@ public class UserDbService {
 
     @PersistenceContext(unitName="signalsDB")
     private EntityManager em;
+
+
+    /**
+     * @return a list of UserEntities
+     */
+    public List<UserEntity> load() {
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<UserEntity> criteriaQuery = builder.createQuery(UserEntity.class);
+        Root<UserEntity> root = criteriaQuery.from(UserEntity.class);
+        criteriaQuery.select(root);
+
+        List<UserEntity> result = new ArrayList<> ();
+        for (UserEntity user: em.createQuery(criteriaQuery).getResultList()) {
+            result.add(user);
+        }
+        return result;
+    }
 
 
     public UserEntity loadById(int id) {
