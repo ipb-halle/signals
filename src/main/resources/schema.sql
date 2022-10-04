@@ -72,6 +72,24 @@ CREATE TABLE groups (
     json_string VARCHAR
 );
 
+CREATE TABLE user_roles (
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    role_id INTEGER NOT NULL REFERENCES roles(id),
+    PRIMARY KEY (user_id, role_id)
+);
+
+CREATE TABLE group_roles (
+    group_id INTEGER NOT NULL REFERENCES groups(id),
+    role_id INTEGER NOT NULL REFERENCES roles(id),
+    PRIMARY KEY (group_id, role_id)
+);
+
+CREATE TABLE group_memberships (
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    group_id INTEGER NOT NULL  REFERENCES groups(id),
+    PRIMARY KEY (user_id, group_id)
+);
+
 CREATE TABLE field_definitions (
     id VARCHAR NOT NULL PRIMARY KEY,
     attribute_list_eid VARCHAR,

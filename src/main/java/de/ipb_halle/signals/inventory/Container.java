@@ -19,13 +19,14 @@ package de.ipb_halle.signals.inventory;
 
 import de.ipb_halle.signals.entity.FieldValue;
 import de.ipb_halle.signals.entity.Unit;
+import de.ipb_halle.signals.materials.IMaterial;
 import de.ipb_halle.signals.materials.Material;
 import de.ipb_halle.signals.materials.MaterialReference;
-import de.ipb_halle.signals.users.User;
 import de.ipb_halle.signals.users.UserReference;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import de.ipb_halle.signals.users.IUser;
 
 /** 
  * Single signals entity (entities API endpoint) 
@@ -59,15 +60,15 @@ public class Container {
     private Integer coordinateX;
     private Integer coordinateY;
     private Date createdAt;
-    private User createdBy;
+    private IUser createdBy;
     private String digest;
     private Set<FieldValue> fieldValues;
     private String jsonString;
-    private Location location;
-    private Set<MaterialReference> materials;
+    private ILocation location;
+    private Set<IMaterial> materials;
     private String name;
     private Date updatedAt;
-    private User updatedBy;
+    private IUser updatedBy;
     private Unit unit;
 
 
@@ -130,7 +131,7 @@ public class Container {
         fieldValues.add(v);
     }
 
-    public void addMaterial(MaterialReference m) {
+    public void addMaterial(IMaterial m) {
         materials.add(m);
     }
 
@@ -166,7 +167,7 @@ public class Container {
         return createdAt;
     }
 
-    public User getCreatedBy() {
+    public IUser getCreatedBy() {
         return createdBy;
     }
 
@@ -186,11 +187,11 @@ public class Container {
         return jsonString;
     }
 
-    public Location getLocation() {
+    public ILocation getLocation() {
         return location;
     }
 
-    public Set<MaterialReference> getMaterials() {
+    public Set<IMaterial> getMaterials() {
         return materials;
     }
 
@@ -206,7 +207,7 @@ public class Container {
         return updatedAt;
     }
 
-    public User getUpdatedBy() {
+    public IUser getUpdatedBy() {
         return updatedBy;
     }
 
@@ -242,7 +243,7 @@ public class Container {
         createdAt = d;
     }
 
-    public void setCreatedBy(User u) {
+    public void setCreatedBy(IUser u) {
         createdBy = u;
     }
 
@@ -262,11 +263,11 @@ public class Container {
         jsonString = j;
     }
 
-    public void setLocation(Location l) {
+    public void setLocation(ILocation l) {
         location = l;
     }
 
-    public void setMaterials(Set<MaterialReference> ms) {
+    public void setMaterials(Set<IMaterial> ms) {
         materials = ms;
     }
 
@@ -282,7 +283,7 @@ public class Container {
         updatedAt = d;
     }
 
-    public void setUpdatedBy(User u) {
+    public void setUpdatedBy(IUser u) {
         updatedBy = u;
     }
 }

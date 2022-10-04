@@ -15,18 +15,16 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.users;
-
+package de.ipb_halle.signals.inventory;
 
 /** 
- * SNB user interface
+ * Location interface 
  */
-
-public interface User {
+public interface ILocation {
 
     public String dump();
 
-    public Integer getId();
+    public String getId();
 
-    public User setId(Integer i);
+    public ILocation setId(String i);
 }

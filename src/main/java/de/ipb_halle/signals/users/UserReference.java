@@ -21,7 +21,7 @@ package de.ipb_halle.signals.users;
 /** 
  * SNB user reference
  */
-public class UserReference implements User {
+public class UserReference implements IUser {
 
     private Integer id;
 
@@ -33,7 +33,7 @@ public class UserReference implements User {
         return id;
     }
 
-    public User setId(Integer i) {
+    public IUser setId(Integer i) {
         id = i;
         return this;
     }

@@ -15,16 +15,14 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.inventory;
+package de.ipb_halle.signals.materials;
 
-/** 
- * Location interface 
+/**
+ *
+ * @author fblocal
  */
-public interface Location {
-
+public interface IMaterial {
     public String dump();
-
     public String getId();
-
-    public Location setId(String i);
+    public IMaterial setId(String i);
 }

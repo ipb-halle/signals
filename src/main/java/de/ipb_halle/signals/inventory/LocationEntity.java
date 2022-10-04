@@ -29,7 +29,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="locations")
-public class LocationEntity implements Location {
+public class LocationEntity implements ILocation {
 
     public final static String ATTR_ANCESTORS = "ancestors";
     public final static String ATTR_ANCESTOR_ID = "id";
@@ -94,7 +94,7 @@ public class LocationEntity implements Location {
     private Integer updatedBy;
 
     private transient LocationType type;
-    private transient Location ancestor;
+    private transient ILocation ancestor;
 
     /**
      * default constructor
@@ -173,7 +173,7 @@ public class LocationEntity implements Location {
         return grid;
     }
 
-    public Location setId(String i) {
+    public ILocation setId(String i) {
         id = i;
         return this;
     }

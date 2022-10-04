@@ -15,26 +15,18 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.materials;
+package de.ipb_halle.signals.users;
+
 
 /** 
- * Material DTO 
+ * SNB user interface
  */
 
-public class Material implements IMaterial {
+public interface IUser {
 
-    private String id;
+    public String dump();
 
-    public String dump() {
-        return String.format("Material(%s)\n", getId());
-    }
+    public Integer getId();
 
-    public String getId() {
-        return id;
-    }
-
-    public IMaterial setId(String i) {
-        id = i;
-        return this;
-    }
+    public IUser setId(Integer i);
 }

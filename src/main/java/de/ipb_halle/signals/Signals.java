@@ -18,7 +18,6 @@
 package de.ipb_halle.signals;
 
 import de.ipb_halle.signals.users.LdapClient;
-import de.ipb_halle.signals.users.User;
 
 import java.util.Iterator;
 import java.util.Properties;
@@ -42,6 +41,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.openejb.OpenEjbContainer;
 import org.apache.openejb.api.LocalClient;
+import de.ipb_halle.signals.users.IUser;
 
 
 

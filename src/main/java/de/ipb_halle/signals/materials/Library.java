@@ -18,12 +18,12 @@
 package de.ipb_halle.signals.materials;
 
 import de.ipb_halle.signals.entity.FieldDefinition;
-import de.ipb_halle.signals.users.User;
 import de.ipb_halle.signals.users.UserReference;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import de.ipb_halle.signals.users.IUser;
 
 /** 
  * DTO material libraries 
@@ -62,12 +62,12 @@ public class Library {
     private String batchNumberingFormat;
 
     private Date createdAt;
-    private User createdBy;
+    private IUser createdBy;
     private String digest;
     private String displayImage;                // JSON
     private String displayTable;                // JSON
     private Date editedAt;
-    private User editedBy;
+    private IUser editedBy;
     private Boolean enabled;
     private String entityFlags;                 // JSON
 
@@ -185,7 +185,7 @@ public class Library {
         return createdAt;
     }
 
-    public User getCreatedBy() {
+    public IUser getCreatedBy() {
         return createdBy;
     }
 
@@ -205,7 +205,7 @@ public class Library {
         return editedAt;
     }
 
-    public User getEditedBy() {
+    public IUser getEditedBy() {
         return editedBy;
     }
 
@@ -277,7 +277,7 @@ public class Library {
         return this;
     }
 
-    public Library setCreatedBy(User u) {
+    public Library setCreatedBy(IUser u) {
         createdBy = u;
         return this;
     }
@@ -302,7 +302,7 @@ public class Library {
         return this;
     }
 
-    public Library setEditedBy(User u) {
+    public Library setEditedBy(IUser u) {
         editedBy = u;
         return this;
     }

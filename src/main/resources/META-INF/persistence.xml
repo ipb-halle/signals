@@ -23,9 +23,12 @@
         <class>de.ipb_halle.signals.material.MaterialEntity</class>
         <class>de.ipb_halle.signals.material.MaterialsLibrary</class>
         <class>de.ipb_halle.signals.users.Group</class>
+        <class>de.ipb_halle.signals.users.GroupMembership</class>
+        <class>de.ipb_halle.signals.users.GroupRole</class>
         <class>de.ipb_halle.signals.users.Role</class>
         <class>de.ipb_halle.signals.users.RolePriv</class>
         <class>de.ipb_halle.signals.users.UserEntity</class>
+        <class>de.ipb_halle.signals.users.UserRole</class>
 
         <properties>
 

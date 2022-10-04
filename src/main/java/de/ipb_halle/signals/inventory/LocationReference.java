@@ -20,7 +20,7 @@ package de.ipb_halle.signals.inventory;
 /** 
  * Location reference 
  */
-public class LocationReference implements Location {
+public class LocationReference implements ILocation {
 
     private String id;
 
@@ -32,7 +32,7 @@ public class LocationReference implements Location {
         return id;
     }
 
-    public Location setId(String i) {
+    public ILocation setId(String i) {
         id = i;
         return this;
     }

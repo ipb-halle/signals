@@ -33,7 +33,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="users")
-public class UserEntity implements User {
+public class UserEntity implements IUser {
 
     public final static String ATTR_ALIAS = "alias";
     public final static String ATTR_COUNTRY = "country";
@@ -183,7 +183,7 @@ public class UserEntity implements User {
         return immutable;
     }
 
-    public User setId(Integer i) {
+    public IUser setId(Integer i) {
         id = i;
         return this;
     }
