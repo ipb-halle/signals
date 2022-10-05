@@ -81,9 +81,9 @@ public interface LdapClient {
 
     /**
      * @param userDN a distinguished user name
-     * @return a corresponding UserEntity object
+     * @return a corresponding User object
      */
-    public UserEntity getUserEntity(String userDN);
+    public User getUser(String userDN);
 
     /**
      * @param filter the filter for searching users or null to 

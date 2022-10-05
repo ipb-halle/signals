@@ -37,33 +37,33 @@ public class UserManager {
     @Inject
     private UserRestService restService;
 
-    public UserEntity getDbUser(int id) {
+    public User getDbUser(int id) {
         return dbService.loadById(id);
     }
 
-    public UserEntity getSnbUser(int id) {
+    public User getSnbUser(int id) {
         return restService.doGetUser(id);
     }
 
-    public UserEntity getUser(int id) {
-        UserEntity u = dbService.loadById(id);
+    public User getUser(int id) {
+        User u = dbService.loadById(id);
         if (u == null) {
             u = restService.doGetUser(id);
         }
         return u;
     }
 
-    public List<UserEntity> getSnbUsers(String query, boolean enabled) {
+    public List<User> getSnbUsers(String query, boolean enabled) {
         return restService.doGetUsers(query, enabled);
     }
 
-    public void save(List<UserEntity> users) {
-        for (UserEntity u : users) {
+    public void save(List<User> users) {
+        for (User u : users) {
             dbService.save(u);
         }
     }
 
-    public void save(UserEntity user) {
+    public void save(User user) {
         dbService.save(user);
     }
 }

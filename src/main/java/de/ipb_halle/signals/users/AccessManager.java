@@ -63,13 +63,13 @@ public class AccessManager {
 
     private Map<String, Group> dbGroups;
     private Map<String, Role> dbRoles;
-    private Map<String, UserEntity> dbUsers;
+    private Map<String, User> dbUsers;
     private Map<String, Group> ldapGroups;
     private Map<String, Role> ldapRoles;
-    private Map<String, UserEntity> ldapUsers;
+    private Map<String, User> ldapUsers;
     private Map<String, Group> snbGroups;
     private Map<String, Role> snbRoles;
-    private Map<String, UserEntity> snbUsers;
+    private Map<String, User> snbUsers;
     
 
     /**
@@ -109,7 +109,7 @@ public class AccessManager {
         }
 
         dbUsers = new HashMap<> ();
-        for (UserEntity user : userDbService.load()) {
+        for (User user : userDbService.load()) {
             dbUsers.put(user.getEmail(), user);
         }
     }
@@ -142,7 +142,7 @@ public class AccessManager {
         ldapUsers = new HashMap<> ();
         ldapClient.getMembers(userDNs, groupDNs, config.getLdapManagedUsers(), false);
         for (String dn : userDNs) {
-            UserEntity user = ldapClient.getUserEntity(dn);
+            User user = ldapClient.getUser(dn);
             ldapUsers.put(user.getEmail(), user);
         }
     }
@@ -165,7 +165,7 @@ public class AccessManager {
         }
 
         snbUsers = new HashMap<> ();
-        for(UserEntity user : userRestService.doGetUsers(null, true)) {
+        for(User user : userRestService.doGetUsers(null, true)) {
             userRestService.doGetSystemGroupMemberships(user);
             snbUsers.put(user.getEmail(), user);
         }
@@ -195,8 +195,8 @@ public class AccessManager {
         }
 
         for (String userName : snbUsers.keySet())  {
-            UserEntity snbUser = snbUsers.get(userName);
-            UserEntity dbUser = dbUsers.remove(userName);
+            User snbUser = snbUsers.get(userName);
+            User dbUser = dbUsers.remove(userName);
             if ((dbUser == null) || dbUser.isImmutable()) {
                 userDbService.save(snbUser);
             }

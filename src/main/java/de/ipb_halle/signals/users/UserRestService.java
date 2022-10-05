@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  */
 
 @Local
-public class UserRestService implements RestService<UserEntity> {
+public class UserRestService implements RestService<User> {
 
     /*
      * Parameter 'q' is a String and it is used to 
@@ -80,25 +80,25 @@ public class UserRestService implements RestService<UserEntity> {
     /**
      * deserialize user
      */
-    public UserEntity createEntity(JsonElement j) {
+    public User createEntity(JsonElement j) {
         JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
-        UserEntity user = new UserEntity();
-        user.setId(attributes.getAsJsonPrimitive(UserEntity.ATTR_USER_ID).getAsInt());
-        user.setAlias(attributes.getAsJsonPrimitive(UserEntity.ATTR_ALIAS).getAsString());
-        user.setCountry(attributes.getAsJsonPrimitive(UserEntity.ATTR_COUNTRY).getAsString());
-        user.setCreatedAt(RestHelper.parseDate(attributes, UserEntity.ATTR_CREATED_AT, new Date()));
-        user.setEmail(attributes.getAsJsonPrimitive(UserEntity.ATTR_EMAIL).getAsString());
-        user.setEnabled(attributes.getAsJsonPrimitive(UserEntity.ATTR_ENABLED).getAsBoolean());
-        user.setFirstName(attributes.getAsJsonPrimitive(UserEntity.ATTR_FIRST_NAME).getAsString());
+        User user = new User();
+        user.setId(attributes.getAsJsonPrimitive(User.ATTR_USER_ID).getAsInt());
+        user.setAlias(attributes.getAsJsonPrimitive(User.ATTR_ALIAS).getAsString());
+        user.setCountry(attributes.getAsJsonPrimitive(User.ATTR_COUNTRY).getAsString());
+        user.setCreatedAt(RestHelper.parseDate(attributes, User.ATTR_CREATED_AT, new Date()));
+        user.setEmail(attributes.getAsJsonPrimitive(User.ATTR_EMAIL).getAsString());
+        user.setEnabled(attributes.getAsJsonPrimitive(User.ATTR_ENABLED).getAsBoolean());
+        user.setFirstName(attributes.getAsJsonPrimitive(User.ATTR_FIRST_NAME).getAsString());
         user.setImmutable(true);
         user.setJsonString(j.toString());
-        user.setLastLoginAt(RestHelper.parseDate(attributes, UserEntity.ATTR_LAST_LOGIN, new Date()));
-        user.setLastName(attributes.getAsJsonPrimitive(UserEntity.ATTR_LAST_NAME).getAsString());
-        user.setOrganization(attributes.getAsJsonPrimitive(UserEntity.ATTR_ORGANIZATION).getAsString());
-        user.setUserName(attributes.getAsJsonPrimitive(UserEntity.ATTR_USER_NAME).getAsString());
+        user.setLastLoginAt(RestHelper.parseDate(attributes, User.ATTR_LAST_LOGIN, new Date()));
+        user.setLastName(attributes.getAsJsonPrimitive(User.ATTR_LAST_NAME).getAsString());
+        user.setOrganization(attributes.getAsJsonPrimitive(User.ATTR_ORGANIZATION).getAsString());
+        user.setUserName(attributes.getAsJsonPrimitive(User.ATTR_USER_NAME).getAsString());
 
-        JsonArray roles = RestHelper.getFromPath(j, UserEntity.ATTR_RELATIONSHIP_ROLES).getAsJsonArray();
+        JsonArray roles = RestHelper.getFromPath(j, User.ATTR_RELATIONSHIP_ROLES).getAsJsonArray();
         parseRoles(user, roles);
         return user;
     }
@@ -106,7 +106,7 @@ public class UserRestService implements RestService<UserEntity> {
     /**
      * POST -- create user
      */
-    public UserEntity doCreateUser(UserEntity user) {
+    public User doCreateUser(User user) {
         try {
             restClient.reset()
                 .setMethod(Method.POST)
@@ -130,7 +130,7 @@ public class UserRestService implements RestService<UserEntity> {
     /**
      * GET system group memberships
      */
-    public void doGetSystemGroupMemberships(UserEntity user) {
+    public void doGetSystemGroupMemberships(User user) {
         try {
             restClient.reset()
                 .setEndpoint(String.format(SYSTEMGROUPS_ENDPOINT, user.getId()))
@@ -151,7 +151,7 @@ public class UserRestService implements RestService<UserEntity> {
     /**
      * GET user by id 
      */
-    public UserEntity doGetUser(int id) {
+    public User doGetUser(int id) {
         try {
             restClient.reset()
                 .setEndpoint(String.format(USER_ENDPOINT, id))
@@ -173,7 +173,7 @@ public class UserRestService implements RestService<UserEntity> {
     /**
      * GET users -- obtain list of users 
      */
-    public List<UserEntity> doGetUsers(String query, Boolean enabled) {
+    public List<User> doGetUsers(String query, Boolean enabled) {
         restClient.reset()
             .setMethod(Method.GET)
             .setEndpoint(USERS_ENDPOINT);
@@ -185,8 +185,8 @@ public class UserRestService implements RestService<UserEntity> {
             restClient.putUrlParameter("enabled", enabled ? "true" : "false");
         }
 
-        RestResultIterator<UserEntity> iter = new RestResultIterator<> (restClient, this, true); 
-        ArrayList<UserEntity> users = new ArrayList<> ();
+        RestResultIterator<User> iter = new RestResultIterator<> (restClient, this, true); 
+        ArrayList<User> users = new ArrayList<> ();
 
         while(iter.hasNext()) {
             users.add(iter.next());
@@ -194,7 +194,7 @@ public class UserRestService implements RestService<UserEntity> {
         return users;
     }
 
-    private void parseMemberships(UserEntity user, JsonArray jArray) {
+    private void parseMemberships(User user, JsonArray jArray) {
         Iterator<JsonElement> iter = jArray.iterator();
         while (iter.hasNext()) {
             JsonObject json = iter.next().getAsJsonObject();
@@ -203,7 +203,7 @@ public class UserRestService implements RestService<UserEntity> {
         }
     }
 
-    private void parseRoles(UserEntity user, JsonArray jArray) {
+    private void parseRoles(User user, JsonArray jArray) {
         Iterator<JsonElement> iter = jArray.iterator();
         while (iter.hasNext()) {
             JsonObject json = iter.next().getAsJsonObject();
@@ -212,20 +212,20 @@ public class UserRestService implements RestService<UserEntity> {
         }
     }
 
-    protected String prepareJsonString(UserEntity user) {
+    protected String prepareJsonString(User user) {
         JsonObject attributes = new JsonObject();
-        attributes.addProperty(UserEntity.ATTR_ALIAS, user.getAlias());
-        attributes.addProperty(UserEntity.ATTR_COUNTRY, user.getCountry());
-        attributes.addProperty(UserEntity.ATTR_EMAIL, user.getEmail());
-        attributes.addProperty(UserEntity.ATTR_FIRST_NAME, user.getFirstName());
-        attributes.addProperty(UserEntity.ATTR_LAST_NAME, user.getLastName());
-        attributes.addProperty(UserEntity.ATTR_ORGANIZATION, user.getOrganization());
+        attributes.addProperty(User.ATTR_ALIAS, user.getAlias());
+        attributes.addProperty(User.ATTR_COUNTRY, user.getCountry());
+        attributes.addProperty(User.ATTR_EMAIL, user.getEmail());
+        attributes.addProperty(User.ATTR_FIRST_NAME, user.getFirstName());
+        attributes.addProperty(User.ATTR_LAST_NAME, user.getLastName());
+        attributes.addProperty(User.ATTR_ORGANIZATION, user.getOrganization());
         if (user.getRoles() != null) {
-            attributes.add(UserEntity.ATTR_ROLES, prepareRoles(user));
+            attributes.add(User.ATTR_ROLES, prepareRoles(user));
         }
 /*
         if (user.getSystemGroups() != null) {
-            attributes.add(UserEntity.ATTR_SYSTEM_GROUPS, prepareSystemGroups(user));
+            attributes.add(User.ATTR_SYSTEM_GROUPS, prepareSystemGroups(user));
         }
 */
 
@@ -237,7 +237,7 @@ public class UserRestService implements RestService<UserEntity> {
         return obj.toString();
     }
 
-    private JsonArray prepareRoles(UserEntity user) {
+    private JsonArray prepareRoles(User user) {
         JsonArray roles = new JsonArray();
         for (IRole roleObj : user.getRoles()) {
             JsonObject role = new JsonObject();
@@ -248,7 +248,7 @@ public class UserRestService implements RestService<UserEntity> {
         return roles;
     }
 
-    private JsonArray prepareSystemGroups(UserEntity user) {
+    private JsonArray prepareSystemGroups(User user) {
         JsonArray systemGroups = new JsonArray();
         for (IGroup groupObj : user.getSystemGroups()) {
             JsonObject systemGroup = new JsonObject();

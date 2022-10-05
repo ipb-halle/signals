@@ -19,8 +19,6 @@ package de.ipb_halle.signals.users;
 
 import de.ipb_halle.signals.rest.RestHelper;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,29 +26,12 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 /** 
- * SNB user 
+ * SNB user entity
  */
-
 @Entity
 @Table(name="users")
-public class UserEntity implements IUser {
+public class UserEntity {
 
-    public final static String ATTR_ALIAS = "alias";
-    public final static String ATTR_COUNTRY = "country";
-    public final static String ATTR_CREATED_AT = "createdAt";
-    public final static String ATTR_EMAIL = "email";
-    public final static String ATTR_ENABLED = "isEnabled";
-    public final static String ATTR_FIRST_NAME = "firstName";
-    public final static String ATTR_LAST_LOGIN = "lastLoginAt";
-    public final static String ATTR_LAST_NAME = "lastName";
-    public final static String ATTR_ORGANIZATION = "organization";
-    public final static String ATTR_RELATIONSHIP_ROLES = "relationships.roles.data";
-    public final static String ATTR_ROLES = "roles";
-    public final static String ATTR_SYSTEM_GROUPS = "systemGroups";
-    public final static String ATTR_USER_ID = "userId";
-    public final static String ATTR_USER_NAME = "userName";
-    
-    
     @Id
     private Integer id;
 
@@ -90,37 +71,12 @@ public class UserEntity implements IUser {
     @Column(name="json_string")
     private String jsonString;
 
-    private transient Set<IRole> roles;
-    private transient Set<IGroup> systemGroups;
-
     /**
      * default constructor
      */
     public UserEntity() {
         createdAt = new Date(0);
         lastLoginAt = new Date(0);
-        roles = new HashSet<> ();
-        systemGroups = new HashSet<> ();
-    }
-
-    public void addRole(IRole role) {
-        roles.add(role);
-    }
-
-    public void addSystemGroup(IGroup group) {
-        systemGroups.add(group);
-    }
-
-    public String dump() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format("User(%d): %s, %s\n", id, lastName, firstName));
-        sb.append(String.format("  Alias: %s    User name: %s  %s\n", alias, userName, immutable ? "immutable" : "managed"));
-        sb.append(String.format("  Email: %s    Country: %s\n", email, country));
-        sb.append(String.format("  Organization: %s   Enabled: %s\n", organization, enabled ? "True" : "False"));
-        sb.append(String.format("  Created at: %s\n", RestHelper.formatDate(createdAt)));
-        sb.append(String.format("  Last login: %s\n", RestHelper.formatDate(lastLoginAt)));
-        sb.append((jsonString != null) ? jsonString : "");
-         return sb.toString();
     }
 
     public Integer getId() {
@@ -163,14 +119,6 @@ public class UserEntity implements IUser {
         return organization;
     }
 
-    public Set<IRole> getRoles() {
-        return roles;
-    }
-
-    public Set<IGroup> getSystemGroups() {
-        return systemGroups;
-    }
-
     public String getUserName() {
         return userName;
     }
@@ -183,64 +131,68 @@ public class UserEntity implements IUser {
         return immutable;
     }
 
-    public IUser setId(Integer i) {
+    public UserEntity setId(Integer i) {
         id = i;
         return this;
     }
 
-    public void setAlias(String a) { 
+    public UserEntity setAlias(String a) { 
         alias = a;
+        return this;
     }
 
-    public void setCountry(String c) {
+    public UserEntity setCountry(String c) {
         country = c;
+        return this;
     }
 
-    public void setCreatedAt(Date d) {
+    public UserEntity setCreatedAt(Date d) {
         createdAt = d;
+        return this;
     }
 
-    public void setEmail(String e) {
+    public UserEntity setEmail(String e) {
         email = e;
+        return this;
     }
 
-    public void setEnabled(Boolean e) {
+    public UserEntity setEnabled(Boolean e) {
         enabled = e;
+        return this;
     }
 
-    public void setFirstName(String f) {
+    public UserEntity setFirstName(String f) {
         firstName = f;
+        return this;
     }
 
-    public void setImmutable(boolean i) {
+    public UserEntity setImmutable(boolean i) {
         immutable = i;
+        return this;
     }
 
-    public void setJsonString(String j) {
+    public UserEntity setJsonString(String j) {
         jsonString = j;
+        return this;
     }
 
-    public void setLastLoginAt(Date d) {
+    public UserEntity setLastLoginAt(Date d) {
         lastLoginAt = d;
+        return this;
     }
 
-    public void setLastName(String l) {
+    public UserEntity setLastName(String l) {
         lastName = l;
+        return this;
     }
 
-    public void setOrganization(String o) {
+    public UserEntity setOrganization(String o) {
         organization = o;
+        return this;
     }
 
-    public void setRoles(Set<IRole> r) {
-        roles = r;
-    }
-
-    public void setSystemGroups(Set<IGroup> g) {
-        systemGroups = g;
-    }
-
-    public void setUserName(String u) {
+    public UserEntity setUserName(String u) {
         userName = u;
+        return this;
     }
 }

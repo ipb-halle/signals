@@ -68,7 +68,7 @@ public class UserManagerTest {
 
     @Module
     @Classes(cdi = true, value = { MockRestClient.class, MockLdapClient.class, SignalsConfig.class,
-        UserEntity.class, UserDbService.class, UserManager.class, UserRestService.class })
+        User.class, UserEntity.class, UserDbService.class, UserManager.class, UserRestService.class })
     public EjbJar app() {
         return new EjbJar();
     }
@@ -97,9 +97,9 @@ public class UserManagerTest {
     @Test
     public void userManagerTest() {
 
-        List<UserEntity> users = manager.getSnbUsers(TEST_USER1_LAST_NAME, true);
+        List<User> users = manager.getSnbUsers(TEST_USER1_LAST_NAME, true);
         manager.save(users);
-        UserEntity user = manager.getDbUser(TEST_USER1_ID);
+        User user = manager.getDbUser(TEST_USER1_ID);
 
         assertEquals("user alias mismatch", TEST_USER1_ALIAS, user.getAlias());
         assertEquals("user first name mismatch", TEST_USER1_FIRST_NAME, user.getFirstName());

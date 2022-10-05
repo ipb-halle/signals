@@ -42,26 +42,36 @@ public class UserDbService {
     /**
      * @return a list of UserEntities
      */
-    public List<UserEntity> load() {
+    public List<User> load() {
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<UserEntity> criteriaQuery = builder.createQuery(UserEntity.class);
         Root<UserEntity> root = criteriaQuery.from(UserEntity.class);
         criteriaQuery.select(root);
 
-        List<UserEntity> result = new ArrayList<> ();
-        for (UserEntity user: em.createQuery(criteriaQuery).getResultList()) {
+        List<User> result = new ArrayList<> ();
+        for (UserEntity entity: em.createQuery(criteriaQuery).getResultList()) {
+            User user = new User(entity);
+            // load roles
+            // load group memberships
             result.add(user);
         }
         return result;
     }
 
 
-    public UserEntity loadById(int id) {
-        return this.em.find(UserEntity.class, id);
+    public User loadById(int id) {
+        UserEntity ue = this.em.find(UserEntity.class, id);
+        if (ue != null) {
+            User user = new User(ue);
+            // load roles
+            // load group memberships
+            return user;
+        }
+        return null;
     }
 
-    public void save(UserEntity u) {
-        this.em.merge(u);
+    public void save(User u) {
+        this.em.merge(u.createEntity());
     }
 }
 

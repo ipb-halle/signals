@@ -286,15 +286,15 @@ public class LdapClientImpl implements LdapClient {
 
     /**
      * @param userDN a distinguished user name
-     * @return a corresponding UserEntity object
+     * @return a corresponding User object
      */
-    public UserEntity getUserEntity(String userDN) {
+    public User getUser(String userDN) {
         try {
             DirContext ctx = new InitialDirContext(ldapEnv); 
             try {
                 Attributes attrs = ctx.getAttributes(userDN);
 
-                UserEntity user = new UserEntity();
+                User user = new User();
                 user.setAlias(attrs.get(signalsConfig.getLdapAttrAlias()).get().toString());
                 user.setCountry(signalsConfig.getUserAttrCountry());
                 user.setCreatedAt(getCreatedAt(attrs));
