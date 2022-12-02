@@ -58,7 +58,7 @@ public class GroupRestService implements RestService<Group> {
     @Inject
     private RestClient restClient;
     
-    private Logger logger = LoggerFactory.getLogger(GroupRestService.class.getName());
+    private Logger logger = LoggerFactory.getLogger(GroupRestService.class);
 
     /**
      * deserialize group
@@ -151,6 +151,30 @@ public class GroupRestService implements RestService<Group> {
             groups.add(iter.next());
         }
         return groups;
+    }
+
+    /**
+     * PATCH group - update group
+     */
+    public Group doUpdateGroup(Group group) {
+        try {
+            restClient.reset()
+                .setMethod(Method.PATCH)
+                .setEndpoint(String.format(GROUP_ENDPOINT, group.getId()))
+                .setRequestData(prepareJsonString(group))
+                .execute(RestClient.HTTP_CREATED);
+
+            // endpoint does not return data
+            return group;
+
+        } catch(UnexpectedResponseCodeException ue) {
+            logger.warn("Unexpected code");
+        } catch(MalformedURLException me) {
+            logger.warn("Malformed URL");
+        } catch(IOException ioe) {
+            logger.warn("IOException",  (Throwable) ioe);
+        }
+        return null;
     }
 
     protected String prepareJsonString(Group group) {

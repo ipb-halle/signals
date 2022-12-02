@@ -54,7 +54,7 @@ public class LibraryDbService {
     @PersistenceContext(unitName="signalsDB")
     private EntityManager em;
 
-    private Logger logger = LoggerFactory.getLogger(LibraryDbService.class.getName());
+    private Logger logger = LoggerFactory.getLogger(LibraryDbService.class);
 
 
     private List<FieldDefinition> loadFieldDefinitions(String id, String type) {

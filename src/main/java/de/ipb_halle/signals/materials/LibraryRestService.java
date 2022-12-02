@@ -55,7 +55,7 @@ public class LibraryRestService implements RestService<Library> {
     @Inject
     private RestClient restClient;
 
-    private Logger logger = LoggerFactory.getLogger(LibraryRestService.class.getName());
+    private Logger logger = LoggerFactory.getLogger(LibraryRestService.class);
 
     public Library createEntity(JsonElement json) {
         Library lib = new Library();

@@ -46,7 +46,7 @@ import static org.junit.Assert.assertThrows;
 public class UserManagerTest {
 
     private final String TEST_RESOURCE_1 = "UserManagerTest001.json";
-    private final String TEST_KEY_1 = 
+    private final String TEST_KEY_1 =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users?page%5Blimit%5D=20&q=ThreeLast&page%5Boffset%5D=0&enabled=true";
     private final String TEST_RESOURCE_2 = "UserManagerTest002.json";
     private final String TEST_KEY_2 =
@@ -59,6 +59,12 @@ public class UserManagerTest {
     private final String TEST_USER1_LAST_NAME = "ThreeLast";
     private final int TEST_USER2_ID = 107;
     private final String TEST_USER2_LAST_NAME = "FourLast";
+    private final int TEST_ROLE1_ID = 1;
+    private final String TEST_ROLE1_NAME = "System Admin";
+    private final int TEST_ROLE3_ID = 3;
+    private final String TEST_ROLE3_NAME = "Standard User";
+    private final int TEST_ROLE4_ID = 4;
+    private final String TEST_ROLE4_NAME = "Inventory Admin";
 
     @Inject
     private MockRestClient mockRestClient;
@@ -66,8 +72,12 @@ public class UserManagerTest {
     @Inject
     private UserManager manager;
 
+    @Inject
+    private RoleDbService roleSvc;
+
     @Module
     @Classes(cdi = true, value = { MockRestClient.class, MockLdapClient.class, SignalsConfig.class,
+        Role.class, RoleDbService.class,
         User.class, UserEntity.class, UserDbService.class, UserManager.class, UserRestService.class })
     public EjbJar app() {
         return new EjbJar();
@@ -91,6 +101,19 @@ public class UserManagerTest {
         TestBase.prepareRestClients(mockRestClient,
             TEST_KEY_2,
             getClass().getResourceAsStream(TEST_RESOURCE_2));
+
+        Role role = new Role();
+        role.setId(TEST_ROLE1_ID);
+        role.setName(TEST_ROLE1_NAME);
+        roleSvc.save(role);
+        role = new Role();
+        role.setId(TEST_ROLE3_ID);
+        role.setName(TEST_ROLE3_NAME);
+        roleSvc.save(role);
+        role = new Role();
+        role.setId(TEST_ROLE4_ID);
+        role.setName(TEST_ROLE4_NAME);
+        roleSvc.save(role);
     }
 
 

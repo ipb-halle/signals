@@ -71,7 +71,7 @@ public class UserRestService implements RestService<User> {
     public final String USER_ENDPOINT = "/users/%d";
     public final String SYSTEMGROUPS_ENDPOINT = "/users/%d/systemGroups";
 
-    private Logger logger = LoggerFactory.getLogger(UserRestService.class.getName());
+    private Logger logger = LoggerFactory.getLogger(UserRestService.class);
 
 
     @Inject
@@ -81,11 +81,12 @@ public class UserRestService implements RestService<User> {
      * deserialize user
      */
     public User createEntity(JsonElement j) {
+//      logger.info("createEntity() --> {}", j.toString());
         JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
         User user = new User();
         user.setId(attributes.getAsJsonPrimitive(User.ATTR_USER_ID).getAsInt());
-        user.setAlias(attributes.getAsJsonPrimitive(User.ATTR_ALIAS).getAsString());
+        user.setAlias(RestHelper.parseString(attributes, User.ATTR_ALIAS));
         user.setCountry(attributes.getAsJsonPrimitive(User.ATTR_COUNTRY).getAsString());
         user.setCreatedAt(RestHelper.parseDate(attributes, User.ATTR_CREATED_AT, new Date()));
         user.setEmail(attributes.getAsJsonPrimitive(User.ATTR_EMAIL).getAsString());
@@ -194,6 +195,30 @@ public class UserRestService implements RestService<User> {
         return users;
     }
 
+    /**
+     * ... update user
+     */
+    public User doUpdateUser(User user) {
+        try {
+            restClient.reset()
+                .setMethod(Method.PATCH)
+                .setEndpoint(String.format(USER_ENDPOINT, user.getId()))
+                .setRequestData(prepareJsonString(user))
+                .execute();
+
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
+            return createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
+
+        } catch(UnexpectedResponseCodeException ue) {
+            logger.warn("Unexpected code");
+        } catch(MalformedURLException me) {
+            logger.warn("Malformed URL");
+        } catch(IOException ioe) {
+            logger.warn("IOException", (Throwable) ioe);
+        }
+        return null;
+    }
+
     private void parseMemberships(User user, JsonArray jArray) {
         Iterator<JsonElement> iter = jArray.iterator();
         while (iter.hasNext()) {
@@ -223,11 +248,9 @@ public class UserRestService implements RestService<User> {
         if (user.getRoles() != null) {
             attributes.add(User.ATTR_ROLES, prepareRoles(user));
         }
-/*
         if (user.getSystemGroups() != null) {
             attributes.add(User.ATTR_SYSTEM_GROUPS, prepareSystemGroups(user));
         }
-*/
 
         JsonObject data = new JsonObject();
         data.add(RestHelper.ATTR_ATTRIBUTES, attributes);
@@ -252,8 +275,9 @@ public class UserRestService implements RestService<User> {
         JsonArray systemGroups = new JsonArray();
         for (IGroup groupObj : user.getSystemGroups()) {
             JsonObject systemGroup = new JsonObject();
-            systemGroup.addProperty(RestHelper.ATTR_ID, groupObj.getId());
+//          systemGroup.addProperty(RestHelper.ATTR_ID, groupObj.getId());
             systemGroup.addProperty(Group.ATTR_NAME, ((Group) groupObj).getName());
+            systemGroup.addProperty(Group.ATTR_ASSOCIATE_TYPE, Group.ATTR_ASSOCIATE_TYPE_ADD);
             systemGroups.add(systemGroup);
         }
         return systemGroups;

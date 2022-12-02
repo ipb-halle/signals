@@ -108,6 +108,14 @@ public class User implements IUser {
         systemGroups.add(group);
     }
 
+    public void clearRoles() {
+        this.roles = new HashSet<> ();
+    }
+
+    public void clearSystemGroups() {
+        this.systemGroups = new HashSet<> ();
+    }
+
     public UserEntity createEntity() {
         return new UserEntity()
             .setId(id)

@@ -46,7 +46,7 @@ public class ContainerManager {
     @Inject
     private LocationManager locationManager;
 
-    private Logger logger = LoggerFactory.getLogger(ContainerManager.class.getName());
+    private Logger logger = LoggerFactory.getLogger(ContainerManager.class);
 
     public void augmentContainer(Container ct) {
         ct.setCreatedBy(userManager.getUser(ct.getCreatedBy().getId()));

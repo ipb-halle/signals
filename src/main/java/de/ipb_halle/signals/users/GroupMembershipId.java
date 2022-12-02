@@ -20,12 +20,14 @@ package de.ipb_halle.signals.users;
 import java.io.Serializable;
 import javax.persistence.Embeddable;
 
-/** 
+/**
  * SNB group membership id
  */
 @Embeddable
 public class GroupMembershipId implements Serializable {
     private final static long serialVersionUID = 1L;
+
+    public final static String USER_ID = "user_id";
 
     private Integer group_id;
     private Integer user_id;
@@ -42,10 +44,10 @@ public class GroupMembershipId implements Serializable {
     }
 
     public Integer getGroupId() {
-        return group_id; 
+        return group_id;
     }
 
-    public Integer getUserId() { 
+    public Integer getUserId() {
         return user_id;
     }
 

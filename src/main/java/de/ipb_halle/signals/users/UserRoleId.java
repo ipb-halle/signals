@@ -20,12 +20,14 @@ package de.ipb_halle.signals.users;
 import java.io.Serializable;
 import javax.persistence.Embeddable;
 
-/** 
+/**
  * SNB user roles
  */
 @Embeddable
 public class UserRoleId implements Serializable {
     private final static long serialVersionUID = 1L;
+
+    public final static String USER_ID = "user_id";
 
     private Integer role_id;
 
@@ -42,8 +44,8 @@ public class UserRoleId implements Serializable {
             && (getUserId() == other.getUserId());
     }
 
-    public Integer getRoleId() { 
-        return role_id; 
+    public Integer getRoleId() {
+        return role_id;
     }
 
     public Integer getUserId() {

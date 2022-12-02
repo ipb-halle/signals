@@ -51,7 +51,7 @@ public class LocationRestService implements RestService<LocationEntity> {
     @Inject
     private RestClient restClient;
 
-    private Logger logger = LoggerFactory.getLogger(LocationRestService.class.getName());
+    private Logger logger = LoggerFactory.getLogger(LocationRestService.class);
     
     public LocationEntity createEntity(JsonElement json) {
         JsonObject j = json.getAsJsonObject();

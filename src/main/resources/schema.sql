@@ -65,7 +65,7 @@ CREATE TABLE groups (
     edited_at TIMESTAMP,
     description VARCHAR,
     digest VARCHAR,
-    immutable VARCHAR,
+    immutable BOOLEAN,
     name VARCHAR,
     is_system BOOLEAN,
     snb_type VARCHAR,

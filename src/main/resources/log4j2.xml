@@ -15,7 +15,7 @@
   <Loggers>
 
     <Logger name="de.ipb_halle" level="info" additivity="false">
-      <AppenderRef ref="Console" level="info"/>
+      <AppenderRef ref="Console"/>
     </Logger>
 
     <!-- set level to debug to log SQL statements -->
@@ -23,7 +23,7 @@
       <AppenderRef ref="Console" level="warn"/>
     </Logger>
 
-    <!-- set level to trace to log bind parameters -->
+    <!-- set level to warn to log bind parameters -->
     <Logger name="org.hibernate.type" level="warn" additivity="false">
       <AppenderRef ref="Console" level="warn"/>
     </Logger>

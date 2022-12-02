@@ -42,7 +42,7 @@ public class LocationManager {
     @Inject
     private UserManager userManager;
 
-    private Logger logger =  LoggerFactory.getLogger(ContainerManager.class.getName());
+    private Logger logger =  LoggerFactory.getLogger(ContainerManager.class);
 
     public void augmentLocation(LocationEntity loc) {
 /*

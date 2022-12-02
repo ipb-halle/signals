@@ -54,7 +54,7 @@ public class MaterialRestService implements RestService<Material> {
     @Inject
     private RestClient restClient;
 
-    private Logger logger = LoggerFactory.getLogger(MaterialRestService.class.getName());
+    private Logger logger = LoggerFactory.getLogger(MaterialRestService.class);
 
     public Material createEntity(JsonElement json) {
         Material mat = new Material();

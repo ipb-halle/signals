@@ -36,6 +36,8 @@ import javax.persistence.Table;
 @Table(name="groups")
 public class Group implements IGroup {
 
+    public final static String ATTR_ASSOCIATE_TYPE = "associateType";
+    public final static String ATTR_ASSOCIATE_TYPE_ADD = "ADD";
     public final static String ATTR_CREATED_AT= "createdAt";
     public final static String ATTR_DESCRIPTION = "description";
     public final static String ATTR_DIGEST = "digest";

@@ -64,5 +64,6 @@ public enum RolePrivilege {
     canEditLocation,
     canExportNotebooks,
     canEditMaterials,
+    canExportMaterials,
     canTrashParaExp
 }

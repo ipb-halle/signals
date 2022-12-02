@@ -62,7 +62,7 @@ public class LdapClientImpl implements LdapClient {
 
     private Hashtable<String, String> ldapEnv;
 
-    private Logger logger = LoggerFactory.getLogger(LdapClientImpl.class.getName());
+    private Logger logger = LoggerFactory.getLogger(LdapClientImpl.class);
 
     @PostConstruct
     private void initialize() {

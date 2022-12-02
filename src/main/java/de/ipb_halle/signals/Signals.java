@@ -17,7 +17,9 @@
  */
 package de.ipb_halle.signals;
 
+import de.ipb_halle.signals.users.AccessManager;
 import de.ipb_halle.signals.users.LdapClient;
+import de.ipb_halle.signals.users.IUser;
 
 import java.util.Iterator;
 import java.util.Properties;
@@ -41,9 +43,12 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.openejb.OpenEjbContainer;
 import org.apache.openejb.api.LocalClient;
-import de.ipb_halle.signals.users.IUser;
 
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** 
  * IPB Signals client is a tool for data import and export
@@ -60,7 +65,13 @@ public class Signals {
     private SignalsEntityManager signalsMgr;
 
     @Inject
+    private AccessManager accessManager;
+
+    @Inject
     private LdapClient ldapClient;
+
+    private boolean dryRun;
+    private Logger logger;
 
     @SuppressWarnings("static-access")
     private static final Option configOpt = Option.builder("c")
@@ -83,7 +94,29 @@ public class Signals {
     .desc("Perform user,  group and role management")
     .build();
 
+    @SuppressWarnings("static-acces")
+    private static final Option dryRunOpt = Option.builder("n")
+    .longOpt("dry-run")
+    .desc("Don't modify - dry run")
+    .build();
 
+    @SuppressWarnings("static-acces")
+    private static final Option debugOpt = Option.builder("d")
+    .longOpt("debug")
+    .hasArg()
+    .argName("LEVEL")
+    .desc("Set log level to DEBUG")
+    .build();
+
+
+
+    /**
+     * default constructor
+     */
+    public Signals() {
+        dryRun = false;
+        logger = LoggerFactory.getLogger(Signals.class);
+    }
 
     public void doIt() {
 
@@ -123,6 +156,8 @@ public class Signals {
 
     private void manageUsers() {
         System.out.println("Managing users ...");
+        accessManager.setDryRun(dryRun);
+        accessManager.manageAccess();
     }
 
     public static Signals getInstance(String fname) {
@@ -182,6 +217,16 @@ public class Signals {
             String configFile = cmdline.getOptionValue(configOpt.getOpt());
             Signals signals = getInstance(configFile);
 
+            if (cmdline.hasOption(dryRunOpt.getOpt())) {
+                signals.setDryRun();
+            }
+
+            if (cmdline.hasOption(debugOpt.getOpt())) {
+                if (! signals.setLogLevel(cmdline.getOptionValue(debugOpt.getOpt()))) {
+                    printHelp("ERROR: invalid log level", options);
+                    return;
+                }
+            }
 
             if (cmdline.hasOption(userMgrOpt.getOpt())) {
                 signals.manageUsers();
@@ -198,11 +243,34 @@ public class Signals {
         }
     }
 
+    /**
+     * @param userLevel text representation of the log level, should be one of 
+     * <code>FATAL, ERROR, WARN, INFO, DEBUG, TRACE</code>.
+     * @return true if setting of log level succeeded, false otherwise
+     */
+    private boolean setLogLevel(String userLevel) {
+        try {
+            Level level = Level.valueOf(userLevel);
+            Configurator.setLevel("de.ipb_halle", level); 
+            return true;
+        } catch (IllegalArgumentException iae) {
+            logger.warn("Undefined level '{}' in setLogLevel()", userLevel);
+        } catch (NullPointerException npe) {
+            logger.warn("setLogLevel(userLevel) called with null argument");
+        }
+        return false;
+    }
+
+    private void setDryRun() {
+        dryRun = true;
+    }
 
     public static void main(String[] argv) {
         Options options = new Options();
         options.addOption(configOpt);
         options.addOption(helpOpt);
+        options.addOption(debugOpt);
+        options.addOption(dryRunOpt);
         options.addOption(userMgrOpt);
 
         processCommandLine(argv, options);

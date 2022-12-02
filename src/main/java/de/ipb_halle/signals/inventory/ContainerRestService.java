@@ -55,7 +55,7 @@ public class ContainerRestService implements RestService<Container> {
     @Inject
     private RestClient restClient;
 
-    private Logger logger = LoggerFactory.getLogger(ContainerRestService.class.getName());
+    private Logger logger = LoggerFactory.getLogger(ContainerRestService.class);
     
     public Container createEntity(JsonElement json) {
         JsonObject j = json.getAsJsonObject();

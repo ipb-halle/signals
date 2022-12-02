@@ -43,7 +43,7 @@ public class RestResultIterator<T> implements Iterator {
     private JsonElement jsonResult;
     private Iterator<JsonElement> jsonIterator;
 
-    private Logger logger = LoggerFactory.getLogger(RestResultIterator.class.getName());
+    private Logger logger = LoggerFactory.getLogger(RestResultIterator.class);
 
     /**
      * constructor

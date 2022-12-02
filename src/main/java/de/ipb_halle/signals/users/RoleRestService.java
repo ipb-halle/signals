@@ -55,7 +55,7 @@ public class RoleRestService implements RestService<Role> {
     @Inject
     private RestClient restClient;
 
-    private Logger logger = LoggerFactory.getLogger(RoleRestService.class.getName());
+    private Logger logger = LoggerFactory.getLogger(RoleRestService.class);
 
 
     public Role createEntity(JsonElement j) {
