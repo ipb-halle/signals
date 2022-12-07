@@ -41,6 +41,7 @@ public class SignalsConfig {
     private String ldapAttrMembers;                     // member
     private String ldapAttrObjectClass;                 // objectClass
     private String ldapAttrObjectClassGroup;            // group
+    private String ldapAttrObjectClassUser;             // person
     private String ldapAttrUserName;                    // mail
     private String ldapBaseDNs;                         // dc=<domain>,dc=<country>;...
     private String ldapContextProviderURL;              // ldap://<server>:<port>
@@ -76,6 +77,7 @@ public class SignalsConfig {
     public String getLdapAttrMembers() { return ldapAttrMembers; }
     public String getLdapAttrObjectClass() { return ldapAttrObjectClass; }
     public String getLdapAttrObjectClassGroup() { return ldapAttrObjectClassGroup; }
+    public String getLdapAttrObjectClassUser() { return ldapAttrObjectClassUser; }
     public String getLdapAttrUserName() { return ldapAttrUserName; }
     public String getLdapBaseDNs() { return ldapBaseDNs; }
     public String getLdapContextProviderURL() { return ldapContextProviderURL; }

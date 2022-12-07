@@ -19,6 +19,7 @@ package de.ipb_halle.signals.users;
 
 import de.ipb_halle.signals.SignalsConfig;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -37,7 +38,11 @@ import javax.naming.InvalidNameException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.*;
+import javax.naming.ldap.InitialLdapContext;
+import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.LdapName;
+import javax.naming.ldap.StartTlsRequest;
+import javax.naming.ldap.StartTlsResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,12 +55,17 @@ import org.slf4j.LoggerFactory;
  * As IPB does not possess other LDAP instances for testing and has 
  * no use case, the introduction of an abstraction layer (LdapClientImplAD, etc.)
  * is deemed unnecessary.
+ * This implementation supports (and currently requires) STARTTLS. It might be 
+ * necessary to provide a custom truststore, in case the LDAP server does not 
+ * use a certificate from an officially recognized CA.
  */
 @Local
 public class LdapClientImpl implements LdapClient {
 
     // offset in 100 nanosecond intervals for 1601-01-01
     private final long TIME_OFFSET_AD = 116444768080000000L;
+
+    private final String startTlsEnvKey = "StartTlsResponseEnvKey";
 
     @Resource
     SignalsConfig signalsConfig;
@@ -70,10 +80,17 @@ public class LdapClientImpl implements LdapClient {
         ldapEnv.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         ldapEnv.put(Context.PROVIDER_URL, signalsConfig.getLdapContextProviderURL());
         ldapEnv.put(Context.REFERRAL, signalsConfig.getLdapContextReferral());
-        ldapEnv.put(Context.SECURITY_AUTHENTICATION, signalsConfig.getLdapSecurityAuthentication());
-        ldapEnv.put(Context.SECURITY_PRINCIPAL, signalsConfig.getLdapSecurityPrincipal());
-        ldapEnv.put(Context.SECURITY_CREDENTIALS, signalsConfig.getLdapSecurityCredentials());
     }
+
+    /**
+     * close a Context and the StartTlsResponse
+     */
+    private void closeContext(Context ctx) throws NamingException, IOException {
+        ((StartTlsResponse) ctx.getEnvironment().get(startTlsEnvKey)).close();
+        ctx.removeFromEnvironment(startTlsEnvKey);
+        ctx.close();
+    }
+
 
     /**
      * Filter a set of distinguished names. Only DNs matching the filter pattern
@@ -109,6 +126,27 @@ public class LdapClientImpl implements LdapClient {
             }
         }
         return results;
+    }
+
+    private LdapContext getContext() throws Exception {
+        LdapContext ctx = new InitialLdapContext(ldapEnv, null);
+
+        // Start TLS
+        StartTlsResponse tls = (StartTlsResponse) ctx.extendedOperation(new StartTlsRequest());
+        tls.negotiate();
+
+        ldapEnv.put(Context.SECURITY_AUTHENTICATION, signalsConfig.getLdapSecurityAuthentication());
+        ldapEnv.put(Context.SECURITY_PRINCIPAL, signalsConfig.getLdapSecurityPrincipal());
+        ldapEnv.put(Context.SECURITY_CREDENTIALS, signalsConfig.getLdapSecurityCredentials());
+
+
+        // Perform simple client authentication
+        ctx.addToEnvironment(Context.SECURITY_AUTHENTICATION, signalsConfig.getLdapSecurityAuthentication());
+        ctx.addToEnvironment(Context.SECURITY_PRINCIPAL, signalsConfig.getLdapSecurityPrincipal());
+        ctx.addToEnvironment(Context.SECURITY_CREDENTIALS, signalsConfig.getLdapSecurityCredentials());
+
+        ctx.addToEnvironment(startTlsEnvKey, tls);
+        return ctx;
     }
 
     /**
@@ -190,7 +228,7 @@ public class LdapClientImpl implements LdapClient {
      */
     public void getMembers(Set<String> users, Set<String> groups, String groupDN, boolean nesting) {
         try {
-            DirContext ctx = new InitialDirContext(ldapEnv);
+            LdapContext ctx = getContext();
             try {
                 BasicAttribute membersAttr = (BasicAttribute) ctx
                         .getAttributes(groupDN)
@@ -200,7 +238,7 @@ public class LdapClientImpl implements LdapClient {
                     NamingEnumeration<?> membersEnumeration = membersAttr.getAll();
                     while (membersEnumeration.hasMore()) {
                         String dn = membersEnumeration.next().toString();
-                        if (isGroup(dn)) {
+                        if (isGroup(ctx, dn)) {
                             if (groups.add(dn) && nesting) {
                                 getMembers(users, groups, dn, nesting);
                             }
@@ -210,10 +248,10 @@ public class LdapClientImpl implements LdapClient {
                     }
                 }
             } finally {
-                ctx.close();
+                closeContext(ctx);
             }
         } catch(Exception e) {
-            logger.warn("getMembers() caught an Exception: ", (Throwable) e);
+            logger.warn("getMembers() caught an Exception for DN {}: ", groupDN, e);
         }
     }
 
@@ -236,7 +274,7 @@ public class LdapClientImpl implements LdapClient {
      */
     private void getMemberships(Set<String> groups, String objDN, boolean nesting) {
         try {
-            DirContext ctx = new InitialDirContext(ldapEnv);
+            LdapContext ctx = getContext();
             try {
                 BasicAttribute memberOfAttr = (BasicAttribute) ctx
                         .getAttributes(objDN)
@@ -253,7 +291,7 @@ public class LdapClientImpl implements LdapClient {
                     }
                 }
             } finally {
-                ctx.close();
+                closeContext(ctx);
             }
         } catch(Exception e) {
             logger.warn("getMemberships() caught an Exception: ", (Throwable) e);
@@ -266,7 +304,7 @@ public class LdapClientImpl implements LdapClient {
      */
     public Role getRole(String roleDN) {
         try {
-            DirContext ctx = new InitialDirContext(ldapEnv);
+            LdapContext ctx = getContext();
             try {
                 Attributes attrs = ctx.getAttributes(roleDN);
 
@@ -276,7 +314,7 @@ public class LdapClientImpl implements LdapClient {
 
                 return role;
             } finally {
-                ctx.close();
+                closeContext(ctx);
             }
         } catch(Exception e) {
             logger.warn("getRole() caught an Exception: ", (Throwable) e);
@@ -290,25 +328,31 @@ public class LdapClientImpl implements LdapClient {
      */
     public User getUser(String userDN) {
         try {
-            DirContext ctx = new InitialDirContext(ldapEnv); 
+            LdapContext ctx = getContext();
             try {
                 Attributes attrs = ctx.getAttributes(userDN);
 
+                if (! attrs.get(signalsConfig.getLdapAttrObjectClass())
+                            .contains(signalsConfig.getLdapAttrObjectClassUser())) {
+                    logger.warn("DN {} is not a person", userDN);
+                    return null;
+                }
+
                 User user = new User();
-                user.setAlias(attrs.get(signalsConfig.getLdapAttrAlias()).get().toString());
+                user.setAlias(attrs.get(signalsConfig.getLdapAttrAlias()).get().toString().toUpperCase());
                 user.setCountry(signalsConfig.getUserAttrCountry());
                 user.setCreatedAt(getCreatedAt(attrs));
-                user.setEmail(attrs.get(signalsConfig.getLdapAttrEmail()).get().toString());
+                user.setEmail(attrs.get(signalsConfig.getLdapAttrEmail()).get().toString().toLowerCase());
                 user.setEnabled(getUserExpiration(attrs));
                 user.setFirstName(attrs.get(signalsConfig.getLdapAttrFirstName()).get().toString());
                 user.setImmutable(false);
                 user.setLastName(attrs.get(signalsConfig.getLdapAttrLastName()).get().toString());
                 user.setOrganization(signalsConfig.getUserAttrOrganization());
-                user.setUserName(attrs.get(signalsConfig.getLdapAttrUserName()).get().toString());
+                user.setUserName(attrs.get(signalsConfig.getLdapAttrUserName()).get().toString().toLowerCase());
 
                 return user;
             } finally {
-                ctx.close();
+                closeContext(ctx);
             }
         } catch(Exception e) {
             logger.warn("getUser() caught an Exception: ", (Throwable) e);
@@ -361,7 +405,7 @@ public class LdapClientImpl implements LdapClient {
             filter = signalsConfig.getLdapFilterUser().replaceAll("@", filterValue);
         }
         try {
-            DirContext ctx = new InitialDirContext(ldapEnv); 
+            LdapContext ctx = getContext();
             try {
                 SearchControls searchControls = new SearchControls();
                 searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
@@ -375,25 +419,20 @@ public class LdapClientImpl implements LdapClient {
                 }
                 search.close();
             } finally {
-                ctx.close();
+                closeContext(ctx);
             }
         } catch(Exception e) {
             logger.warn("getUsers() caught an Exception: ", (Throwable) e);
         }
     }
 
-    private boolean isGroup(String dn) {
+    private boolean isGroup(LdapContext ctx, String dn) {
         try {
-            DirContext ctx = new InitialDirContext(ldapEnv);
-            try {
-                BasicAttribute objectClassAttr = (BasicAttribute) ctx
-                        .getAttributes(dn)
-                        .get(signalsConfig.getLdapAttrObjectClass());
+            BasicAttribute objectClassAttr = (BasicAttribute) ctx
+                    .getAttributes(dn)
+                    .get(signalsConfig.getLdapAttrObjectClass());
 
-                return objectClassAttr.contains(signalsConfig.getLdapAttrObjectClassGroup());
-            } finally {
-                ctx.close();
-            }
+            return objectClassAttr.contains(signalsConfig.getLdapAttrObjectClassGroup());
         } catch(Exception e) {
             logger.warn("isGroup() caught an Exception: ", (Throwable) e);
         }

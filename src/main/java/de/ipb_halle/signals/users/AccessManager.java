@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
@@ -39,7 +40,7 @@ import org.slf4j.LoggerFactory;
 @Stateless
 public class AccessManager {
 
-    @Inject
+    @Resource
     private SignalsConfig config;
 
     @Inject

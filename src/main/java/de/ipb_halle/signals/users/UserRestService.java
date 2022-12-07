@@ -86,10 +86,11 @@ public class UserRestService implements RestService<User> {
 
         User user = new User();
         user.setId(attributes.getAsJsonPrimitive(User.ATTR_USER_ID).getAsInt());
-        user.setAlias(RestHelper.parseString(attributes, User.ATTR_ALIAS));
+        String alias = RestHelper.parseString(attributes, User.ATTR_ALIAS);
+        user.setAlias((alias != null) ? alias.toUpperCase() : null); 
         user.setCountry(attributes.getAsJsonPrimitive(User.ATTR_COUNTRY).getAsString());
         user.setCreatedAt(RestHelper.parseDate(attributes, User.ATTR_CREATED_AT, new Date()));
-        user.setEmail(attributes.getAsJsonPrimitive(User.ATTR_EMAIL).getAsString());
+        user.setEmail(attributes.getAsJsonPrimitive(User.ATTR_EMAIL).getAsString().toLowerCase());
         user.setEnabled(attributes.getAsJsonPrimitive(User.ATTR_ENABLED).getAsBoolean());
         user.setFirstName(attributes.getAsJsonPrimitive(User.ATTR_FIRST_NAME).getAsString());
         user.setImmutable(true);
@@ -97,7 +98,7 @@ public class UserRestService implements RestService<User> {
         user.setLastLoginAt(RestHelper.parseDate(attributes, User.ATTR_LAST_LOGIN, new Date()));
         user.setLastName(attributes.getAsJsonPrimitive(User.ATTR_LAST_NAME).getAsString());
         user.setOrganization(attributes.getAsJsonPrimitive(User.ATTR_ORGANIZATION).getAsString());
-        user.setUserName(attributes.getAsJsonPrimitive(User.ATTR_USER_NAME).getAsString());
+        user.setUserName(attributes.getAsJsonPrimitive(User.ATTR_USER_NAME).getAsString().toLowerCase());
 
         JsonArray roles = RestHelper.getFromPath(j, User.ATTR_RELATIONSHIP_ROLES).getAsJsonArray();
         parseRoles(user, roles);

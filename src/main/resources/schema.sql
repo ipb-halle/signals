@@ -40,7 +40,7 @@ CREATE TABLE roles (
 
 CREATE TABLE role_privileges (
     role_id INTEGER NOT NULL REFERENCES roles(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    privilege VARCHAR NOT NULL
+    privilege INTEGER NOT NULL
 );
 
 CREATE TABLE users (

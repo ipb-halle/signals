@@ -108,6 +108,14 @@ public class Signals {
     .desc("Set log level to DEBUG")
     .build();
 
+    @SuppressWarnings("static-acces")
+    private static final Option trustStoreOpt = Option.builder("ts")
+    .longOpt("trustStore")
+    .hasArg()
+    .argName("FILE")
+    .desc("Set the truststore for startSSL. The trustStore should contain certificates for both: LDAP and SNB API.")
+    .build();
+
 
 
     /**
@@ -221,6 +229,11 @@ public class Signals {
                 signals.setDryRun();
             }
 
+            if (cmdline.hasOption(trustStoreOpt.getOpt())) {
+                System.setProperty("javax.net.ssl.trustStore", cmdline.getOptionValue(trustStoreOpt.getOpt()));
+            }
+
+
             if (cmdline.hasOption(debugOpt.getOpt())) {
                 if (! signals.setLogLevel(cmdline.getOptionValue(debugOpt.getOpt()))) {
                     printHelp("ERROR: invalid log level", options);
@@ -271,6 +284,7 @@ public class Signals {
         options.addOption(helpOpt);
         options.addOption(debugOpt);
         options.addOption(dryRunOpt);
+        options.addOption(trustStoreOpt);
         options.addOption(userMgrOpt);
 
         processCommandLine(argv, options);
