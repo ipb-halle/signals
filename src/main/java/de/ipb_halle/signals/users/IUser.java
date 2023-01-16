@@ -26,7 +26,7 @@ public interface IUser {
 
     public String dump();
 
-    public Integer getId();
+    public String getId();
 
-    public IUser setId(Integer i);
+    public IUser setId(String i);
 }

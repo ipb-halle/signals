@@ -29,8 +29,8 @@ public class GroupMembershipId implements Serializable {
 
     public final static String USER_ID = "user_id";
 
-    private Integer group_id;
-    private Integer user_id;
+    private String group_id;
+    private String user_id;
 
 
     @Override
@@ -39,15 +39,15 @@ public class GroupMembershipId implements Serializable {
             return false;
         }
         GroupMembershipId other = (GroupMembershipId) o;
-        return (getGroupId() == other.getGroupId())
-            && (getUserId() == other.getUserId());
+        return (getGroupId().equals(other.getGroupId()))
+            && (getUserId().equals(other.getUserId()));
     }
 
-    public Integer getGroupId() {
+    public String getGroupId() {
         return group_id;
     }
 
-    public Integer getUserId() {
+    public String getUserId() {
         return user_id;
     }
 
@@ -63,11 +63,11 @@ public class GroupMembershipId implements Serializable {
         return hc;
     }
 
-    public void setGroupId(Integer g) {
+    public void setGroupId(String g) {
         group_id = g;
     }
 
-    public void setUserId(Integer u) {
+    public void setUserId(String u) {
         user_id = u;
     }
 }

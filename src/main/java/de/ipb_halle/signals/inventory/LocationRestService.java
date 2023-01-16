@@ -112,9 +112,9 @@ public class LocationRestService implements RestService<LocationEntity> {
     }
 
     private void parseChangeRecords(JsonObject json, LocationEntity loc) {
-        loc.setCreatedBy(RestHelper.parseInt(
+        loc.setCreatedBy(RestHelper.parseString(
                     RestHelper.getPrimitiveFromPath(json, LocationEntity.ATTR_CREATED_BY)));
-        loc.setUpdatedBy(RestHelper.parseInt(
+        loc.setUpdatedBy(RestHelper.parseString(
                     RestHelper.getPrimitiveFromPath(json, LocationEntity.ATTR_UPDATED_BY)));
     }
 }

@@ -192,7 +192,6 @@ public class LdapClientImpl implements LdapClient {
 
                 Group group = new Group();
                 group.setCreatedAt(getCreatedAt(attrs));
-                group.setImmutable(false);
                 group.setName(attrs.get(signalsConfig.getLdapAttrGroupName()).get().toString());
 
                 group.setDescription(signalsConfig.getGroupAttrDescription());
@@ -345,7 +344,7 @@ public class LdapClientImpl implements LdapClient {
                 user.setEmail(attrs.get(signalsConfig.getLdapAttrEmail()).get().toString().toLowerCase());
                 user.setEnabled(getUserExpiration(attrs));
                 user.setFirstName(attrs.get(signalsConfig.getLdapAttrFirstName()).get().toString());
-                user.setImmutable(false);
+                user.setMutable(true);
                 user.setLastName(attrs.get(signalsConfig.getLdapAttrLastName()).get().toString());
                 user.setOrganization(signalsConfig.getUserAttrOrganization());
                 user.setUserName(attrs.get(signalsConfig.getLdapAttrUserName()).get().toString().toLowerCase());

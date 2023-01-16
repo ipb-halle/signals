@@ -17,40 +17,14 @@
  */
 package de.ipb_halle.signals.users;
 
-import java.util.List;
-
-import javax.ejb.Stateless;
-import javax.inject.Inject;
-
 
 /** 
- * Manager for signals groups
+ * compare types on SNB / DB / LDAP synchronization.
+ * SNB honours access times (createdAt, lastLoginAt), whereas 
+ * LDAP compares ignore data differences.
  */
 
-@Stateless
-public class GroupManager {
-
-    @Inject
-    private GroupDbService dbService;
-
-    @Inject
-    private GroupRestService restService;
-    
-    public Group getDbGroup(String id) {
-        return dbService.loadById(id);
-    }
-
-    public Group getSnbGroup(String id) {
-        return restService.doGetGroup(id);
-    }
-
-    public List<Group> getSnbGroups() {
-        return restService.doGetGroups();
-    }
-
-    public void save(List<Group> groups) {
-        for (Group g : groups) {
-            dbService.save(g);
-        }
-    }
+public enum CompareType { 
+    SNB,
+    LDAP
 }

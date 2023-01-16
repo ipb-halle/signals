@@ -68,8 +68,8 @@ public class UserRestService implements RestService<User> {
      * Parameter page[limit]
      */
     public final String USERS_ENDPOINT = "/users";
-    public final String USER_ENDPOINT = "/users/%d";
-    public final String SYSTEMGROUPS_ENDPOINT = "/users/%d/systemGroups";
+    public final String USER_ENDPOINT = "/users/%s";
+    public final String SYSTEMGROUPS_ENDPOINT = "/users/%s/systemGroups";
 
     private Logger logger = LoggerFactory.getLogger(UserRestService.class);
 
@@ -81,11 +81,11 @@ public class UserRestService implements RestService<User> {
      * deserialize user
      */
     public User createEntity(JsonElement j) {
-//      logger.info("createEntity() --> {}", j.toString());
+//      logger.debug("createEntity() --> {}", j.toString());
         JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
         User user = new User();
-        user.setId(attributes.getAsJsonPrimitive(User.ATTR_USER_ID).getAsInt());
+        user.setId(attributes.getAsJsonPrimitive(User.ATTR_USER_ID).getAsString());
         String alias = RestHelper.parseString(attributes, User.ATTR_ALIAS);
         user.setAlias((alias != null) ? alias.toUpperCase() : null); 
         user.setCountry(attributes.getAsJsonPrimitive(User.ATTR_COUNTRY).getAsString());
@@ -93,7 +93,7 @@ public class UserRestService implements RestService<User> {
         user.setEmail(attributes.getAsJsonPrimitive(User.ATTR_EMAIL).getAsString().toLowerCase());
         user.setEnabled(attributes.getAsJsonPrimitive(User.ATTR_ENABLED).getAsBoolean());
         user.setFirstName(attributes.getAsJsonPrimitive(User.ATTR_FIRST_NAME).getAsString());
-        user.setImmutable(true);
+        user.setMutable(false);
         user.setJsonString(j.toString());
         user.setLastLoginAt(RestHelper.parseDate(attributes, User.ATTR_LAST_LOGIN, new Date()));
         user.setLastName(attributes.getAsJsonPrimitive(User.ATTR_LAST_NAME).getAsString());
@@ -153,7 +153,7 @@ public class UserRestService implements RestService<User> {
     /**
      * GET user by id 
      */
-    public User doGetUser(int id) {
+    public User doGetUser(String id) {
         try {
             restClient.reset()
                 .setEndpoint(String.format(USER_ENDPOINT, id))
@@ -225,7 +225,7 @@ public class UserRestService implements RestService<User> {
         while (iter.hasNext()) {
             JsonObject json = iter.next().getAsJsonObject();
             user.addSystemGroup(new GroupReference()
-                .setId(RestHelper.parseInt(json, RestHelper.ATTR_ID)));
+                .setId(RestHelper.parseString(json, RestHelper.ATTR_ID)));
         }
     }
 
@@ -234,7 +234,7 @@ public class UserRestService implements RestService<User> {
         while (iter.hasNext()) {
             JsonObject json = iter.next().getAsJsonObject();
             user.addRole(new RoleReference()
-                .setId(RestHelper.parseInt(json, RestHelper.ATTR_ID)));
+                .setId(RestHelper.parseString(json, RestHelper.ATTR_ID)));
         }
     }
 

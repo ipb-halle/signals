@@ -44,6 +44,8 @@ import javax.persistence.Table;
 @Table(name="roles")
 public class Role implements IRole {
 
+    public final static String ROLE_NAME = "name";
+
     public final static String ATTR_COUNTS = "counts";
     public final static String ATTR_DESCRIPTION = "description";
     public final static String ATTR_FLAGS = "flags";
@@ -51,13 +53,19 @@ public class Role implements IRole {
     public final static String ATTR_PRIVILEGES = "privileges";
 
     @Id
-    private Integer id;
+    private String id;
 
     @Column
     private String description;
 
     @Column
     private String name;
+
+    @Column(name="ldap_role")
+    private boolean ldapRole;
+
+    @Column
+    private boolean deleted;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch=FetchType.EAGER)
     @JoinColumn(name = "role_id")
@@ -68,11 +76,19 @@ public class Role implements IRole {
 
     public Role() {
         privileges = new HashSet<> ();
+        deleted = false;
+        ldapRole = false;
     }
 
     public Role addPrivilege(RolePrivilege p) {
         privileges.add(new RolePriv(id,p));
         return this;
+    }
+
+    public void applyChangesFromSnb(Role snbRole) {
+        description = snbRole.getDescription();
+        name = snbRole.getName();
+        privileges = snbRole.getPrivileges();
     }
 
     public String dump() {
@@ -96,7 +112,22 @@ public class Role implements IRole {
         return sb.toString();
     }
 
-    public Integer getId() {
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj instanceof IRole) {
+            IRole other = (IRole) obj;
+            if (((id == null) && (other.getId() == null)) ||
+                id.equals(other.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public String getId() {
         return id;
     }
 
@@ -116,17 +147,43 @@ public class Role implements IRole {
         return jsonString;
     }
 
+    @Override
+    public int hashCode() {
+        if (id == null) {
+            return 0;
+        }
+        return id.hashCode();
+    }
+
     public boolean hasPrivilege(RolePrivilege p) {
         return privileges.contains(new RolePriv(id, p));
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public boolean isModified(Role role) {
+        return ! (name.equals(role.getName())
+            && description.equals(role.getDescription())
+            && privileges.equals(role.getPrivileges()));
+    }
+
+    public boolean isLdapRole() {
+        return ldapRole;
     }
 
     public void removePrivilege(RolePrivilege p) {
         privileges.remove(p);
     }
 
-    public IRole setId(Integer i) {
+    public IRole setId(String i) {
         id = i;
         return this;
+    }
+
+    public void setDeleted(boolean b) {
+        deleted = b;
     }
 
     public void setDescription(String d) { 
@@ -135,6 +192,10 @@ public class Role implements IRole {
 
     public void setJsonString(String j) {
         jsonString = j;
+    }
+
+    public void setLdapRole(boolean b) {
+        ldapRole = b;
     }
 
     public void setName(String n) {

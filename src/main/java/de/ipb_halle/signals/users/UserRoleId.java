@@ -29,9 +29,9 @@ public class UserRoleId implements Serializable {
 
     public final static String USER_ID = "user_id";
 
-    private Integer role_id;
+    private String role_id;
 
-    private Integer user_id;
+    private String user_id;
 
 
     @Override
@@ -40,15 +40,15 @@ public class UserRoleId implements Serializable {
             return false;
         }
         UserRoleId other = (UserRoleId) o;
-        return (getRoleId() == other.getRoleId())
-            && (getUserId() == other.getUserId());
+        return (getRoleId().equals(other.getRoleId()))
+            && (getUserId().equals(other.getUserId()));
     }
 
-    public Integer getRoleId() {
+    public String getRoleId() {
         return role_id;
     }
 
-    public Integer getUserId() {
+    public String getUserId() {
         return user_id;
     }
 
@@ -56,19 +56,19 @@ public class UserRoleId implements Serializable {
     public int hashCode() {
         int hc = 0;
         if (role_id != null) {
-            hc = role_id;
+            hc = role_id.hashCode();
         }
         if (user_id != null) {
-            hc += user_id;
+            hc += user_id.hashCode();
         }
         return hc;
     }
 
-    public void setRoleId(Integer id) {
+    public void setRoleId(String id) {
         role_id = id;
     }
 
-    public void setUserId(Integer u) {
+    public void setUserId(String u) {
         user_id = u;
     }
 }

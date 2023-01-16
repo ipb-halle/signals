@@ -70,7 +70,7 @@ public class LocationEntity implements ILocation {
     private Date createdAt;
 
     @Column(name="created_by")
-    private Integer createdBy;
+    private String createdBy;
 
     @Column(name="type_id")
     private String typeId;
@@ -91,7 +91,7 @@ public class LocationEntity implements ILocation {
     private Date updatedAt;
 
     @Column(name="updated_by")
-    private Integer updatedBy;
+    private String updatedBy;
 
     private transient LocationType type;
     private transient ILocation ancestor;
@@ -133,7 +133,7 @@ public class LocationEntity implements ILocation {
         return createdAt;
     }
 
-    public Integer getCreatedBy() {
+    public String getCreatedBy() {
         return createdBy;
     }
 
@@ -165,7 +165,7 @@ public class LocationEntity implements ILocation {
         return updatedAt;
     }
 
-    public Integer getUpdatedBy() {
+    public String getUpdatedBy() {
         return updatedBy;
     }
 
@@ -199,7 +199,7 @@ public class LocationEntity implements ILocation {
         createdAt = d;
     }
 
-    public void setCreatedBy(Integer u) {
+    public void setCreatedBy(String u) {
         createdBy = u;
     }
 
@@ -242,7 +242,7 @@ public class LocationEntity implements ILocation {
         updatedAt = d;
     }
 
-    public void setUpdatedBy(Integer u) {
+    public void setUpdatedBy(String u) {
         updatedBy = u;
     }
 }

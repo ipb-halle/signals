@@ -33,7 +33,7 @@ import javax.persistence.Table;
 public class UserEntity {
 
     @Id
-    private Integer id;
+    private String id;
 
     @Column
     private String alias;
@@ -54,7 +54,7 @@ public class UserEntity {
     private String firstName;
 
     @Column
-    private boolean immutable;
+    private boolean mutable;
 
     @Column(name="last_login_at")
     private Date lastLoginAt;
@@ -79,7 +79,7 @@ public class UserEntity {
         lastLoginAt = new Date(0);
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
@@ -127,11 +127,11 @@ public class UserEntity {
         return enabled;
     }
 
-    public boolean isImmutable() {
-        return immutable;
+    public boolean isMutable() {
+        return mutable;
     }
 
-    public UserEntity setId(Integer i) {
+    public UserEntity setId(String i) {
         id = i;
         return this;
     }
@@ -166,8 +166,8 @@ public class UserEntity {
         return this;
     }
 
-    public UserEntity setImmutable(boolean i) {
-        immutable = i;
+    public UserEntity setMutable(boolean i) {
+        mutable = i;
         return this;
     }
 

@@ -23,19 +23,42 @@ package de.ipb_halle.signals.users;
  */
 public class GroupReference implements IGroup {
 
-    private Integer id;
+    private String id;
 
     public String dump() {
-        return String.format("GroupReference(%d)\n", id);
+        return String.format("GroupReference(%s)\n", id);
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public IGroup setId(Integer i) {
-        id = i;
+    public IGroup setId(String st) {
+        id = st;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (obj instanceof IGroup) {
+            IGroup igroup = (IGroup) obj;
+            if (id == igroup.getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        if (id == null) {
+            return 0;
+        }
+        return id.hashCode();
     }
 }
 

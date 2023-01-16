@@ -36,6 +36,8 @@ import javax.persistence.Table;
 @Table(name="groups")
 public class Group implements IGroup {
 
+    public final static String GROUP_NAME = "name";
+
     public final static String ATTR_ASSOCIATE_TYPE = "associateType";
     public final static String ATTR_ASSOCIATE_TYPE_ADD = "ADD";
     public final static String ATTR_CREATED_AT= "createdAt";
@@ -48,11 +50,16 @@ public class Group implements IGroup {
     public final static String ATTR_SYSTEM = "isSystem";
     public final static String ATTR_TYPE = "type";
 
+    public final static String SNB_GROUP_TYPE = "group";
+
     @Id
-    private Integer id;
+    private String id;
 
     @Column(name="created_at")
     private Date createdAt;
+
+    @Column
+    private boolean deleted;
 
     @Column
     private String description;
@@ -63,8 +70,8 @@ public class Group implements IGroup {
     @Column(name="edited_at")
     private Date editedAt;
 
-    @Column
-    private boolean immutable;
+    @Column(name="ldap_group")
+    private boolean ldapGroup;
 
     @Column
     private String name;
@@ -78,15 +85,49 @@ public class Group implements IGroup {
     @Column(name="json_string")
     private String jsonString;
 
+    /**
+     * default constructor
+     */
+    public Group() {
+        deleted = false;
+        type = SNB_GROUP_TYPE;
+    }
+
+    public void applyChangesFromSnb(Group snb) {
+        id = snb.getId();
+        description = snb.getDescription();
+        name = snb.getName();
+        type = snb.getType();
+        editedAt = snb.getEditedAt();
+    }
+
     public String dump() {
         StringBuilder sb = new StringBuilder();
+        if (deleted) {
+            sb.append("Deleted ");
+        }
         sb.append(String.format("Group(%d) --> %s\n", id, name));
         sb.append(String.format("Description: %s\n", description));
         sb.append((jsonString != null) ? jsonString : "");
         return sb.toString();
     }
 
-    public Integer getId() {
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (obj instanceof IGroup) {
+            IGroup igroup = (IGroup) obj;
+            if (id == igroup.getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public String getId() {
         return id;
     }
 
@@ -114,21 +155,44 @@ public class Group implements IGroup {
         return type;
     }
 
-    public boolean isImmutable() {
-        return immutable;
+    @Override
+    public int hashCode() {
+        if (id == null) {
+            return 0;
+        }
+        return id.hashCode();
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public boolean isLdapGroup() {
+        return ldapGroup;
+    }
+
+    public boolean isModified(CompareType context, Group group) {
+        return !(name.equals(group.getName())
+            && description.equals(group.getDescription())
+            && type.equals(group.getType())
+            && ((context == CompareType.SNB) ? editedAt.equals(group.getEditedAt()) : true));
     }
 
     public boolean isSystem() {
         return system;
     }
 
-    public IGroup setId(Integer i) {
-        id = i;
+    public IGroup setId(String st) {
+        id = st;
         return this;
     }
 
     public void setCreatedAt(Date d) {
         createdAt = d;
+    }
+
+    public void setDeleted(boolean b) {
+        deleted = b;
     }
 
     public void setDescription(String d) { 
@@ -139,12 +203,12 @@ public class Group implements IGroup {
         editedAt = d;
     }
 
-    public void setImmutable(boolean i) {
-        immutable = i;
-    }
-
     public void setJsonString(String j) {
         jsonString = j;
+    }
+
+    public void setLdapGroup(boolean b) {
+        ldapGroup = b;
     }
 
     public void setName(String n) {

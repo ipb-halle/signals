@@ -23,18 +23,41 @@ package de.ipb_halle.signals.users;
 
 public class RoleReference implements IRole {
 
-    private Integer id;
+    private String id;
 
     public String dump() {
-        return String.format("Role reference(%d)", id);
+        return String.format("Role reference(%s)", id);
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public IRole setId(Integer i) {
+    public IRole setId(String i) {
         id = i;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj instanceof IRole) {
+            IRole other = (IRole) obj;
+            if (((id == null) && (other.getId() == null)) ||
+                id.equals(other.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        if (id == null) {
+            return 0;
+        }
+        return id.hashCode();
     }
 }

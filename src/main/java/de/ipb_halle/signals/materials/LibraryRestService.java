@@ -153,11 +153,11 @@ public class LibraryRestService implements RestService<Library> {
     private void parseChangeRecords(JsonObject json, Library lib) {
         lib.setCreatedAt(RestHelper.parseDate(RestHelper.getPrimitiveFromPath(json, Library.ATTR_PATH_CREATED_AT)));
         lib.setCreatedBy(new UserReference().setId(
-                    RestHelper.parseInt(
+                    RestHelper.parseString(
                     RestHelper.getPrimitiveFromPath(json, Library.ATTR_PATH_CREATED_BY))));
         lib.setEditedAt(RestHelper.parseDate(RestHelper.getPrimitiveFromPath(json, Library.ATTR_PATH_EDITED_AT)));
         lib.setEditedBy(new UserReference().setId(
-                    RestHelper.parseInt(
+                    RestHelper.parseString(
                     RestHelper.getPrimitiveFromPath(json, Library.ATTR_PATH_EDITED_BY))));
     }
 }

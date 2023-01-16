@@ -54,28 +54,28 @@ public class UserRole {
             return false;
         } 
         UserRole other = (UserRole) o;
-        return (id.getRoleId() == other.getRoleId())
-            && (id.getUserId() == other.getUserId());
+        return (id.getRoleId().equals(other.getRoleId()))
+            && (id.getUserId().equals(other.getUserId()));
     }
 
-    public Integer getRoleId() {
+    public String getRoleId() {
         return id.getRoleId();
     }
 
-    public Integer getUserId() {
+    public String getUserId() {
         return id.getUserId();
     }
 
     @Override
     public int hashCode() {
-        return getRoleId() + getUserId();
+        return getRoleId().hashCode() + getUserId().hashCode();
     }
 
-    public void setRoleId(Integer i) {
+    public void setRoleId(String i) {
         id.setRoleId(i);
     }
 
-    public void setUserId(Integer u) {
+    public void setUserId(String u) {
         id.setUserId(u);
     }
 }

@@ -54,7 +54,7 @@ public class ContainerEntity {
     private Date createdAt;
 
     @Column(name="created_by")
-    private Integer createdBy;
+    private String createdBy;
 
     @Column
     private String digest;
@@ -75,7 +75,7 @@ public class ContainerEntity {
     private Date updatedAt;
 
     @Column(name="updated_by")
-    private Integer updatedBy;
+    private String updatedBy;
 
 
     public Double getAmount() {
@@ -102,7 +102,7 @@ public class ContainerEntity {
         return createdAt;
     }
 
-    public Integer getCreatedBy() {
+    public String getCreatedBy() {
         return createdBy;
     }
 
@@ -134,7 +134,7 @@ public class ContainerEntity {
         return updatedAt;
     }
 
-    public Integer getUpdatedBy() {
+    public String getUpdatedBy() {
         return updatedBy;
     }
 
@@ -168,7 +168,7 @@ public class ContainerEntity {
         return this;
     }
 
-    public ContainerEntity setCreatedBy(Integer u) {
+    public ContainerEntity setCreatedBy(String u) {
         createdBy = u;
         return this;
     }
@@ -208,7 +208,7 @@ public class ContainerEntity {
         return this;
     }
 
-    public ContainerEntity setUpdatedBy(Integer u) {
+    public ContainerEntity setUpdatedBy(String u) {
         updatedBy = u;
         return this;
     }

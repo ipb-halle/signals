@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
 public class RoleRestService implements RestService<Role> {
 
     public final String ROLES_ENDPOINT = "/roles";
-    public final String ROLE_ENDPOINT = "/roles/%d";
+    public final String ROLE_ENDPOINT = "/roles/%s";
 
     @Inject
     private RestClient restClient;
@@ -63,7 +63,7 @@ public class RoleRestService implements RestService<Role> {
 
         Role role = new Role();
         role.setDescription(attributes.getAsJsonPrimitive(Role.ATTR_DESCRIPTION).getAsString());
-        role.setId(j.getAsJsonObject().getAsJsonPrimitive(RestHelper.ATTR_ID).getAsInt());
+        role.setId(j.getAsJsonObject().getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
         role.setJsonString(j.toString());
         role.setName(attributes.getAsJsonPrimitive(Role.ATTR_NAME).getAsString());
         parsePrivileges(attributes.getAsJsonObject(Role.ATTR_PRIVILEGES), role);
@@ -71,7 +71,7 @@ public class RoleRestService implements RestService<Role> {
         return role;
     }
 
-    public Role doGetRole(int id) {
+    public Role doGetRole(String id) {
         try {
             restClient.reset()
                 .setEndpoint(String.format(ROLE_ENDPOINT, id))

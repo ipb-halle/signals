@@ -28,6 +28,9 @@ import java.util.Set;
  */
 public class User implements IUser {
 
+    public final static String USER_USERNAME = "user_name";
+    public final static String USER_MUTABLE = "mutable";
+
     public final static String ATTR_ALIAS = "alias";
     public final static String ATTR_COUNTRY = "country";
     public final static String ATTR_CREATED_AT = "createdAt";
@@ -43,8 +46,7 @@ public class User implements IUser {
     public final static String ATTR_USER_ID = "userId";
     public final static String ATTR_USER_NAME = "userName";
     
-    
-    private Integer id;
+    private String id;
 
     private String alias;
 
@@ -58,7 +60,7 @@ public class User implements IUser {
 
     private String firstName;
 
-    private boolean immutable;
+    private boolean mutable;
 
     private Date lastLoginAt;
 
@@ -92,7 +94,7 @@ public class User implements IUser {
         email = entity.getEmail();
         enabled = entity.isEnabled();
         firstName = entity.getFirstName();
-        immutable = entity.isImmutable();
+        mutable = entity.isMutable();
         lastLoginAt = entity.getLastLoginAt();
         lastName = entity.getLastName();
         organization = entity.getOrganization();
@@ -108,12 +110,26 @@ public class User implements IUser {
         systemGroups.add(group);
     }
 
-    public void clearRoles() {
-        this.roles = new HashSet<> ();
+    /*
+     * apply changes from SNB excluding role and group memberships
+     */
+    public void applyChangesFromSnb(User snbUser) {
+        alias = snbUser.getAlias();
+        country = snbUser.getCountry();
+        createdAt = snbUser.getCreatedAt();
+        email = snbUser.getEmail();
+        enabled = snbUser.isEnabled();
+        firstName = snbUser.getFirstName();
+        /* do NOT overwrite the mutable attribute */
+        lastLoginAt = snbUser.getLastLoginAt();
+        lastName = snbUser.getLastName();
+        organization = snbUser.getOrganization();
+        userName = snbUser.getUserName();
+        jsonString = snbUser.getJsonString();
     }
 
-    public void clearSystemGroups() {
-        this.systemGroups = new HashSet<> ();
+    public void clearRoles() {
+        this.roles = new HashSet<> ();
     }
 
     public UserEntity createEntity() {
@@ -125,7 +141,7 @@ public class User implements IUser {
             .setEmail(email)
             .setEnabled(enabled)
             .setFirstName(firstName)
-            .setImmutable(immutable)
+            .setMutable(mutable)
             .setLastLoginAt(lastLoginAt)
             .setLastName(lastName)
             .setOrganization(organization)
@@ -136,7 +152,7 @@ public class User implements IUser {
     public String dump() {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("User(%d): %s, %s\n", id, lastName, firstName));
-        sb.append(String.format("  Alias: %s    User name: %s  %s\n", alias, userName, immutable ? "immutable" : "managed"));
+        sb.append(String.format("  Alias: %s    User name: %s  %s\n", alias, userName, mutable ? "managed": "immutable"));
         sb.append(String.format("  Email: %s    Country: %s\n", email, country));
         sb.append(String.format("  Organization: %s   Enabled: %s\n", organization, enabled ? "True" : "False"));
         sb.append(String.format("  Created at: %s\n", RestHelper.formatDate(createdAt)));
@@ -145,7 +161,7 @@ public class User implements IUser {
          return sb.toString();
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
@@ -201,11 +217,26 @@ public class User implements IUser {
         return enabled;
     }
 
-    public boolean isImmutable() {
-        return immutable;
+    public boolean isModified(CompareType type, User user) {
+        return !( alias.equals(user.getAlias())
+            && country.equals(user.getCountry())
+            && ((type == CompareType.SNB) ? createdAt.equals(user.getCreatedAt()) : true)
+            && email.equals(user.getEmail())
+            && (enabled == user.isEnabled())
+            && firstName.equals(user.getFirstName())
+            && ((type == CompareType.SNB) ? lastLoginAt.equals(user.getLastLoginAt()) : true)
+            && lastName.equals(user.getLastName())
+            && organization.equals(user.getOrganization())
+            && userName.equals(user.getUserName())
+            && roles.equals(user.getRoles())
+            && systemGroups.equals(user.getSystemGroups()));
     }
 
-    public IUser setId(Integer i) {
+    public boolean isMutable() {
+        return mutable;
+    }
+
+    public IUser setId(String i) {
         id = i;
         return this;
     }
@@ -234,8 +265,8 @@ public class User implements IUser {
         firstName = f;
     }
 
-    public void setImmutable(boolean i) {
-        immutable = i;
+    public void setMutable(boolean i) {
+        mutable = i;
     }
 
     public void setJsonString(String j) {

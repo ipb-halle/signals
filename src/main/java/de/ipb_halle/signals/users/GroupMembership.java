@@ -58,24 +58,24 @@ public class GroupMembership {
             && (id.getUserId() == other.getUserId());
     }
 
-    public Integer getGroupId() {
+    public String getGroupId() {
         return id.getGroupId();
     }
 
-    public Integer getUserId() {
+    public String getUserId() {
         return id.getUserId();
     }
 
     @Override
     public int hashCode() {
-        return getGroupId() + getUserId();
+        return getGroupId().hashCode() + getUserId().hashCode();
     }
 
-    public void setGroupId(Integer g) {
+    public void setGroupId(String g) {
         id.setGroupId(g);
     }
 
-    public void setUserId(Integer u) {
+    public void setUserId(String u) {
         id.setUserId(u);
     }
 }

@@ -18,8 +18,10 @@
 package de.ipb_halle.signals.users;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -27,6 +29,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 
@@ -49,7 +52,10 @@ public class UserDbService {
 
         Set<IRole> result = new HashSet<> ();
         for (UserRole userRole: em.createQuery(criteriaQuery).getResultList()) {
-            result.add(new RoleReference().setId(userRole.getRoleId()));
+            Role role = this.em.find(Role.class, userRole.getRoleId());
+            if (role != null) {
+                result.add(role);
+            }
         }
         return result;
     }
@@ -63,7 +69,10 @@ public class UserDbService {
 
         Set<IGroup> result = new HashSet<> ();
         for (GroupMembership membership: em.createQuery(criteriaQuery).getResultList()) {
-            result.add(new GroupReference().setId(membership.getGroupId()));
+            Group group = this.em.find(Group.class, membership.getGroupId());
+            if (group != null) {
+                result.add(group);
+            }
         }
         return result;
     }
@@ -73,10 +82,34 @@ public class UserDbService {
      * @return a list of UserEntities
      */
     public List<User> load() {
+        return loadBy(new HashMap<String, Object> ());
+    }
+
+    public User loadByUserName(String userName) {
+        Map<String, Object> cmap = new HashMap<> ();
+        cmap.put(User.USER_USERNAME, userName);
+        List<User> result = loadBy(cmap);
+        if (result.size() == 1) {
+            return result.get(0);
+        }
+        return null;
+    }
+
+    public List<User> loadBy(Map<String, Object> cmap) {
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<UserEntity> criteriaQuery = builder.createQuery(UserEntity.class);
         Root<UserEntity> root = criteriaQuery.from(UserEntity.class);
         criteriaQuery.select(root);
+
+        List<Predicate> predicates = new ArrayList<>();
+        if (cmap.get(User.USER_USERNAME) != null) {
+            predicates.add(builder.equal(root.get(User.USER_USERNAME), cmap.get(User.USER_USERNAME)));
+        }
+        if (cmap.get(User.USER_MUTABLE) != null) {
+            predicates.add(builder.equal(root.get(User.USER_MUTABLE), cmap.get(User.USER_MUTABLE)));
+        }
+
+        criteriaQuery.where(builder.and(predicates.toArray(new Predicate[0])));
 
         List<User> result = new ArrayList<> ();
         for (UserEntity entity: em.createQuery(criteriaQuery).getResultList()) {
@@ -89,7 +122,7 @@ public class UserDbService {
     }
 
 
-    public User loadById(int id) {
+    public User loadById(String id) {
         UserEntity ue = this.em.find(UserEntity.class, id);
         if (ue != null) {
             User user = new User(ue);

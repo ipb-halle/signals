@@ -25,7 +25,7 @@ public interface IRole {
 
     public String dump();
 
-    public Integer getId();
+    public String getId();
 
-    public IRole setId(Integer i);
+    public IRole setId(String i);
 }

@@ -59,9 +59,9 @@ public class ContainerManagerTest {
     private final String TEST_CONTAINER_ID = "ef16c7af-a763-49f2-b218-294ac02fc224";
     private final String TEST_CONTAINER_BARCODE =  "0000000026";
     private final String TEST_CONTAINER_NAME = "item00000021";
-    private final Integer TEST_USER1_ID = 116;
+    private final String TEST_USER1_ID = "116";
     private final String TEST_USER1_FIRST = "TwoFirst";
-    private final Integer TEST_USER2_ID = 102;
+    private final String TEST_USER2_ID = "102";
     private final String TEST_USER2_FIRST = "ThreeFirst";
     private final String TEST_LOCATION_ID = "e13620f4-4933-4275-83cc-3194a4be6607";
     private final String TEST_LOCATION_NAME = "Grid96Well_Test";

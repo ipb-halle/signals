@@ -23,18 +23,18 @@ package de.ipb_halle.signals.users;
  */
 public class UserReference implements IUser {
 
-    private Integer id;
+    private String id;
 
     public String dump() {
-        return String.format("User reference(%d)", id);
+        return String.format("User reference(%s)", id);
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public IUser setId(Integer i) {
-        id = i;
+    public IUser setId(String u) {
+        id = u;
         return this;
     }
 }

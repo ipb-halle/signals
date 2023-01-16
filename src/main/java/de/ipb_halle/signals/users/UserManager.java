@@ -37,15 +37,15 @@ public class UserManager {
     @Inject
     private UserRestService restService;
 
-    public User getDbUser(int id) {
+    public User getDbUser(String id) {
         return dbService.loadById(id);
     }
 
-    public User getSnbUser(int id) {
+    public User getSnbUser(String id) {
         return restService.doGetUser(id);
     }
 
-    public User getUser(int id) {
+    public User getUser(String id) {
         User u = dbService.loadById(id);
         if (u == null) {
             u = restService.doGetUser(id);

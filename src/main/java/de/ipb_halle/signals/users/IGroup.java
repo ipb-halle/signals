@@ -25,8 +25,8 @@ public interface IGroup {
 
     public String dump();
 
-    public Integer getId();
+    public String getId();
 
-    public IGroup setId(Integer i);
+    public IGroup setId(String i);
 }
 

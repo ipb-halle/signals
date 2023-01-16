@@ -42,9 +42,9 @@ public class RolePriv {
         id = new RolePrivId();
     }
 
-    public RolePriv(Integer i, RolePrivilege p) {
+    public RolePriv(String r, RolePrivilege p) {
         id = new RolePrivId();
-        id.setRoleId(i);
+        id.setRoleId(r);
         id.setRolePrivilege(p);
     }
 
@@ -54,11 +54,11 @@ public class RolePriv {
             return false;
         } 
         RolePriv other = (RolePriv) o;
-        return (id.getRoleId() == other.getRoleId())
-            && (id.getRolePrivilege() == other.getRolePrivilege());
+        return (id.getRoleId().equals(other.getRoleId()))
+            && (id.getRolePrivilege().equals(other.getRolePrivilege()));
     }
 
-    public Integer getRoleId() {
+    public String getRoleId() {
         return id.getRoleId();
     }
 
@@ -68,10 +68,10 @@ public class RolePriv {
 
     @Override
     public int hashCode() {
-        return getRoleId() + getRolePrivilege().hashCode();
+        return getRoleId().hashCode() + getRolePrivilege().hashCode();
     }
 
-    public void setRoleId(Integer i) {
+    public void setRoleId(String i) {
         id.setRoleId(i);
     }
 

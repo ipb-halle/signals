@@ -27,7 +27,7 @@ import javax.persistence.Embeddable;
 public class RolePrivId implements Serializable {
     private final static long serialVersionUID = 1L;
 
-    private Integer role_id;
+    private String role_id;
 
     private RolePrivilege privilege;
 
@@ -42,7 +42,7 @@ public class RolePrivId implements Serializable {
             && (getRolePrivilege() == other.getRolePrivilege());
     }
 
-    public Integer getRoleId() { 
+    public String getRoleId() { 
         return role_id; 
     }
 
@@ -62,7 +62,7 @@ public class RolePrivId implements Serializable {
         return hc;
     }
 
-    public void setRoleId(Integer id) {
+    public void setRoleId(String id) {
         role_id = id;
     }
 

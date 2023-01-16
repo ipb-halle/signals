@@ -32,7 +32,7 @@ import static org.junit.Assert.assertThrows;
 public class UserEntityTest {
 
     private final String TEST_RESOURCE = "UserEntityTest001.json";
-    private final int TEST_ID = 116;
+    private final String TEST_ID = "116";
     private final String TEST_USER_NAME = "user.two@someplace.invalid";
     private final long TEST_CREATED = 1654850485098L;
     private final long TEST_LAST_LOGIN = 1660721583522L;
@@ -49,7 +49,7 @@ public class UserEntityTest {
         UserEntity entity = user.createEntity();
         user = new User(entity);
 
-        assertEquals("id matches", TEST_ID, (int) user.getId());
+        assertEquals("id matches", TEST_ID, user.getId());
         assertEquals("createdAt date matches", TEST_CREATED, user.getCreatedAt().getTime());
         assertEquals("lastLoginAt date matches", TEST_LAST_LOGIN, user.getLastLoginAt().getTime());
         assertEquals("userName matches", TEST_USER_NAME, user.getUserName());

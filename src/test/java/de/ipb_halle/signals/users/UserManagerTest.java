@@ -53,17 +53,17 @@ public class UserManagerTest {
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/107";
 
 
-    private final int TEST_USER1_ID = 102;
+    private final String TEST_USER1_ID = "102";
     private final String TEST_USER1_ALIAS = "USR3";
     private final String TEST_USER1_FIRST_NAME = "ThreeFirst";
     private final String TEST_USER1_LAST_NAME = "ThreeLast";
-    private final int TEST_USER2_ID = 107;
+    private final String TEST_USER2_ID = "107";
     private final String TEST_USER2_LAST_NAME = "FourLast";
-    private final int TEST_ROLE1_ID = 1;
+    private final String TEST_ROLE1_ID = "1";
     private final String TEST_ROLE1_NAME = "System Admin";
-    private final int TEST_ROLE3_ID = 3;
+    private final String TEST_ROLE3_ID = "3";
     private final String TEST_ROLE3_NAME = "Standard User";
-    private final int TEST_ROLE4_ID = 4;
+    private final String TEST_ROLE4_ID = "4";
     private final String TEST_ROLE4_NAME = "Inventory Admin";
 
     @Inject

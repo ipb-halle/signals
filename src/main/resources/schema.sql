@@ -18,7 +18,7 @@ CREATE TABLE locations (
     ancestor_name VARCHAR,
     barcode VARCHAR,
     created_at DATE,
-    created_by INTEGER /* REFERENCES users(id) */,
+    created_by VARCHAR /* REFERENCES users(id) */,
     name VARCHAR,
     description VARCHAR,
     grid BOOLEAN,
@@ -27,29 +27,31 @@ CREATE TABLE locations (
     type_id VARCHAR,
     type_name VARCHAR,
     updated_at DATE,
-    updated_by INTEGER /* REFERENCES users(id) */,
+    updated_by VARCHAR /* REFERENCES users(id) */,
     json_string VARCHAR
 );
 
 CREATE TABLE roles (
-    id INTEGER NOT NULL PRIMARY KEY,
+    id VARCHAR NOT NULL PRIMARY KEY,
     name VARCHAR,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
     description VARCHAR,
+    ldap_role BOOLEAN NOT NULL DEFAULT FALSE,
     json_string VARCHAR
 );
 
 CREATE TABLE role_privileges (
-    role_id INTEGER NOT NULL REFERENCES roles(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    role_id VARCHAR NOT NULL REFERENCES roles(id) ON UPDATE CASCADE ON DELETE CASCADE,
     privilege INTEGER NOT NULL
 );
 
 CREATE TABLE users (
-    id INTEGER NOT NULL PRIMARY KEY,
+    id VARCHAR NOT NULL PRIMARY KEY,
     alias VARCHAR,
     country VARCHAR,
     created_at TIMESTAMP,
     email VARCHAR,
-    immutable BOOLEAN,
+    mutable BOOLEAN,
     is_enabled BOOLEAN NOT NULL DEFAULT FALSE,
     first_name VARCHAR,
     last_login_at TIMESTAMP,
@@ -60,12 +62,13 @@ CREATE TABLE users (
 );
 
 CREATE TABLE groups (
-    id INTEGER NOT NULL PRIMARY KEY,
+    id VARCHAR NOT NULL PRIMARY KEY,
     created_at TIMESTAMP,
     edited_at TIMESTAMP,
     description VARCHAR,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
     digest VARCHAR,
-    immutable BOOLEAN,
+    ldap_group BOOLEAN NOT NULL DEFAULT FALSE,
     name VARCHAR,
     is_system BOOLEAN,
     snb_type VARCHAR,
@@ -73,20 +76,14 @@ CREATE TABLE groups (
 );
 
 CREATE TABLE user_roles (
-    user_id INTEGER NOT NULL REFERENCES users(id),
-    role_id INTEGER NOT NULL REFERENCES roles(id),
+    user_id VARCHAR NOT NULL REFERENCES users(id),
+    role_id VARCHAR NOT NULL REFERENCES roles(id),
     PRIMARY KEY (user_id, role_id)
 );
 
-CREATE TABLE group_roles (
-    group_id INTEGER NOT NULL REFERENCES groups(id),
-    role_id INTEGER NOT NULL REFERENCES roles(id),
-    PRIMARY KEY (group_id, role_id)
-);
-
 CREATE TABLE group_memberships (
-    user_id INTEGER NOT NULL REFERENCES users(id),
-    group_id INTEGER NOT NULL  REFERENCES groups(id),
+    user_id VARCHAR NOT NULL REFERENCES users(id),
+    group_id VARCHAR NOT NULL  REFERENCES groups(id),
     PRIMARY KEY (user_id, group_id)
 );
 
@@ -161,12 +158,12 @@ CREATE TABLE libraries (
     batch_display_name VARCHAR,
     batch_numbering VARCHAR,
     created_at TIMESTAMP,
-    created_by INTEGER,
+    created_by VARCHAR,
     digest VARCHAR,
     display_image VARCHAR,
     display_table VARCHAR,
     edited_at TIMESTAMP,
-    edited_by INTEGER,
+    edited_by VARCHAR,
     enabled BOOLEAN,
     entity_flags VARCHAR,
     json_string VARCHAR,
@@ -194,13 +191,13 @@ CREATE TABLE containers (
     coordinate_x INTEGER,
     coordinate_y INTEGER,
     created_at TIMESTAMP,
-    created_by INTEGER /* REFERENCES users(id) */,
+    created_by VARCHAR /* REFERENCES users(id) */,
     digest VARCHAR,
     json_string VARCHAR,
     location_id VARCHAR,
     material_id VARCHAR /* REFERENCES materials(id) */,
     name VARCHAR,
     updated_at TIMESTAMP,
-    updated_by INTEGER /* REFERENCES users(id) */,
+    updated_by VARCHAR /* REFERENCES users(id) */,
     unit VARCHAR
 );

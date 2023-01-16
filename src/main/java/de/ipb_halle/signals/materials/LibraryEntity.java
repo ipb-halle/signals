@@ -53,7 +53,7 @@ public class LibraryEntity {
     private Date createdAt;
 
     @Column(name="created_by")
-    private Integer createdBy;
+    private String createdBy;
 
     @Column
     private String digest;
@@ -68,7 +68,7 @@ public class LibraryEntity {
     private Date editedAt;
 
     @Column(name="edited_by")
-    private Integer editedBy;
+    private String editedBy;
 
     @Column
     private Boolean enabled;
@@ -114,7 +114,7 @@ public class LibraryEntity {
         return createdAt;
     }
 
-    public Integer getCreatedBy() {
+    public String getCreatedBy() {
         return createdBy;
     }
 
@@ -134,7 +134,7 @@ public class LibraryEntity {
         return editedAt;
     }
 
-    public Integer getEditedBy() {
+    public String getEditedBy() {
         return editedBy;
     }
 
@@ -196,7 +196,7 @@ public class LibraryEntity {
         return this;
     }
 
-    public LibraryEntity setCreatedBy(Integer u) {
+    public LibraryEntity setCreatedBy(String u) {
         createdBy = u;
         return this;
     }
@@ -221,7 +221,7 @@ public class LibraryEntity {
         return this;
     }
 
-    public LibraryEntity setEditedBy(Integer u) {
+    public LibraryEntity setEditedBy(String u) {
         editedBy = u;
         return this;
     }

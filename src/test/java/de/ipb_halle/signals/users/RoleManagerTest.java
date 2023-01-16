@@ -48,7 +48,7 @@ public class RoleManagerTest {
     private final String TEST_RESOURCE_1 = "RoleManagerTest001.json";
     private final String TEST_KEY_1 = 
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/roles";
-    private final int TEST_ROLE_ID = 1;
+    private final String TEST_ROLE_ID = "1";
     private final String TEST_ROLE_DESCRIPTION = "Users with this role have all privileges.";
     private final String TEST_ROLE_NAME = "System Admin";
 

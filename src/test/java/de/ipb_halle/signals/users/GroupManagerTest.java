@@ -48,7 +48,7 @@ public class GroupManagerTest {
     private final String TEST_RESOURCE_1 = "GroupManagerTest001.json";
     private final String TEST_KEY_1 = 
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/groups";
-    private final int TEST_GROUP_ID = 132;
+    private final String TEST_GROUP_ID = "132";
     private final String TEST_GROUP_DESCRIPTION = "Research Group 1, Gamma department";
     private final String TEST_GROUP_NAME = "RG Gamma 1";
     private final String TEST_GROUP_TYPE = "group";

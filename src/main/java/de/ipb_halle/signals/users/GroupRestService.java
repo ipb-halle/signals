@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
 public class GroupRestService implements RestService<Group> {
 
     public final String GROUPS_ENDPOINT = "/groups";
-    public final String GROUP_ENDPOINT = "/groups/%d";
+    public final String GROUP_ENDPOINT = "/groups/%s";
 
 
     @Inject
@@ -67,14 +67,13 @@ public class GroupRestService implements RestService<Group> {
         JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
         Group group = new Group();
-        group.setId(attributes.getAsJsonPrimitive(RestHelper.ATTR_ID).getAsInt());
+        group.setId(attributes.getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
         group.setCreatedAt(RestHelper.parseDate(attributes, Group.ATTR_CREATED_AT, new Date()));
         group.setDescription(getOptionalStringAttribute(attributes, Group.ATTR_DESCRIPTION));
         // digest
         // eid
         group.setEditedAt(RestHelper.parseDate(attributes, Group.ATTR_EDITED_AT, new Date()));
         //flags
-        group.setImmutable(true);
         group.setJsonString(j.toString());
         group.setName(attributes.getAsJsonPrimitive(Group.ATTR_NAME).getAsString());
         group.setSystem(attributes.getAsJsonPrimitive(Group.ATTR_SYSTEM).getAsBoolean());
@@ -103,7 +102,8 @@ public class GroupRestService implements RestService<Group> {
                 .execute(RestClient.HTTP_CREATED);
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
-            return createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
+            Group snbGroup = createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
+            return snbGroup;
 
         } catch(UnexpectedResponseCodeException ue) {
             logger.warn("Unexpected code");
@@ -118,7 +118,7 @@ public class GroupRestService implements RestService<Group> {
     /**
      * GET group by id 
      */
-    public Group doGetGroup(int id) {
+    public Group doGetGroup(String id) {
         try {
             restClient.reset()
                 .setEndpoint(String.format(GROUP_ENDPOINT, id))

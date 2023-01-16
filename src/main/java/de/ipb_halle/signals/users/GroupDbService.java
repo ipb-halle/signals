@@ -18,7 +18,9 @@
 package de.ipb_halle.signals.users;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -42,10 +44,28 @@ public class GroupDbService {
      * @return a list of Groups 
      */
     public List<Group> load() {
+        return loadBy(new HashMap<String, Object> ());
+    }
+
+    public Group loadByName(String name) {
+        Map<String, Object> cmap = new HashMap<> ();
+        cmap.put(Group.GROUP_NAME, name);
+        List<Group> result = loadBy(cmap);
+        if (result.size() == 1) {
+            return result.get(0);
+        }
+        return null;
+    }
+
+    public List<Group> loadBy(Map<String, Object> cmap) {
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Group> criteriaQuery = builder.createQuery(Group.class);
         Root<Group> root = criteriaQuery.from(Group.class);
         criteriaQuery.select(root);
+
+        if (cmap.get(Group.GROUP_NAME) != null) {
+            criteriaQuery.where(builder.equal(root.get(Group.GROUP_NAME), cmap.get(Group.GROUP_NAME)));
+        }
 
         List<Group> result = new ArrayList<> ();
         for (Group group : em.createQuery(criteriaQuery).getResultList()) {
@@ -54,7 +74,15 @@ public class GroupDbService {
         return result;
     }
 
-    public Group loadById(int id) {
+    public Map<String, Group> loadMappedById(Map<String, Object> cmap) {
+        Map<String, Group> resultMap = new HashMap<> ();
+        for (Group group : loadBy(cmap)) {
+            resultMap.put(group.getId(), group);
+        }
+        return resultMap;
+    }
+
+    public Group loadById(String id) {
         return this.em.find(Group.class, id);
     }
 

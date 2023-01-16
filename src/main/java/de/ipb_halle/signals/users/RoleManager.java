@@ -36,11 +36,11 @@ public class RoleManager {
     @Inject
     private RoleRestService restService;
     
-    public Role getDbRole(int id) {
+    public Role getDbRole(String id) {
         return dbService.loadById(id);
     }
 
-    public Role getSnbRole(int id) {
+    public Role getSnbRole(String id) {
         return restService.doGetRole(id);
     }
 

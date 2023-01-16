@@ -18,7 +18,9 @@
 package de.ipb_halle.signals.users;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -42,10 +44,28 @@ public class RoleDbService {
      * @return a list of Roles
      */
     public List<Role> load() {
+        return loadBy(new HashMap<String, Object> ());
+    }
+
+    public Role loadByName(String name) {
+        Map<String, Object> cmap = new HashMap<> ();
+        cmap.put(Role.ROLE_NAME, name);
+        List<Role> result = loadBy(cmap);
+        if (result.size() == 1) {
+            return result.get(0);
+        }
+        return null;
+    }
+
+    public List<Role> loadBy(Map<String, Object> cmap) {
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Role> criteriaQuery = builder.createQuery(Role.class);
         Root<Role> root = criteriaQuery.from(Role.class);
         criteriaQuery.select(root);
+
+        if (cmap.get(Role.ROLE_NAME) != null) {
+            criteriaQuery.where(builder.equal(root.get(Role.ROLE_NAME), cmap.get(Role.ROLE_NAME)));
+        }
 
         List<Role> result = new ArrayList<> ();
         for (Role role: em.createQuery(criteriaQuery).getResultList()) {
@@ -54,7 +74,15 @@ public class RoleDbService {
         return result;
     }
 
-    public Role loadById(int id) {
+    public Map<String, Role> loadMappedById(Map<String, Object> cmap) {
+        Map<String, Role> resultMap = new HashMap<> ();
+        for (Role role : loadBy(cmap)) {
+            resultMap.put(role.getId(), role);
+        }
+        return resultMap;
+    }
+
+    public Role loadById(String id) {
         return this.em.find(Role.class, id);
     }
 
