@@ -84,8 +84,8 @@ public class AccessManager {
      * clean group memberships for a mutable user: remove all
      * LDAP managed groups from user
      */
-    private void cleanUserLdapGroups(User dbUser) {
-        Iterator<IGroup> iter = dbUser.getSystemGroups().iterator();
+    private void cleanUserLdapGroups(User user) {
+        Iterator<IGroup> iter = user.getSystemGroups().iterator();
         while (iter.hasNext()) {
             IGroup iGroup = iter.next();
             if ((iGroup instanceof Group) && ((Group) iGroup).isLdapGroup()) {
@@ -98,8 +98,8 @@ public class AccessManager {
      * clean user roles for a mutable user: remove all roles
      * which are managed by LDAP
      */
-    private void cleanUserLdapRoles(User dbUser) {
-        Iterator<IRole> iter = dbUser.getRoles().iterator();
+    private void cleanUserLdapRoles(User user) {
+        Iterator<IRole> iter = user.getRoles().iterator();
         while (iter.hasNext()) {
             IRole iRole = iter.next();
             if ((iRole instanceof Role) && ((Role) iRole).isLdapRole()) {
@@ -112,8 +112,14 @@ public class AccessManager {
      * create user in SNB, synchronize Db with new SNB user
      */
     private User createUserFromLdap(User ldapUser) {
-        // ToDo: handle this use case
-        return null;
+        if (! dryRun) {
+            logger.debug("creating new user from LDAP: {}", ldapUser.getUserName());
+            User snbUser = userRestService.doCreateUser(ldapUser);
+            userDbService.save(snbUser);
+            return userDbService.loadById(snbUser.getId());
+        } 
+        logger.debug("DRY RUN: skipping user creation: {}", ldapUser.getUserName());
+        return ldapUser;
     }
 
     /**
@@ -146,7 +152,9 @@ public class AccessManager {
                 } else {
                     logger.debug("Group {} is managed via LDAP", ldapGroup.getName());
                     dbGroup.setLdapGroup(true);
-                    groupDbService.save(dbGroup);
+                    if (! dryRun) {
+                        groupDbService.save(dbGroup);
+                    }
                     groupsByDN.put(dn, dbGroup);
                 }
             }
@@ -173,12 +181,39 @@ public class AccessManager {
                 } else {
                     logger.debug("Role {} is managed via LDAP", ldapRole.getName());
                     dbRole.setLdapRole(true);
-                    roleDbService.save(dbRole);
+                    if (! dryRun) {
+                        roleDbService.save(dbRole);
+                    }
                     rolesByDN.put(dn, dbRole);
                 }
             }
         }
     }
+
+    private void resolveRoleReferences(User snbUser) {
+        Set<IRole> newRoles = new HashSet<> ();
+        for (IRole iRole : snbUser.getRoles()) {
+            if (iRole instanceof RoleReference) {
+                newRoles.add(roleDbService.loadById(iRole.getId()));
+            } else {
+                newRoles.add(iRole);
+            }
+        }
+        snbUser.setRoles(newRoles);
+    }
+
+    private void resolveGroupReferences(User snbUser) {
+        Set<IGroup> newGroups = new HashSet<> ();
+        for (IGroup iGroup : snbUser.getSystemGroups()) {
+            if (iGroup instanceof IGroup) {
+                newGroups.add(groupDbService.loadById(iGroup.getId()));
+            } else {
+                newGroups.add(iGroup);
+            }
+        }
+        snbUser.setSystemGroups(newGroups);
+    }
+
 
     public void setDryRun(boolean d) {
         dryRun = d;
@@ -212,6 +247,8 @@ public class AccessManager {
                         dbGroup.applyChangesFromSnb(snbGroup);
                         dbGroup.setDeleted(false);
                         groupDbService.save(dbGroup);
+                    } else {
+                        logger.debug("DRY RUN: group {} not updated despite modification", dbGroup.getName());
                     }
                 }
             }
@@ -219,8 +256,13 @@ public class AccessManager {
 
         // mark groups not found in SNB as deleted
         for (Group group : groupsFromDb.values()) {
-            group.setDeleted(true);     
-            groupDbService.save(group);
+            if (! dryRun) {
+                logger.debug("group {} not found in SNB - marking as deleted", group.getName());
+                group.setDeleted(true);     
+                groupDbService.save(group);
+            } else {
+                logger.debug("DRY RUN: group {} not found in SNB", group.getName());
+            }
         }
     }
 
@@ -247,62 +289,92 @@ public class AccessManager {
 
         // mark roles not found in SNB as deleted
         for (Role dbRole : rolesFromDb.values()) {
-            dbRole.setDeleted(true);
-            roleDbService.save(dbRole);
+            if (! dryRun) {
+                logger.debug("DRY RUN: role {} not found in SNB - marking as deleted", dbRole.getName());
+                dbRole.setDeleted(true);
+                roleDbService.save(dbRole);
+            } else {
+                logger.debug("DRY RUN: role {} not found in SNB", dbRole.getName());
+            }
+        }
+    }
+
+    private void syncDbUserFromSnb(User snbUser) {
+        User dbUser = userDbService.loadById(snbUser.getId());
+        if (dbUser == null) {
+            logger.debug("Discovered new SNB user: {}", snbUser.getUserName());
+            if (! dryRun) {
+                snbUser.setMutable(false);
+                userDbService.save(snbUser);
+            }
+        } else {
+            resolveRoleReferences(snbUser);
+            resolveGroupReferences(snbUser);
+            if (snbUser.isModified(CompareType.SNB, dbUser)) {       
+                logger.debug("Discovered modified user {} in SNB", snbUser.getUserName());
+                if (! dryRun) {
+                    dbUser.applyChangesFromSnb(snbUser);
+                    userDbService.save(dbUser);
+                }
+            }
         }
     }
 
     private void syncDbUsersFromSnb() {
-        for(User snbUser : userRestService.doGetUsers(null, true)) {
-            logger.debug("Discovered SNB user: {}", snbUser.getEmail());
-            userRestService.doGetSystemGroupMemberships(snbUser);
-            User dbUser = userDbService.loadById(snbUser.getId());
-            if (dbUser == null) {
-                if (! dryRun) {
-                    snbUser.setMutable(false);
-                    userDbService.save(snbUser);
-                }
-            } else {
-                if (snbUser.isModified(CompareType.SNB, dbUser)) {       
-                    if (! dryRun) {
-                        dbUser.applyChangesFromSnb(snbUser);
-                        userDbService.save(dbUser);
-                    }
-                }
-            }
+        // enabled users
+        for( User snbUser : userRestService.doGetUsers(null, true)) {
+            syncDbUserFromSnb(snbUser);
+        }
+
+        // disabled users
+        for (User snbUser : userRestService.doGetUsers(null, false)) {
+            syncDbUserFromSnb(snbUser);
         }
     }
 
     /**
      * synchronize a single user from LDAP
      */
-    private void syncUserFromLdap(String userDN) {
+    private User syncUserFromLdap(String userDN) {
         User ldapUser = ldapClient.getUser(userDN);
         User dbUser = userDbService.loadByUserName(ldapUser.getUserName());
         if (dbUser == null) {
-            logger.debug("Discovered new user in LDAP: {}", ldapUser.getEmail());
-            dbUser = createUserFromLdap(ldapUser);
+            logger.debug("Discovered new user in LDAP: {}", ldapUser.getUserName());
+            if (! dryRun) {
+                dbUser = createUserFromLdap(ldapUser);
+            }
         }
 
         if (dbUser.isMutable()) {
-            cleanUserLdapRoles(dbUser);
-            cleanUserLdapGroups(dbUser);
+            ldapUser.setId(dbUser.getId());
+            ldapUser.getRoles().addAll(dbUser.getRoles());
+            ldapUser.getSystemGroups().addAll(dbUser.getSystemGroups());
+            cleanUserLdapRoles(ldapUser);
+            cleanUserLdapGroups(ldapUser);
             Set<String> memberships = ldapClient.getMemberships(userDN, true);
             for (String membershipDN : memberships) {
                 Role dbRole = rolesByDN.get(membershipDN);
                 Group dbGroup = groupsByDN.get(membershipDN);
                 if (dbRole != null) {
-                    dbUser.addRole(dbRole);
+                    ldapUser.addRole(dbRole);
                 }
                 if (dbGroup != null) {
-                    dbUser.addSystemGroup(dbGroup);
+                    ldapUser.addSystemGroup(dbGroup);
                 }
             }
-            userDbService.save(dbUser);
-            userRestService.doUpdateUser(dbUser);
+            if (dbUser.isModified(CompareType.LDAP, ldapUser)) {
+                dbUser.applyChangesFromLdap(ldapUser);
+                if (! dryRun) {
+                    userDbService.save(dbUser);
+                    userRestService.doUpdateUser(dbUser);
+                } else {
+                    logger.debug("DRY RUN: skipping update of user {}", dbUser.getUserName());
+                }
+            }
         } else {
-            logger.info("Leaving immutable user {} untouched", dbUser.getEmail());
+            logger.info("Leaving immutable user {} untouched", dbUser.getUserName());
         }
+        return dbUser;
     }
 
     /**
@@ -312,11 +384,26 @@ public class AccessManager {
         Set<String> groupDNs = new HashSet<> (); // should remain empty; content will be ignored
         Set<String> userDNs = new HashSet<> ();
 
-        Set<User> ldapUsers = new HashSet<> ();
+        Map<String, Object> cmap = new HashMap<> ();
+        cmap.put(User.USER_MUTABLE, Boolean.TRUE);
+        cmap.put(User.USER_ENABLED, Boolean.TRUE);
+        Map<String, User> ldapUsersById = userDbService.loadMappedById(cmap);
 
         ldapClient.getMembers(userDNs, groupDNs, config.getLdapManagedUsers(), false);
         for (String dn : userDNs) {
-            syncUserFromLdap(dn);
+            User dbUser = syncUserFromLdap(dn);
+            ldapUsersById.remove(dbUser.getId());
+        }
+
+        // disable mutable users not found in LDAP
+        for (User user : ldapUsersById.values()) {
+            if (user.isMutable()) {
+                userRestService.doDisableUser(user);
+                user.setEnabled(false);
+                user.setRoles(new HashSet<> ());
+                user.setSystemGroups(new HashSet<> ());
+                userDbService.save(user);
+            }
         }
     }
 

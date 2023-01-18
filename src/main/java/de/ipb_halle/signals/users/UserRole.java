@@ -35,6 +35,8 @@ import javax.persistence.Table;
 @Table(name="user_roles")
 public class UserRole {
 
+    public final static String USER_ROLE_ID = "id";
+
     @EmbeddedId
     private UserRoleId id;
 

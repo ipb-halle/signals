@@ -51,6 +51,14 @@ public class UserManagerTest {
     private final String TEST_RESOURCE_2 = "UserManagerTest002.json";
     private final String TEST_KEY_2 =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/107";
+    private final String TEST_RESOURCE_3 = "UserManagerTest003.json";
+    private final String TEST_KEY_3a = 
+        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/102/systemGroups";
+    private final String TEST_KEY_3b =
+        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/107/systemGroups";
+    private final String TEST_KEY_3c =
+        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/122/systemGroups";
+
 
 
     private final String TEST_USER1_ID = "102";
@@ -101,6 +109,17 @@ public class UserManagerTest {
         TestBase.prepareRestClients(mockRestClient,
             TEST_KEY_2,
             getClass().getResourceAsStream(TEST_RESOURCE_2));
+        TestBase.prepareRestClients(mockRestClient,
+            TEST_KEY_3a,
+            getClass().getResourceAsStream(TEST_RESOURCE_3));
+        TestBase.prepareRestClients(mockRestClient,
+            TEST_KEY_3b,
+            getClass().getResourceAsStream(TEST_RESOURCE_3));
+        TestBase.prepareRestClients(mockRestClient,
+            TEST_KEY_3c,
+            getClass().getResourceAsStream(TEST_RESOURCE_3));
+
+
 
         Role role = new Role();
         role.setId(TEST_ROLE1_ID);

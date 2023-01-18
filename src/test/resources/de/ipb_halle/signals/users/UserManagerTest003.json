@@ -1,0 +1,6 @@
+{
+    "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102/systemGroups"
+    },
+    "data": []
+}

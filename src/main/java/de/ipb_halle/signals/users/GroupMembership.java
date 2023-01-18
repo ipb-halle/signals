@@ -35,6 +35,8 @@ import javax.persistence.Table;
 @Table(name="group_memberships")
 public class GroupMembership {
 
+    public final static String GROUP_MEMBERSHIP_ID = "id";
+
     @EmbeddedId
     private GroupMembershipId id;
 

@@ -48,7 +48,10 @@ public class UserDbService {
         CriteriaQuery<UserRole> criteriaQuery = builder.createQuery(UserRole.class);
         Root<UserRole> root = criteriaQuery.from(UserRole.class);
         criteriaQuery.select(root);
-        criteriaQuery.where(builder.equal(root.get(UserRoleId.USER_ID), user.getId()));
+        criteriaQuery.where(builder.equal(root
+                .get(UserRole.USER_ROLE_ID)
+                .get(UserRoleId.USER_ID), 
+                user.getId()));
 
         Set<IRole> result = new HashSet<> ();
         for (UserRole userRole: em.createQuery(criteriaQuery).getResultList()) {
@@ -65,7 +68,10 @@ public class UserDbService {
         CriteriaQuery<GroupMembership> criteriaQuery = builder.createQuery(GroupMembership.class);
         Root<GroupMembership> root = criteriaQuery.from(GroupMembership.class);
         criteriaQuery.select(root);
-        criteriaQuery.where(builder.equal(root.get(GroupMembershipId.USER_ID), user.getId()));
+        criteriaQuery.where(builder.equal(root
+                .get(GroupMembership.GROUP_MEMBERSHIP_ID)
+                .get(GroupMembershipId.USER_ID), 
+                user.getId()));
 
         Set<IGroup> result = new HashSet<> ();
         for (GroupMembership membership: em.createQuery(criteriaQuery).getResultList()) {
@@ -108,6 +114,9 @@ public class UserDbService {
         if (cmap.get(User.USER_MUTABLE) != null) {
             predicates.add(builder.equal(root.get(User.USER_MUTABLE), cmap.get(User.USER_MUTABLE)));
         }
+        if (cmap.get(User.USER_ENABLED) != null) {
+            predicates.add(builder.equal(root.get(User.USER_MUTABLE), cmap.get(User.USER_ENABLED)));
+        }
 
         criteriaQuery.where(builder.and(predicates.toArray(new Predicate[0])));
 
@@ -121,13 +130,20 @@ public class UserDbService {
         return result;
     }
 
+    public Map<String, User> loadMappedById(Map<String, Object> cmap) {
+        Map<String, User> resultMap = new HashMap<> ();
+        for (User user: loadBy(cmap)) {
+            resultMap.put(user.getId(), user);
+        }
+        return resultMap;
+    }
 
     public User loadById(String id) {
         UserEntity ue = this.em.find(UserEntity.class, id);
         if (ue != null) {
             User user = new User(ue);
-            // load roles
-            // load group memberships
+            user.setRoles(loadRoles(user));
+            user.setSystemGroups(loadSystemGroups(user));
             return user;
         }
         return null;

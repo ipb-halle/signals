@@ -45,7 +45,7 @@ public class UserEntityTest {
         JsonElement j = JsonParser.parseString(test);
 
         UserRestService svc = new UserRestService();
-        User user = svc.createEntity(j);
+        User user = svc.parseUser(j);
         UserEntity entity = user.createEntity();
         user = new User(entity);
 

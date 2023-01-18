@@ -69,6 +69,7 @@ public class UserRestService implements RestService<User> {
      */
     public final String USERS_ENDPOINT = "/users";
     public final String USER_ENDPOINT = "/users/%s";
+    public final String USER_DELETE_ENDPOINT = "/users/%s";                     // could also be "/users/%s?assignResourceTo=%s";
     public final String SYSTEMGROUPS_ENDPOINT = "/users/%s/systemGroups";
 
     private Logger logger = LoggerFactory.getLogger(UserRestService.class);
@@ -82,26 +83,13 @@ public class UserRestService implements RestService<User> {
      */
     public User createEntity(JsonElement j) {
 //      logger.debug("createEntity() --> {}", j.toString());
-        JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
+        User user = parseUser(j);
 
-        User user = new User();
-        user.setId(attributes.getAsJsonPrimitive(User.ATTR_USER_ID).getAsString());
-        String alias = RestHelper.parseString(attributes, User.ATTR_ALIAS);
-        user.setAlias((alias != null) ? alias.toUpperCase() : null); 
-        user.setCountry(attributes.getAsJsonPrimitive(User.ATTR_COUNTRY).getAsString());
-        user.setCreatedAt(RestHelper.parseDate(attributes, User.ATTR_CREATED_AT, new Date()));
-        user.setEmail(attributes.getAsJsonPrimitive(User.ATTR_EMAIL).getAsString().toLowerCase());
-        user.setEnabled(attributes.getAsJsonPrimitive(User.ATTR_ENABLED).getAsBoolean());
-        user.setFirstName(attributes.getAsJsonPrimitive(User.ATTR_FIRST_NAME).getAsString());
-        user.setMutable(false);
-        user.setJsonString(j.toString());
-        user.setLastLoginAt(RestHelper.parseDate(attributes, User.ATTR_LAST_LOGIN, new Date()));
-        user.setLastName(attributes.getAsJsonPrimitive(User.ATTR_LAST_NAME).getAsString());
-        user.setOrganization(attributes.getAsJsonPrimitive(User.ATTR_ORGANIZATION).getAsString());
-        user.setUserName(attributes.getAsJsonPrimitive(User.ATTR_USER_NAME).getAsString().toLowerCase());
-
-        JsonArray roles = RestHelper.getFromPath(j, User.ATTR_RELATIONSHIP_ROLES).getAsJsonArray();
-        parseRoles(user, roles);
+        if (user.isEnabled()) {
+            JsonArray roles = RestHelper.getFromPath(j, User.ATTR_RELATIONSHIP_ROLES).getAsJsonArray();
+            parseRoles(user, roles);
+            doGetSystemGroupMemberships(user);
+        }
         return user;
     }
 
@@ -118,6 +106,23 @@ public class UserRestService implements RestService<User> {
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
             return createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
+
+        } catch(UnexpectedResponseCodeException ue) {
+            logger.warn("Unexpected code");
+        } catch(MalformedURLException me) {
+            logger.warn("Malformed URL");
+        } catch(IOException ioe) {
+            logger.warn("IOException", (Throwable) ioe);
+        }
+        return null;
+    }
+
+    public User doDisableUser(User user) {
+        try {
+            restClient.reset()
+                .setMethod(Method.DELETE)
+                .setEndpoint(String.format(USER_DELETE_ENDPOINT, user.getId()))
+                .execute(RestClient.HTTP_NO_CONTENT);
 
         } catch(UnexpectedResponseCodeException ue) {
             logger.warn("Unexpected code");
@@ -236,6 +241,27 @@ public class UserRestService implements RestService<User> {
             user.addRole(new RoleReference()
                 .setId(RestHelper.parseString(json, RestHelper.ATTR_ID)));
         }
+    }
+
+    public User parseUser(JsonElement j) {
+        JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
+
+        User user = new User();
+        user.setId(attributes.getAsJsonPrimitive(User.ATTR_USER_ID).getAsString());
+        String alias = RestHelper.parseString(attributes, User.ATTR_ALIAS);
+        user.setAlias((alias != null) ? alias.toUpperCase() : null); 
+        user.setCountry(attributes.getAsJsonPrimitive(User.ATTR_COUNTRY).getAsString());
+        user.setCreatedAt(RestHelper.parseDate(attributes, User.ATTR_CREATED_AT, new Date()));
+        user.setEmail(attributes.getAsJsonPrimitive(User.ATTR_EMAIL).getAsString().toLowerCase());
+        user.setEnabled(attributes.getAsJsonPrimitive(User.ATTR_ENABLED).getAsBoolean());
+        user.setFirstName(attributes.getAsJsonPrimitive(User.ATTR_FIRST_NAME).getAsString());
+        user.setMutable(false);
+        user.setJsonString(j.toString());
+        user.setLastLoginAt(RestHelper.parseDate(attributes, User.ATTR_LAST_LOGIN, new Date()));
+        user.setLastName(attributes.getAsJsonPrimitive(User.ATTR_LAST_NAME).getAsString());
+        user.setOrganization(attributes.getAsJsonPrimitive(User.ATTR_ORGANIZATION).getAsString());
+        user.setUserName(attributes.getAsJsonPrimitive(User.ATTR_USER_NAME).getAsString().toLowerCase());
+        return user;
     }
 
     protected String prepareJsonString(User user) {

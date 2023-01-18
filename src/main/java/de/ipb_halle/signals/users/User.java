@@ -30,6 +30,7 @@ public class User implements IUser {
 
     public final static String USER_USERNAME = "user_name";
     public final static String USER_MUTABLE = "mutable";
+    public final static String USER_ENABLED = "is_enabled";
 
     public final static String ATTR_ALIAS = "alias";
     public final static String ATTR_COUNTRY = "country";
@@ -110,22 +111,41 @@ public class User implements IUser {
         systemGroups.add(group);
     }
 
-    /*
-     * apply changes from SNB excluding role and group memberships
+    /** 
+     * Apply changes from a reference user. Does NOT overwrite the 
+     * createdAt, lastLoginAt, mutable and jsonString attributes.
+     * Expects roles and system groups to be database entities and 
+     * not just role / group references.
+     */
+    public void applyChanges(User user) {
+        alias = user.getAlias();
+        country = user.getCountry();
+        email = user.getEmail();
+        enabled = user.isEnabled();
+        firstName = user.getFirstName();
+        lastName = user.getLastName();
+        organization = user.getOrganization();
+        userName = user.getUserName();
+        setRoles(user.getRoles());
+        setSystemGroups(user.getSystemGroups());
+    }
+
+    /**
+     * specifically apply changes from LDAP
+     */
+    public void applyChangesFromLdap(User ldapUser) {
+        applyChanges(ldapUser);
+    }
+
+    /**
+     * specifically apply changes from SNB (include 
+     * also createdAt, lastLoginAt and jsonString attributes).
      */
     public void applyChangesFromSnb(User snbUser) {
-        alias = snbUser.getAlias();
-        country = snbUser.getCountry();
         createdAt = snbUser.getCreatedAt();
-        email = snbUser.getEmail();
-        enabled = snbUser.isEnabled();
-        firstName = snbUser.getFirstName();
-        /* do NOT overwrite the mutable attribute */
         lastLoginAt = snbUser.getLastLoginAt();
-        lastName = snbUser.getLastName();
-        organization = snbUser.getOrganization();
-        userName = snbUser.getUserName();
         jsonString = snbUser.getJsonString();
+        applyChanges(snbUser);
     }
 
     public void clearRoles() {
@@ -217,14 +237,21 @@ public class User implements IUser {
         return enabled;
     }
 
-    public boolean isModified(CompareType type, User user) {
+    /**
+     * Compare this user to a reference user. 
+     * @param context the compare context: either SNB or LDAP. Creation and last login 
+     * timestamps are ignored in LDAP compare type mode
+     * @param user the reference user
+     * @return true if current user is modified
+     */
+    public boolean isModified(CompareType context, User user) {
         return !( alias.equals(user.getAlias())
             && country.equals(user.getCountry())
-            && ((type == CompareType.SNB) ? createdAt.equals(user.getCreatedAt()) : true)
+            && ((context == CompareType.SNB) ? createdAt.equals(user.getCreatedAt()) : true)
             && email.equals(user.getEmail())
             && (enabled == user.isEnabled())
             && firstName.equals(user.getFirstName())
-            && ((type == CompareType.SNB) ? lastLoginAt.equals(user.getLastLoginAt()) : true)
+            && ((context == CompareType.SNB) ? lastLoginAt.equals(user.getLastLoginAt()) : true)
             && lastName.equals(user.getLastName())
             && organization.equals(user.getOrganization())
             && userName.equals(user.getUserName())
