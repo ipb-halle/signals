@@ -290,7 +290,7 @@ public class AccessManager {
         // mark roles not found in SNB as deleted
         for (Role dbRole : rolesFromDb.values()) {
             if (! dryRun) {
-                logger.debug("DRY RUN: role {} not found in SNB - marking as deleted", dbRole.getName());
+                logger.debug("role {} not found in SNB - marking as deleted", dbRole.getName());
                 dbRole.setDeleted(true);
                 roleDbService.save(dbRole);
             } else {
