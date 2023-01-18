@@ -115,9 +115,10 @@ public class AccessManager {
         if (! dryRun) {
             logger.debug("creating new user from LDAP: {}", ldapUser.getUserName());
             User snbUser = userRestService.doCreateUser(ldapUser);
+            snbUser.setMutable(true);
             userDbService.save(snbUser);
             return userDbService.loadById(snbUser.getId());
-        } 
+        }
         logger.debug("DRY RUN: skipping user creation: {}", ldapUser.getUserName());
         return ldapUser;
     }
@@ -139,8 +140,7 @@ public class AccessManager {
     private void obtainLdapGroups() {
         groupsByDN = new HashMap<> ();
         Set<String> groupDNs = new HashSet<> ();
-        Set<String> userDNs = new HashSet<> (); // should remain empty; content will be ignored
-        ldapClient.getMembers(userDNs, groupDNs, config.getLdapManagedGroups(), false);
+        ldapClient.getMembers( new HashSet<> (), groupDNs, config.getLdapManagedGroups(), false);
         for (String dn : groupDNs) {
             Group ldapGroup = ldapClient.getGroup(dn);
             Group dbGroup = groupDbService.loadByName(ldapGroup.getName());
@@ -168,8 +168,7 @@ public class AccessManager {
     private void obtainLdapRoles() {
         rolesByDN = new HashMap<> ();
         Set<String> roleDNs = new HashSet<> ();
-        Set<String> userDNs = new HashSet<> (); // should remain empty; content will be ignored
-        ldapClient.getMembers(userDNs, roleDNs, config.getLdapManagedRoles(), false);
+        ldapClient.getMembers(new HashSet<> (), roleDNs, config.getLdapManagedRoles(), false);
         for (String dn : roleDNs) {
             Role ldapRole = ldapClient.getRole(dn);
             Role dbRole = roleDbService.loadByName(ldapRole.getName());
@@ -205,7 +204,7 @@ public class AccessManager {
     private void resolveGroupReferences(User snbUser) {
         Set<IGroup> newGroups = new HashSet<> ();
         for (IGroup iGroup : snbUser.getSystemGroups()) {
-            if (iGroup instanceof IGroup) {
+            if (iGroup instanceof GroupReference) {
                 newGroups.add(groupDbService.loadById(iGroup.getId()));
             } else {
                 newGroups.add(iGroup);
@@ -258,7 +257,7 @@ public class AccessManager {
         for (Group group : groupsFromDb.values()) {
             if (! dryRun) {
                 logger.debug("group {} not found in SNB - marking as deleted", group.getName());
-                group.setDeleted(true);     
+                group.setDeleted(true);
                 groupDbService.save(group);
             } else {
                 logger.debug("DRY RUN: group {} not found in SNB", group.getName());
@@ -310,7 +309,7 @@ public class AccessManager {
         } else {
             resolveRoleReferences(snbUser);
             resolveGroupReferences(snbUser);
-            if (snbUser.isModified(CompareType.SNB, dbUser)) {       
+            if (snbUser.isModified(CompareType.SNB, dbUser)) {
                 logger.debug("Discovered modified user {} in SNB", snbUser.getUserName());
                 if (! dryRun) {
                     dbUser.applyChangesFromSnb(snbUser);
@@ -340,9 +339,7 @@ public class AccessManager {
         User dbUser = userDbService.loadByUserName(ldapUser.getUserName());
         if (dbUser == null) {
             logger.debug("Discovered new user in LDAP: {}", ldapUser.getUserName());
-            if (! dryRun) {
-                dbUser = createUserFromLdap(ldapUser);
-            }
+            dbUser = createUserFromLdap(ldapUser);
         }
 
         if (dbUser.isMutable()) {
@@ -381,7 +378,6 @@ public class AccessManager {
      * syncronize multiple users from LDAP
      */
     private void syncUsersFromLdap() {
-        Set<String> groupDNs = new HashSet<> (); // should remain empty; content will be ignored
         Set<String> userDNs = new HashSet<> ();
 
         Map<String, Object> cmap = new HashMap<> ();
@@ -389,7 +385,7 @@ public class AccessManager {
         cmap.put(User.USER_ENABLED, Boolean.TRUE);
         Map<String, User> ldapUsersById = userDbService.loadMappedById(cmap);
 
-        ldapClient.getMembers(userDNs, groupDNs, config.getLdapManagedUsers(), false);
+        ldapClient.getMembers(userDNs, new HashSet<> (), config.getLdapManagedUsers(), false);
         for (String dn : userDNs) {
             User dbUser = syncUserFromLdap(dn);
             ldapUsersById.remove(dbUser.getId());

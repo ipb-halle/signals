@@ -17,8 +17,10 @@
  */
 package de.ipb_halle.signals.users;
 
-/** 
- * SNB role reference 
+import java.util.Objects;
+
+/**
+ * SNB role reference
  */
 
 public class RoleReference implements IRole {
@@ -45,10 +47,7 @@ public class RoleReference implements IRole {
         }
         if (obj instanceof IRole) {
             IRole other = (IRole) obj;
-            if (((id == null) && (other.getId() == null)) ||
-                id.equals(other.getId())) {
-                return true;
-            }
+            return Objects.equals(id, other.getId());
         }
         return false;
     }

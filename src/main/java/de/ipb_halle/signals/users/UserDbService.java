@@ -115,7 +115,7 @@ public class UserDbService {
             predicates.add(builder.equal(root.get(User.USER_MUTABLE), cmap.get(User.USER_MUTABLE)));
         }
         if (cmap.get(User.USER_ENABLED) != null) {
-            predicates.add(builder.equal(root.get(User.USER_MUTABLE), cmap.get(User.USER_ENABLED)));
+            predicates.add(builder.equal(root.get(User.USER_ENABLED), cmap.get(User.USER_ENABLED)));
         }
 
         criteriaQuery.where(builder.and(predicates.toArray(new Predicate[0])));

@@ -247,11 +247,11 @@ public class User implements IUser {
     public boolean isModified(CompareType context, User user) {
         return !( alias.equals(user.getAlias())
             && country.equals(user.getCountry())
-            && ((context == CompareType.SNB) ? createdAt.equals(user.getCreatedAt()) : true)
+            && ((context == CompareType.SNB) ? (createdAt.compareTo(user.getCreatedAt()) == 0) : true)
             && email.equals(user.getEmail())
             && (enabled == user.isEnabled())
             && firstName.equals(user.getFirstName())
-            && ((context == CompareType.SNB) ? lastLoginAt.equals(user.getLastLoginAt()) : true)
+            && ((context == CompareType.SNB) ? (lastLoginAt.compareTo(user.getLastLoginAt()) == 0) : true)
             && lastName.equals(user.getLastName())
             && organization.equals(user.getOrganization())
             && userName.equals(user.getUserName())

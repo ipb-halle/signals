@@ -191,7 +191,7 @@ public class LdapClientImpl implements LdapClient {
                 Attributes attrs = ctx.getAttributes(groupDN);
 
                 Group group = new Group();
-                group.setCreatedAt(getCreatedAt(attrs));
+
                 group.setName(attrs.get(signalsConfig.getLdapAttrGroupName()).get().toString());
 
                 group.setDescription(signalsConfig.getGroupAttrDescription());

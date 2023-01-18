@@ -17,8 +17,10 @@
  */
 package de.ipb_halle.signals.users;
 
+import java.util.Objects;
 
-/** 
+
+/**
  * SNB group reference
  */
 public class GroupReference implements IGroup {
@@ -46,9 +48,7 @@ public class GroupReference implements IGroup {
 
         if (obj instanceof IGroup) {
             IGroup igroup = (IGroup) obj;
-            if (id == igroup.getId()) {
-                return true;
-            }
+            return Objects.equals(id, igroup.getId());
         }
         return false;
     }

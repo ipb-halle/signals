@@ -18,18 +18,15 @@
 package de.ipb_halle.signals.users;
 
 import java.util.Date;
+import java.util.Objects;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-/** 
- * SNB group 
+/**
+ * SNB group
  */
 
 @Entity
@@ -120,9 +117,7 @@ public class Group implements IGroup {
 
         if (obj instanceof IGroup) {
             IGroup igroup = (IGroup) obj;
-            if (id == igroup.getId()) {
-                return true;
-            }
+            return Objects.equals(id,igroup.getId());
         }
         return false;
     }
@@ -195,7 +190,7 @@ public class Group implements IGroup {
         deleted = b;
     }
 
-    public void setDescription(String d) { 
+    public void setDescription(String d) {
         description = d;
     }
 

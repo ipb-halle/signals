@@ -17,14 +17,9 @@
  */
 package de.ipb_halle.signals.users;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-
-import java.util.Date;
 import java.util.Iterator;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -36,8 +31,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-/** 
- * SNB role 
+/**
+ * SNB role
  */
 
 @Entity
@@ -119,10 +114,7 @@ public class Role implements IRole {
         }
         if (obj instanceof IRole) {
             IRole other = (IRole) obj;
-            if (((id == null) && (other.getId() == null)) ||
-                id.equals(other.getId())) {
-                return true;
-            }
+            return Objects.equals(id,other.getId());
         }
         return false;
     }
@@ -186,7 +178,7 @@ public class Role implements IRole {
         deleted = b;
     }
 
-    public void setDescription(String d) { 
+    public void setDescription(String d) {
         description = d;
     }
 
