@@ -43,14 +43,9 @@ public class SignalsConfig {
     private String ldapAttrObjectClassGroup;            // group
     private String ldapAttrObjectClassUser;             // person
     private String ldapAttrUserName;                    // mail
-    private String ldapBaseDNs;                         // dc=<domain>,dc=<country>;...
     private String ldapContextProviderURL;              // ldap://<server>:<port>
     private String ldapContextReferral;                 // follow
     private String ldapDateFormatString;                // yyyy...  -> 20040119134348.0Z
-    private String ldapFilterGroupDN;                   // ou=<SNB group OU>,...,dc=<domain>,dc=<country>
-    private String ldapFilterRoleDN;                    // ou=<SNB role OU>,...,dc=<domain>,dc=<country>
-    private String ldapFilterUser;                      // (&(objectClass=person)(mail=@))
-    private String ldapFilterUsers;                     // (objectClass=person)
     private String ldapManagedGroups;                   // group dn
     private String ldapManagedRoles;                    // group dn
     private String ldapManagedUsers;                    // group dn
@@ -79,14 +74,9 @@ public class SignalsConfig {
     public String getLdapAttrObjectClassGroup() { return ldapAttrObjectClassGroup; }
     public String getLdapAttrObjectClassUser() { return ldapAttrObjectClassUser; }
     public String getLdapAttrUserName() { return ldapAttrUserName; }
-    public String getLdapBaseDNs() { return ldapBaseDNs; }
     public String getLdapContextProviderURL() { return ldapContextProviderURL; }
     public String getLdapContextReferral() { return ldapContextReferral; }
     public String getLdapDateFormatString() { return ldapDateFormatString; }
-    public String getLdapFilterGroupDN() { return ldapFilterGroupDN; }
-    public String getLdapFilterRoleDN() { return ldapFilterRoleDN; }
-    public String getLdapFilterUser() { return ldapFilterUser; }
-    public String getLdapFilterUsers() { return ldapFilterUsers; }
     public String getLdapManagedGroups() { return ldapManagedGroups; }
     public String getLdapManagedRoles() { return ldapManagedRoles; }
     public String getLdapManagedUsers() { return ldapManagedUsers; }

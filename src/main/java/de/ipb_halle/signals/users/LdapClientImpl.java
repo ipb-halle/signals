@@ -91,43 +91,6 @@ public class LdapClientImpl implements LdapClient {
         ctx.close();
     }
 
-
-    /**
-     * Filter a set of distinguished names. Only DNs matching the filter pattern
-     * will be kept. This prevents inflation of groups in the dependend system 
-     * (SNB) and to leaking of internal information.
-     *
-     * @param distinguishedNames a set of distinguished names
-     * @param filterType 
-     * @return a filtered set of distinguished names according to the ldapFilterGroupDN setting
-     */
-    public Set<String> filterDNs(Set<String> distinguishedNames, FilterType type) {
-        Set<String> results = new HashSet<> ();
-        String[] filters = getDnFilters(type);
-
-        for (String filter : filters) {
-            try {
-                LdapName filterName = new LdapName(filter);
-                Iterator<String> dnIter = distinguishedNames.iterator();
-                while(dnIter.hasNext()) {
-                    String dn = dnIter.next();
-                    try {
-                        LdapName name = new LdapName(dn);
-
-                        if (name.startsWith(filterName)) {
-                            results.add(dn);
-                        }
-                     } catch (InvalidNameException f) {
-                         logger.warn("filterGroup() invalid name: '{}'", dn);
-                     }
-                }
-            } catch (InvalidNameException e) {
-                logger.warn("filterGroup() invalid filter expression '{}'", filter);
-            }
-        }
-        return results;
-    }
-
     private LdapContext getContext() throws Exception {
         LdapContext ctx = new InitialLdapContext(ldapEnv, null);
 
@@ -166,18 +129,6 @@ public class LdapClientImpl implements LdapClient {
             // silently ignore date
         }
         return new Date();
-    }
-
-    private String[] getDnFilters(FilterType type) {
-        switch(type) {
-            case GROUP:
-                return new String[] { signalsConfig.getLdapFilterGroupDN() };
-            case ROLE:
-                return new String[] { signalsConfig.getLdapFilterRoleDN() };
-            case USER:
-                return signalsConfig.getLdapBaseDNs().split(";");
-        }
-        throw new IllegalArgumentException("unrecognized type");
     }
 
     /**
@@ -380,49 +331,6 @@ public class LdapClientImpl implements LdapClient {
             logger.warn("stack trace:", (Throwable) nfe);
         }
         return true;
-    }
-
-    /**
-     * @param filterValue the value for the filter to search 
-     * for specific users. Usually a email address. Can be null
-     * to search for all users.
-     * @return a set of distinguished user names.
-     */
-    public Set<String> getUsers(String filterValue) {
-        Set<String> users = new HashSet<> ();
-        String[] baseDNs = signalsConfig.getLdapBaseDNs().split(";");
-        for(String baseDN : baseDNs) {
-            getUsers(users, baseDN, filterValue);
-        }
-        return users;
-    }
-
-    private void getUsers(Set<String> users, String baseDN, String filterValue) {
-        String filter = signalsConfig.getLdapFilterUsers();
-        if (filterValue != null) {
-            // select a specific user
-            filter = signalsConfig.getLdapFilterUser().replaceAll("@", filterValue);
-        }
-        try {
-            LdapContext ctx = getContext();
-            try {
-                SearchControls searchControls = new SearchControls();
-                searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-                NamingEnumeration<SearchResult> search = ctx.search(baseDN, 
-                        filter,
-                        searchControls);
-
-                while (search.hasMore()) {
-                    String dn = search.next().getNameInNamespace();
-                    users.add(dn);
-                }
-                search.close();
-            } finally {
-                closeContext(ctx);
-            }
-        } catch(Exception e) {
-            logger.warn("getUsers() caught an Exception: ", (Throwable) e);
-        }
     }
 
     private boolean isGroup(LdapContext ctx, String dn) {

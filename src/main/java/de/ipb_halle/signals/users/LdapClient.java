@@ -26,23 +26,6 @@ import javax.ejb.Local;
 @Local
 public interface LdapClient {
 
-    public enum FilterType {
-        GROUP,
-        ROLE,
-        USER
-    };
-
-    /*
-     * Filter a set of distinguished names. Only DNs matching the filter pattern
-     * will be kept. This prevents inflation of groups in the dependend system 
-     * (SNB) and to leaking of internal information.
-     *
-     * @param distinguishedNames a set of distinguished names
-     * @param filterType 
-     * @return a filtered set of distinguished names according to the ldapFilterGroupDN setting
-     */
-    public Set<String> filterDNs(Set<String> distinguishedNames, FilterType type);
-
     /**
      * @param groupDN a distinguished group name
      * @return a corresponding Group object
@@ -84,12 +67,4 @@ public interface LdapClient {
      * @return a corresponding User object
      */
     public User getUser(String userDN);
-
-    /**
-     * @param filter the filter for searching users or null to 
-     * obtain all users. The value is usually an email address.
-     * @return a set of (matching) distinguished user names
-     */
-    public Set<String> getUsers(String filter);
-
 }

@@ -126,35 +126,6 @@ public class Signals {
         logger = LoggerFactory.getLogger(Signals.class);
     }
 
-    public void doIt() {
-
-//          signalsMgr.doGet("location");
-
-/*
-            System.out.println("Users\n=====");
-            Set<String> users = ldapClient.getUsers(null);
-            dumpSet(users);
-
-            Set<String> groups = ldapClient.getMemberships("SOME USER DN");
-            System.out.println("Group memberships\n=================");
-            dumpSet(ldapClient.filterDNs(groups, LdapClient.FilterType.GROUP));
-            System.out.println("Role memberships\n================");
-            dumpSet(ldapClient.filterDNs(groups, LdapClient.FilterType.ROLE));
-
-            User u = ldapClient.getUser("SOME USER DN");
-            System.out.println(u.dump());
-
-            System.out.println("User by name\n============");
-            users = ldapClient.getUsers("SOME EMAIL ADDRESS");
-            dumpSet(users);
-
-            System.out.println("Members of Group\n================");
-            groups = ldapClient.getMembers("SOME GROUP DN");
-            System.out.println("Members");
-            dumpSet(groups);
-*/
-    }
-
     private void dumpSet(Set<String> set) {
         Iterator<String> iter = set.iterator();
         while(iter.hasNext()) {

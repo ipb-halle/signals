@@ -37,6 +37,31 @@ This project bundles code for migration of IPB data sources, for backup, mainten
         <Resource id="signalsConfig" class-name="de.ipb_halle.signals.SignalsConfig">
           apiKey = THIS+IS+THE+SUPER+SECRET+API+TOKEN+WHICH+NEVER+SHOULD+APPEAR+ON+GITHUB==
           baseUrl = https://YOUR-ORG-TRIAL-INSTANCE.signalsnotebook.SOMECLOUD.INVALID/api/rest/v1.0
+          groupAttrDescription = LDAP managed group
+          ldapAttrAccountExpirationDate = accountExpires
+          ldapAttrAlias = initials
+          ldapAttrCreatedAt = whenCreated
+          ldapAttrGroupName = cn
+          ldapAttrEmail = mail
+          ldapAttrFirstName = givenName
+          ldapAttrLastName = sn
+          ldapAttrMemberOf = memberOf
+          ldapAttrMembers = member
+          ldapAttrObjectClass = objectClass
+          ldapAttrObjectClassGroup = group
+          ldapAttrObjectClassUser = person
+          ldapAttrUserName = mail
+          ldapContextProviderURL = ldap://ldap.somewhere.invalid:PORT
+          ldapContextReferral = follow
+          ldapDateFormatString = yyyyMMddHHmmss.S'Z'
+          ldapManagedGroups = cn=SnbManagedGroups,ou=...,dc=DOMAIN,dc=COUNTRY
+          ldapManagedRoles = cn=SnbManagedRoles,ou=...,dc=DOMAIN,dc=COUNTRY
+          ldapManagedUsers = cn=SnbManagedUsers,ou=...,dc=DOMAIN,dc=COUNTRY
+          ldapSecurityPrincipal = test
+          ldapSecurityCredentials = 0000
+          ldapSecurityAuthentication = simple
+          userAttrCountry = Germany
+          userAttrOrganization = testOrg
         </Resource>
     </openejb>
 
