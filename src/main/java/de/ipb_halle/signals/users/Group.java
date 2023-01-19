@@ -33,8 +33,10 @@ import javax.persistence.Table;
 @Table(name="groups")
 public class Group implements IGroup {
 
+    // entity field names (NOT column names from SQL table)
     public final static String GROUP_NAME = "name";
 
+    // JSON attributes
     public final static String ATTR_ASSOCIATE_TYPE = "associateType";
     public final static String ATTR_ASSOCIATE_TYPE_ADD = "ADD";
     public final static String ATTR_CREATED_AT= "createdAt";

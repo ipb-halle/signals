@@ -172,7 +172,7 @@ CREATE TABLE libraries (
     json_string VARCHAR,
     materials_sample_mapping VARCHAR,
     name VARCHAR,
-    uniqueness VARCHAR,
+    uniqueness VARCHAR
 );
 
 CREATE TABLE library_fields (
@@ -188,7 +188,7 @@ CREATE TABLE materials (
 
 CREATE TABLE containers (
     id VARCHAR NOT NULL PRIMARY KEY,
-    amount DOUBLE,
+    amount FLOAT,
     barcode VARCHAR,
     container_type_id VARCHAR /* REFERENCES container_types(id) */,
     coordinate_x INTEGER,

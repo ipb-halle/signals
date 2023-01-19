@@ -65,5 +65,7 @@ public enum RolePrivilege {
     canExportNotebooks,
     canEditMaterials,
     canExportMaterials,
-    canTrashParaExp
+    canTrashParaExp,
+    manageVitroVivo,
+    manageInventa
 }

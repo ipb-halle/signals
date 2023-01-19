@@ -22,7 +22,7 @@
       ldapAttrObjectClass = objectClass
       ldapAttrObjectClassGroup = group 
       ldapAttrObjectClassUser = person
-      ldapAttrUserName = mail
+      ldapAttrUserName = userPrincipalName
       ldapContextProviderURL = ldap://ldap.somewhere.invalid:PORT
       ldapContextReferral = follow
       ldapDateFormatString = yyyyMMddHHmmss.S'Z'

@@ -24,6 +24,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
 
 /** 
  * SNB user entity
@@ -48,6 +50,7 @@ public class UserEntity {
     private String email;
 
     @Column(name="is_enabled")
+    @NotNull
     private Boolean enabled;
 
     @Column(name="first_name")

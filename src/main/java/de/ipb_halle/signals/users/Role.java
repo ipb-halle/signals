@@ -39,8 +39,10 @@ import javax.persistence.Table;
 @Table(name="roles")
 public class Role implements IRole {
 
+    // entity field names (NOT column names from SQL table)
     public final static String ROLE_NAME = "name";
 
+    // JSON attributes
     public final static String ATTR_COUNTS = "counts";
     public final static String ATTR_DESCRIPTION = "description";
     public final static String ATTR_FLAGS = "flags";

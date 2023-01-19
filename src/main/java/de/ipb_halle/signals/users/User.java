@@ -28,10 +28,12 @@ import java.util.Set;
  */
 public class User implements IUser {
 
-    public final static String USER_USERNAME = "user_name";
+    // UserEntity field names (NOT column names from SQL table)
+    public final static String USER_USERNAME = "userName";
     public final static String USER_MUTABLE = "mutable";
-    public final static String USER_ENABLED = "is_enabled";
+    public final static String USER_ENABLED = "enabled";
 
+    // JSON attributes
     public final static String ATTR_ALIAS = "alias";
     public final static String ATTR_COUNTRY = "country";
     public final static String ATTR_CREATED_AT = "createdAt";

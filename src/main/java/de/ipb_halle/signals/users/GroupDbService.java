@@ -28,6 +28,9 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /** 
  * DB service for groups
@@ -39,6 +42,8 @@ public class GroupDbService {
 
     @PersistenceContext(unitName="signalsDB")
     private EntityManager em;
+
+    private Logger logger = LoggerFactory.getLogger(GroupDbService.class);
 
     /**
      * @return a list of Groups 
@@ -54,6 +59,7 @@ public class GroupDbService {
         if (result.size() == 1) {
             return result.get(0);
         }
+        logger.debug("Result list for name '{}' contains {} Group records", name, result.size());
         return null;
     }
 
