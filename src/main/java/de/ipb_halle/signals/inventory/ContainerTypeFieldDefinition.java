@@ -18,6 +18,7 @@
 package de.ipb_halle.signals.inventory;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
@@ -54,8 +55,8 @@ public class ContainerTypeFieldDefinition {
             return false;
         } 
         ContainerTypeFieldDefinition other = (ContainerTypeFieldDefinition) o;
-        return (getContainerTypeId() == other.getContainerTypeId())
-            && (getFieldDefinitionId() == other.getFieldDefinitionId());
+        return Objects.equals(container_type_id, other.getContainerTypeId())
+            && Objects.equals(field_definition_id, other.getFieldDefinitionId());
     }
 
     public String getContainerTypeId() {

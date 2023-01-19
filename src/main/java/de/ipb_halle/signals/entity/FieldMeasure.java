@@ -18,6 +18,7 @@
 package de.ipb_halle.signals.entity;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -59,8 +60,8 @@ public class FieldMeasure {
             return false;
         } 
         FieldMeasure other = (FieldMeasure) o;
-        return (getFieldId() == other.getFieldId())
-            && (getMeasure() == other.getMeasure());
+        return Objects.equals(field_id, other.field_id)
+            && Objects.equals(measure, other.measure);
     }
 
     public String getFieldId() {

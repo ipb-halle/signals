@@ -28,6 +28,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -156,12 +157,32 @@ public class UserDbService {
     }
 
     private void saveRoles(User u) {
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaDelete<UserRole> criteriaDelete = builder.createCriteriaDelete(UserRole.class);
+        Root<UserRole> root = criteriaDelete.from(UserRole.class);
+
+        criteriaDelete.where(builder.equal(root
+                .get(UserRole.USER_ROLE_ID)
+                .get(UserRoleId.USER_ID),
+                u.getId()));
+        this.em.createQuery(criteriaDelete).executeUpdate();
+
         for(IRole r: u.getRoles()) {
             this.em.merge(new UserRole(r, u));
         }
     }
 
     private void saveSystemGroups(User u)  {
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaDelete<GroupMembership> criteriaDelete = builder.createCriteriaDelete(GroupMembership.class);
+        Root<GroupMembership> root = criteriaDelete.from(GroupMembership.class);
+
+        criteriaDelete.where(builder.equal(root
+                .get(GroupMembership.GROUP_MEMBERSHIP_ID)
+                .get(GroupMembershipId.USER_ID),
+                u.getId()));
+        this.em.createQuery(criteriaDelete).executeUpdate();
+
         for(IGroup g: u.getSystemGroups()) {
             this.em.merge(new GroupMembership(g, u));
         }

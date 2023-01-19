@@ -158,6 +158,7 @@ public class Role implements IRole {
     public boolean isModified(Role role) {
         return ! (name.equals(role.getName())
             && description.equals(role.getDescription())
+            && (deleted == role.isDeleted())
             && privileges.equals(role.getPrivileges()));
     }
 

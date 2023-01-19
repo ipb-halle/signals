@@ -18,6 +18,7 @@
 package de.ipb_halle.signals.users;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Embeddable;
 
 /**
@@ -40,8 +41,8 @@ public class UserRoleId implements Serializable {
             return false;
         }
         UserRoleId other = (UserRoleId) o;
-        return (getRoleId().equals(other.getRoleId()))
-            && (getUserId().equals(other.getUserId()));
+        return Objects.equals(getRoleId(), other.getRoleId())
+            && Objects.equals(getUserId(), other.getUserId());
     }
 
     public String getRoleId() {

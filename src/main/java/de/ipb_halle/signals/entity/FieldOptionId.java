@@ -18,6 +18,7 @@
 package de.ipb_halle.signals.entity;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 
 /** 
@@ -36,8 +37,8 @@ public class FieldOptionId implements Serializable {
             return false;
         } 
         FieldOptionId other = (FieldOptionId) o;
-        return (field_id == other.field_id)
-            && (option == other.option);
+        return Objects.equals(field_id, other.field_id)
+            && Objects.equals(option, other.option);
     }
 
     @Override

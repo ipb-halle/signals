@@ -18,6 +18,7 @@
 package de.ipb_halle.signals.materials;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
@@ -57,9 +58,9 @@ public class LibraryFieldDefinition {
             return false;
         } 
         LibraryFieldDefinition other = (LibraryFieldDefinition) o;
-        return (getLibraryId() == other.getLibraryId())
-            && (getFieldDefinitionId() == other.getFieldDefinitionId())
-            && (getType() == other.getType());
+        return Objects.equals(library_id, other.library_id)
+            && Objects.equals(field_definition_id, other.field_definition_id)
+            && Objects.equals(type, other.type);
     }
 
     public String getLibraryId() {

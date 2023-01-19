@@ -18,6 +18,7 @@
 package de.ipb_halle.signals.inventory;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -57,8 +58,8 @@ public class ContainerTypeAttachment {
             return false;
         } 
         ContainerTypeAttachment other = (ContainerTypeAttachment) o;
-        return (getContainerTypeId() == other.getContainerTypeId())
-            && (getAttachmentId() == other.getAttachmentId());
+        return Objects.equals(container_type_id, other.container_type_id)
+            && Objects.equals(attachment_id, other.attachment_id);
     }
 
     public String getContainerTypeId() {

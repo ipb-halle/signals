@@ -18,6 +18,7 @@
 package de.ipb_halle.signals.entity;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -61,8 +62,8 @@ public class FieldOption implements Serializable {
             return false;
         } 
         FieldOption other = (FieldOption) o;
-        return (getFieldId() == other.getFieldId())
-            && (getOption() == other.getOption());
+        return Objects.equals(field_id, other.field_id)
+            && Objects.equals(option, other.option);
     }
 
     public String getFieldId() {

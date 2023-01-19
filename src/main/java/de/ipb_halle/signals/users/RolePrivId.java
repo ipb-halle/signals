@@ -18,6 +18,7 @@
 package de.ipb_halle.signals.users;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Embeddable;
 
 /** 
@@ -38,8 +39,8 @@ public class RolePrivId implements Serializable {
             return false;
         }
         RolePrivId other = (RolePrivId) o;
-        return (getRoleId() == other.getRoleId())
-            && (getRolePrivilege() == other.getRolePrivilege());
+        return Objects.equals(getRoleId(), other.getRoleId())
+            && Objects.equals(getRolePrivilege(), other.getRolePrivilege());
     }
 
     public String getRoleId() { 

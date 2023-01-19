@@ -170,7 +170,8 @@ public class Group implements IGroup {
         return !(name.equals(group.getName())
             && description.equals(group.getDescription())
             && type.equals(group.getType())
-            && ((context == CompareType.SNB) ? editedAt.equals(group.getEditedAt()) : true));
+            && (deleted == group.isDeleted())
+            && ((context == CompareType.SNB) ? (editedAt.compareTo(group.getEditedAt()) == 0) : true));
     }
 
     public boolean isSystem() {

@@ -18,7 +18,7 @@
 package de.ipb_halle.signals.users;
 
 import java.io.Serializable;
-
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
@@ -54,8 +54,8 @@ public class RolePriv {
             return false;
         } 
         RolePriv other = (RolePriv) o;
-        return (id.getRoleId().equals(other.getRoleId()))
-            && (id.getRolePrivilege().equals(other.getRolePrivilege()));
+        return Objects.equals(getRoleId(), other.getRoleId())
+            && Objects.equals(getRolePrivilege(), other.getRolePrivilege());
     }
 
     public String getRoleId() {

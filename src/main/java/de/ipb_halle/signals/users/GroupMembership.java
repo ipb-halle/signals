@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals.users;
 
+import java.util.Objects;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -50,8 +51,8 @@ public class GroupMembership {
             return false;
         } 
         GroupMembership other = (GroupMembership) o;
-        return (id.getGroupId().equals(other.getGroupId()))
-            && (id.getUserId().equals(other.getUserId()));
+        return Objects.equals(getGroupId(), other.getGroupId())
+            && Objects.equals(getUserId(), other.getUserId());
     }
 
     public String getGroupId() {

@@ -18,6 +18,7 @@
 package de.ipb_halle.signals.entity;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /** 
  * JPA compound Id class for field definition measures
@@ -35,8 +36,8 @@ public class FieldMeasureId implements Serializable {
             return false;
         } 
         FieldMeasureId other = (FieldMeasureId) o;
-        return (field_id == other.field_id)
-            && (measure == other.measure);
+        return Objects.equals(field_id, other.field_id)
+            && Objects.equals(measure, other.measure);
     }
 
     @Override

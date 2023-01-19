@@ -21,7 +21,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
 import de.ipb_halle.signals.TestBase;
-import java.text.DateFormat;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

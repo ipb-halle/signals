@@ -18,6 +18,7 @@
 package de.ipb_halle.signals.users;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Embeddable;
 
 /**
@@ -39,8 +40,8 @@ public class GroupMembershipId implements Serializable {
             return false;
         }
         GroupMembershipId other = (GroupMembershipId) o;
-        return (getGroupId().equals(other.getGroupId()))
-            && (getUserId().equals(other.getUserId()));
+        return Objects.equals(getGroupId(), other.getGroupId())
+            && Objects.equals(getUserId(), other.getUserId());
     }
 
     public String getGroupId() {

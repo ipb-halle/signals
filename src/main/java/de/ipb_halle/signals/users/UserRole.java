@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals.users;
 
+import java.util.Objects;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -50,8 +51,8 @@ public class UserRole {
             return false;
         } 
         UserRole other = (UserRole) o;
-        return (id.getRoleId().equals(other.getRoleId()))
-            && (id.getUserId().equals(other.getUserId()));
+        return Objects.equals(getRoleId(), other.getRoleId())
+            && Objects.equals(getUserId(), other.getUserId());
     }
 
     public String getRoleId() {

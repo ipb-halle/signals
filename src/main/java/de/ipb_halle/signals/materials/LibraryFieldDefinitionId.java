@@ -18,6 +18,7 @@
 package de.ipb_halle.signals.materials;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /** 
  * Field definitions for libraries. This class solely exists 
@@ -38,9 +39,9 @@ public class LibraryFieldDefinitionId implements Serializable {
             return false;
         } 
         LibraryFieldDefinitionId other = (LibraryFieldDefinitionId) o;
-        return (library_id == other.library_id)
-            && (field_definition_id == other.field_definition_id)
-            && (type == other.type);
+        return Objects.equals(library_id, other.library_id)
+            && Objects.equals(field_definition_id, other.field_definition_id)
+            && Objects.equals(type, other.type);
     }
 
     @Override

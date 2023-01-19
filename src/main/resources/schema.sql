@@ -37,7 +37,8 @@ CREATE TABLE roles (
     deleted BOOLEAN NOT NULL DEFAULT FALSE,
     description VARCHAR,
     ldap_role BOOLEAN NOT NULL DEFAULT FALSE,
-    json_string VARCHAR
+    json_string VARCHAR,
+    UNIQUE (name)
 );
 
 CREATE TABLE role_privileges (
@@ -58,7 +59,8 @@ CREATE TABLE users (
     last_name VARCHAR,
     organization VARCHAR,
     user_name VARCHAR,
-    json_string VARCHAR
+    json_string VARCHAR,
+    UNIQUE (user_name)
 );
 
 CREATE TABLE groups (
@@ -72,7 +74,8 @@ CREATE TABLE groups (
     name VARCHAR,
     is_system BOOLEAN,
     snb_type VARCHAR,
-    json_string VARCHAR
+    json_string VARCHAR,
+    UNIQUE (name)
 );
 
 CREATE TABLE user_roles (

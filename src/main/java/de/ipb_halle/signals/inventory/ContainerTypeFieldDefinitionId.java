@@ -18,6 +18,7 @@
 package de.ipb_halle.signals.inventory;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /** 
  * Field definitions for container types. This class solely exists 
@@ -36,8 +37,8 @@ public class ContainerTypeFieldDefinitionId implements Serializable {
             return false;
         } 
         ContainerTypeFieldDefinitionId other = (ContainerTypeFieldDefinitionId) o;
-        return (container_type_id == other.container_type_id)
-            && (field_definition_id == other.field_definition_id);
+        return Objects.equals(container_type_id, other.container_type_id)
+            && Objects.equals(field_definition_id, other.field_definition_id);
     }
 
     @Override
