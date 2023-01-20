@@ -39,6 +39,7 @@ public class Group implements IGroup {
     // JSON attributes
     public final static String ATTR_ASSOCIATE_TYPE = "associateType";
     public final static String ATTR_ASSOCIATE_TYPE_ADD = "ADD";
+    public final static String ATTR_ASSOCIATE_TYPE_REMOVE = "REMOVE";
     public final static String ATTR_CREATED_AT= "createdAt";
     public final static String ATTR_DESCRIPTION = "description";
     public final static String ATTR_DIGEST = "digest";
@@ -88,6 +89,8 @@ public class Group implements IGroup {
      * default constructor
      */
     public Group() {
+        createdAt = new Date(0);
+        editedAt = new Date(0);
         deleted = false;
         type = SNB_GROUP_TYPE;
     }
@@ -96,6 +99,7 @@ public class Group implements IGroup {
         id = snb.getId();
         description = snb.getDescription();
         name = snb.getName();
+        system = snb.isSystem();
         type = snb.getType();
         editedAt = snb.getEditedAt();
     }
@@ -169,11 +173,11 @@ public class Group implements IGroup {
     }
 
     public boolean isModified(CompareType context, Group group) {
-        return !(name.equals(group.getName())
-            && description.equals(group.getDescription())
-            && type.equals(group.getType())
+        return !(Objects.equals(name, group.getName())
+            && Objects.equals(description, group.getDescription())
+            && Objects.equals(type, group.getType())
             && (deleted == group.isDeleted())
-            && ((context == CompareType.SNB) ? (editedAt.compareTo(group.getEditedAt()) == 0) : true));
+            && ((context == CompareType.SNB) ? Objects.equals(editedAt.getTime() / 1000L, group.getEditedAt().getTime() / 1000L)  : true));
     }
 
     public boolean isSystem() {

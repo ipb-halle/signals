@@ -33,6 +33,10 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 
 /**
  * Database Service for users
@@ -43,6 +47,8 @@ public class UserDbService {
 
     @PersistenceContext(unitName="signalsDB")
     private EntityManager em;
+
+    private Logger logger = LoggerFactory.getLogger(UserDbService.class);
 
     private Set<IRole> loadRoles(IUser user) {
         CriteriaBuilder builder = em.getCriteriaBuilder();
@@ -151,11 +157,17 @@ public class UserDbService {
     }
 
     public void save(User u) {
+        logger.trace("UserDbService.save() {}", u.dump());
         this.em.merge(u.createEntity());
+        this.em.flush();        // flush() & clear are necessary
+        this.em.clear();        // for the following steps
         saveRoles(u);
         saveSystemGroups(u);
     }
 
+    /**
+     * bulk update the user roles (using criteriaDelete and persist)
+     */
     private void saveRoles(User u) {
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaDelete<UserRole> criteriaDelete = builder.createCriteriaDelete(UserRole.class);
@@ -168,10 +180,13 @@ public class UserDbService {
         this.em.createQuery(criteriaDelete).executeUpdate();
 
         for(IRole r: u.getRoles()) {
-            this.em.merge(new UserRole(r, u));
+            this.em.persist(new UserRole(r, u));
         }
     }
 
+    /**
+     * bulk update the group memberships (using criteriaDelete and persist)
+     */
     private void saveSystemGroups(User u)  {
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaDelete<GroupMembership> criteriaDelete = builder.createCriteriaDelete(GroupMembership.class);
@@ -184,7 +199,7 @@ public class UserDbService {
         this.em.createQuery(criteriaDelete).executeUpdate();
 
         for(IGroup g: u.getSystemGroups()) {
-            this.em.merge(new GroupMembership(g, u));
+            this.em.persist(new GroupMembership(g, u));
         }
     }
 }

@@ -53,6 +53,7 @@ public class SignalsConfig {
     private String ldapSecurityCredentials;             //
     private String ldapSecurityAuthentication;          // simple
 
+    private String standardUserRoleName;                // Standard User
     private String userAttrCountry;                     // default country
     private String userAttrOrganization;                // default organization
 
@@ -84,6 +85,7 @@ public class SignalsConfig {
     public String getLdapSecurityCredentials() { return ldapSecurityCredentials; }
     public String getLdapSecurityAuthentication() { return ldapSecurityAuthentication; }
 
+    public String getStandardUserRoleName() { return standardUserRoleName; }
     public String getUserAttrCountry() { return userAttrCountry; }
     public String getUserAttrOrganization() { return userAttrOrganization; }
 }

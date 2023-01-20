@@ -128,7 +128,7 @@ public class LdapClientImpl implements LdapClient {
         } catch(ParseException pe) {
             // silently ignore date
         }
-        return new Date();
+        return new Date(0);
     }
 
     /**
@@ -144,7 +144,6 @@ public class LdapClientImpl implements LdapClient {
                 Group group = new Group();
 
                 group.setName(attrs.get(signalsConfig.getLdapAttrGroupName()).get().toString());
-
                 group.setDescription(signalsConfig.getGroupAttrDescription());
                 group.setSystem(true);
 

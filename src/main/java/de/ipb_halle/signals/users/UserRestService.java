@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.NoSuchElementException;
 
 import javax.ejb.Local;
@@ -51,6 +52,11 @@ import org.slf4j.LoggerFactory;
 
 @Local
 public class UserRestService implements RestService<User> {
+
+    private enum EndPoint {
+        CREATE,
+        UPDATE
+    }
 
     /*
      * Parameter 'q' is a String and it is used to 
@@ -101,7 +107,7 @@ public class UserRestService implements RestService<User> {
             restClient.reset()
                 .setMethod(Method.POST)
                 .setEndpoint(USERS_ENDPOINT)
-                .setRequestData(prepareJsonString(user))
+                .setRequestData(prepareJsonString(EndPoint.CREATE, user, null, null))
                 .execute(RestClient.HTTP_CREATED);
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
@@ -204,12 +210,12 @@ public class UserRestService implements RestService<User> {
     /**
      * ... update user
      */
-    public User doUpdateUser(User user) {
+    public User doUpdateUser(User user, Set<Group> groupsToAdd, Set<Group> groupsToRemove) {
         try {
             restClient.reset()
                 .setMethod(Method.PATCH)
                 .setEndpoint(String.format(USER_ENDPOINT, user.getId()))
-                .setRequestData(prepareJsonString(user))
+                .setRequestData(prepareJsonString(EndPoint.UPDATE, user, groupsToAdd, groupsToRemove))
                 .execute();
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
@@ -251,32 +257,34 @@ public class UserRestService implements RestService<User> {
         String alias = RestHelper.parseString(attributes, User.ATTR_ALIAS);
         user.setAlias((alias != null) ? alias.toUpperCase() : null); 
         user.setCountry(attributes.getAsJsonPrimitive(User.ATTR_COUNTRY).getAsString());
-        user.setCreatedAt(RestHelper.parseDate(attributes, User.ATTR_CREATED_AT, new Date()));
+        user.setCreatedAt(RestHelper.parseDate(attributes, User.ATTR_CREATED_AT, new Date(0)));
         user.setEmail(attributes.getAsJsonPrimitive(User.ATTR_EMAIL).getAsString().toLowerCase());
         user.setEnabled(attributes.getAsJsonPrimitive(User.ATTR_ENABLED).getAsBoolean());
         user.setFirstName(attributes.getAsJsonPrimitive(User.ATTR_FIRST_NAME).getAsString());
         user.setMutable(false);
         user.setJsonString(j.toString());
-        user.setLastLoginAt(RestHelper.parseDate(attributes, User.ATTR_LAST_LOGIN, new Date()));
+        user.setLastLoginAt(RestHelper.parseDate(attributes, User.ATTR_LAST_LOGIN, new Date(0)));
         user.setLastName(attributes.getAsJsonPrimitive(User.ATTR_LAST_NAME).getAsString());
         user.setOrganization(attributes.getAsJsonPrimitive(User.ATTR_ORGANIZATION).getAsString());
         user.setUserName(attributes.getAsJsonPrimitive(User.ATTR_USER_NAME).getAsString().toLowerCase());
         return user;
     }
 
-    protected String prepareJsonString(User user) {
+    protected String prepareJsonString(EndPoint endpoint, User user, Set<Group> groupsToAdd, Set<Group> groupsToRemove) {
         JsonObject attributes = new JsonObject();
         attributes.addProperty(User.ATTR_ALIAS, user.getAlias());
         attributes.addProperty(User.ATTR_COUNTRY, user.getCountry());
-        attributes.addProperty(User.ATTR_EMAIL, user.getEmail());
+        if (endpoint == EndPoint.CREATE) {
+            attributes.addProperty(User.ATTR_EMAIL_ADDRESS, user.getUserName());
+        }
         attributes.addProperty(User.ATTR_FIRST_NAME, user.getFirstName());
         attributes.addProperty(User.ATTR_LAST_NAME, user.getLastName());
         attributes.addProperty(User.ATTR_ORGANIZATION, user.getOrganization());
         if (user.getRoles() != null) {
             attributes.add(User.ATTR_ROLES, prepareRoles(user));
         }
-        if (user.getSystemGroups() != null) {
-            attributes.add(User.ATTR_SYSTEM_GROUPS, prepareSystemGroups(user));
+        if (endpoint == EndPoint.UPDATE) {
+            attributes.add(User.ATTR_SYSTEM_GROUPS, prepareSystemGroups(user, groupsToAdd, groupsToRemove));
         }
 
         JsonObject data = new JsonObject();
@@ -298,16 +306,21 @@ public class UserRestService implements RestService<User> {
         return roles;
     }
 
-    private JsonArray prepareSystemGroups(User user) {
-        JsonArray systemGroups = new JsonArray();
-        for (IGroup groupObj : user.getSystemGroups()) {
+    private JsonArray prepareSystemGroups(User user, Set<Group> groupsToAdd, Set<Group> groupsToRemove) {
+        JsonArray systemGroupUpdates = new JsonArray();
+        for (IGroup group: groupsToAdd) {
             JsonObject systemGroup = new JsonObject();
-//          systemGroup.addProperty(RestHelper.ATTR_ID, groupObj.getId());
-            systemGroup.addProperty(Group.ATTR_NAME, ((Group) groupObj).getName());
+            systemGroup.addProperty(Group.ATTR_NAME, ((Group) group).getName());
             systemGroup.addProperty(Group.ATTR_ASSOCIATE_TYPE, Group.ATTR_ASSOCIATE_TYPE_ADD);
-            systemGroups.add(systemGroup);
+            systemGroupUpdates.add(systemGroup);
         }
-        return systemGroups;
+        for (Group group : groupsToRemove) {
+            JsonObject systemGroup = new JsonObject();
+            systemGroup.addProperty(Group.ATTR_NAME, ((Group) group).getName());
+            systemGroup.addProperty(Group.ATTR_ASSOCIATE_TYPE, Group.ATTR_ASSOCIATE_TYPE_REMOVE);
+            systemGroupUpdates.add(systemGroup);
+        }
+        return systemGroupUpdates;
     }
 }
 

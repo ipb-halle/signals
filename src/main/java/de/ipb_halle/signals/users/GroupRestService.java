@@ -68,11 +68,11 @@ public class GroupRestService implements RestService<Group> {
 
         Group group = new Group();
         group.setId(attributes.getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
-        group.setCreatedAt(RestHelper.parseDate(attributes, Group.ATTR_CREATED_AT, new Date()));
+        group.setCreatedAt(RestHelper.parseDate(attributes, Group.ATTR_CREATED_AT, new Date(0)));
         group.setDescription(getOptionalStringAttribute(attributes, Group.ATTR_DESCRIPTION));
         // digest
         // eid
-        group.setEditedAt(RestHelper.parseDate(attributes, Group.ATTR_EDITED_AT, new Date()));
+        group.setEditedAt(RestHelper.parseDate(attributes, Group.ATTR_EDITED_AT, new Date(0)));
         //flags
         group.setJsonString(j.toString());
         group.setName(attributes.getAsJsonPrimitive(Group.ATTR_NAME).getAsString());

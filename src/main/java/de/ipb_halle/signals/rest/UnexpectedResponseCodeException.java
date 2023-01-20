@@ -23,5 +23,12 @@ package de.ipb_halle.signals.rest;
 
 public class UnexpectedResponseCodeException extends Exception {
 
+    public UnexpectedResponseCodeException() {
+        super();
+    }
+
+    public UnexpectedResponseCodeException(String message) {
+        super(message);
+    }
 }
 

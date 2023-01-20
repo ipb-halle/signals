@@ -30,18 +30,25 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.Resource;
 import javax.ejb.Local;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** 
  * Http client reader for Signals tool 
@@ -62,11 +69,17 @@ public class RestClientImpl implements RestClient {
     private URL url;
     private Map<String, String> urlParameterMap;
 
+    private Logger logger;
+
+    // see below
+    private static boolean patchAllowed = allowMethods(Method.PATCH.toString());
+
     /**
      * constructor
      */
     public RestClientImpl() {
         urlParameterMap = new HashMap<> ();
+        logger = LoggerFactory.getLogger(RestResultIterator.class);
         method = Method.GET;
     }
 
@@ -76,27 +89,35 @@ public class RestClientImpl implements RestClient {
 
     public RestClient execute(int expectedResponseCode) throws IOException, MalformedURLException, UnexpectedResponseCodeException {
         HttpURLConnection urlConn = (HttpURLConnection) getURL().openConnection();
+        if ((method == Method.PATCH) && (! RestClientImpl.patchAllowed)) {
+                throw new IllegalStateException("fix to HttpURLConnection failed - method PATCH is not allowed");
+        }
         urlConn.setRequestMethod(method.toString());
-        urlConn.setRequestProperty("accept", "application/vnd.api+json");
+        urlConn.setRequestProperty("Accept", "application/vnd.api+json");
         urlConn.setRequestProperty("X-API-KEY", signalsConfig.getApiKey());
 
         if (requestData != null) {
+            if ((method == Method.GET) || (method == Method.DELETE)) {
+                logger.warn("Unexpected write request for UrlConnection in {} request", method.toString());
+            }
+            logger.trace("***** Dump of request *****\n{}\n***** End of request dump  *****", requestData);
+            urlConn.setRequestProperty("Content-Type", "application/vnd.api+json");
+            urlConn.setDoOutput(true);
             urlConn.getOutputStream().write(requestData.getBytes(UTF8));
         }
 
         responseCode = urlConn.getResponseCode();
-
-        try(BufferedReader br = new BufferedReader(new InputStreamReader(urlConn.getInputStream(), UTF8))) {
-            StringBuilder sb = new StringBuilder();
-            String responseLine = null;
-            while ((responseLine = br.readLine()) != null) {
-                sb.append(responseLine.trim());
+        try {
+            obtainResponse(urlConn);
+        } finally {
+            if (responseCode != expectedResponseCode) {
+                this.logger.debug("Obtained unexpected response code ({} vs {})", responseCode, expectedResponseCode);
+                this.logger.debug("Connection {} {}", method.toString(), getURL().toString());
+                if (response != null) {
+                    this.logger.debug("***** Dump of response *****\n{}\n***** End of response dump *****", response);
+                }
+                throw new UnexpectedResponseCodeException(String.format("expected %d, got %d", expectedResponseCode, responseCode));
             }
-            setResponse(sb.toString());
-        } 
-
-        if (responseCode != expectedResponseCode) {
-            throw new UnexpectedResponseCodeException();
         }
 
         return this;
@@ -143,6 +164,17 @@ public class RestClientImpl implements RestClient {
         return url;
     }
 
+    private void obtainResponse(HttpURLConnection urlConn) throws IOException {
+        try(BufferedReader br = new BufferedReader(new InputStreamReader(urlConn.getInputStream(), UTF8))) {
+            StringBuilder sb = new StringBuilder();
+            String responseLine = null;
+            while ((responseLine = br.readLine()) != null) {
+                sb.append(responseLine.trim());
+            }
+            setResponse(sb.toString());
+        }
+    }
+
     public RestClient putUrlParameter(String key, String value) {
         url = null;
         this.urlParameterMap.put(key, value);
@@ -152,6 +184,7 @@ public class RestClientImpl implements RestClient {
     public RestClient reset() {
         method = Method.GET;
         requestData = null;
+        response = null;
         urlParameterMap = new HashMap<> ();
         return this;
     }
@@ -185,5 +218,32 @@ public class RestClientImpl implements RestClient {
         urlParameterMap.clear();
         url = new URL(u);
         return this;
+    }
+
+    /**
+     * Patch HttpURLConnection to recognize 'PATCH' as valid HTTP method.
+     * This will become obsolete in Java11+ when HttpURLConnection is replaced
+     * by java.net.http.HttpRequest
+     */
+    private static boolean allowMethods(String... methods) {
+        try {
+            Field methodsField = HttpURLConnection.class.getDeclaredField("methods");
+
+            Field modifiersField = Field.class.getDeclaredField("modifiers");
+            modifiersField.setAccessible(true);
+            modifiersField.setInt(methodsField, methodsField.getModifiers() & ~Modifier.FINAL);
+
+            methodsField.setAccessible(true);
+
+            String[] oldMethods = (String[]) methodsField.get(null);
+            Set<String> methodsSet = new LinkedHashSet<>(Arrays.asList(oldMethods));
+            methodsSet.addAll(Arrays.asList(methods));
+            String[] newMethods = methodsSet.toArray(new String[0]);
+
+            methodsField.set(null/*static field*/, newMethods);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
+        return true;
     }
 }

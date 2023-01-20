@@ -32,6 +32,7 @@
       ldapSecurityPrincipal = test
       ldapSecurityCredentials = 0000
       ldapSecurityAuthentication = simple
+      standardUserRoleName = Standard User
       userAttrCountry = Germany
       userAttrOrganization = testOrg
     </Resource>

@@ -69,6 +69,7 @@ public class AccessManager {
 
     private Map<String, Group> groupsByDN;
     private Map<String, Role> rolesByDN;
+    private Role standardUserRole;
 
     private boolean dryRun;
 
@@ -77,21 +78,6 @@ public class AccessManager {
      */
     public AccessManager() {
         dryRun = false;
-    }
-
-
-    /**
-     * clean group memberships for a mutable user: remove all
-     * LDAP managed groups from user
-     */
-    private void cleanUserLdapGroups(User user) {
-        Iterator<IGroup> iter = user.getSystemGroups().iterator();
-        while (iter.hasNext()) {
-            IGroup iGroup = iter.next();
-            if ((iGroup instanceof Group) && ((Group) iGroup).isLdapGroup()) {
-                iter.remove();
-            }
-        }
     }
 
     /**
@@ -121,6 +107,22 @@ public class AccessManager {
         }
         logger.debug("DRY RUN: skipping user creation: {}", ldapUser.getUserName());
         return ldapUser;
+    }
+
+    /**
+     * @param user
+     * @return the set of LDAP managed groups for given user.
+     */
+    private Set<Group> getUserLdapGroups(User user) {
+        Set<Group> ldapGroups = new HashSet<> ();
+        Iterator<IGroup> iter = user.getSystemGroups().iterator();
+        while (iter.hasNext()) {
+            IGroup iGroup = iter.next();
+            if ((iGroup instanceof Group) && ((Group) iGroup).isLdapGroup()) {
+                ldapGroups.add((Group) iGroup);
+            }
+        }
+        return ldapGroups;
     }
 
     /**
@@ -271,6 +273,9 @@ public class AccessManager {
         for(Role snbRole : roleRestService.doGetRoles()) {
             logger.debug("Discovered SNB role: {}", snbRole.getName());
             Role dbRole = rolesFromDb.remove(snbRole.getId());
+            if (snbRole.getName().equals(config.getStandardUserRoleName())) {
+                standardUserRole = snbRole;
+            }
             if (dbRole == null) {
                 if (! dryRun) {
                     roleDbService.save(snbRole);
@@ -336,6 +341,7 @@ public class AccessManager {
      */
     private User syncUserFromLdap(String userDN) {
         User ldapUser = ldapClient.getUser(userDN);
+        ldapUser.addRole(standardUserRole);
         User dbUser = userDbService.loadByUserName(ldapUser.getUserName());
         if (dbUser == null) {
             logger.debug("Discovered new user in LDAP: {}", ldapUser.getUserName());
@@ -343,35 +349,60 @@ public class AccessManager {
         }
 
         if (dbUser.isMutable()) {
-            ldapUser.setId(dbUser.getId());
-            ldapUser.getRoles().addAll(dbUser.getRoles());
-            ldapUser.getSystemGroups().addAll(dbUser.getSystemGroups());
-            cleanUserLdapRoles(ldapUser);
-            cleanUserLdapGroups(ldapUser);
-            Set<String> memberships = ldapClient.getMemberships(userDN, true);
-            for (String membershipDN : memberships) {
-                Role dbRole = rolesByDN.get(membershipDN);
-                Group dbGroup = groupsByDN.get(membershipDN);
-                if (dbRole != null) {
-                    ldapUser.addRole(dbRole);
-                }
-                if (dbGroup != null) {
-                    ldapUser.addSystemGroup(dbGroup);
-                }
-            }
-            if (dbUser.isModified(CompareType.LDAP, ldapUser)) {
-                dbUser.applyChangesFromLdap(ldapUser);
-                if (! dryRun) {
-                    userDbService.save(dbUser);
-                    userRestService.doUpdateUser(dbUser);
-                } else {
-                    logger.debug("DRY RUN: skipping update of user {}", dbUser.getUserName());
-                }
-            }
+            // check for changes and apply if necessary
+            syncUserLdapChanges(userDN, ldapUser, dbUser);
         } else {
             logger.info("Leaving immutable user {} untouched", dbUser.getUserName());
         }
         return dbUser;
+    }
+
+    /**
+     * compute necessary changes in user roles and group
+     * memberships; save them to DB and SNB
+     */
+    private void syncUserLdapChanges(String userDN, User ldapUser, User dbUser) {
+        ldapUser.setId(dbUser.getId());
+        ldapUser.getRoles().addAll(dbUser.getRoles());
+        ldapUser.getSystemGroups().addAll(dbUser.getSystemGroups());
+        cleanUserLdapRoles(ldapUser);
+        Set<Group> groupsToRemove = getUserLdapGroups(ldapUser);
+        Set<Group> groupsToAdd = new HashSet<> ();
+
+        syncUserLdapGroupsAndRoles(userDN, ldapUser,
+                groupsToAdd, groupsToRemove);
+        ldapUser.getSystemGroups()
+                .removeAll(groupsToRemove);
+
+        if (dbUser.isModified(CompareType.LDAP, ldapUser)) {
+            dbUser.applyChangesFromLdap(ldapUser);
+            if (! dryRun) {
+                logger.debug("Updating user from LDAP: {}", dbUser.getUserName());
+                userDbService.save(dbUser);
+                userRestService.doUpdateUser(dbUser, groupsToAdd, groupsToRemove);
+            } else {
+                logger.debug("DRY RUN: skipping update of LDAP user {}", dbUser.getUserName());
+            }
+        }
+    }
+
+    private void syncUserLdapGroupsAndRoles(String userDN, User ldapUser,
+            Set<Group> groupsToAdd, Set<Group> groupsToRemove) {
+
+        Set<String> memberships = ldapClient.getMemberships(userDN, true);
+        for (String membershipDN : memberships) {
+            Role dbRole = rolesByDN.get(membershipDN);
+            Group dbGroup = groupsByDN.get(membershipDN);
+            if (dbRole != null) {
+                ldapUser.addRole(dbRole);
+            }
+            if (dbGroup != null) {
+                groupsToRemove.remove(dbGroup);
+                if (ldapUser.addSystemGroup(dbGroup)) {
+                    groupsToAdd.add(dbGroup);
+                }
+            }
+        }
     }
 
     /**
@@ -385,7 +416,8 @@ public class AccessManager {
         cmap.put(User.USER_ENABLED, Boolean.TRUE);
         Map<String, User> ldapUsersById = userDbService.loadMappedById(cmap);
 
-        ldapClient.getMembers(userDNs, new HashSet<> (), config.getLdapManagedUsers(), false);
+        // nesting allowed here, i.e. we can assign entire groups to SNB
+        ldapClient.getMembers(userDNs, new HashSet<> (), config.getLdapManagedUsers(), true);
         for (String dn : userDNs) {
             User dbUser = syncUserFromLdap(dn);
             ldapUsersById.remove(dbUser.getId());
@@ -402,5 +434,4 @@ public class AccessManager {
             }
         }
     }
-
 }

@@ -18,10 +18,15 @@
 package de.ipb_halle.signals.users;
 
 import de.ipb_halle.signals.rest.RestHelper;
+
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** 
  * SNB user DTO
@@ -38,6 +43,7 @@ public class User implements IUser {
     public final static String ATTR_COUNTRY = "country";
     public final static String ATTR_CREATED_AT = "createdAt";
     public final static String ATTR_EMAIL = "email";
+    public final static String ATTR_EMAIL_ADDRESS = "emailAddress";  // used during creation of user
     public final static String ATTR_ENABLED = "isEnabled";
     public final static String ATTR_FIRST_NAME = "firstName";
     public final static String ATTR_LAST_LOGIN = "lastLoginAt";
@@ -79,6 +85,8 @@ public class User implements IUser {
 
     private Set<IGroup> systemGroups;
 
+    private Logger logger;
+
     /**
      * default constructor
      */
@@ -87,9 +95,12 @@ public class User implements IUser {
         lastLoginAt = new Date(0);
         roles = new HashSet<> ();
         systemGroups = new HashSet<> ();
+        logger = LoggerFactory.getLogger(User.class);
     }
 
     public User(UserEntity entity) {
+        roles = new HashSet<> ();
+        systemGroups = new HashSet<> ();
         id = entity.getId();
         alias = entity.getAlias();
         country = entity.getCountry();
@@ -103,14 +114,15 @@ public class User implements IUser {
         organization = entity.getOrganization();
         userName = entity.getUserName();
         jsonString = entity.getJsonString();
+        logger = LoggerFactory.getLogger(User.class);
     }
 
-    public void addRole(IRole role) {
-        roles.add(role);
+    public boolean addRole(IRole role) {
+        return roles.add(role);
     }
 
-    public void addSystemGroup(IGroup group) {
-        systemGroups.add(group);
+    public boolean addSystemGroup(IGroup group) {
+        return systemGroups.add(group);
     }
 
     /** 
@@ -173,13 +185,26 @@ public class User implements IUser {
 
     public String dump() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("User(%d): %s, %s\n", id, lastName, firstName));
+        AtomicReference<String> sep = new AtomicReference<> ("");
+        sb.append(String.format("User(%s): %s, %s\n", id, lastName, firstName));
         sb.append(String.format("  Alias: %s    User name: %s  %s\n", alias, userName, mutable ? "managed": "immutable"));
         sb.append(String.format("  Email: %s    Country: %s\n", email, country));
         sb.append(String.format("  Organization: %s   Enabled: %s\n", organization, enabled ? "True" : "False"));
         sb.append(String.format("  Created at: %s\n", RestHelper.formatDate(createdAt)));
         sb.append(String.format("  Last login: %s\n", RestHelper.formatDate(lastLoginAt)));
-        sb.append((jsonString != null) ? jsonString : "");
+//      sb.append((jsonString != null) ? jsonString : "");
+        sb.append("  Roles: ");
+        for (IRole iRole : roles) {
+            sb.append(sep.getAndSet(", "));
+            sb.append(iRole.getId());
+        }
+        sep.getAndSet("");
+        sb.append("\n  Groups: ");
+        for (IGroup iGroup : systemGroups) {
+            sb.append(sep.getAndSet(", "));
+            sb.append(iGroup.getId());
+        }
+        sb.append("\n");
          return sb.toString();
     }
 
@@ -241,28 +266,44 @@ public class User implements IUser {
 
     /**
      * Compare this user to a reference user. 
+     *
+     * NOTE: It is not possible to update email or userName via SNB REST API
+     * NOTE: times must be rounded to full seconds
+     *
      * @param context the compare context: either SNB or LDAP. Creation and last login 
-     * timestamps are ignored in LDAP compare type mode
+     * timestamps are ignored in LDAP compare type mode.
      * @param user the reference user
      * @return true if current user is modified
      */
     public boolean isModified(CompareType context, User user) {
-        return !( alias.equals(user.getAlias())
-            && country.equals(user.getCountry())
-            && ((context == CompareType.SNB) ? (createdAt.compareTo(user.getCreatedAt()) == 0) : true)
-            && email.equals(user.getEmail())
-            && (enabled == user.isEnabled())
-            && firstName.equals(user.getFirstName())
-            && ((context == CompareType.SNB) ? (lastLoginAt.compareTo(user.getLastLoginAt()) == 0) : true)
-            && lastName.equals(user.getLastName())
-            && organization.equals(user.getOrganization())
-            && userName.equals(user.getUserName())
-            && roles.equals(user.getRoles())
-            && systemGroups.equals(user.getSystemGroups()));
+        return !( loggingEquals(alias, user.getAlias(), "alias")
+            && loggingEquals(country, user.getCountry(), "country")
+            && ((context == CompareType.SNB)
+                ? loggingEquals(createdAt.getTime() / 1000L, user.getCreatedAt().getTime() / 1000L, "createdAt")
+                : true)
+            && loggingEquals(email, user.getEmail(), "email")
+            && loggingEquals(enabled, user.isEnabled(), "enabled")
+            && loggingEquals(firstName, user.getFirstName(), "firstName")
+            && ((context == CompareType.SNB)
+                ? loggingEquals(lastLoginAt.getTime() / 1000L, user.getLastLoginAt().getTime() / 1000L, "lastLoginAt")
+                : true)
+            && loggingEquals(lastName, user.getLastName(), "lastName")
+            && loggingEquals(organization, user.getOrganization(),  "organization")
+            && loggingEquals(userName, user.getUserName(), "userName")
+            && loggingEquals(roles, user.getRoles(), "roles")
+            && loggingEquals(systemGroups, user.getSystemGroups(), "systemGroups"));
     }
 
     public boolean isMutable() {
         return mutable;
+    }
+
+    private boolean loggingEquals(Object a, Object b, String message) {
+        if (Objects.equals(a, b)) {
+            return true;
+        }
+        logger.trace("{} NOT equal", message);
+        return false;
     }
 
     public IUser setId(String i) {
