@@ -60,6 +60,7 @@ This project bundles code for migration of IPB data sources, for backup, mainten
           ldapSecurityPrincipal = test
           ldapSecurityCredentials = 0000
           ldapSecurityAuthentication = simple
+          standardUserRoleName = Standard User
           userAttrCountry = Germany
           userAttrOrganization = testOrg
         </Resource>
@@ -72,7 +73,12 @@ To run the code, build the project
 
 adjust the config files and start the tool with the following command line:
 
-    java -jar target/signals-1.0.jar PATH/TO/openejb.xml
+    java -jar target/signals-1.0.jar --config PATH/TO/openejb.xml --help
+
+or e.g.
+
+    java -jar target/signals-1.0.jar --config PATH/TO/openejb.xml \
+        --trustStore PATH/TO/truststore.jks --manage-users
 
 
 ## Trademark Notice
