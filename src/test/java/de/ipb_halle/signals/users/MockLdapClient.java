@@ -25,10 +25,6 @@ import java.util.Set;
  */
 public class MockLdapClient implements LdapClient {
 
-    public Set<String> filterDNs(Set<String> distinguishedNames, FilterType type) {
-        return new HashSet<String> ();
-    }
-
     public Group getGroup(String groupDN) {
         return null;
     }
@@ -50,9 +46,5 @@ public class MockLdapClient implements LdapClient {
 
     public User getUser(String userDN) {
         return null;
-    }
-
-    public Set<String> getUsers(String filter) {
-        return new HashSet<String> ();
     }
 }
