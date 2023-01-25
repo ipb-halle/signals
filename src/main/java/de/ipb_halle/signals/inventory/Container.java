@@ -63,7 +63,6 @@ public class Container {
     private IUser createdBy;
     private String digest;
     private Set<FieldValue> fieldValues;
-    private String jsonString;
     private ILocation location;
     private Set<IMaterial> materials;
     private String name;
@@ -77,7 +76,6 @@ public class Container {
         sb.append(String.format("Container(%s): name=%s barcode=%s\n", id, name, barcode));
         sb.append(String.format("  createdBy='%s', updatedBy='%s'\n", createdBy.dump(), updatedBy.dump()));
         sb.append(String.format("  amount=%f, location='%s'\n", amount, location.dump()));
-//      sb.append(jsonString);
         return sb.toString();
     }
 
@@ -98,7 +96,6 @@ public class Container {
         coordinateY = ce.getCoordinateY();
         createdAt = ce.getCreatedAt();
         createdBy = new UserReference().setId(ce.getCreatedBy());
-        jsonString = ce.getJsonString();
         location = new LocationReference().setId(ce.getLocationId());
         name = ce.getName();
         unit = Unit.getUnit(ce.getUnit());
@@ -119,7 +116,6 @@ public class Container {
             .setCreatedAt(createdAt)
             .setCreatedBy(createdBy.getId())
             .setDigest(digest) 
-            .setJsonString(jsonString)
             .setLocationId(location.getId())
             .setName(name)
             .setUnit(unit.getUnit())
@@ -181,10 +177,6 @@ public class Container {
 
     public String getId() {
         return id;
-    }
-
-    public String getJsonString() {
-        return jsonString;
     }
 
     public ILocation getLocation() {
@@ -257,10 +249,6 @@ public class Container {
 
     public void setId(String i) {
         id = i;
-    }
-
-    public void setJsonString(String j) {
-        jsonString = j;
     }
 
     public void setLocation(ILocation l) {

@@ -72,7 +72,6 @@ public class Library {
     private String entityFlags;                 // JSON
 
     private String id;
-    private String jsonString;                  // JSON
     private String materialsSampleMapping;      // JSON
     private String name;
     private String uniqueness;                  // JSON
@@ -102,7 +101,6 @@ public class Library {
         editedBy = new UserReference().setId(le.getEditedBy());
         enabled = le.isEnabled();
         entityFlags = le.getEntityFlags();
-        jsonString = le.getJsonString();
         materialsSampleMapping = le.getMaterialsSampleMapping();
         name = le.getName();
         uniqueness = le.getUniqueness();
@@ -130,7 +128,6 @@ public class Library {
             .setEditedBy(editedBy.getId())
             .setEnabled(enabled)
             .setEntityFlags(entityFlags)
-            .setJsonString(jsonString)
             .setMaterialsSampleMapping(materialsSampleMapping)
             .setName(name)
             .setUniqueness(uniqueness);
@@ -141,7 +138,6 @@ public class Library {
     public String dump() {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("Library(%s): %s\n", id, name));
-        sb.append(jsonString);
         return sb.toString();
     }
 
@@ -215,10 +211,6 @@ public class Library {
 
     public String getId() {
         return id;
-    }
-
-    public String getJsonString() {
-        return jsonString;
     }
 
     public String getMaterialsSampleMapping() {
@@ -319,11 +311,6 @@ public class Library {
 
     public Library setId(String i) {
         id = i;
-        return this;
-    }
-
-    public Library setJsonString(String j) {
-        jsonString = j;
         return this;
     }
 

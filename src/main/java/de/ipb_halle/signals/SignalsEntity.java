@@ -41,23 +41,14 @@ public class SignalsEntity {
     @Column(name="snb_type")
     private String type;
 
-    @Column(name="json_string")
-    private String jsonString;
-
-
     public String dump() {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("SignalsEntity(%s) --> %s\n", id,  type));
-        sb.append(jsonString);
         return sb.toString();
     }
 
     public String getId() {
         return id;
-    }
-
-    public String getJsonString() {
-        return jsonString;
     }
 
     public String getType() {
@@ -66,10 +57,6 @@ public class SignalsEntity {
 
     public void setId(String i) {
         id = i;
-    }
-
-    public void setJsonString(String j) {
-        jsonString = j;
     }
 
     public void setType(String t) {

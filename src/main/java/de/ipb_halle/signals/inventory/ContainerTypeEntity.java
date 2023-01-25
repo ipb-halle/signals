@@ -51,9 +51,6 @@ public class ContainerTypeEntity {
     @Column
     private String name;
 
-    @Column(name="json_string")
-    private String jsonString;
-
     @Column(name="updated_at")
     private Date updatedAt;
 
@@ -76,10 +73,6 @@ public class ContainerTypeEntity {
 
     public String getDescription() {
         return description;
-    }
-
-    public String getJsonString() {
-        return jsonString;
     }
 
     public String getName() {
@@ -120,11 +113,6 @@ public class ContainerTypeEntity {
 
     public ContainerTypeEntity setInUse(boolean u) {
         inUse = u;
-        return this;
-    }
-
-    public ContainerTypeEntity setJsonString(String j) {
-        jsonString = j;
         return this;
     }
 

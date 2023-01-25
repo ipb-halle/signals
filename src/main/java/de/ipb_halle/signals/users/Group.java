@@ -82,9 +82,6 @@ public class Group implements IGroup {
     @Column(name="snb_type")
     private String type;
 
-    @Column(name="json_string")
-    private String jsonString;
-
     /**
      * default constructor
      */
@@ -111,7 +108,6 @@ public class Group implements IGroup {
         }
         sb.append(String.format("Group(%d) --> %s\n", id, name));
         sb.append(String.format("Description: %s\n", description));
-        sb.append((jsonString != null) ? jsonString : "");
         return sb.toString();
     }
 
@@ -142,10 +138,6 @@ public class Group implements IGroup {
 
     public Date getEditedAt() {
         return editedAt;
-    }
-
-    public String getJsonString() {
-        return jsonString;
     }
 
     public String getName() {
@@ -203,10 +195,6 @@ public class Group implements IGroup {
 
     public void setEditedAt(Date d) {
         editedAt = d;
-    }
-
-    public void setJsonString(String j) {
-        jsonString = j;
     }
 
     public void setLdapGroup(boolean b) {

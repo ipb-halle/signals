@@ -18,7 +18,7 @@
 package de.ipb_halle.signals.rest;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -42,10 +42,10 @@ public class MockRestClient extends RestClientImpl {
     }
 
     @Override
-    public RestClient execute(int expectedResponseCode) throws IOException, MalformedURLException, UnexpectedResponseCodeException {
+    public RestClient execute(int expectedResponseCode) throws IOException, URISyntaxException, UnexpectedResponseCodeException {
         StringJoiner sj = new StringJoiner(":");
         String key = sj.add(getMethod().toString())
-                .add(getURL().toString())
+                .add(getURI().toString())
                 .toString();
         String response = responseMap.get(key);
         if (response == null) {

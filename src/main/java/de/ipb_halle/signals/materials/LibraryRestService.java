@@ -32,7 +32,7 @@ import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
 import de.ipb_halle.signals.users.UserReference;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -64,7 +64,6 @@ public class LibraryRestService implements RestService<Library> {
 
         lib.setId(RestHelper.parseString(j, RestHelper.ATTR_ID));
         lib.setEnabled(RestHelper.parseBool(j, Library.ATTR_ENABLED));
-        lib.setJsonString(j.toString());
 
         lib.setName(RestHelper.parseString(attributes, RestHelper.ATTR_NAME));
         if (attributes.has(Library.ATTR_ASSETS)) {
@@ -95,7 +94,7 @@ public class LibraryRestService implements RestService<Library> {
 
         } catch(UnexpectedResponseCodeException ue) {
             logger.warn("Unexpected code");
-        } catch(MalformedURLException me) {
+        } catch(URISyntaxException me) {
             logger.warn("Malformed URL");
         } catch(IOException ioe) {
             logger.warn("IOException", (Throwable) ioe);

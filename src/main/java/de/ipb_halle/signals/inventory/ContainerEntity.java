@@ -59,9 +59,6 @@ public class ContainerEntity {
     @Column
     private String digest;
 
-    @Column(name="json_string")
-    private String jsonString;
-
     @Column(name="location_id")
     private String locationId;
 
@@ -112,10 +109,6 @@ public class ContainerEntity {
 
     public String getId() {
         return id;
-    }
-
-    public String getJsonString() {
-        return jsonString;
     }
 
     public String getLocationId() {
@@ -180,11 +173,6 @@ public class ContainerEntity {
 
     public ContainerEntity setId(String i) {
         id = i;
-        return this;
-    }
-
-    public ContainerEntity setJsonString(String j) {
-        jsonString = j;
         return this;
     }
 

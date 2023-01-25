@@ -23,9 +23,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;

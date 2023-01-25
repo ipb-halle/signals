@@ -32,7 +32,7 @@ import de.ipb_halle.signals.rest.RestService;
 import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -116,7 +116,7 @@ public class UserRestService implements RestService<User> {
 
         } catch(UnexpectedResponseCodeException ue) {
             logger.warn("Unexpected code");
-        } catch(MalformedURLException me) {
+        } catch(URISyntaxException me) {
             logger.warn("Malformed URL");
         } catch(IOException ioe) {
             logger.warn("IOException", (Throwable) ioe);
@@ -133,7 +133,7 @@ public class UserRestService implements RestService<User> {
 
         } catch(UnexpectedResponseCodeException ue) {
             logger.warn("Unexpected code");
-        } catch(MalformedURLException me) {
+        } catch(URISyntaxException me) {
             logger.warn("Malformed URL");
         } catch(IOException ioe) {
             logger.warn("IOException", (Throwable) ioe);
@@ -155,7 +155,7 @@ public class UserRestService implements RestService<User> {
 
         } catch(UnexpectedResponseCodeException ue) {
             logger.warn("Unexpected code");
-        } catch(MalformedURLException me) {
+        } catch(URISyntaxException me) {
             logger.warn("Malformed URL");
         } catch(IOException ioe) {
             logger.warn("IOException", (Throwable) ioe);
@@ -176,7 +176,7 @@ public class UserRestService implements RestService<User> {
 
         } catch(UnexpectedResponseCodeException ue) {
             logger.warn("Unexpected code");
-        } catch(MalformedURLException me) {
+        } catch(URISyntaxException me) {
             logger.warn("Malformed URL");
         } catch(IOException ioe) {
             logger.warn("IOException", (Throwable) ioe);
@@ -193,10 +193,10 @@ public class UserRestService implements RestService<User> {
             .setEndpoint(USERS_ENDPOINT);
 
         if (query != null) {
-            restClient.putUrlParameter("q", query);
+            restClient.putUriParameter("q", query);
         }
         if (enabled != null) {
-            restClient.putUrlParameter("enabled", enabled ? "true" : "false");
+            restClient.putUriParameter("enabled", enabled ? "true" : "false");
         }
 
         RestResultIterator<User> iter = new RestResultIterator<> (restClient, this, true); 
@@ -224,7 +224,7 @@ public class UserRestService implements RestService<User> {
 
         } catch(UnexpectedResponseCodeException ue) {
             logger.warn("Unexpected code");
-        } catch(MalformedURLException me) {
+        } catch(URISyntaxException me) {
             logger.warn("Malformed URL");
         } catch(IOException ioe) {
             logger.warn("IOException", (Throwable) ioe);
@@ -263,7 +263,6 @@ public class UserRestService implements RestService<User> {
         user.setEnabled(attributes.getAsJsonPrimitive(User.ATTR_ENABLED).getAsBoolean());
         user.setFirstName(attributes.getAsJsonPrimitive(User.ATTR_FIRST_NAME).getAsString());
         user.setMutable(false);
-        user.setJsonString(j.toString());
         user.setLastLoginAt(RestHelper.parseDate(attributes, User.ATTR_LAST_LOGIN, new Date(0)));
         user.setLastName(attributes.getAsJsonPrimitive(User.ATTR_LAST_NAME).getAsString());
         user.setOrganization(attributes.getAsJsonPrimitive(User.ATTR_ORGANIZATION).getAsString());

@@ -34,7 +34,7 @@ import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
 import de.ipb_halle.signals.users.UserReference;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import jakarta.ejb.Local;
@@ -75,7 +75,6 @@ public class ContainerRestService implements RestService<Container> {
         parseFieldValues(attributes.getAsJsonArray(Container.ATTR_FIELDS), ct);
         parseMaterials(attributes.getAsJsonArray(Container.ATTR_CONTENTS), ct);
 
-        ct.setJsonString(j.toString());
         parseChangeRecords(j, ct);
 
         return ct;
@@ -93,7 +92,7 @@ public class ContainerRestService implements RestService<Container> {
 
         } catch(UnexpectedResponseCodeException ue) {
            logger.warn("Unexpected code");
-        } catch(MalformedURLException me) {
+        } catch(URISyntaxException me) {
             logger.warn("Malformed URL");
         } catch(IOException ioe) {
             logger.warn("IOException",  (Throwable) ioe);

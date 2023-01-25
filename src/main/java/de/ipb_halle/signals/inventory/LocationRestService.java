@@ -30,7 +30,7 @@ import de.ipb_halle.signals.rest.RestService;
 import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import jakarta.ejb.Local;
@@ -64,7 +64,6 @@ public class LocationRestService implements RestService<LocationEntity> {
         loc.setName(RestHelper.parseString(attributes, LocationEntity.ATTR_NAME));
         loc.setDescription(RestHelper.parseString(attributes, LocationEntity.ATTR_DESCRIPTION));
         loc.setGrid(RestHelper.parseBool(attributes, LocationEntity.ATTR_GRID));
-        loc.setJsonString(j.toString());
         loc.setTypeId(RestHelper.parseString(attributes, LocationEntity.ATTR_TYPE_ID));
         loc.setTypeName(RestHelper.parseString(attributes, LocationEntity.ATTR_TYPE_NAME));
         loc.setUpdatedAt(RestHelper.parseDate(attributes, LocationEntity.ATTR_UPDATED_AT));
@@ -88,7 +87,7 @@ public class LocationRestService implements RestService<LocationEntity> {
 
         } catch(UnexpectedResponseCodeException ue) {
            logger.warn("Unexpected code");
-        } catch(MalformedURLException me) {
+        } catch(URISyntaxException me) {
             logger.warn("Malformed URL");
         } catch(IOException ioe) {
             logger.warn("IOException",  (Throwable) ioe);

@@ -42,13 +42,9 @@ public class LocationType {
     @Column
     private String description;
 
-    @Column(name="json_string")
-    private String jsonString;
-
     public String dump() {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("LocationType(%s): %s\n", id, name));
-        sb.append(jsonString);
         return sb.toString();
     }
 
@@ -58,10 +54,6 @@ public class LocationType {
 
     public String getDescription() {
         return description;
-    }
-
-    public String getJsonString() {
-        return jsonString;
     }
 
     public String getName() {
@@ -74,10 +66,6 @@ public class LocationType {
 
     public void setDescription(String d) {
         description = d;
-    }
-
-    public void setJsonString(String j) {
-        jsonString = j;
     }
 
     public void setName(String n) {

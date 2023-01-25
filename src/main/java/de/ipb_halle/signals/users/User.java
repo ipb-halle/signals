@@ -79,8 +79,6 @@ public class User implements IUser {
 
     private String userName;
 
-    private String jsonString;
-
     private Set<IRole> roles;
 
     private Set<IGroup> systemGroups;
@@ -113,7 +111,6 @@ public class User implements IUser {
         lastName = entity.getLastName();
         organization = entity.getOrganization();
         userName = entity.getUserName();
-        jsonString = entity.getJsonString();
         logger = LoggerFactory.getLogger(User.class);
     }
 
@@ -127,7 +124,7 @@ public class User implements IUser {
 
     /** 
      * Apply changes from a reference user. Does NOT overwrite the 
-     * createdAt, lastLoginAt, mutable and jsonString attributes.
+     * createdAt, lastLoginAt and mutable attributes.
      * Expects roles and system groups to be database entities and 
      * not just role / group references.
      */
@@ -153,12 +150,11 @@ public class User implements IUser {
 
     /**
      * specifically apply changes from SNB (include 
-     * also createdAt, lastLoginAt and jsonString attributes).
+     * also createdAt and lastLoginAt attributes).
      */
     public void applyChangesFromSnb(User snbUser) {
         createdAt = snbUser.getCreatedAt();
         lastLoginAt = snbUser.getLastLoginAt();
-        jsonString = snbUser.getJsonString();
         applyChanges(snbUser);
     }
 
@@ -179,8 +175,7 @@ public class User implements IUser {
             .setLastLoginAt(lastLoginAt)
             .setLastName(lastName)
             .setOrganization(organization)
-            .setUserName(userName)
-            .setJsonString(jsonString);
+            .setUserName(userName);
     }
 
     public String dump() {
@@ -192,7 +187,6 @@ public class User implements IUser {
         sb.append(String.format("  Organization: %s   Enabled: %s\n", organization, enabled ? "True" : "False"));
         sb.append(String.format("  Created at: %s\n", RestHelper.formatDate(createdAt)));
         sb.append(String.format("  Last login: %s\n", RestHelper.formatDate(lastLoginAt)));
-//      sb.append((jsonString != null) ? jsonString : "");
         sb.append("  Roles: ");
         for (IRole iRole : roles) {
             sb.append(sep.getAndSet(", "));
@@ -230,10 +224,6 @@ public class User implements IUser {
 
     public String getFirstName() {
         return firstName;
-    }
-
-    public String getJsonString() {
-        return jsonString;
     }
 
     public Date getLastLoginAt() {
@@ -337,10 +327,6 @@ public class User implements IUser {
 
     public void setMutable(boolean i) {
         mutable = i;
-    }
-
-    public void setJsonString(String j) {
-        jsonString = j;
     }
 
     public void setLastLoginAt(Date d) {

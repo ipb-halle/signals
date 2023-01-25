@@ -1,15 +1,13 @@
 
 CREATE TABLE signalsentities (
     id VARCHAR NOT NULL PRIMARY KEY,
-    snb_type VARCHAR,
-    json_string VARCHAR
+    snb_type VARCHAR
 );
 
 CREATE TABLE location_types (
     id VARCHAR NOT NULL PRIMARY KEY,
     name VARCHAR,
-    description VARCHAR,
-    json_string VARCHAR
+    description VARCHAR
 );
 
 CREATE TABLE locations (
@@ -27,8 +25,7 @@ CREATE TABLE locations (
     type_id VARCHAR,
     type_name VARCHAR,
     updated_at DATE,
-    updated_by VARCHAR /* REFERENCES users(id) */,
-    json_string VARCHAR
+    updated_by VARCHAR /* REFERENCES users(id) */
 );
 
 CREATE TABLE roles (
@@ -37,7 +34,6 @@ CREATE TABLE roles (
     deleted BOOLEAN NOT NULL DEFAULT FALSE,
     description VARCHAR,
     ldap_role BOOLEAN NOT NULL DEFAULT FALSE,
-    json_string VARCHAR,
     UNIQUE (name)
 );
 
@@ -59,7 +55,6 @@ CREATE TABLE users (
     last_name VARCHAR,
     organization VARCHAR,
     user_name VARCHAR,
-    json_string VARCHAR,
     UNIQUE (user_name)
 );
 
@@ -74,7 +69,6 @@ CREATE TABLE groups (
     name VARCHAR,
     is_system BOOLEAN,
     snb_type VARCHAR,
-    json_string VARCHAR,
     UNIQUE (name)
 );
 
@@ -137,7 +131,6 @@ CREATE TABLE container_types (
     in_use BOOLEAN,
     movable BOOLEAN,
     name VARCHAR,
-    json_string VARCHAR,
     updated_at TIMESTAMP
 );
 
@@ -169,7 +162,6 @@ CREATE TABLE libraries (
     edited_by VARCHAR,
     enabled BOOLEAN,
     entity_flags VARCHAR,
-    json_string VARCHAR,
     materials_sample_mapping VARCHAR,
     name VARCHAR,
     uniqueness VARCHAR
@@ -196,7 +188,6 @@ CREATE TABLE containers (
     created_at TIMESTAMP,
     created_by VARCHAR /* REFERENCES users(id) */,
     digest VARCHAR,
-    json_string VARCHAR,
     location_id VARCHAR,
     material_id VARCHAR /* REFERENCES materials(id) */,
     name VARCHAR,

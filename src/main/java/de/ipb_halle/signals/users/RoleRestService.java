@@ -31,7 +31,7 @@ import de.ipb_halle.signals.rest.RestService;
 import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -64,7 +64,6 @@ public class RoleRestService implements RestService<Role> {
         Role role = new Role();
         role.setDescription(attributes.getAsJsonPrimitive(Role.ATTR_DESCRIPTION).getAsString());
         role.setId(j.getAsJsonObject().getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
-        role.setJsonString(j.toString());
         role.setName(attributes.getAsJsonPrimitive(Role.ATTR_NAME).getAsString());
         parsePrivileges(attributes.getAsJsonObject(Role.ATTR_PRIVILEGES), role);
 
@@ -82,7 +81,7 @@ public class RoleRestService implements RestService<Role> {
 
         } catch(UnexpectedResponseCodeException ue) {
             logger.warn("Unexpected code");
-        } catch(MalformedURLException me) {
+        } catch(URISyntaxException me) {
             logger.warn("Malformed URL");
         } catch(IOException ioe) {
             logger.warn("IOException", (Throwable) ioe);

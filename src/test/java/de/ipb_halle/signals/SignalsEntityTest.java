@@ -42,6 +42,5 @@ public class SignalsEntityTest {
         SignalsEntity entity = svc.createEntity(j);
 
         assertEquals("id matches", TEST_ID, entity.getId());
-        assertEquals("json string matches", test, entity.getJsonString());
     }
 }

@@ -28,15 +28,10 @@ import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestResultIterator;
 import de.ipb_halle.signals.rest.RestService;
-import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import jakarta.ejb.Local;
 import jakarta.inject.Inject;
@@ -62,7 +57,6 @@ public class SignalsEntityRestService implements RestService<SignalsEntity> {
 
         entity.setId(json.getAsJsonObject().getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
         entity.setType(attributes.getAsJsonPrimitive(RestHelper.ATTR_TYPE).getAsString());
-        entity.setJsonString(json.toString());
         return entity;
     }
 
@@ -70,7 +64,7 @@ public class SignalsEntityRestService implements RestService<SignalsEntity> {
         restClient.reset()
             .setMethod(Method.GET)
             .setEndpoint(SIGNALS_ENTITY_ENDPOINT)
-            .putUrlParameter(PARAMETER_INCLUDE_TYPES, includeTypes);
+            .putUriParameter(PARAMETER_INCLUDE_TYPES, includeTypes);
 
         RestResultIterator<SignalsEntity> iter = new RestResultIterator<> (restClient, this, true); 
         List<SignalsEntity> entities = new ArrayList<> ();

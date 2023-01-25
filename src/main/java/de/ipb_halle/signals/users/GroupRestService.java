@@ -31,7 +31,7 @@ import de.ipb_halle.signals.rest.RestService;
 import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -74,7 +74,6 @@ public class GroupRestService implements RestService<Group> {
         // eid
         group.setEditedAt(RestHelper.parseDate(attributes, Group.ATTR_EDITED_AT, new Date(0)));
         //flags
-        group.setJsonString(j.toString());
         group.setName(attributes.getAsJsonPrimitive(Group.ATTR_NAME).getAsString());
         group.setSystem(attributes.getAsJsonPrimitive(Group.ATTR_SYSTEM).getAsBoolean());
         group.setType(attributes.getAsJsonPrimitive(Group.ATTR_TYPE).getAsString());
@@ -107,7 +106,7 @@ public class GroupRestService implements RestService<Group> {
 
         } catch(UnexpectedResponseCodeException ue) {
             logger.warn("Unexpected code");
-        } catch(MalformedURLException me) {
+        } catch(URISyntaxException me) {
             logger.warn("Malformed URL");
         } catch(IOException ioe) {
             logger.warn("IOException",  (Throwable) ioe);
@@ -129,7 +128,7 @@ public class GroupRestService implements RestService<Group> {
 
         } catch(UnexpectedResponseCodeException ue) {
             logger.warn("Unexpected code");
-        } catch(MalformedURLException me) {
+        } catch(URISyntaxException me) {
             logger.warn("Malformed URL");
         } catch(IOException ioe) {
             logger.warn("IOException",  (Throwable) ioe);
@@ -169,7 +168,7 @@ public class GroupRestService implements RestService<Group> {
 
         } catch(UnexpectedResponseCodeException ue) {
             logger.warn("Unexpected code");
-        } catch(MalformedURLException me) {
+        } catch(URISyntaxException me) {
             logger.warn("Malformed URL");
         } catch(IOException ioe) {
             logger.warn("IOException",  (Throwable) ioe);

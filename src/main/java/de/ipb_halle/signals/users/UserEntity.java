@@ -71,9 +71,6 @@ public class UserEntity {
     @Column(name="user_name")
     private String userName;
 
-    @Column(name="json_string")
-    private String jsonString;
-
     /**
      * default constructor
      */
@@ -104,10 +101,6 @@ public class UserEntity {
 
     public String getFirstName() {
         return firstName;
-    }
-
-    public String getJsonString() {
-        return jsonString;
     }
 
     public Date getLastLoginAt() {
@@ -171,11 +164,6 @@ public class UserEntity {
 
     public UserEntity setMutable(boolean i) {
         mutable = i;
-        return this;
-    }
-
-    public UserEntity setJsonString(String j) {
-        jsonString = j;
         return this;
     }
 

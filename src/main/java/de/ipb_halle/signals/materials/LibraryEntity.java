@@ -76,9 +76,6 @@ public class LibraryEntity {
     @Column(name="entity_flags")
     private String entityFlags;                 // JSON
 
-    @Column(name="json_string")
-    private String jsonString;                  // JSON
-
     @Column(name="materials_sample_mapping")
     private String materialsSampleMapping;      // JSON
 
@@ -144,10 +141,6 @@ public class LibraryEntity {
 
     public String getId() {
         return id;
-    }
-
-    public String getJsonString() {
-        return jsonString;
     }
 
     public String getMaterialsSampleMapping() {
@@ -238,11 +231,6 @@ public class LibraryEntity {
 
     public LibraryEntity setId(String i) {
         id = i;
-        return this;
-    }
-
-    public LibraryEntity setJsonString(String j) {
-        jsonString = j;
         return this;
     }
 

@@ -33,8 +33,22 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import java.net.Authenticator;
+import java.net.http.HttpClient;
+import java.net.http.HttpClient.Redirect;
+import java.net.http.HttpClient.Version;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublisher;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpRequest.Builder;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.net.ProxySelector;
+import java.time.Duration;
+
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -66,8 +80,8 @@ public class RestClientImpl implements RestClient {
     private String requestData;
     private String response;
     private int responseCode;
-    private URL url;
-    private Map<String, String> urlParameterMap;
+    private URI uri;
+    private Map<String, String> uriParameterMap;
 
     private Logger logger;
 
@@ -75,50 +89,61 @@ public class RestClientImpl implements RestClient {
      * constructor
      */
     public RestClientImpl() {
-        urlParameterMap = new HashMap<> ();
+        uriParameterMap = new HashMap<> ();
         logger = LoggerFactory.getLogger(RestResultIterator.class);
         method = Method.GET;
     }
 
-    public RestClient execute() throws IOException, MalformedURLException, UnexpectedResponseCodeException {
+    public RestClient execute() throws IOException, URISyntaxException, UnexpectedResponseCodeException {
         return execute(HttpURLConnection.HTTP_OK);
     }
 
-    public RestClient execute(int expectedResponseCode) throws IOException, MalformedURLException, UnexpectedResponseCodeException {
-        HttpURLConnection urlConn = (HttpURLConnection) getURL().openConnection();
-/*
-        if ((method == Method.PATCH) && (! RestClientImpl.patchAllowed)) {
-                throw new IllegalStateException("fix to HttpURLConnection failed - method PATCH is not allowed");
-        }
-*/
-        urlConn.setRequestMethod(method.toString());
-        urlConn.setRequestProperty("Accept", "application/vnd.api+json");
-        urlConn.setRequestProperty("X-API-KEY", signalsConfig.getApiKey());
+    public RestClient execute(int expectedResponseCode) throws IOException, URISyntaxException, UnexpectedResponseCodeException {
+        BodyPublisher requestBody = BodyPublishers.noBody();
+
+        HttpRequest.Builder builder = HttpRequest.newBuilder(getURI())
+            .header("Accept", "application/vnd.api+json")
+            .header("X-API-KEY", signalsConfig.getApiKey());
 
         if (requestData != null) {
             if ((method == Method.GET) || (method == Method.DELETE)) {
-                logger.warn("Unexpected write request for UrlConnection in {} request", method.toString());
+                logger.warn("Unexpected request for write operation in HttpRequest: {}", method.toString());
             }
             logger.trace("***** Dump of request *****\n{}\n***** End of request dump  *****", requestData);
-            urlConn.setRequestProperty("Content-Type", "application/vnd.api+json");
-            urlConn.setDoOutput(true);
-            urlConn.getOutputStream().write(requestData.getBytes(UTF8));
+
+            requestBody = BodyPublishers.ofString(requestData);
+            builder = builder.header("Content-Type", "application/vnd.api+json");
         }
 
-        responseCode = urlConn.getResponseCode();
+        HttpRequest request = builder
+                    .method(method.toString(), requestBody)
+                    .build();
+
+       HttpClient client = HttpClient.newBuilder()
+            .version(Version.HTTP_1_1)
+            .followRedirects(Redirect.NORMAL)
+            .connectTimeout(Duration.ofSeconds(20))
+            .proxy(ProxySelector.getDefault()) 
+            .build();
+
         try {
-            obtainResponse(urlConn);
+            HttpResponse<String> httpResponse = client.send(request, BodyHandlers.ofString());
+            responseCode = httpResponse.statusCode();
+            setResponse(httpResponse.body());
+        } catch (InterruptedException ie) {
+            this.logger.warn("HTTP request got interrupted");
+            response = null;
+            responseCode = 0;
         } finally {
             if (responseCode != expectedResponseCode) {
                 this.logger.debug("Obtained unexpected response code ({} vs {})", responseCode, expectedResponseCode);
-                this.logger.debug("Connection {} {}", method.toString(), getURL().toString());
+                this.logger.debug("Connection {} {}", method.toString(), getURI().toString());
                 if (response != null) {
                     this.logger.debug("***** Dump of response *****\n{}\n***** End of response dump *****", response);
                 }
                 throw new UnexpectedResponseCodeException(String.format("expected %d, got %d", expectedResponseCode, responseCode));
             }
         }
-
         return this;
     }
 
@@ -138,16 +163,16 @@ public class RestClientImpl implements RestClient {
         return responseCode;
     }
 
-    protected URL getURL() throws MalformedURLException {
-        if (url != null) {
-            return url;
+    protected URI getURI() throws URISyntaxException {
+        if (uri != null) {
+            return uri;
         }
         StringBuilder sb = new StringBuilder(signalsConfig.getBaseUrl());
         sb.append(endpoint);
-        if (! urlParameterMap.isEmpty()) {
+        if (! uriParameterMap.isEmpty()) {
             AtomicReference<String> sep = new AtomicReference<> ("");
             sb.append("?");
-            urlParameterMap.forEach((key, value) -> {
+            uriParameterMap.forEach((key, value) -> {
                         sb.append(sep.getAndSet("&"));
                         try {
                             sb.append(URLEncoder.encode(key, UTF8));
@@ -159,24 +184,13 @@ public class RestClientImpl implements RestClient {
                     });
         }
 
-        url = new URL(sb.toString());
-        return url;
+        uri = new URI(sb.toString());
+        return uri;
     }
 
-    private void obtainResponse(HttpURLConnection urlConn) throws IOException {
-        try(BufferedReader br = new BufferedReader(new InputStreamReader(urlConn.getInputStream(), UTF8))) {
-            StringBuilder sb = new StringBuilder();
-            String responseLine = null;
-            while ((responseLine = br.readLine()) != null) {
-                sb.append(responseLine.trim());
-            }
-            setResponse(sb.toString());
-        }
-    }
-
-    public RestClient putUrlParameter(String key, String value) {
-        url = null;
-        this.urlParameterMap.put(key, value);
+    public RestClient putUriParameter(String key, String value) {
+        uri = null;
+        this.uriParameterMap.put(key, value);
         return this;
     }
 
@@ -184,12 +198,12 @@ public class RestClientImpl implements RestClient {
         method = Method.GET;
         requestData = null;
         response = null;
-        urlParameterMap = new HashMap<> ();
+        uriParameterMap = new HashMap<> ();
         return this;
     }
 
     public RestClient setEndpoint(String path) {
-        url = null;
+        uri = null;
         endpoint = path;
         return this;
     }
@@ -212,10 +226,10 @@ public class RestClientImpl implements RestClient {
         response = r;
     }
 
-    public RestClient setURL(String u) throws MalformedURLException {
+    public RestClient setURI(String u) throws URISyntaxException {
         endpoint = null;
-        urlParameterMap.clear();
-        url = new URL(u);
+        uriParameterMap.clear();
+        uri = new URI(u);
         return this;
     }
 }

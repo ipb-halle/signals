@@ -84,9 +84,6 @@ public class LocationEntity implements ILocation {
     @Column(name="ancestor_name")
     private String ancestorName;
 
-    @Column(name="json_string")
-    private String jsonString;
-
     @Column(name="updated_at")
     private Date updatedAt;
 
@@ -139,10 +136,6 @@ public class LocationEntity implements ILocation {
 
     public String getDescription() {
         return description;
-    }
-
-    public String getJsonString() {
-        return jsonString;
     }
 
     public String getName() {
@@ -209,10 +202,6 @@ public class LocationEntity implements ILocation {
 
     public void setGrid(Boolean g) {
         grid = g;
-    }
-
-    public void setJsonString(String j) {
-        jsonString = j;
     }
 
     public void setName(String n) {

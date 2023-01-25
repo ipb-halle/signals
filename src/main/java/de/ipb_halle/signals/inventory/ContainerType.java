@@ -57,8 +57,6 @@ public class ContainerType {
     
     private String name;
 
-    private String jsonString;
-
     private Date updatedAt;
 
     /**
@@ -76,7 +74,6 @@ public class ContainerType {
         createdAt = cte.getCreatedAt();
         description = cte.getDescription();
         inUse = cte.isInUse();
-        jsonString = cte.getJsonString();
         movable = cte.isMovable();
         name = cte.getName();
         updatedAt = cte.getUpdatedAt();
@@ -93,7 +90,6 @@ public class ContainerType {
             .setCreatedAt(createdAt)
             .setDescription(description)
             .setInUse(inUse)
-            .setJsonString(jsonString)
             .setMovable(movable)
             .setName(name)
             .setUpdatedAt(updatedAt);
@@ -130,10 +126,6 @@ public class ContainerType {
 
     public Set<FieldDefinition> getFieldDefinitions() {
         return fieldDefinitions;
-    }
-
-    public String getJsonString() {
-        return jsonString;
     }
 
     public String getName() {
@@ -186,10 +178,6 @@ public class ContainerType {
 
     public void setInUse(boolean u) {
         inUse = u;
-    }
-
-    public void setJsonString(String j) {
-        jsonString = j;
     }
 
     public void setName(String n) {

@@ -24,7 +24,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -56,8 +56,8 @@ public class RestResultIterator<T> implements Iterator {
         paged = p;
         service = svc;
         if (p) {
-            client.putUrlParameter("page[offset]", "0");
-            client.putUrlParameter("page[limit]", "20");
+            client.putUriParameter("page[offset]", "0");
+            client.putUriParameter("page[limit]", "20");
         }
         initialFetch();
     }
@@ -70,17 +70,17 @@ public class RestResultIterator<T> implements Iterator {
             jsonIterator = jsonResult.getAsJsonObject().getAsJsonArray(RestHelper.ATTR_DATA).iterator();
 
         } catch(UnexpectedResponseCodeException ue) {
-            logger.warn("Unexpected code");
-        } catch(MalformedURLException me) {
-            logger.warn("Malformed URL");
+            logger.warn("Unexpected code", (Throwable) ue);
+        } catch(URISyntaxException me) {
+            logger.warn("Malformed URI", (Throwable) me);
         } catch(IOException ioe) {
             logger.warn("IOException", (Throwable) ioe);
         }
     }
 
-    private void fetchPage(String url) {
+    private void fetchPage(String uri) {
         try {
-            client.setURL(url)
+            client.setURI(uri)
                 .execute();
 
             jsonResult = JsonParser.parseString(client.getResponse());
@@ -88,8 +88,8 @@ public class RestResultIterator<T> implements Iterator {
 
         } catch(UnexpectedResponseCodeException ue) {
             logger.warn("Unexpected code");
-        } catch(MalformedURLException me) {
-            logger.warn("Malformed URL");
+        } catch(URISyntaxException me) {
+            logger.warn("Malformed URI");
         } catch(IOException ioe) {
             logger.warn("IOException", (Throwable) ioe);
         }

@@ -68,9 +68,6 @@ public class Role implements IRole {
     @JoinColumn(name = "role_id")
     private Set<RolePriv> privileges;
 
-    @Column(name="json_string")
-    private String jsonString;
-
     public Role() {
         privileges = new HashSet<> ();
         deleted = false;
@@ -137,10 +134,6 @@ public class Role implements IRole {
         return privileges;
     }
 
-    public String getJsonString() {
-        return jsonString;
-    }
-
     @Override
     public int hashCode() {
         if (id == null) {
@@ -183,10 +176,6 @@ public class Role implements IRole {
 
     public void setDescription(String d) {
         description = d;
-    }
-
-    public void setJsonString(String j) {
-        jsonString = j;
     }
 
     public void setLdapRole(boolean b) {

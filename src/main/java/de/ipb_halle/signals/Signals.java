@@ -105,7 +105,7 @@ public class Signals {
     .longOpt("debug")
     .hasArg()
     .argName("LEVEL")
-    .desc("Set log level to DEBUG")
+    .desc("Set log level to the selected LEVEL (one of FATAL, ERROR, WARN, INFO, DEBUG, TRACE)")
     .build();
 
     @SuppressWarnings("static-acces")
@@ -201,7 +201,7 @@ public class Signals {
             }
 
             if (cmdline.hasOption(trustStoreOpt.getOpt())) {
-                System.setProperty("jakarta.net.ssl.trustStore", cmdline.getOptionValue(trustStoreOpt.getOpt()));
+                System.setProperty("javax.net.ssl.trustStore", cmdline.getOptionValue(trustStoreOpt.getOpt()));
             }
 
 

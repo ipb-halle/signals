@@ -34,7 +34,6 @@ import de.ipb_halle.signals.rest.RestService;
 import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -63,7 +62,6 @@ public class ContainerTypeRestService implements RestService<ContainerType> {
 
         ct.setId(j.getAsJsonObject().getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
         ct.setDescription(attributes.getAsJsonPrimitive(ContainerType.ATTR_DESCRIPTION).getAsString());
-        ct.setJsonString(j.toString());
         ct.setName(attributes.getAsJsonPrimitive(ContainerType.ATTR_NAME).getAsString());
         if (attributes.has(ContainerType.ATTR_ATTACHMENTS)) {
             parseAttachments(attributes.getAsJsonArray(ContainerType.ATTR_ATTACHMENTS), ct);
@@ -80,7 +78,7 @@ public class ContainerTypeRestService implements RestService<ContainerType> {
         restClient.reset()
             .setMethod(Method.GET)
             .setEndpoint(CONTAINER_TYPE_ENDPOINT)
-            .putUrlParameter("entityType","container");
+            .putUriParameter("entityType","container");
 
         RestResultIterator<ContainerType> iter = new RestResultIterator<> (restClient, this, true);
 

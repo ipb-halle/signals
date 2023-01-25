@@ -27,15 +27,10 @@ import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestResultIterator;
 import de.ipb_halle.signals.rest.RestService;
-import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import jakarta.ejb.Local;
 import jakarta.inject.Inject;
@@ -60,7 +55,6 @@ public class LocationTypeRestService implements RestService<LocationType> {
 
         lt.setId(attributes.getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
         lt.setDescription(attributes.getAsJsonPrimitive(LocationType.ATTR_DESCRIPTION).getAsString());
-        lt.setJsonString(j.toString());
         lt.setName(attributes.getAsJsonPrimitive(LocationType.ATTR_NAME).getAsString());
         return lt;
     }
@@ -70,7 +64,7 @@ public class LocationTypeRestService implements RestService<LocationType> {
         restClient.reset()
             .setMethod(Method.GET)
             .setEndpoint(CONTAINER_TYPE_ENDPOINT)
-            .putUrlParameter("entityType","location");
+            .putUriParameter("entityType","location");
 
         RestResultIterator<LocationType> iter = new RestResultIterator<> (restClient, this, true);
 //      Iterator<LocationType> iter = new ArrayList<LocationType> ().iterator();

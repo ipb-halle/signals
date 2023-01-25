@@ -26,8 +26,8 @@ import com.google.gson.JsonPrimitive;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URISyntaxException;
+import java.net.URI;
 import jakarta.ejb.Local;
 
 /** 
@@ -41,15 +41,15 @@ public interface RestClient {
     public final int HTTP_ACCEPTED = 202;
     public final int HTTP_NO_CONTENT = 204;
 
-    public RestClient execute() throws IOException, MalformedURLException, UnexpectedResponseCodeException ;
+    public RestClient execute() throws IOException, URISyntaxException, UnexpectedResponseCodeException ;
 
-    public RestClient execute(int expectedResponseCode) throws IOException, MalformedURLException, UnexpectedResponseCodeException ;
+    public RestClient execute(int expectedResponseCode) throws IOException, URISyntaxException, UnexpectedResponseCodeException ;
 
     public String getResponse();
 
     public int getResponseCode();
 
-    public RestClient putUrlParameter(String key, String value); 
+    public RestClient putUriParameter(String key, String value); 
 
     public RestClient reset();
 
@@ -61,5 +61,5 @@ public interface RestClient {
 
     public RestClient setRequestData(String data);
 
-    public RestClient setURL(String u) throws MalformedURLException;
+    public RestClient setURI(String u) throws URISyntaxException;
 }
