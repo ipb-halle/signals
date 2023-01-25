@@ -28,8 +28,8 @@ import de.ipb_halle.signals.rest.RestService;
 import java.util.Iterator;
 
 
-// import javax.ejb.Local;
-// import javax.inject.Inject;
+// import jakarta.ejb.Local;
+// import jakarta.inject.Inject;
 
 /** 
  * service for field values (not a real REST service)

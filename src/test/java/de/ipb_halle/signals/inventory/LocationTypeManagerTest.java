@@ -22,7 +22,7 @@ import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.rest.MockRestClient;
 import java.util.List;
 import java.util.Properties;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

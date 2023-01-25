@@ -25,7 +25,7 @@ import de.ipb_halle.signals.users.UserDbService;
 import de.ipb_halle.signals.users.UserManager;
 import de.ipb_halle.signals.users.UserRestService;
 import java.util.Properties;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -18,8 +18,8 @@
 package de.ipb_halle.signals.inventory;
 
 import java.util.List;
-import javax.ejb.Stateless;
-import javax.inject.Inject;
+import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 
 /** 
  * Manager for location types (inventory/types API endpoint) 

@@ -21,8 +21,8 @@ import de.ipb_halle.signals.inventory.LocationManager;
 import de.ipb_halle.signals.users.UserManager;
 
 import java.util.List;
-import javax.ejb.Stateless;
-import javax.inject.Inject;
+import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

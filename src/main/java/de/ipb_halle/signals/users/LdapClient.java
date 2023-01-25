@@ -18,7 +18,7 @@
 package de.ipb_halle.signals.users;
 
 import java.util.Set;
-import javax.ejb.Local;
+import jakarta.ejb.Local;
 
 /** 
  * Ldap client reader for Signals tool 

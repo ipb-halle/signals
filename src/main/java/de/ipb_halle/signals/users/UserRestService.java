@@ -25,6 +25,7 @@ import com.google.gson.JsonPrimitive;
 
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
+import de.ipb_halle.signals.rest.RestClientImpl;
 import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestResultIterator;
 import de.ipb_halle.signals.rest.RestService;
@@ -39,8 +40,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.NoSuchElementException;
 
-import javax.ejb.Local;
-import javax.inject.Inject;
+import jakarta.ejb.Local;
+import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +83,7 @@ public class UserRestService implements RestService<User> {
 
 
     @Inject
-    private RestClient restClient;
+    private RestClientImpl restClient;
     
     /**
      * deserialize user

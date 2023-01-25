@@ -28,7 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import javax.ejb.Local;
+import jakarta.ejb.Local;
 
 /** 
  * Http client reader for Signals tool 

@@ -18,7 +18,7 @@
 package de.ipb_halle.signals.rest;
 
 import com.google.gson.JsonElement;
-import javax.ejb.Local;
+import jakarta.ejb.Local;
 
 /** 
  * Rest service 

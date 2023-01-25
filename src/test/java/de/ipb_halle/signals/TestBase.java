@@ -55,10 +55,11 @@ public class TestBase {
 //      unit.setProperty("hibernate.format_sql", "true");
 //      unit.setProperty("hibernate.use_sql_comments", "true");
         unit.setProperty("hibernate.connection.driver_class", "org.hsqldb.jdbcDriver");
-        unit.setProperty("javax.persistence.schema-generation.database.action", "create-drop");
-        unit.setProperty("javax.persistence.schema-generation.create-script-source", "schema.sql");
-        unit.setProperty("javax.persistence.schema-generation.drop-script-source", "drop_schema.sql");
-        unit.setProperty("hibernate.hbm2ddl.import_files_sql_extractor", "org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor");
+        unit.setProperty("jakarta.persistence.schema-generation.database.action", "create-drop");
+        unit.setProperty("jakarta.persistence.schema-generation.create-script-source", "schema.sql");
+        unit.setProperty("jakarta.persistence.schema-generation.drop-script-source", "drop_schema.sql");
+        unit.setProperty("hibernate.hbm2ddl.import_files_sql_extractor", "org.hibernate.tool.schema.internal.script.MultiLineSqlScriptExtractor");
+
         unit.setProperty("tomee.jpa.cdi", "false");
         return unit;
     }

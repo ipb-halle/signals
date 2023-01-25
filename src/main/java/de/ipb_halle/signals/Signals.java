@@ -25,9 +25,9 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Resource;
-import javax.ejb.embeddable.EJBContainer;
-import javax.inject.Inject;
+import jakarta.annotation.Resource;
+import jakarta.ejb.embeddable.EJBContainer;
+import jakarta.inject.Inject;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
@@ -201,7 +201,7 @@ public class Signals {
             }
 
             if (cmdline.hasOption(trustStoreOpt.getOpt())) {
-                System.setProperty("javax.net.ssl.trustStore", cmdline.getOptionValue(trustStoreOpt.getOpt()));
+                System.setProperty("jakarta.net.ssl.trustStore", cmdline.getOptionValue(trustStoreOpt.getOpt()));
             }
 
 

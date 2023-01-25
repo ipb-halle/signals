@@ -18,8 +18,8 @@
 package de.ipb_halle.signals.materials;
 
 import java.util.List;
-import javax.ejb.Stateless;
-import javax.inject.Inject;
+import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 
 /** 
  * Manager for signals entities (entities API endpoint) 

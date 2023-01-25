@@ -19,7 +19,7 @@ package de.ipb_halle.signals.users;
 
 import java.io.Serializable;
 import java.util.Objects;
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 
 /**
  * SNB user roles

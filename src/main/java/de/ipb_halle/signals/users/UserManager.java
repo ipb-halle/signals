@@ -18,8 +18,8 @@
 package de.ipb_halle.signals.users;
 
 import java.util.List;
-import javax.ejb.Stateless;
-import javax.inject.Inject;
+import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 
 
 /** 

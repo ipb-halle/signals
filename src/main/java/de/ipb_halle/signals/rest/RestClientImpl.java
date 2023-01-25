@@ -42,10 +42,10 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.annotation.Resource;
-import javax.ejb.Local;
-import javax.ejb.Stateless;
-import javax.inject.Inject;
+import jakarta.annotation.Resource;
+import jakarta.ejb.Local;
+import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,9 +71,6 @@ public class RestClientImpl implements RestClient {
 
     private Logger logger;
 
-    // see below
-    private static boolean patchAllowed = allowMethods(Method.PATCH.toString());
-
     /**
      * constructor
      */
@@ -89,9 +86,11 @@ public class RestClientImpl implements RestClient {
 
     public RestClient execute(int expectedResponseCode) throws IOException, MalformedURLException, UnexpectedResponseCodeException {
         HttpURLConnection urlConn = (HttpURLConnection) getURL().openConnection();
+/*
         if ((method == Method.PATCH) && (! RestClientImpl.patchAllowed)) {
                 throw new IllegalStateException("fix to HttpURLConnection failed - method PATCH is not allowed");
         }
+*/
         urlConn.setRequestMethod(method.toString());
         urlConn.setRequestProperty("Accept", "application/vnd.api+json");
         urlConn.setRequestProperty("X-API-KEY", signalsConfig.getApiKey());
@@ -218,32 +217,5 @@ public class RestClientImpl implements RestClient {
         urlParameterMap.clear();
         url = new URL(u);
         return this;
-    }
-
-    /**
-     * Patch HttpURLConnection to recognize 'PATCH' as valid HTTP method.
-     * This will become obsolete in Java11+ when HttpURLConnection is replaced
-     * by java.net.http.HttpRequest
-     */
-    private static boolean allowMethods(String... methods) {
-        try {
-            Field methodsField = HttpURLConnection.class.getDeclaredField("methods");
-
-            Field modifiersField = Field.class.getDeclaredField("modifiers");
-            modifiersField.setAccessible(true);
-            modifiersField.setInt(methodsField, methodsField.getModifiers() & ~Modifier.FINAL);
-
-            methodsField.setAccessible(true);
-
-            String[] oldMethods = (String[]) methodsField.get(null);
-            Set<String> methodsSet = new LinkedHashSet<>(Arrays.asList(oldMethods));
-            methodsSet.addAll(Arrays.asList(methods));
-            String[] newMethods = methodsSet.toArray(new String[0]);
-
-            methodsField.set(null/*static field*/, newMethods);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        }
-        return true;
     }
 }

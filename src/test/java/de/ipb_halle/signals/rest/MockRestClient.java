@@ -24,9 +24,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.StringJoiner;
 
-import javax.ejb.LocalBean;
-import javax.ejb.Stateful;
-import javax.inject.Inject;
+import jakarta.ejb.LocalBean;
+import jakarta.ejb.Stateful;
+import jakarta.inject.Inject;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import org.apache.openejb.OpenEjbContainer;
