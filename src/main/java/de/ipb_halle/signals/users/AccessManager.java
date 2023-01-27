@@ -194,11 +194,7 @@ public class AccessManager {
     private void resolveRoleReferences(User snbUser) {
         Set<IRole> newRoles = new HashSet<> ();
         for (IRole iRole : snbUser.getRoles()) {
-            if (iRole instanceof RoleReference) {
-                newRoles.add(roleDbService.loadById(iRole.getId()));
-            } else {
-                newRoles.add(iRole);
-            }
+            newRoles.add(roleDbService.loadById(iRole.getId()));
         }
         snbUser.setRoles(newRoles);
     }
@@ -206,11 +202,7 @@ public class AccessManager {
     private void resolveGroupReferences(User snbUser) {
         Set<IGroup> newGroups = new HashSet<> ();
         for (IGroup iGroup : snbUser.getSystemGroups()) {
-            if (iGroup instanceof GroupReference) {
-                newGroups.add(groupDbService.loadById(iGroup.getId()));
-            } else {
-                newGroups.add(iGroup);
-            }
+            newGroups.add(groupDbService.loadById(iGroup.getId()));
         }
         snbUser.setSystemGroups(newGroups);
     }
@@ -273,9 +265,6 @@ public class AccessManager {
         for(Role snbRole : roleRestService.doGetRoles()) {
             logger.debug("Discovered SNB role: {}", snbRole.getName());
             Role dbRole = rolesFromDb.remove(snbRole.getId());
-            if (snbRole.getName().equals(config.getStandardUserRoleName())) {
-                standardUserRole = snbRole;
-            }
             if (dbRole == null) {
                 if (! dryRun) {
                     roleDbService.save(snbRole);
@@ -288,6 +277,9 @@ public class AccessManager {
                         roleDbService.save(dbRole);
                     }
                 }
+            }
+            if (dbRole.getName().equals(config.getStandardUserRoleName())) {
+                standardUserRole = dbRole;
             }
         }
 
@@ -348,11 +340,11 @@ public class AccessManager {
             dbUser = createUserFromLdap(ldapUser);
         }
 
-        if (dbUser.isMutable()) {
+        if (dbUser.isMutable() || (! dbUser.isEnabled())) {
             // check for changes and apply if necessary
             syncUserLdapChanges(userDN, ldapUser, dbUser);
         } else {
-            logger.debug("Leaving immutable user {} untouched", dbUser.getUserName());
+            logger.debug("Cannot update immutable or disabled user: {}", dbUser.getUserName());
         }
         return dbUser;
     }

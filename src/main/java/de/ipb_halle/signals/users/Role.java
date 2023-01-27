@@ -23,20 +23,11 @@ import java.util.Objects;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 
 /**
  * SNB role
  */
 
-@Entity
-@Table(name="roles")
 public class Role implements IRole {
 
     // entity field names (NOT column names from SQL table)
@@ -49,24 +40,12 @@ public class Role implements IRole {
     public final static String ATTR_NAME = "name";
     public final static String ATTR_PRIVILEGES = "privileges";
 
-    @Id
     private String id;
-
-    @Column
     private String description;
-
-    @Column
     private String name;
-
-    @Column(name="ldap_role")
     private boolean ldapRole;
-
-    @Column
     private boolean deleted;
-
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch=FetchType.EAGER)
-    @JoinColumn(name = "role_id")
-    private Set<RolePriv> privileges;
+    private Set<RolePrivilege> privileges;
 
     public Role() {
         privileges = new HashSet<> ();
@@ -74,15 +53,34 @@ public class Role implements IRole {
         ldapRole = false;
     }
 
+    public Role(RoleEntity re) {
+        id = re.getId();
+        description = re.getDescription();
+        name = re.getName();    
+        ldapRole = re.isLdapRole();
+        deleted = re.isDeleted();
+        privileges = new HashSet<> ();
+    }
+
     public Role addPrivilege(RolePrivilege p) {
-        privileges.add(new RolePriv(id,p));
+        privileges.add(p);
         return this;
     }
 
     public void applyChangesFromSnb(Role snbRole) {
         description = snbRole.getDescription();
         name = snbRole.getName();
-        privileges = snbRole.getPrivileges();
+        privileges.clear();
+        privileges.addAll(snbRole.getPrivileges());
+    }
+
+    public RoleEntity createEntity() {
+        return new RoleEntity()
+            .setId(id)
+            .setDeleted(deleted)
+            .setDescription(description)
+            .setName(name)
+            .setLdapRole(ldapRole);
     }
 
     public String dump() {
@@ -91,10 +89,10 @@ public class Role implements IRole {
         sb.append("Privileges: ");
         int i = 0;
         String sep = "";
-        Iterator<RolePriv> iter = privileges.iterator();
+        Iterator<RolePrivilege> iter = privileges.iterator();
         while(iter.hasNext()) {
             sb.append(sep);
-            sb.append(iter.next().getRolePrivilege().toString());
+            sb.append(iter.next().toString());
             i++;
             if (i % 4 == 0) {
                 sep = ",\n            ";
@@ -130,7 +128,7 @@ public class Role implements IRole {
         return name;
     }
 
-    public Set<RolePriv> getPrivileges() {
+    public Set<RolePrivilege> getPrivileges() {
         return privileges;
     }
 
@@ -143,7 +141,7 @@ public class Role implements IRole {
     }
 
     public boolean hasPrivilege(RolePrivilege p) {
-        return privileges.contains(new RolePriv(id, p));
+        return privileges.contains(p); 
     }
 
     public boolean isDeleted() {
@@ -186,7 +184,7 @@ public class Role implements IRole {
         name = n;
     }
 
-    public void setPrivileges(Set<RolePriv> sp) {
-        privileges = sp;
+    public void setPrivileges(Set<RolePrivilege> p) {
+        privileges = p;
     }
 }

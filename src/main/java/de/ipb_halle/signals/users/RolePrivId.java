@@ -26,7 +26,9 @@ import jakarta.persistence.Embeddable;
  */
 @Embeddable
 public class RolePrivId implements Serializable {
+
     private final static long serialVersionUID = 1L;
+    public final static String ROLE_ID = "role_id";
 
     private String role_id;
 

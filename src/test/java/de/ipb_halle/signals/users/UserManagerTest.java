@@ -85,7 +85,7 @@ public class UserManagerTest {
 
     @Module
     @Classes(cdi = true, value = { MockRestClient.class, MockLdapClient.class, SignalsConfig.class,
-        Role.class, RoleDbService.class,
+        Role.class, RoleEntity.class, RolePriv.class, RoleDbService.class,
         User.class, UserEntity.class, UserDbService.class, UserManager.class, UserRestService.class })
     public EjbJar app() {
         return new EjbJar();

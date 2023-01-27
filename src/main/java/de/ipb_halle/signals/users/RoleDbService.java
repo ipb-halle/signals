@@ -19,8 +19,10 @@ package de.ipb_halle.signals.users;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
@@ -59,8 +61,8 @@ public class RoleDbService {
 
     public List<Role> loadBy(Map<String, Object> cmap) {
         CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<Role> criteriaQuery = builder.createQuery(Role.class);
-        Root<Role> root = criteriaQuery.from(Role.class);
+        CriteriaQuery<RoleEntity> criteriaQuery = builder.createQuery(RoleEntity.class);
+        Root<RoleEntity> root = criteriaQuery.from(RoleEntity.class);
         criteriaQuery.select(root);
 
         if (cmap.get(Role.ROLE_NAME) != null) {
@@ -68,7 +70,9 @@ public class RoleDbService {
         }
 
         List<Role> result = new ArrayList<> ();
-        for (Role role: em.createQuery(criteriaQuery).getResultList()) {
+        for (RoleEntity entity: em.createQuery(criteriaQuery).getResultList()) {
+            Role role = new Role(entity);
+            role.setPrivileges(loadRolePrivileges(entity));
             result.add(role);
         }
         return result;
@@ -82,12 +86,42 @@ public class RoleDbService {
         return resultMap;
     }
 
+    public Set<RolePrivilege> loadRolePrivileges(RoleEntity entity) {
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<RolePriv> criteriaQuery = builder.createQuery(RolePriv.class);
+        Root<RolePriv> root = criteriaQuery.from(RolePriv.class);
+        criteriaQuery.select(root);
+        criteriaQuery.where(builder.equal(root
+                .get(RolePriv.ROLE_PRIV_ID)
+                .get(RolePrivId.ROLE_ID), 
+                entity.getId()));
+
+        Set<RolePrivilege> privileges = new HashSet<> ();
+        for (RolePriv rp : em.createQuery(criteriaQuery).getResultList()) {
+            privileges.add(rp.getRolePrivilege());
+        }
+        return privileges;
+    }
+
     public Role loadById(String id) {
-        return this.em.find(Role.class, id);
+        RoleEntity entity = this.em.find(RoleEntity.class, id);
+        if (entity != null) {
+            Role role = new Role(entity);
+            role.setPrivileges(loadRolePrivileges(entity));
+            return role;
+        }
+        return null;
     }
 
     public void save(Role r) {
-        this.em.merge(r);
+        this.em.merge(r.createEntity());
+        savePrivileges(r);
+    }
+
+    public void savePrivileges(Role r) {
+        for (RolePrivilege privilege : r.getPrivileges()) {
+            this.em.merge(new RolePriv(r.getId(), privilege));
+        }
     }
 }
 

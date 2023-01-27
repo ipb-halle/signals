@@ -35,6 +35,8 @@ import jakarta.persistence.Table;
 @Table(name="role_privileges")
 public class RolePriv {
 
+    public final static String ROLE_PRIV_ID = "id";
+
     @EmbeddedId
     private RolePrivId id;
 

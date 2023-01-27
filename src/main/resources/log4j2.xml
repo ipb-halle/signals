@@ -18,12 +18,12 @@
       <AppenderRef ref="Console"/>
     </Logger>
 
-    <!-- set level to debug to log SQL statements -->
+    <!-- set level to 'debug' to log SQL statements -->
     <Logger name="org.hibernate.SQL" level="warn" additivity="false">
       <AppenderRef ref="Console" level="warn"/>
     </Logger>
 
-    <!-- set level to warn to log bind parameters -->
+    <!-- set level to 'debug' to log bind parameters -->
     <Logger name="org.hibernate.type" level="warn" additivity="false">
       <AppenderRef ref="Console" level="warn"/>
     </Logger>

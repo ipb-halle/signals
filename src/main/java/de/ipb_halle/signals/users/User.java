@@ -159,7 +159,7 @@ public class User implements IUser {
     }
 
     public void clearRoles() {
-        this.roles = new HashSet<> ();
+        this.roles.clear(); 
     }
 
     public UserEntity createEntity() {

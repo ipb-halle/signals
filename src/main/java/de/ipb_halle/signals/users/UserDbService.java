@@ -50,6 +50,12 @@ public class UserDbService {
 
     private Logger logger = LoggerFactory.getLogger(UserDbService.class);
 
+    /**
+     * Load the set of UserRoles for a given user.
+     * NOTE: does not load role privileges!
+     * @param user a User or a UserReference
+     * @return the set of roles assigned to that user, NOT including RolePrivileges
+     */
     private Set<IRole> loadRoles(IUser user) {
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<UserRole> criteriaQuery = builder.createQuery(UserRole.class);
@@ -62,9 +68,9 @@ public class UserDbService {
 
         Set<IRole> result = new HashSet<> ();
         for (UserRole userRole: em.createQuery(criteriaQuery).getResultList()) {
-            Role role = this.em.find(Role.class, userRole.getRoleId());
-            if (role != null) {
-                result.add(role);
+            RoleEntity roleEntity = this.em.find(RoleEntity.class, userRole.getRoleId());
+            if (roleEntity!= null) {
+                result.add(new Role(roleEntity));
             }
         }
         return result;
@@ -156,6 +162,9 @@ public class UserDbService {
         return null;
     }
 
+    /**
+     * save a user, group memberships and user roles to the database.
+     */
     public void save(User u) {
         logger.trace("UserDbService.save() {}", u.dump());
         this.em.merge(u.createEntity());
