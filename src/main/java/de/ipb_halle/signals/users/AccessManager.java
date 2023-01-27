@@ -306,7 +306,7 @@ public class AccessManager {
     private void syncDbUserFromSnb(User snbUser) {
         User dbUser = userDbService.loadById(snbUser.getId());
         if (dbUser == null) {
-            logger.debug("Discovered new SNB user: {}", snbUser.getUserName());
+            logger.info("Discovered new SNB user: {}", snbUser.getUserName());
             if (! dryRun) {
                 snbUser.setMutable(false);
                 userDbService.save(snbUser);
@@ -344,7 +344,7 @@ public class AccessManager {
         ldapUser.addRole(standardUserRole);
         User dbUser = userDbService.loadByUserName(ldapUser.getUserName());
         if (dbUser == null) {
-            logger.debug("Discovered new user in LDAP: {}", ldapUser.getUserName());
+            logger.info("Discovered new user in LDAP: {}", ldapUser.getUserName());
             dbUser = createUserFromLdap(ldapUser);
         }
 
@@ -352,7 +352,7 @@ public class AccessManager {
             // check for changes and apply if necessary
             syncUserLdapChanges(userDN, ldapUser, dbUser);
         } else {
-            logger.info("Leaving immutable user {} untouched", dbUser.getUserName());
+            logger.debug("Leaving immutable user {} untouched", dbUser.getUserName());
         }
         return dbUser;
     }
@@ -362,6 +362,7 @@ public class AccessManager {
      * memberships; save them to DB and SNB
      */
     private void syncUserLdapChanges(String userDN, User ldapUser, User dbUser) {
+        logger.trace("Checking LDAP user for changes: {}", dbUser.getUserName());
         ldapUser.setId(dbUser.getId());
         ldapUser.getRoles().addAll(dbUser.getRoles());
         ldapUser.getSystemGroups().addAll(dbUser.getSystemGroups());
@@ -426,11 +427,18 @@ public class AccessManager {
         // disable mutable users not found in LDAP
         for (User user : ldapUsersById.values()) {
             if (user.isMutable()) {
-                userRestService.doDisableUser(user);
-                user.setEnabled(false);
-                user.setRoles(new HashSet<> ());
-                user.setSystemGroups(new HashSet<> ());
-                userDbService.save(user);
+                logger.info("Could not find mutable user {} in LDAP: DISABLE", user.getUserName());
+                if (! dryRun) {
+                    userRestService.doDisableUser(user);
+                    user.setEnabled(false);
+                    user.setRoles(new HashSet<> ());
+                    user.setSystemGroups(new HashSet<> ());
+                    userDbService.save(user);
+                } else {
+                    logger.info("DRY RUN: skipping update of user {}", user.getUserName());
+                }
+            } else {
+                logger.info("Immutable user {} not found in LDAP: NO ACTION", user.getUserName());
             }
         }
     }
