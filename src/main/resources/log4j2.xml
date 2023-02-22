@@ -4,18 +4,19 @@
   <Appenders>
 
     <Console name="Console" target="SYSTEM_OUT">
-<!--
-      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %m%n"/>
--->
       <PatternLayout pattern="[%-5level] %m%n"/>
     </Console>
+
+    <File name="IPB" fileName="logs/snb.log">
+        <PatternLayout pattern="[%-5level] %m%n"/>
+    </File>
 
   </Appenders>
 
   <Loggers>
 
     <Logger name="de.ipb_halle" level="info" additivity="false">
-      <AppenderRef ref="Console"/>
+      <AppenderRef ref="IPB"/>
     </Logger>
 
     <!-- set level to 'debug' to log SQL statements -->

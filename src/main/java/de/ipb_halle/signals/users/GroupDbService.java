@@ -59,7 +59,7 @@ public class GroupDbService {
         if (result.size() == 1) {
             return result.get(0);
         }
-        logger.debug("Result list for name '{}' contains {} Group records", name, result.size());
+        logger.warn("loadByName() returned {} records for non-unique group name '{}'", result.size(), name);
         return null;
     }
 

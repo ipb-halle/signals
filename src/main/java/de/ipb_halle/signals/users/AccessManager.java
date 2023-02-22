@@ -403,6 +403,8 @@ public class AccessManager {
      */
     private void syncUsersFromLdap() {
         Set<String> userDNs = new HashSet<> ();
+        Set<String> deniedUsers = new HashSet<> ();
+        ldapClient.getMembers(deniedUsers, new HashSet<> (), config.getLdapDeniedUsers(), true);
 
         Map<String, Object> cmap = new HashMap<> ();
         cmap.put(User.USER_MUTABLE, Boolean.TRUE);
@@ -412,14 +414,18 @@ public class AccessManager {
         // nesting allowed here, i.e. we can assign entire groups to SNB
         ldapClient.getMembers(userDNs, new HashSet<> (), config.getLdapManagedUsers(), true);
         for (String dn : userDNs) {
-            User dbUser = syncUserFromLdap(dn);
-            ldapUsersById.remove(dbUser.getId());
+            if (! deniedUsers.contains(dn)) {
+                User dbUser = syncUserFromLdap(dn);
+                ldapUsersById.remove(dbUser.getId());
+            } else {
+                logger.trace("Skipping denied user {}", dn);
+            }
         }
 
         // disable mutable users not found in LDAP
         for (User user : ldapUsersById.values()) {
             if (user.isMutable()) {
-                logger.info("Could not find mutable user {} in LDAP: DISABLE", user.getUserName());
+                logger.info("Disabling mutable user not found in LDAP: {}", user.getUserName());
                 if (! dryRun) {
                     userRestService.doDisableUser(user);
                     user.setEnabled(false);
@@ -427,7 +433,7 @@ public class AccessManager {
                     user.setSystemGroups(new HashSet<> ());
                     userDbService.save(user);
                 } else {
-                    logger.info("DRY RUN: skipping update of user {}", user.getUserName());
+                    logger.debug("DRY RUN: not found in LDAP; skip disabling of mutable user {}", user.getUserName());
                 }
             } else {
                 logger.info("Immutable user {} not found in LDAP: NO ACTION", user.getUserName());

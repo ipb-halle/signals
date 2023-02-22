@@ -105,9 +105,9 @@ public class GroupRestService implements RestService<Group> {
             return snbGroup;
 
         } catch(UnexpectedResponseCodeException ue) {
-            logger.warn("Unexpected code");
+            logger.warn("doCreateGroup() got unexpected return code from API call");
         } catch(URISyntaxException me) {
-            logger.warn("Malformed URL");
+            logger.warn("doCreateGroup() malformed URL");
         } catch(IOException ioe) {
             logger.warn("IOException",  (Throwable) ioe);
         }
@@ -127,9 +127,9 @@ public class GroupRestService implements RestService<Group> {
             return createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
 
         } catch(UnexpectedResponseCodeException ue) {
-            logger.warn("Unexpected code");
+            logger.warn("doGetGroup() Got unexpected return code from API call");
         } catch(URISyntaxException me) {
-            logger.warn("Malformed URL");
+            logger.warn("doGetGroup() malformed URL");
         } catch(IOException ioe) {
             logger.warn("IOException",  (Throwable) ioe);
         }
@@ -167,9 +167,9 @@ public class GroupRestService implements RestService<Group> {
             return group;
 
         } catch(UnexpectedResponseCodeException ue) {
-            logger.warn("Unexpected code");
+            logger.warn("doUpdateGroup() got unexpected return code from API call");
         } catch(URISyntaxException me) {
-            logger.warn("Malformed URL");
+            logger.warn("doUpdateGroup(): malformed URL");
         } catch(IOException ioe) {
             logger.warn("IOException",  (Throwable) ioe);
         }

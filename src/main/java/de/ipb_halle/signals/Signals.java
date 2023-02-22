@@ -134,7 +134,7 @@ public class Signals {
     }
 
     private void manageUsers() {
-        System.out.println("Managing users ...");
+        logger.info("Managing users ...");
         accessManager.setDryRun(dryRun);
         accessManager.manageAccess();
     }

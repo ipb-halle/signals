@@ -46,6 +46,7 @@ public class SignalsConfig {
     private String ldapContextProviderURL;              // ldap://<server>:<port>
     private String ldapContextReferral;                 // follow
     private String ldapDateFormatString;                // yyyy...  -> 20040119134348.0Z
+    private String ldapDeniedUsers;                     // group dn
     private String ldapManagedGroups;                   // group dn
     private String ldapManagedRoles;                    // group dn
     private String ldapManagedUsers;                    // group dn
@@ -78,6 +79,7 @@ public class SignalsConfig {
     public String getLdapContextProviderURL() { return ldapContextProviderURL; }
     public String getLdapContextReferral() { return ldapContextReferral; }
     public String getLdapDateFormatString() { return ldapDateFormatString; }
+    public String getLdapDeniedUsers() { return ldapDeniedUsers; }
     public String getLdapManagedGroups() { return ldapManagedGroups; }
     public String getLdapManagedRoles() { return ldapManagedRoles; }
     public String getLdapManagedUsers() { return ldapManagedUsers; }

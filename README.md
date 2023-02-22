@@ -54,6 +54,7 @@ This project bundles code for migration of IPB data sources, for backup, mainten
           ldapContextProviderURL = ldap://ldap.somewhere.invalid:PORT
           ldapContextReferral = follow
           ldapDateFormatString = yyyyMMddHHmmss.S'Z'
+          ldapDeniedUsers = cn=SnbDeniedUsers,ou=...,dc=DOMAIN,dc=COUNTRY
           ldapManagedGroups = cn=SnbManagedGroups,ou=...,dc=DOMAIN,dc=COUNTRY
           ldapManagedRoles = cn=SnbManagedRoles,ou=...,dc=DOMAIN,dc=COUNTRY
           ldapManagedUsers = cn=SnbManagedUsers,ou=...,dc=DOMAIN,dc=COUNTRY

@@ -80,9 +80,9 @@ public class RoleRestService implements RestService<Role> {
             return createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
 
         } catch(UnexpectedResponseCodeException ue) {
-            logger.warn("Unexpected code");
+            logger.warn("doGetRole() unexpected return code from API call");
         } catch(URISyntaxException me) {
-            logger.warn("Malformed URL");
+            logger.warn("doGetRole() malformed URL");
         } catch(IOException ioe) {
             logger.warn("IOException", (Throwable) ioe);
         }

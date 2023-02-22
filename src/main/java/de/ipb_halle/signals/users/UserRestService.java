@@ -89,7 +89,6 @@ public class UserRestService implements RestService<User> {
      * deserialize user
      */
     public User createEntity(JsonElement j) {
-//      logger.debug("createEntity() --> {}", j.toString());
         User user = parseUser(j);
 
         if (user.isEnabled()) {
@@ -115,9 +114,9 @@ public class UserRestService implements RestService<User> {
             return createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
 
         } catch(UnexpectedResponseCodeException ue) {
-            logger.warn("Unexpected code");
+            logger.warn("doCreateUser() got unexpected return code from API call");
         } catch(URISyntaxException me) {
-            logger.warn("Malformed URL");
+            logger.warn("doCreateUser() malformed URL");
         } catch(IOException ioe) {
             logger.warn("IOException", (Throwable) ioe);
         }
@@ -132,9 +131,9 @@ public class UserRestService implements RestService<User> {
                 .execute(RestClient.HTTP_NO_CONTENT);
 
         } catch(UnexpectedResponseCodeException ue) {
-            logger.warn("Unexpected code");
+            logger.warn("doDisableUser() got unexpected return code from API call");
         } catch(URISyntaxException me) {
-            logger.warn("Malformed URL");
+            logger.warn("doDisableUser() malformed URL");
         } catch(IOException ioe) {
             logger.warn("IOException", (Throwable) ioe);
         }
@@ -154,9 +153,9 @@ public class UserRestService implements RestService<User> {
             parseMemberships(user, jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA).getAsJsonArray());
 
         } catch(UnexpectedResponseCodeException ue) {
-            logger.warn("Unexpected code");
+            logger.warn("doGetSystemGroupMemberships() got unexpected return code from API call");
         } catch(URISyntaxException me) {
-            logger.warn("Malformed URL");
+            logger.warn("doGetSystemGroupMemberships() malformed URL");
         } catch(IOException ioe) {
             logger.warn("IOException", (Throwable) ioe);
         }
@@ -175,9 +174,9 @@ public class UserRestService implements RestService<User> {
             return createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
 
         } catch(UnexpectedResponseCodeException ue) {
-            logger.warn("Unexpected code");
+            logger.warn("doGetUser() got unexpected return code from API call");
         } catch(URISyntaxException me) {
-            logger.warn("Malformed URL");
+            logger.warn("doGetUser() malformed URL");
         } catch(IOException ioe) {
             logger.warn("IOException", (Throwable) ioe);
         }
@@ -223,9 +222,9 @@ public class UserRestService implements RestService<User> {
             return createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
 
         } catch(UnexpectedResponseCodeException ue) {
-            logger.warn("Unexpected code");
+            logger.warn("doUpdateUser() got unexpected return code from API call");
         } catch(URISyntaxException me) {
-            logger.warn("Malformed URL");
+            logger.warn("doUpdateUser() malformed URL");
         } catch(IOException ioe) {
             logger.warn("IOException", (Throwable) ioe);
         }
