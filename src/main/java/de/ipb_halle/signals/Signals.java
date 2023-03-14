@@ -44,9 +44,6 @@ import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.openejb.OpenEjbContainer;
 import org.apache.openejb.api.LocalClient;
 
-
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.core.config.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +66,9 @@ public class Signals {
 
     @Inject
     private LdapClient ldapClient;
+
+    @Inject
+    private LogConfig logConfig;
 
     private boolean dryRun;
     private Logger logger;
@@ -206,7 +206,7 @@ public class Signals {
 
 
             if (cmdline.hasOption(debugOpt.getOpt())) {
-                if (! signals.setLogLevel(cmdline.getOptionValue(debugOpt.getOpt()))) {
+                if (! signals.logConfig.setLogLevel(cmdline.getOptionValue(debugOpt.getOpt()))) {
                     printHelp("ERROR: invalid log level", options);
                     return;
                 }
@@ -225,24 +225,6 @@ public class Signals {
         } catch(Exception e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * @param userLevel text representation of the log level, should be one of 
-     * <code>FATAL, ERROR, WARN, INFO, DEBUG, TRACE</code>.
-     * @return true if setting of log level succeeded, false otherwise
-     */
-    private boolean setLogLevel(String userLevel) {
-        try {
-            Level level = Level.valueOf(userLevel);
-            Configurator.setLevel("de.ipb_halle", level); 
-            return true;
-        } catch (IllegalArgumentException iae) {
-            logger.warn("Undefined level '{}' in setLogLevel()", userLevel);
-        } catch (NullPointerException npe) {
-            logger.warn("setLogLevel(userLevel) called with null argument");
-        }
-        return false;
     }
 
     private void setDryRun() {

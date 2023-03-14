@@ -228,6 +228,13 @@
     <version>4.0.0</version>
   </dependency>
 
+  <!-- javax.mail -->
+  <dependency>
+      <groupId>com.sun.mail</groupId>
+      <artifactId>javax.mail</artifactId>
+      <version>1.6.2</version>
+  </dependency>
+
   <!-- needed on JDK 11: Runtime, com.sun.xml.bind module -->
   <dependency>
     <groupId>org.glassfish.jaxb</groupId>

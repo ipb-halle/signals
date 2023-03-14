@@ -67,5 +67,14 @@ public enum RolePrivilege {
     canExportMaterials,
     canTrashParaExp,
     manageVitroVivo,
-    manageInventa
+    manageInventa,
+    canReopenSamples,
+    canCloseSamples,
+    canCreateAnalysis,
+    canEditAnalysis,
+    canViewAnalysis,
+    canShareAnalysis,
+    canMoveAnalysis,
+    canTrashAnalysis,
+    canExportAnalysis
 }
