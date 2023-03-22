@@ -267,7 +267,7 @@ public class AccessManager {
             Role dbRole = rolesFromDb.remove(snbRole.getId());
             if (dbRole == null) {
                 if (! dryRun) {
-                    roleDbService.save(snbRole);
+                    dbRole = roleDbService.save(snbRole);
                 }
             } else {
                 if (snbRole.isModified(dbRole)) {
@@ -278,7 +278,8 @@ public class AccessManager {
                     }
                 }
             }
-            if (dbRole.getName().equals(config.getStandardUserRoleName())) {
+            if ((dbRole != null)
+                    && (dbRole.getName().equals(config.getStandardUserRoleName()))) {
                 standardUserRole = dbRole;
             }
         }
@@ -333,7 +334,9 @@ public class AccessManager {
      */
     private User syncUserFromLdap(String userDN) {
         User ldapUser = ldapClient.getUser(userDN);
-        ldapUser.addRole(standardUserRole);
+        if (standardUserRole != null) {
+            ldapUser.addRole(standardUserRole);
+        }
         User dbUser = userDbService.loadByUserName(ldapUser.getUserName());
         if (dbUser == null) {
             logger.info("Discovered new user in LDAP: {}", ldapUser.getUserName());

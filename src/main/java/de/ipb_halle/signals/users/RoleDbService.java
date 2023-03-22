@@ -113,9 +113,10 @@ public class RoleDbService {
         return null;
     }
 
-    public void save(Role r) {
+    public Role save(Role r) {
         this.em.merge(r.createEntity());
         savePrivileges(r);
+        return loadById(r.getId());
     }
 
     public void savePrivileges(Role r) {
