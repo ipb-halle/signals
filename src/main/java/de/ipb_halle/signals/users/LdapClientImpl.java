@@ -39,7 +39,6 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
-import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
@@ -140,7 +139,7 @@ public class LdapClientImpl implements LdapClient {
      */
     public Group getGroup(String groupDN) {
         try {
-            DirContext ctx = new InitialDirContext(ldapEnv);
+            LdapContext ctx = getContext();
             try {
                 Attributes attrs = ctx.getAttributes(groupDN);
 
