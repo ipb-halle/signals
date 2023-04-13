@@ -24,7 +24,6 @@ import de.ipb_halle.signals.inventory.LocationEntity;
 import de.ipb_halle.signals.inventory.LocationManager;
 import de.ipb_halle.signals.inventory.LocationRestService;
 import de.ipb_halle.signals.rest.MockRestClient;
-import de.ipb_halle.signals.users.MockLdapClient;
 import de.ipb_halle.signals.users.User;
 import de.ipb_halle.signals.users.UserDbService;
 import de.ipb_halle.signals.users.UserRestService;
@@ -79,7 +78,7 @@ public class ContainerManagerTest {
     private ContainerManager manager;
 
     @Module
-    @Classes(cdi = true, value = { MockLdapClient.class, MockRestClient.class, SignalsConfig.class,
+    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
         LocationEntity.class, LocationDbService.class, LocationManager.class, LocationRestService.class,
         User.class, UserEntity.class, UserDbService.class, UserManager.class, UserRestService.class,
         Container.class, ContainerDbService.class, ContainerManager.class, ContainerRestService.class })

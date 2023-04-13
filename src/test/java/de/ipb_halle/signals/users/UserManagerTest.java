@@ -32,8 +32,6 @@ import org.apache.openejb.jee.EjbJar;
 import org.apache.openejb.junit.ApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
-import org.apache.openejb.testing.Descriptor;
-import org.apache.openejb.testing.Descriptors;
 import org.apache.openejb.testing.Module;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
 
@@ -84,7 +82,7 @@ public class UserManagerTest {
     private RoleDbService roleSvc;
 
     @Module
-    @Classes(cdi = true, value = { MockRestClient.class, MockLdapClient.class, SignalsConfig.class,
+    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
         Role.class, RoleEntity.class, RolePriv.class, RoleDbService.class,
         User.class, UserEntity.class, UserDbService.class, UserManager.class, UserRestService.class })
     public EjbJar app() {

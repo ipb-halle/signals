@@ -13,24 +13,25 @@
       ldapAttrAccountExpirationDate = accountExpires
       ldapAttrAlias = initials
       ldapAttrCreatedAt = whenCreated
-      ldapAttrGroupName = cn
-      ldapAttrEmail = mail
+      ldapAttrEmail = userPrincipalName
       ldapAttrFirstName = givenName
+      ldapAttrGroupName = cn
       ldapAttrLastName = sn
       ldapAttrMemberOf = memberOf
       ldapAttrMembers = member
       ldapAttrObjectClass = objectClass
-      ldapAttrObjectClassGroup = group 
+      ldapAttrObjectClassGroup = group
       ldapAttrObjectClassUser = person
       ldapAttrUserName = userPrincipalName
-      ldapContextProviderURL = ldap://ldap.somewhere.invalid:PORT
+      ldapContextProviderURL = ldap://ldap.somewhere.invalid:389
       ldapContextReferral = follow
       ldapDateFormatString = yyyyMMddHHmmss.S'Z'
-      ldapManagedGroups = cn=SnbManagedGroups,ou=...,dc=DOMAIN,dc=COUNTRY
-      ldapManagedRoles = cn=SnbManagedRoles,ou=...,dc=DOMAIN,dc=COUNTRY
-      ldapManagedUsers = cn=SnbManagedUsers,ou=...,dc=DOMAIN,dc=COUNTRY
-      ldapSecurityPrincipal = test
-      ldapSecurityCredentials = 0000
+      ldapDeniedUsers = CN=testDeniedUsers,OU=groups,DC=somewhere,DC=invalid
+      ldapManagedGroups = CN=testGroups,OU=groups,DC=somewhere,DC=invalid
+      ldapManagedRoles = CN=testRoles,OU=groups,DC=somewhere,DC=invalid
+      ldapManagedUsers = CN=testUsers,OU=groups,DC=somewhere,DC=invalid
+      ldapSecurityPrincipal = CN=ldapsearch,CN=admin,DC=somewhere,DC=invalid
+      ldapSecurityCredentials = secretPassword
       ldapSecurityAuthentication = simple
       standardUserRoleName = Standard User
       userAttrCountry = Germany
