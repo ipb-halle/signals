@@ -53,18 +53,46 @@
  <build>
   <plugins>
 
-   <!-- compile plugin -->
-   <plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-compiler-plugin</artifactId>
-    <version>3.1</version>
-    <configuration>
-     <source>1.8</source>
-     <target>1.8</target>
-     <compilerArgument>-Xlint:all</compilerArgument>
-     <encoding>${project.build.sourceEncoding}</encoding>
-    </configuration>
-   </plugin>
+    <!-- maven site plugin -->
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.12.1</version>
+    </plugin>
+
+    <!-- compile plugin -->
+    <plugin>
+     <groupId>org.apache.maven.plugins</groupId>
+     <artifactId>maven-compiler-plugin</artifactId>
+     <version>3.1</version>
+     <configuration>
+      <source>1.8</source>
+      <target>1.8</target>
+      <compilerArgument>-Xlint:all</compilerArgument>
+      <encoding>${project.build.sourceEncoding}</encoding>
+     </configuration>
+    </plugin>
+
+    <!-- Code Coverage report generation -->
+    <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.9</version>
+        <executions>
+            <execution>
+                <goals>
+                    <goal>prepare-agent</goal>
+                </goals>
+            </execution>
+            <execution>
+                <id>generate-code-coverage-report</id>
+                <phase>test</phase>
+                <goals>
+                    <goal>report</goal>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
 
     <!-- assembly plugin -->
     <plugin>
@@ -144,7 +172,26 @@
         </dependencies>
     </plugin>
 
-
+    <!-- software BOM -->
+    <plugin>
+        <groupId>org.spdx</groupId>
+        <artifactId>spdx-maven-plugin</artifactId>
+        <version>0.6.4</version>
+        <executions>
+            <execution>
+                <id>build-spdx</id>
+                <phase>site</phase>
+                <goals>
+                    <goal>createSPDX</goal>
+                </goals>
+            </execution>
+        </executions>
+        <configuration>
+          <excludedFilePatterns>
+            <param>*.spdx</param>
+          </excludedFilePatterns>
+        </configuration>
+    </plugin>
 
   </plugins>
  </build>
