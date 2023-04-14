@@ -46,8 +46,9 @@ import static org.junit.Assert.assertThrows;
 @RunWith(ApplicationComposer.class)
 public class LdapClientTest {
 
-    public final static String TEST_GROUP_DN = "CN=All Users, OU=groups, DC=somewhere, DC=invalid";
-    public final static String TEST_GROUP_NAME = "All Users";
+    public final static String TEST_ALL_USERS_DN = "CN=All Users, OU=groups, DC=somewhere, DC=invalid";
+    public final static String TEST_ALL_USERS_NAME = "All Users";
+    public final static String TEST_GOETHE_DN = "CN=Goethe\\, JohannW, OU=poet, DC=somewhere, DC=invalid";
 
     @Resource
     SignalsConfig signalsConfig;
@@ -77,9 +78,17 @@ public class LdapClientTest {
 
 
     @Test
-    public void clientTest() {
-        assertEquals("configuration is present", "initials", signalsConfig.getLdapAttrAlias());
+    public void getGroupTest() {
+        assertEquals("Name of Group matches", TEST_ALL_USERS_NAME, ldapClient.getGroup(TEST_ALL_USERS_DN).getName());
+    }
 
-        assertEquals("Group name matches", TEST_GROUP_NAME, ldapClient.getGroup(TEST_GROUP_DN).getName());
+    @Test
+    public void getMembersTest() {
+        assertTrue("'All Users' has member 'Goethe'", ldapClient.getMembers(TEST_ALL_USERS_DN, true).contains(TEST_GOETHE_DN));
+    }
+
+    @Test
+    public void getMembershipTest() {
+        assertTrue("'Goethe' is member in 'All Users'", ldapClient.getMemberships(TEST_GOETHE_DN, true).contains(TEST_ALL_USERS_DN));
     }
 }

@@ -68,7 +68,8 @@
     "dn"                  : "CN=All Users, OU=groups, DC=somewhere, DC=invalid",
     "cn"                  : "All Users",
     "memberOf"            : [],
-    "members"             : [ "CN=Scientists, OU=groups, DC=somewhere, DC=invalid", "CN=Poets, OU=groups, DC=somewhere, DC=invalid" ],
+    "members"             : [ "CN=Scientists, OU=groups, DC=somewhere, DC=invalid", 
+                            "CN=Poets, OU=groups, DC=somewhere, DC=invalid" ],
     "objectClass"         : ["top", "group"]
  },{
     "dn"                  : "CN=Scientists, OU=groups, DC=somewhere, DC=invalid",
