@@ -68,20 +68,20 @@
     "dn"                  : "CN=All Users, OU=groups, DC=somewhere, DC=invalid",
     "cn"                  : "All Users",
     "memberOf"            : [],
-    "members"             : [ "CN=Scientists, OU=groups, DC=somewhere, DC=invalid", 
+    "member"             : [ "CN=Scientists, OU=groups, DC=somewhere, DC=invalid", 
                             "CN=Poets, OU=groups, DC=somewhere, DC=invalid" ],
     "objectClass"         : ["top", "group"]
  },{
     "dn"                  : "CN=Scientists, OU=groups, DC=somewhere, DC=invalid",
     "cn"                  : "Scientists",
     "memberOf"            : [ "CN=All Users, OU=groups, DC=somewhere, DC=invalid" ],
-    "members"             : [ "CN=Einstein\\, Albert, OU=science, DC=somewhere, DC=invalid" ],
+    "member"             : [ "CN=Einstein\\, Albert, OU=science, DC=somewhere, DC=invalid" ],
     "objectClass"         : ["top", "group"]
  },{
     "dn"                  : "CN=Poets, OU=groups, DC=somewhere, DC=invalid",
     "cn"                  : "Poets",
     "memberOf"            : [ "CN=All Users, OU=groups, DC=somewhere, DC=invalid" ],
-    "members"             : [ "CN=Goethe\\, JohannW, OU=poet, DC=somewhere, DC=invalid",
+    "member"             : [ "CN=Goethe\\, JohannW, OU=poet, DC=somewhere, DC=invalid",
                             "CN=Schiller\\, Friedrich, OU=poet, DC=somewhere, DC=invalid",
                             "CN=Morgenstern\\, Christian, OU=poet, DC=somewhere, DC=invalid",
                             "CN=Heine\\, Heinrich, OU=poet, DC=somewhere, DC=invalid",

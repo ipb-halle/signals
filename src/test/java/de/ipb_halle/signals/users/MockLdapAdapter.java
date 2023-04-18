@@ -90,7 +90,7 @@ public class MockLdapAdapter implements LdapAdapter {
                 case "dn" : 
                     dn = element.getAsJsonPrimitive().getAsString();
                     break;
-                case "members" :
+                case "member" :
                 case "memberOf" :
                 case "objectClass" :
                     attributes.put(parseArrayAttribute(key, element));
