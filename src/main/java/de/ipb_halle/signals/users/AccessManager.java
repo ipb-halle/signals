@@ -19,6 +19,7 @@ package de.ipb_halle.signals.users;
 
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.users.LdapClient;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -27,7 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import jakarta.annotation.Resource;
-import jakarta.ejb.Stateless;
+import jakarta.ejb.Local;
 import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
@@ -38,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * Manager for signals roles
  */
 
-@Stateless
+@Local
 public class AccessManager {
 
     @Resource
@@ -246,9 +247,11 @@ public class AccessManager {
                 }
             }
         }
+        deleteMissingGroups(groupsFromDb.values());
+    }
 
-        // mark groups not found in SNB as deleted
-        for (Group group : groupsFromDb.values()) {
+    private void deleteMissingGroups(Collection<Group> missingGroups) {
+        for (Group group : missingGroups) {
             if (! dryRun) {
                 logger.debug("group {} not found in SNB - marking as deleted", group.getName());
                 group.setDeleted(true);
@@ -283,9 +286,11 @@ public class AccessManager {
                 standardUserRole = dbRole;
             }
         }
+        deleteMissingRoles(rolesFromDb.values());
+    }
 
-        // mark roles not found in SNB as deleted
-        for (Role dbRole : rolesFromDb.values()) {
+    private void deleteMissingRoles(Collection<Role> missingRoles) {
+        for (Role dbRole : missingRoles) {
             if (! dryRun) {
                 logger.debug("role {} not found in SNB - marking as deleted", dbRole.getName());
                 dbRole.setDeleted(true);
@@ -412,34 +417,33 @@ public class AccessManager {
         Map<String, Object> cmap = new HashMap<> ();
         cmap.put(User.USER_MUTABLE, Boolean.TRUE);
         cmap.put(User.USER_ENABLED, Boolean.TRUE);
-        Map<String, User> ldapUsersById = userDbService.loadMappedById(cmap);
+        Map<String, User> enabledMutableDbUsersById = userDbService.loadMappedById(cmap);
 
         // nesting allowed here, i.e. we can assign entire groups to SNB
         ldapClient.getMembers(userDNs, new HashSet<> (), config.getLdapManagedUsers(), true);
         for (String dn : userDNs) {
             if (! deniedUsers.contains(dn)) {
                 User dbUser = syncUserFromLdap(dn);
-                ldapUsersById.remove(dbUser.getId());
+                enabledMutableDbUsersById.remove(dbUser.getId());
             } else {
                 logger.trace("Skipping denied user {}", dn);
             }
         }
+        // disable remaining mutable users
+        disableMutableUsers(enabledMutableDbUsersById.values());
+    }
 
-        // disable mutable users not found in LDAP
-        for (User user : ldapUsersById.values()) {
-            if (user.isMutable()) {
-                logger.info("Disabling mutable user not found in LDAP: {}", user.getUserName());
-                if (! dryRun) {
-                    userRestService.doDisableUser(user);
-                    user.setEnabled(false);
-                    user.setRoles(new HashSet<> ());
-                    user.setSystemGroups(new HashSet<> ());
-                    userDbService.save(user);
-                } else {
-                    logger.debug("DRY RUN: not found in LDAP; skip disabling of mutable user {}", user.getUserName());
-                }
+    private void disableMutableUsers(Collection<User> mutableUsers) {
+        for (User user : mutableUsers) {
+            logger.info("Disabling mutable user not found in LDAP: {}", user.getUserName());
+            if (! dryRun) {
+                userRestService.doDisableUser(user);
+                user.setEnabled(false);
+                user.setRoles(new HashSet<> ());
+                user.setSystemGroups(new HashSet<> ());
+                userDbService.save(user);
             } else {
-                logger.info("Immutable user {} not found in LDAP: NO ACTION", user.getUserName());
+                logger.debug("DRY RUN: not found in LDAP; skip disabling of mutable user {}", user.getUserName());
             }
         }
     }
