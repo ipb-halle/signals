@@ -15,13 +15,14 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.reporting;
+package de.ipb_halle.signals;
 
-import j2html.tags.Tag;
 
-public interface HtmlSection {
+public class UpdateConfig {
 
-    public void addContent(String content);
+    public boolean updateDb = true;
 
-    public Tag getContent();
+    public boolean updateSNB = true;
+
+    public boolean updateFromLdap = true;
 }

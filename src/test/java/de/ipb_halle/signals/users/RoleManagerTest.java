@@ -19,6 +19,7 @@ package de.ipb_halle.signals.users;
 
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
+import de.ipb_halle.signals.UpdateConfig;
 import de.ipb_halle.signals.rest.MockRestClient;
 import java.util.Iterator;
 import java.util.List;
@@ -58,8 +59,12 @@ public class RoleManagerTest {
     @Inject
     private RoleManager manager;
 
+    @Inject
+    private RoleDbService roleDbService;
+
     @Module
-    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
+    @Classes(cdi = true, value = { LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class, 
+        MockRestClient.class, SignalsConfig.class,
         Role.class, RolePriv.class, RoleDbService.class, RoleManager.class, RoleRestService.class })
     public EjbJar app() {
         return new EjbJar();
@@ -86,9 +91,17 @@ public class RoleManagerTest {
     @Test
     public void roleManagerTest() {
 
-        List<Role> roles = manager.getSnbRoles();
-        manager.save(roles);
-        Role role = manager.getDbRole(TEST_ROLE_ID);
+        Role testRole = roleDbService.loadById(TEST_ROLE_ID);
+        if (testRole != null) {
+            testRole.setName("--- WRONG ---");
+            testRole.setDescription("--- WRONG ---");
+            roleDbService.save(testRole);
+        }
+
+        UserSynchronizationContext context = new UserSynchronizationContext(
+                new UpdateConfig());
+        manager.syncDbRolesFromSnb(context);
+        Role role = roleDbService.loadById(TEST_ROLE_ID);
 
         assertEquals("Role name mismatch", TEST_ROLE_NAME, role.getName());
         assertEquals("Role description mismatch", TEST_ROLE_DESCRIPTION, role.getDescription());

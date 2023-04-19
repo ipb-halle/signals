@@ -31,7 +31,7 @@ public class HtmlReportTest {
     public void reportTest() {
         HtmlReport report = new HtmlReport();
 
-        HtmlSection pageHeader = new HtmlHeading("Report Demo", "Just a few introductory words.");
+        HtmlSection pageHeader = new HtmlText("Report Demo", "Just a few introductory words.");
 
         HtmlList sectionOne = new HtmlList("People", "People from history");
         sectionOne.addContent("Julius Caesar");
@@ -41,13 +41,14 @@ public class HtmlReportTest {
         sectionOne.addContent("Winston Churchill");
         
         HtmlList sectionTwo = new HtmlList("Oceans", "Oceans of the world");
-        sectionTwo.addContent("Atlantic Ocean");
-        sectionTwo.addContent("Pacific Ocean");
-        sectionTwo.addContent("Indian Ocean");
 
-        report.addSection(pageHeader);
-        report.addSection(sectionOne);
-        report.addSection(sectionTwo);
+        report.addSection("header", pageHeader);
+        report.addSection("one", sectionOne);
+        report.addSection("two", sectionTwo);
+
+        report.addContent("two", "Atlantic Ocean");
+        report.addContent("two", "Pacific Ocean");
+        report.addContent("two", "Indian Ocean");
 
         String reportString = report.render();
         assertTrue("Report contains heading", reportString.contains("few introductory words"));

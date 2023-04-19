@@ -70,7 +70,9 @@ public class Signals {
     @Inject
     private LogConfig logConfig;
 
-    private boolean dryRun;
+    private UpdateConfig updateConfig;
+    private boolean noMail;
+
     private Logger logger;
 
     @SuppressWarnings("static-access")
@@ -97,8 +99,27 @@ public class Signals {
     @SuppressWarnings("static-acces")
     private static final Option dryRunOpt = Option.builder("n")
     .longOpt("dry-run")
-    .desc("Don't modify - dry run")
+    .desc("Dry run - don't modify anything (includes --noUpdateSNB and --noUpdateFromLDAP).")
     .build();
+
+    @SuppressWarnings("static-acces")
+    private static final Option noMailOpt = Option.builder("m")
+    .longOpt("noMail")
+    .desc("Do not send any reports by email") 
+    .build();
+
+    @SuppressWarnings("static-acces")
+    private static final Option noUpdateSnbOpt = Option.builder("noSNB")
+    .longOpt("noUpdateSNB")
+    .desc("Do not perform updates to Signals Notebook")
+    .build();
+
+    @SuppressWarnings("static-acces")
+    private static final Option noUpdateFromLdapOpt = Option.builder("noLDAP")
+    .longOpt("noUpdateFromLDAP")
+    .desc("Do not perform updates from LDAP")
+    .build();
+
 
     @SuppressWarnings("static-acces")
     private static final Option debugOpt = Option.builder("d")
@@ -122,7 +143,8 @@ public class Signals {
      * default constructor
      */
     public Signals() {
-        dryRun = false;
+        updateConfig = new UpdateConfig();
+        noMail = false;
         logger = LoggerFactory.getLogger(Signals.class);
     }
 
@@ -135,8 +157,7 @@ public class Signals {
 
     private void manageUsers() {
         logger.info("Managing users ...");
-        accessManager.setDryRun(dryRun);
-        accessManager.manageAccess();
+        accessManager.manageAccess(updateConfig, noMail);
     }
 
     public static Signals getInstance(String fname) {
@@ -197,7 +218,21 @@ public class Signals {
             Signals signals = getInstance(configFile);
 
             if (cmdline.hasOption(dryRunOpt.getOpt())) {
-                signals.setDryRun();
+                signals.updateConfig.updateDb = false;
+                signals.updateConfig.updateSNB = false;
+                signals.updateConfig.updateFromLdap = false;
+            }
+
+            if (cmdline.hasOption(noMailOpt.getOpt())) {
+                signals.noMail = true;
+            }
+
+            if (cmdline.hasOption(noUpdateSnbOpt.getOpt())) {
+                signals.updateConfig.updateSNB = false;
+            }
+
+            if (cmdline.hasOption(noUpdateFromLdapOpt.getOpt())) {
+                signals.updateConfig.updateFromLdap = false;
             }
 
             if (cmdline.hasOption(trustStoreOpt.getOpt())) {
@@ -227,16 +262,15 @@ public class Signals {
         }
     }
 
-    private void setDryRun() {
-        dryRun = true;
-    }
-
     public static void main(String[] argv) {
         Options options = new Options();
         options.addOption(configOpt);
         options.addOption(helpOpt);
         options.addOption(debugOpt);
         options.addOption(dryRunOpt);
+        options.addOption(noMailOpt);
+        options.addOption(noUpdateSnbOpt);
+        options.addOption(noUpdateFromLdapOpt);
         options.addOption(trustStoreOpt);
         options.addOption(userMgrOpt);
 

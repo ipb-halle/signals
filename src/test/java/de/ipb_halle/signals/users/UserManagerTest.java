@@ -82,9 +82,11 @@ public class UserManagerTest {
     private RoleDbService roleSvc;
 
     @Module
-    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
-        Role.class, RoleEntity.class, RolePriv.class, RoleDbService.class,
-        User.class, UserEntity.class, UserDbService.class, UserManager.class, UserRestService.class })
+    @Classes(cdi = true, value = { LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class,
+        MockRestClient.class, SignalsConfig.class, 
+        GroupDbService.class, GroupManager.class, GroupRestService.class,
+        RoleDbService.class, RoleManager.class, RoleRestService.class, 
+        UserDbService.class, UserManager.class, UserRestService.class })
     public EjbJar app() {
         return new EjbJar();
     }
@@ -137,6 +139,9 @@ public class UserManagerTest {
     @Test
     public void userManagerTest() {
 
+        assertTrue("need refactoring, Just fail the test", 1 == 0);
+
+/*
         List<User> users = manager.getSnbUsers(TEST_USER1_LAST_NAME, true);
         manager.save(users);
         User user = manager.getDbUser(TEST_USER1_ID);
@@ -147,5 +152,6 @@ public class UserManagerTest {
 
         user = manager.getSnbUser(TEST_USER2_ID);
         assertEquals("user last name mismatch", TEST_USER2_LAST_NAME, user.getLastName());
+*/
     }
 }

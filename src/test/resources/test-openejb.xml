@@ -33,6 +33,8 @@
       ldapSecurityPrincipal = CN=ldapsearch,CN=admin,DC=somewhere,DC=invalid
       ldapSecurityCredentials = secretPassword
       ldapSecurityAuthentication = simple
+      mailFrom = someone@somewhere.invalid
+      mailTo = someone@somewhere.invalid
       standardUserRoleName = Standard User
       userAttrCountry = Germany
       userAttrOrganization = testOrg

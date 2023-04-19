@@ -20,6 +20,15 @@ package de.ipb_halle.signals.inventory;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.rest.MockRestClient;
+import de.ipb_halle.signals.users.LdapClient;
+import de.ipb_halle.signals.users.MockLdapAdapter;
+import de.ipb_halle.signals.users.MockLdapAdapterFactory;
+import de.ipb_halle.signals.users.GroupDbService;
+import de.ipb_halle.signals.users.GroupManager;
+import de.ipb_halle.signals.users.GroupRestService;
+import de.ipb_halle.signals.users.RoleDbService;
+import de.ipb_halle.signals.users.RoleManager;
+import de.ipb_halle.signals.users.RoleRestService;
 import de.ipb_halle.signals.users.UserDbService;
 import de.ipb_halle.signals.users.UserManager;
 import de.ipb_halle.signals.users.UserRestService;
@@ -59,9 +68,12 @@ public class LocationManagerTest {
     private LocationManager manager;
 
     @Module
-    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
+    @Classes(cdi = true, value = { LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class,
+        MockRestClient.class, SignalsConfig.class,
+        GroupDbService.class, GroupManager.class, GroupRestService.class,
+        RoleDbService.class, RoleManager.class, RoleRestService.class, 
         UserDbService.class, UserManager.class, UserRestService.class,
-        LocationEntity.class, LocationDbService.class, LocationManager.class, LocationRestService.class })
+        LocationDbService.class, LocationManager.class, LocationRestService.class })
     public EjbJar app() {
         return new EjbJar();
     }

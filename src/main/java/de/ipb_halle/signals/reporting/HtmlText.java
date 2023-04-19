@@ -18,10 +18,23 @@
 package de.ipb_halle.signals.reporting;
 
 import j2html.tags.Tag;
+import static j2html.TagCreator.*;
 
-public interface HtmlSection {
 
-    public void addContent(String content);
+public class HtmlText implements HtmlSection {
 
-    public Tag getContent();
+    private String title;
+    private String text;
+
+    public HtmlText(String title, String text) {
+        this.title = title;
+        this.text = text;
+    }
+
+    public void addContent(String content) {
+    }
+
+    public Tag getContent() {
+        return div(h1(title), p(text));
+    }
 }

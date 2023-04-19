@@ -15,23 +15,26 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.reporting;
+package de.ipb_halle.signals.users;
 
-import j2html.tags.Tag;
-import static j2html.TagCreator.*;
+import de.ipb_halle.signals.UpdateConfig;
+import de.ipb_halle.signals.reporting.MailReport;
+import java.util.Map;
+import java.util.Set;
 
+public class UserSynchronizationContext { 
 
-public class HtmlHeading implements HtmlSection {
+    public UpdateConfig updateConfig;
+    public MailReport report;
+    public int reportRecords;
+    public Role standardUserRole;
+    public Map<String, Group> groupsByDN;
+    public Map<String, Role> rolesByDN;
+    public Set<Group> groupsToAdd;
+    public Set<Group> groupsToRemove;
 
-    private String title;
-    private String description;
-
-    public HtmlHeading(String title, String description) {
-        this.title = title;
-        this.description = description;
-    }
-
-    public Tag getContent() {
-        return div(h1(title), p(description));
+    public UserSynchronizationContext(UpdateConfig cfg) {
+        updateConfig = cfg;
+        reportRecords = 0;
     }
 }

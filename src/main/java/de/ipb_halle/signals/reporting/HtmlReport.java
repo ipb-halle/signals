@@ -17,21 +17,25 @@
  */
 package de.ipb_halle.signals.reporting;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import static j2html.TagCreator.*;
 
 public class HtmlReport {
 
-    private List<HtmlSection> sections;
+    private LinkedHashMap<String, HtmlSection> sections;
 
     public HtmlReport() {
-        sections = new ArrayList<> ();
+        sections = new LinkedHashMap<> ();
     }
 
-    public HtmlReport addSection(HtmlSection section) {
-        sections.add(section);
+    public HtmlReport addSection(String name, HtmlSection section) {
+        sections.put(name, section);
         return this;
+    }
+
+    public void addContent(String name, String content) {
+        sections.get(name).addContent(content);
     }
 
     public String render() {
@@ -41,7 +45,7 @@ public class HtmlReport {
                     title("SignalsTool HtmlReport")
                 ),
                 body(
-                    each(sections, section -> section.getContent())
+                    each(sections.values(), section -> section.getContent())
                 )
             )
         );

@@ -19,6 +19,7 @@ package de.ipb_halle.signals.users;
 
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
+import de.ipb_halle.signals.UpdateConfig;
 import de.ipb_halle.signals.rest.MockRestClient;
 import java.util.Iterator;
 import java.util.List;
@@ -60,8 +61,12 @@ public class GroupManagerTest {
     @Inject
     private GroupManager manager;
 
+    @Inject
+    private GroupDbService groupDbService;
+
     @Module
-    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
+    @Classes(cdi = true, value = { LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class,
+        MockRestClient.class, SignalsConfig.class,
         Group.class, GroupDbService.class, GroupManager.class, GroupRestService.class })
     public EjbJar app() {
         return new EjbJar();
@@ -88,9 +93,15 @@ public class GroupManagerTest {
     @Test
     public void groupManagerTest() {
 
-        List<Group> groups = manager.getSnbGroups();
-        manager.save(groups);
-        Group group = manager.getDbGroup(TEST_GROUP_ID);
+        Group testGroup = groupDbService.loadById(TEST_GROUP_ID);
+        if (testGroup != null) {
+            testGroup.setDescription("--- WRONG ---");
+            testGroup.setName("--- WRONG ---");
+            groupDbService.save(testGroup);
+        }
+        
+        manager.syncDbGroupsFromSnb(new UpdateConfig());
+        Group group = groupDbService.loadById(TEST_GROUP_ID);
 
         assertEquals("Group name mismatch", TEST_GROUP_NAME, group.getName());
         assertEquals("Group description mismatch", TEST_GROUP_DESCRIPTION, group.getDescription());

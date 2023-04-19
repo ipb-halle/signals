@@ -19,12 +19,22 @@ package de.ipb_halle.signals.inventory;
 
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
+import de.ipb_halle.signals.UpdateConfig;
 import de.ipb_halle.signals.inventory.LocationDbService;
 import de.ipb_halle.signals.inventory.LocationEntity;
 import de.ipb_halle.signals.inventory.LocationManager;
 import de.ipb_halle.signals.inventory.LocationRestService;
 import de.ipb_halle.signals.rest.MockRestClient;
+import de.ipb_halle.signals.users.LdapClient;
+import de.ipb_halle.signals.users.MockLdapAdapter;
+import de.ipb_halle.signals.users.MockLdapAdapterFactory;
 import de.ipb_halle.signals.users.User;
+import de.ipb_halle.signals.users.GroupDbService;
+import de.ipb_halle.signals.users.GroupManager;
+import de.ipb_halle.signals.users.GroupRestService;
+import de.ipb_halle.signals.users.RoleDbService;
+import de.ipb_halle.signals.users.RoleManager;
+import de.ipb_halle.signals.users.RoleRestService;
 import de.ipb_halle.signals.users.UserDbService;
 import de.ipb_halle.signals.users.UserRestService;
 import de.ipb_halle.signals.users.UserEntity;
@@ -78,10 +88,13 @@ public class ContainerManagerTest {
     private ContainerManager manager;
 
     @Module
-    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
-        LocationEntity.class, LocationDbService.class, LocationManager.class, LocationRestService.class,
-        User.class, UserEntity.class, UserDbService.class, UserManager.class, UserRestService.class,
-        Container.class, ContainerDbService.class, ContainerManager.class, ContainerRestService.class })
+    @Classes(cdi = true, value = { LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class,
+        MockRestClient.class, SignalsConfig.class,
+        LocationDbService.class, LocationManager.class, LocationRestService.class,
+        GroupDbService.class, GroupManager.class, GroupRestService.class,
+        RoleDbService.class, RoleManager.class, RoleRestService.class,
+        UserDbService.class, UserManager.class, UserRestService.class,
+        ContainerDbService.class, ContainerManager.class, ContainerRestService.class })
     public EjbJar app() {
         return new EjbJar();
     }
@@ -108,7 +121,7 @@ public class ContainerManagerTest {
         user.setLastName("TwoLast");
         user.setId(TEST_USER1_ID);
         user.setEmail("user.two@someplace.invalid");
-        userManager.save(user);
+        userManager.save(new UpdateConfig(), user);
 
         user = new User();
         user.setEnabled(true);
@@ -116,7 +129,7 @@ public class ContainerManagerTest {
         user.setLastName("ThreeLast");
         user.setId(TEST_USER2_ID);
         user.setEmail("user.three@someplace.invalid");
-        userManager.save(user);
+        userManager.save(new UpdateConfig(), user);
 
         LocationEntity loc = new LocationEntity();
         loc.setId(TEST_LOCATION_ID);

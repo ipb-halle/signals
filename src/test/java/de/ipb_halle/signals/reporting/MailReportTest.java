@@ -36,8 +36,8 @@ public class MailReportTest {
     public void reportTest() {
         MailReport report = new MailReport();
 
-        HtmlSection pageHeader = new HtmlHeading("Just Nonsense", "An apple a day is worth a pound of cure.");
-        report.addSection(pageHeader);
+        HtmlSection pageHeader = new HtmlText("Just Nonsense", "An apple a day is worth a pound of cure.");
+        report.addSection("header", pageHeader);
 
         try {
             report.setFrom("sender@somewhere.invalid")
