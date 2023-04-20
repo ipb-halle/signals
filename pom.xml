@@ -30,27 +30,27 @@
  <name>IPB signals client</name>
  <url>http://www.ipb-halle.de</url>
  
- <properties>
-  <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-  <!-- check Maven Central for latest versions! -->
-  <cxf.version>4.0.0</cxf.version>
- </properties>
+    <!-- check Maven Central for latest versions! -->
+    <cxf.version>4.0.0</cxf.version>
+  </properties>
 
- <!-- define (additional) repositories -->
- <repositories>
+  <!-- define (additional) repositories -->
+  <repositories>
     <repository>
-      <id>central</id>
-      <url>https://repo.maven.apache.org/maven2/</url>
+        <id>central</id>
+        <url>https://repo.maven.apache.org/maven2/</url>
    </repository>
    <repository>
-     <id>sonatype public</id>
-     <url>https://oss.sonatype.org/content/groups/public/</url>
-   </repository>
- </repositories>
+        <id>sonatype public</id>
+        <url>https://oss.sonatype.org/content/groups/public/</url>
+    </repository>
+  </repositories>
 
  
- <build>
+  <build>
   <plugins>
 
     <!-- maven site plugin -->
@@ -71,27 +71,6 @@
       <compilerArgument>-Xlint:all</compilerArgument>
       <encoding>${project.build.sourceEncoding}</encoding>
      </configuration>
-    </plugin>
-
-    <!-- Code Coverage report generation -->
-    <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.9</version>
-        <executions>
-            <execution>
-                <goals>
-                    <goal>prepare-agent</goal>
-                </goals>
-            </execution>
-            <execution>
-                <id>generate-code-coverage-report</id>
-                <phase>test</phase>
-                <goals>
-                    <goal>report</goal>
-                </goals>
-            </execution>
-        </executions>
     </plugin>
 
     <!-- assembly plugin -->
@@ -172,11 +151,33 @@
         </dependencies>
     </plugin>
 
+
+    <!-- Code Coverage report generation -->
+    <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.9</version>
+        <executions>
+            <execution>
+                <goals>
+                    <goal>prepare-agent</goal>
+                </goals>
+            </execution>
+            <execution>
+                <id>generate-code-coverage-report</id>
+                <phase>test</phase>
+                <goals>
+                    <goal>report</goal>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
+
     <!-- software BOM -->
     <plugin>
         <groupId>org.spdx</groupId>
         <artifactId>spdx-maven-plugin</artifactId>
-        <version>0.6.4</version>
+        <version>0.6.5</version>
         <executions>
             <execution>
                 <id>build-spdx</id>
@@ -194,8 +195,31 @@
     </plugin>
 
   </plugins>
- </build>
+  </build>
 
+  <reporting>
+  <plugins>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>3.4.3</version>
+    </plugin>
+
+    <!-- JavaDoc -->
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.5.0</version>
+        <configuration>
+            <author>Signals Tool development team</author>
+            <encoding>UTF-8</encoding>
+            <nohelp>true</nohelp>
+            <show>private</show>
+        </configuration>
+    </plugin>
+
+  </plugins>
+  </reporting>
 
   <dependencies>
 
