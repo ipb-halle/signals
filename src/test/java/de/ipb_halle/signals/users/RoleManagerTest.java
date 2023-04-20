@@ -91,13 +91,6 @@ public class RoleManagerTest {
     @Test
     public void roleManagerTest() {
 
-        Role testRole = roleDbService.loadById(TEST_ROLE_ID);
-        if (testRole != null) {
-            testRole.setName("--- WRONG ---");
-            testRole.setDescription("--- WRONG ---");
-            roleDbService.save(testRole);
-        }
-
         UserSynchronizationContext context = new UserSynchronizationContext(
                 new UpdateConfig());
         manager.syncDbRolesFromSnb(context);

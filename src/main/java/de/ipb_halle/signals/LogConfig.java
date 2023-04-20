@@ -41,43 +41,7 @@ import org.slf4j.MarkerFactory;
 @Stateless
 public class LogConfig {
 
-    private final static String emailMarkerTag = "EMAIL";
-    private final static String emailAppenderName = "EMAIL";
-    private final static int emailDefaultBufferSize = 10;
-
-    private static Marker emailMarker = MarkerFactory.getMarker(emailMarkerTag);
-
     private Logger logger = LoggerFactory.getLogger(LogConfig.class);
-
-    public void configureEmailLogging(SignalsConfig signalsConfig) {
-/*
-        WORK IN  PROGRESS
-
-        Configuration config = LoggerContext
-                                .getContext()
-                                .getConfiguration();
-
-        SmtpAppender.Builder builder = SmtpAppender.newBuilder();
-        builder.setFrom("somebody@somewhere.invalid");
-        builder.setTo("somebody@somewhere.invalid");
-        builder.setSubject("TEST Signals Tool Logging");
-        builder.setName(emailAppenderName);
-        builder.setConfiguration(config);
-        builder.setBufferSize(emailDefaultBufferSize);
-        builder.setLayout(HtmlLayout.createDefaultLayout());
-        builder.setFilter(MarkerFilter.createFilter(
-                    emailMarkerTag, Filter.Result.ACCEPT, Filter.Result.DENY));
-
-//      config.addAppender(builder.build());
-
-        config.getLoggerConfig("de.ipb_halle").addAppender(builder.build(), Level.INFO, null);
-*/
-        return;
-    }
-
-    public static Marker getEmailMarker() {
-        return emailMarker;
-    }
 
     /**
      * @param userLevel text representation of the log level, should be one of 
@@ -96,7 +60,6 @@ public class LogConfig {
         }
         return false;
     }
-
 }
 
 

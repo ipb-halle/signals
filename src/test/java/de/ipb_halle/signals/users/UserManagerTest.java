@@ -19,6 +19,7 @@ package de.ipb_halle.signals.users;
 
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
+import de.ipb_halle.signals.UpdateConfig;
 import de.ipb_halle.signals.rest.MockRestClient;
 import java.util.Iterator;
 import java.util.List;
@@ -45,7 +46,8 @@ public class UserManagerTest {
 
     private final String TEST_RESOURCE_1 = "UserManagerTest001.json";
     private final String TEST_KEY_1 =
-        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users?page%5Blimit%5D=20&q=ThreeLast&page%5Boffset%5D=0&enabled=true";
+        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users?page%5Blimit%5D=20&page%5Boffset%5D=0&enabled=true";
+//      "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users?page%5Blimit%5D=20&q=ThreeLast&page%5Boffset%5D=0&enabled=true";
     private final String TEST_RESOURCE_2 = "UserManagerTest002.json";
     private final String TEST_KEY_2 =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/107";
@@ -57,14 +59,19 @@ public class UserManagerTest {
     private final String TEST_KEY_3c =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/122/systemGroups";
 
+    private final String TEST_RESOURCE_4 = "UserManagerTest004.json";
+    private final String TEST_KEY_4 = 
+        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users?page%5Blimit%5D=20&page%5Boffset%5D=0&enabled=false";
+
 
 
     private final String TEST_USER1_ID = "102";
     private final String TEST_USER1_ALIAS = "USR3";
     private final String TEST_USER1_FIRST_NAME = "ThreeFirst";
     private final String TEST_USER1_LAST_NAME = "ThreeLast";
-    private final String TEST_USER2_ID = "107";
-    private final String TEST_USER2_LAST_NAME = "FourLast";
+    private final String TEST_USER2_ID = "122";
+    private final String TEST_USER2_LAST_NAME = "ThreeLast";
+    private final String TEST_USER2_FIRST_NAME = "FiveFirst";
     private final String TEST_ROLE1_ID = "1";
     private final String TEST_ROLE1_NAME = "System Admin";
     private final String TEST_ROLE3_ID = "3";
@@ -79,7 +86,10 @@ public class UserManagerTest {
     private UserManager manager;
 
     @Inject
-    private RoleDbService roleSvc;
+    private RoleDbService roleDbService;
+
+    @Inject
+    private UserDbService userDbService;
 
     @Module
     @Classes(cdi = true, value = { LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class,
@@ -118,40 +128,40 @@ public class UserManagerTest {
         TestBase.prepareRestClients(mockRestClient,
             TEST_KEY_3c,
             getClass().getResourceAsStream(TEST_RESOURCE_3));
+        TestBase.prepareRestClients(mockRestClient,
+            TEST_KEY_4,
+            getClass().getResourceAsStream(TEST_RESOURCE_4));
 
 
 
         Role role = new Role();
         role.setId(TEST_ROLE1_ID);
         role.setName(TEST_ROLE1_NAME);
-        roleSvc.save(role);
+        roleDbService.save(role);
         role = new Role();
         role.setId(TEST_ROLE3_ID);
         role.setName(TEST_ROLE3_NAME);
-        roleSvc.save(role);
+        roleDbService.save(role);
         role = new Role();
         role.setId(TEST_ROLE4_ID);
         role.setName(TEST_ROLE4_NAME);
-        roleSvc.save(role);
+        roleDbService.save(role);
     }
 
 
     @Test
     public void userManagerTest() {
 
-        assertTrue("need refactoring, Just fail the test", 1 == 0);
+        manager.syncDbUsersFromSnb(new UpdateConfig());
+        User user = userDbService.loadById(TEST_USER1_ID);
 
-/*
-        List<User> users = manager.getSnbUsers(TEST_USER1_LAST_NAME, true);
-        manager.save(users);
-        User user = manager.getDbUser(TEST_USER1_ID);
 
         assertEquals("user alias mismatch", TEST_USER1_ALIAS, user.getAlias());
         assertEquals("user first name mismatch", TEST_USER1_FIRST_NAME, user.getFirstName());
         assertEquals("user last name mismatch", TEST_USER1_LAST_NAME, user.getLastName());
 
-        user = manager.getSnbUser(TEST_USER2_ID);
+        user = userDbService.loadById(TEST_USER2_ID);
+        assertEquals("user first name mismatch", TEST_USER2_FIRST_NAME, user.getFirstName());
         assertEquals("user last name mismatch", TEST_USER2_LAST_NAME, user.getLastName());
-*/
     }
 }
