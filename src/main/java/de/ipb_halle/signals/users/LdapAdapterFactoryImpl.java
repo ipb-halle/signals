@@ -32,7 +32,7 @@ import javax.naming.ldap.StartTlsRequest;
 import javax.naming.ldap.StartTlsResponse;
 
 @Local
-public class LdapAdapterFactoryImpl {
+public class LdapAdapterFactoryImpl implements LdapAdapterFactory {
 
     public LdapAdapter getAdapter(SignalsConfig cfg) throws Exception {
         LdapAdapterImpl adapter = new LdapAdapterImpl(cfg);
