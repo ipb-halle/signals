@@ -65,31 +65,9 @@ public class UserManager {
 
     private Logger logger = LoggerFactory.getLogger(UserManager.class);
 
-/*
-    public User getDbUser(String id) {
-        return userDbService.loadById(id);
-    }
-
-    public User getSnbUser(String id) {
-        return userRestService.doGetUser(id);
-    }
-*/
-
     public User getUser(String id) {
         return userDbService.loadById(id);
     }
-
-/*
-    public List<User> getSnbUsers(String query, boolean enabled) {
-        return userRestService.doGetUsers(query, enabled);
-    }
-
-    public void save(List<User> users) {
-        for (User u : users) {
-            userDbService.save(u);
-        }
-    }
-*/
 
     public User doCreateUser(UserSynchronizationContext context, User user) {
         if (context.updateConfig.updateSNB) {
@@ -184,21 +162,20 @@ public class UserManager {
             Map<String, Object> cmap = new HashMap<> ();
             cmap.put(User.USER_MUTABLE, Boolean.TRUE);
             cmap.put(User.USER_ENABLED, Boolean.TRUE);
-            Map<String, User> enabledMutableDbUsersById = userDbService.loadMappedById(cmap);
+            Map<String, User> removeMap = userDbService.loadMappedById(cmap);
 
             // nesting allowed here, i.e. we can assign entire groups to SNB
             ldapClient.getMembers(userDNs, new HashSet<> (), config.getLdapManagedUsers(), true);
             for (String dn : userDNs) {
                 if (! deniedUsers.contains(dn)) {
                     logger.trace("Processing LDAP user DN: {}", dn);
-                    User dbUser = syncUserFromLdap(context, dn);
-                    enabledMutableDbUsersById.remove(dbUser.getId());
+                    syncUserFromLdap(context, removeMap, dn);
                 } else {
                     logger.trace("Skipping denied user: {}", dn);
                 }
             }
             // disable remaining mutable users
-            disableMutableUsers(context, enabledMutableDbUsersById.values());
+            disableMutableUsers(context, removeMap.values());
         } catch (Exception e) {
             logger.warn("syncUsersFromLdap() caught an exception: ", (Throwable) e);
             context.report.addContent(AccessManager.SECTION_ERRORS, "LDAP user synchronization failed: " + e.getMessage());
@@ -216,29 +193,53 @@ public class UserManager {
     /**
      * synchronize a single user from LDAP
      */
-    private User syncUserFromLdap(UserSynchronizationContext context, String userDN) throws Exception {
+    private void syncUserFromLdap(
+            UserSynchronizationContext context,
+            Map<String, User> removeMap,
+            String userDN) throws Exception {
+
+        User ldapUser = loadUserFromLdap(context, userDN);
+        if (ldapUser.isEnabled()) {
+            User dbUser = loadOrCreateDbUser(context, ldapUser, removeMap);
+            if (dbUser.isMutable() && dbUser.isEnabled()) {
+                syncUserLdapChanges(context, userDN, ldapUser, dbUser);
+            } else {
+                logger.debug("Cannot update immutable or disabled user: {}", dbUser.getUserName());
+            }
+        } else {
+            logger.debug("Refusing to operate on expired LDAP user: {}", ldapUser.getUserName());
+        }
+    }
+
+    private User loadUserFromLdap(
+                UserSynchronizationContext context,
+                String userDN) throws Exception {
+
         User ldapUser = ldapClient.getUser(userDN);
         if (context.standardUserRole != null) {
             ldapUser.addRole(context.standardUserRole);
         }
+        return ldapUser;
+    }
+
+    private User loadOrCreateDbUser(
+                UserSynchronizationContext context,
+                User ldapUser,
+                Map<String, User> removeMap) {
+
         User dbUser = userDbService.loadByUserName(ldapUser.getUserName());
         if (dbUser == null) {
             logger.info("Discovered new user in LDAP: {}", ldapUser.getUserName());
             dbUser = doCreateUser(context, ldapUser);
-        }
-
-        if (dbUser.isMutable() && dbUser.isEnabled()) {
-            // check for changes and apply if necessary
-            syncUserLdapChanges(context, userDN, ldapUser, dbUser);
         } else {
-            logger.debug("Cannot update immutable or disabled user: {}", dbUser.getUserName());
+            removeMap.remove(dbUser.getId());
         }
         return dbUser;
     }
 
     /**
      * compute necessary changes in user roles and group
-     * memberships; save them to DB and SNB
+     * memberships; save them to DB and propagate to SNB
      */
     private void syncUserLdapChanges(
                 UserSynchronizationContext context,

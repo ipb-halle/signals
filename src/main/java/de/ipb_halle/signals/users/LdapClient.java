@@ -252,9 +252,10 @@ public class LdapClient {
     }
 
     /**
-     * determine expiration status of account according to account expiration date
-     * 
-     * NOTE: This is an AD specific implementation!
+     * Determine expiration status of account according to account expiration date.
+     *
+     * NOTE: This is an AD specific implementation, "expires never" can obviously 
+     * be represented by two values: either 2^63-1 or 0.
      *
      * @param attr LDAP attribute set
      * @return enabled state 
@@ -263,7 +264,11 @@ public class LdapClient {
         String value = getAttribute(attrs, 
                 signalsConfig.getLdapAttrAccountExpirationDate());
         try {
-            long millis = (Long.parseLong(value) - TIME_OFFSET_AD) / 10000;
+            long nanos = Long.parseLong(value);
+            if (nanos == 0) {
+                return true;
+            }
+            long millis = (nanos - TIME_OFFSET_AD) / 10000;
             if (millis < new Date().getTime()) {
                 return false;
             }
