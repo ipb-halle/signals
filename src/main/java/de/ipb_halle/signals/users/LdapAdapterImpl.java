@@ -38,7 +38,7 @@ import javax.naming.ldap.StartTlsResponse;
  * LDAP / AD service.
  */
 @Local
-public class LdapAdapterImpl implements LdapAdapter {
+public class LdapAdapterImpl implements LdapAdapter, AutoCloseable {
 
     private final String startTlsEnvKey = "StartTlsResponseEnvKey";
 
@@ -53,10 +53,14 @@ public class LdapAdapterImpl implements LdapAdapter {
     /**
      * close the  LDAP Context and the StartTlsResponse
      */
-    public void closeAdapter() throws NamingException, IOException {
-        ((StartTlsResponse) context.getEnvironment().get(startTlsEnvKey)).close();
-        context.removeFromEnvironment(startTlsEnvKey);
-        context.close();
+    public void close() throws IOException {
+        try {
+            ((StartTlsResponse) context.getEnvironment().get(startTlsEnvKey)).close();
+            context.removeFromEnvironment(startTlsEnvKey);
+            context.close();
+        } catch(NamingException e) {
+            throw new IOException("close() caught a NamingException: " + e.getMessage());
+        }
     }
 
 

@@ -43,6 +43,8 @@ public class AccessManager {
     public final static String SECTION_HEADER = "header";
     public final static String SECTION_NEW_USERS = "new_users";
     public final static String SECTION_DISABLED_USERS = "disabled_users";
+    public final static String SECTION_GROUP_INFO = "group_info";
+    public final static String SECTION_ERRORS = "errors";
 
     @Resource
     private SignalsConfig signalsConfig;
@@ -86,6 +88,14 @@ public class AccessManager {
         report.addSection(SECTION_DISABLED_USERS, new HtmlList(
             "Disabled Accounts",
             "The following list of accounts are no longer allowed to access Signals Notebook:"
+            ));
+        report.addSection(SECTION_GROUP_INFO, new HtmlList(
+            "Group Info",
+            "Summary of changes in group membership:"
+            ));
+        report.addSection(SECTION_ERRORS, new HtmlList(
+            "Errors",
+            "Summary of severe errors, requiring external fixing:"
             ));
         context.report = report;
     }

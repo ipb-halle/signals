@@ -79,15 +79,13 @@ public class LdapClient {
      * @param attrs the attribute set
      * @return the account creation date
      */
-    private Date getCreatedAt(Attributes attrs) throws NamingException {
+    private Date getCreatedAt(Attributes attrs) throws Exception {
         DateFormat dateFormat = new SimpleDateFormat(signalsConfig.getLdapDateFormatString());
         try {
-            return dateFormat.parse(attrs
-                    .get(signalsConfig.getLdapAttrCreatedAt())
-                    .get()
-                    .toString());
+            return dateFormat.parse(
+                    getAttribute(attrs, signalsConfig.getLdapAttrCreatedAt()));
         } catch(ParseException pe) {
-            // silently ignore date
+            logger.warn("getCreatedAt() date parsing error: {}", pe.getMessage());
         }
         return new Date(0);
     }
@@ -97,21 +95,16 @@ public class LdapClient {
      * @return a corresponding Group object
      */
     public Group getGroup(String groupDN) {
-        try {
-            LdapAdapter adapter = ldapAdapterFactory.getAdapter(signalsConfig);
-            try {
-                Attributes attrs = adapter.getAttributes(groupDN);
+        try (LdapAdapter adapter = ldapAdapterFactory.getAdapter(signalsConfig)) {
+            Attributes attrs = adapter.getAttributes(groupDN);
 
-                Group group = new Group();
+            Group group = new Group();
 
-                group.setName(attrs.get(signalsConfig.getLdapAttrGroupName()).get().toString());
-                group.setDescription(signalsConfig.getGroupAttrDescription());
-                group.setSystem(true);
+            group.setName(getAttribute(attrs, signalsConfig.getLdapAttrGroupName()));
+            group.setDescription(signalsConfig.getGroupAttrDescription());
+            group.setSystem(true);
 
-                return group;
-            } finally {
-                adapter.closeAdapter();
-            }
+            return group;
         } catch(Exception e) {
             logger.warn("getGroup() caught an Exception: ", (Throwable) e);
         }                                                
@@ -137,28 +130,23 @@ public class LdapClient {
      * @param nesting indicate whether nested memberships should be resolved
      */
     public void getMembers(Set<String> users, Set<String> groups, String groupDN, boolean nesting) {
-        try {
-            LdapAdapter adapter = ldapAdapterFactory.getAdapter(signalsConfig);
-            try {
-                BasicAttribute membersAttr = (BasicAttribute) adapter 
-                        .getAttributes(groupDN)
-                        .get(signalsConfig.getLdapAttrMembers());
+        try (LdapAdapter adapter = ldapAdapterFactory.getAdapter(signalsConfig)) {
+            BasicAttribute membersAttr = (BasicAttribute) adapter 
+                    .getAttributes(groupDN)
+                    .get(signalsConfig.getLdapAttrMembers());
 
-                if (membersAttr != null) {
-                    NamingEnumeration<?> membersEnumeration = membersAttr.getAll();
-                    while (membersEnumeration.hasMore()) {
-                        String dn = membersEnumeration.next().toString();
-                        if (isGroup(adapter, dn)) {
-                            if (groups.add(dn) && nesting) {
-                                getMembers(users, groups, dn, nesting);
-                            }
-                        } else {
-                            users.add(dn);
+            if (membersAttr != null) {
+                NamingEnumeration<?> membersEnumeration = membersAttr.getAll();
+                while (membersEnumeration.hasMore()) {
+                    String dn = membersEnumeration.next().toString();
+                    if (isGroup(adapter, dn)) {
+                        if (groups.add(dn) && nesting) {
+                            getMembers(users, groups, dn, nesting);
                         }
+                    } else {
+                        users.add(dn);
                     }
                 }
-            } finally {
-                adapter.closeAdapter();
             }
         } catch(Exception e) {
             logger.warn("getMembers() caught an Exception for DN {}: ", groupDN, e);
@@ -183,25 +171,20 @@ public class LdapClient {
      * @param nesting true if nested memberships should be resolved
      */
     private void getMemberships(Set<String> groups, String objDN, boolean nesting) {
-        try {
-            LdapAdapter adapter = ldapAdapterFactory.getAdapter(signalsConfig);
-            try {
-                BasicAttribute memberOfAttr = (BasicAttribute) adapter
-                        .getAttributes(objDN)
-                        .get(signalsConfig.getLdapAttrMemberOf());
+        try (LdapAdapter adapter = ldapAdapterFactory.getAdapter(signalsConfig)) { 
+            BasicAttribute memberOfAttr = (BasicAttribute) adapter
+                    .getAttributes(objDN)
+                    .get(signalsConfig.getLdapAttrMemberOf());
 
-                if (memberOfAttr != null) {
-                    NamingEnumeration<?> memberOfEnumeration = memberOfAttr.getAll();
+            if (memberOfAttr != null) {
+                NamingEnumeration<?> memberOfEnumeration = memberOfAttr.getAll();
 
-                    while (memberOfEnumeration.hasMore()) {
-                        String dn = memberOfEnumeration.next().toString();
-                        if (groups.add(dn) && nesting) {
-                            getMemberships(groups, dn, nesting);
-                        }
+                while (memberOfEnumeration.hasMore()) {
+                    String dn = memberOfEnumeration.next().toString();
+                    if (groups.add(dn) && nesting) {
+                        getMemberships(groups, dn, nesting);
                     }
                 }
-            } finally {
-                adapter.closeAdapter();
             }
         } catch(Exception e) {
             logger.warn("getMemberships() caught an Exception: ", (Throwable) e);
@@ -213,19 +196,14 @@ public class LdapClient {
      * @return a corresponding Role object
      */
     public Role getRole(String roleDN) {
-        try {
-            LdapAdapter adapter = ldapAdapterFactory.getAdapter(signalsConfig);
-            try {
-                Attributes attrs = adapter.getAttributes(roleDN);
+        try (LdapAdapter adapter = ldapAdapterFactory.getAdapter(signalsConfig)) {
+            Attributes attrs = adapter.getAttributes(roleDN);
 
-                Role role = new Role();
-                role.setName(attrs.get(signalsConfig.getLdapAttrGroupName()).get().toString());
-                role.setDescription(signalsConfig.getGroupAttrDescription());
+            Role role = new Role();
+            role.setName(getAttribute(attrs, signalsConfig.getLdapAttrGroupName()));
+            role.setDescription(signalsConfig.getGroupAttrDescription());
 
-                return role;
-            } finally {
-                adapter.closeAdapter();
-            }
+            return role;
         } catch(Exception e) {
             logger.warn("getRole() caught an Exception: ", (Throwable) e);
         }
@@ -236,38 +214,41 @@ public class LdapClient {
      * @param userDN a distinguished user name
      * @return a corresponding User object
      */
-    public User getUser(String userDN) {
-        try {
-            LdapAdapter adapter = ldapAdapterFactory.getAdapter(signalsConfig);
-            try {
-                Attributes attrs = adapter.getAttributes(userDN);
+    public User getUser(String userDN) throws Exception {
+        try (LdapAdapter adapter = ldapAdapterFactory.getAdapter(signalsConfig)) {
+            Attributes attrs = adapter.getAttributes(userDN);
 
-                if (! attrs.get(signalsConfig.getLdapAttrObjectClass())
-                            .contains(signalsConfig.getLdapAttrObjectClassUser())) {
-                    logger.warn("DN {} is not a person", userDN);
-                    return null;
-                }
-
-                User user = new User();
-                user.setAlias(attrs.get(signalsConfig.getLdapAttrAlias()).get().toString().toUpperCase());
-                user.setCountry(signalsConfig.getUserAttrCountry());
-                user.setCreatedAt(getCreatedAt(attrs));
-                user.setEmail(attrs.get(signalsConfig.getLdapAttrEmail()).get().toString().toLowerCase());
-                user.setEnabled(getUserExpiration(attrs));
-                user.setFirstName(attrs.get(signalsConfig.getLdapAttrFirstName()).get().toString());
-                user.setMutable(true);
-                user.setLastName(attrs.get(signalsConfig.getLdapAttrLastName()).get().toString());
-                user.setOrganization(signalsConfig.getUserAttrOrganization());
-                user.setUserName(attrs.get(signalsConfig.getLdapAttrUserName()).get().toString().toLowerCase());
-
-                return user;
-            } finally {
-                adapter.closeAdapter();
+            if (! attrs.get(signalsConfig.getLdapAttrObjectClass())
+                        .contains(signalsConfig.getLdapAttrObjectClassUser())) {
+                throw new Exception("DN " + userDN +  " is not a person");
             }
+
+            User user = new User();
+            user.setAlias(getAttribute(attrs, signalsConfig.getLdapAttrAlias()).toUpperCase());
+            user.setCountry(signalsConfig.getUserAttrCountry());
+            user.setCreatedAt(getCreatedAt(attrs));
+            user.setEmail(getAttribute(attrs, signalsConfig.getLdapAttrEmail()).toLowerCase());
+            user.setEnabled(getUserExpiration(attrs));
+            user.setFirstName(getAttribute(attrs, signalsConfig.getLdapAttrFirstName()));
+            user.setMutable(true);
+            user.setLastName(getAttribute(attrs, signalsConfig.getLdapAttrLastName()));
+            user.setOrganization(signalsConfig.getUserAttrOrganization());
+            user.setUserName(getAttribute(attrs, signalsConfig.getLdapAttrUserName()).toLowerCase());
+
+            return user;
         } catch(Exception e) {
-            logger.warn("getUser() caught an Exception: ", (Throwable) e);
-        } 
-        return null;
+            logger.warn("getUser({}) caught an exception", userDN);
+            throw new Exception(e.getMessage() + " for user " + userDN);
+        }
+    }
+
+    private String getAttribute(Attributes attrs, String attrName) throws Exception {
+        BasicAttribute attribute = (BasicAttribute) attrs.get(attrName);
+        if (attribute != null) {
+            return attribute.get().toString();
+        }
+        logger.warn("Missing mandatory attribute {}", attrName);
+        throw new Exception("Missing mandatory attribute");
     }
 
     /**
@@ -278,9 +259,9 @@ public class LdapClient {
      * @param attr LDAP attribute set
      * @return enabled state 
      */
-    private boolean getUserExpiration(Attributes attrs) throws NamingException {
-        String value = attrs.get(signalsConfig
-                .getLdapAttrAccountExpirationDate()).get().toString();
+    private boolean getUserExpiration(Attributes attrs) throws Exception {
+        String value = getAttribute(attrs, 
+                signalsConfig.getLdapAttrAccountExpirationDate());
         try {
             long millis = (Long.parseLong(value) - TIME_OFFSET_AD) / 10000;
             if (millis < new Date().getTime()) {

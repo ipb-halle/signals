@@ -19,6 +19,7 @@ package de.ipb_halle.signals.users;
 
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.UpdateConfig;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -175,28 +176,34 @@ public class UserManager {
      * syncronize multiple users from LDAP
      */
     public void syncUsersFromLdap(UserSynchronizationContext context) {
-        Set<String> userDNs = new HashSet<> ();
-        Set<String> deniedUsers = new HashSet<> ();
-        ldapClient.getMembers(deniedUsers, new HashSet<> (), config.getLdapDeniedUsers(), true);
+        try {
+            Set<String> userDNs = new HashSet<> ();
+            Set<String> deniedUsers = new HashSet<> ();
+            ldapClient.getMembers(deniedUsers, new HashSet<> (), config.getLdapDeniedUsers(), true);
 
-        Map<String, Object> cmap = new HashMap<> ();
-        cmap.put(User.USER_MUTABLE, Boolean.TRUE);
-        cmap.put(User.USER_ENABLED, Boolean.TRUE);
-        Map<String, User> enabledMutableDbUsersById = userDbService.loadMappedById(cmap);
+            Map<String, Object> cmap = new HashMap<> ();
+            cmap.put(User.USER_MUTABLE, Boolean.TRUE);
+            cmap.put(User.USER_ENABLED, Boolean.TRUE);
+            Map<String, User> enabledMutableDbUsersById = userDbService.loadMappedById(cmap);
 
-        // nesting allowed here, i.e. we can assign entire groups to SNB
-        ldapClient.getMembers(userDNs, new HashSet<> (), config.getLdapManagedUsers(), true);
-        for (String dn : userDNs) {
-            if (! deniedUsers.contains(dn)) {
-                logger.trace("Processing LDAP user DN: {}", dn);
-                User dbUser = syncUserFromLdap(context, dn);
-                enabledMutableDbUsersById.remove(dbUser.getId());
-            } else {
-                logger.trace("Skipping denied user: {}", dn);
+            // nesting allowed here, i.e. we can assign entire groups to SNB
+            ldapClient.getMembers(userDNs, new HashSet<> (), config.getLdapManagedUsers(), true);
+            for (String dn : userDNs) {
+                if (! deniedUsers.contains(dn)) {
+                    logger.trace("Processing LDAP user DN: {}", dn);
+                    User dbUser = syncUserFromLdap(context, dn);
+                    enabledMutableDbUsersById.remove(dbUser.getId());
+                } else {
+                    logger.trace("Skipping denied user: {}", dn);
+                }
             }
+            // disable remaining mutable users
+            disableMutableUsers(context, enabledMutableDbUsersById.values());
+        } catch (Exception e) {
+            logger.warn("syncUsersFromLdap() caught an exception: ", (Throwable) e);
+            context.report.addContent(AccessManager.SECTION_ERRORS, "LDAP user synchronization failed: " + e.getMessage());
+            context.reportRecords++;
         }
-        // disable remaining mutable users
-        disableMutableUsers(context, enabledMutableDbUsersById.values());
     }
 
     private void disableMutableUsers(UserSynchronizationContext context, Collection<User> mutableUsers) {
@@ -209,7 +216,7 @@ public class UserManager {
     /**
      * synchronize a single user from LDAP
      */
-    private User syncUserFromLdap(UserSynchronizationContext context, String userDN) {
+    private User syncUserFromLdap(UserSynchronizationContext context, String userDN) throws Exception {
         User ldapUser = ldapClient.getUser(userDN);
         if (context.standardUserRole != null) {
             ldapUser.addRole(context.standardUserRole);
@@ -254,6 +261,10 @@ public class UserManager {
 
         if (dbUser.isModified(CompareType.LDAP, ldapUser)) {
             logger.debug("Updating user from LDAP: {}", dbUser.getUserName());
+            if ((context.groupsToAdd.size() > 0) 
+                     || (context.groupsToRemove.size() > 0)) {
+                reportGroupChanges(context, ldapUser);
+            }
             dbUser.applyChangesFromLdap(ldapUser);
             doUpdateUser(context, dbUser);
         }
@@ -287,6 +298,27 @@ public class UserManager {
             }
         }
         return ldapGroups;
+    }
+
+    private void reportGroupChanges(UserSynchronizationContext context, User user) {
+        StringBuilder sb = new StringBuilder(user.getUserName());
+        sb.append(" - ");
+        AtomicReference<String> sep = new AtomicReference<> ("JOIN: ");
+        reportGroupList(context.groupsToAdd, sb, sep);
+        if (context.groupsToAdd.size() > 0) {
+            sb.append("; ");
+        }
+        sep.set("LEAVE: ");
+        reportGroupList(context.groupsToRemove, sb, sep);
+        context.report.addContent(AccessManager.SECTION_GROUP_INFO, sb.toString());
+        context.reportRecords++;
+    }
+
+    private void reportGroupList(Set<Group> groups, StringBuilder sb, AtomicReference<String> separator) {
+        for (Group group : groups) {
+            sb.append(separator.getAndSet(", "));
+            sb.append(group.getName());
+        }
     }
 
     private void syncUserLdapGroupsAndRoles(

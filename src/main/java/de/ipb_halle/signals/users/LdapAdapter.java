@@ -39,12 +39,12 @@ import javax.naming.ldap.StartTlsResponse;
  */
 
 @Local
-public interface LdapAdapter {
+public interface LdapAdapter extends AutoCloseable {
 
     /**
      * close the  LDAP Context and the StartTlsResponse
      */
-    public void closeAdapter() throws NamingException, IOException;
+    public void close() throws IOException;
 
     public Attributes getAttributes(String dn) throws NamingException;
 

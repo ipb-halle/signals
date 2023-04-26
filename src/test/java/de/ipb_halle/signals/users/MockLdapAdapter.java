@@ -42,7 +42,7 @@ import javax.naming.directory.BasicAttributes;
 /**
  * Mock LDAPAdapter 
  */
-public class MockLdapAdapter implements LdapAdapter {
+public class MockLdapAdapter implements AutoCloseable, LdapAdapter {
 
     private final static String TEST_DATA = "LdapData.json";
     private Map<String, Attributes> objects;
@@ -52,7 +52,7 @@ public class MockLdapAdapter implements LdapAdapter {
         parseLdapData();
     }
 
-    public void closeAdapter() throws NamingException, IOException {
+    public void close() throws IOException {
     }
 
     public Attributes getAttributes(String dn) throws NamingException {
