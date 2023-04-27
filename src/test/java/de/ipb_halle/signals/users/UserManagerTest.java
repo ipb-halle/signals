@@ -20,8 +20,10 @@ package de.ipb_halle.signals.users;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.UpdateConfig;
+import de.ipb_halle.signals.reporting.HtmlReport;
 import de.ipb_halle.signals.rest.MockRestClient;
 import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import jakarta.inject.Inject;
@@ -150,7 +152,7 @@ public class UserManagerTest {
 
 
     @Test
-    public void userManagerTest() {
+    public void syncFromSnbTest() {
 
         manager.syncDbUsersFromSnb(new UpdateConfig());
         User user = userDbService.loadById(TEST_USER1_ID);
@@ -163,5 +165,18 @@ public class UserManagerTest {
         user = userDbService.loadById(TEST_USER2_ID);
         assertEquals("user first name mismatch", TEST_USER2_FIRST_NAME, user.getFirstName());
         assertEquals("user last name mismatch", TEST_USER2_LAST_NAME, user.getLastName());
+    }
+
+    @Test
+    public void syncUsersFromLdapTest() {
+        UpdateConfig config = new UpdateConfig(true, false, true);
+        UserSynchronizationContext context = new UserSynchronizationContext(config);
+        context.groupsByDN = new HashMap<> ();
+        context.rolesByDN = new HashMap<> ();
+        AccessManager.prepareReport(context,  new HtmlReport());
+        manager.syncUsersFromLdap(context);
+        String html = context.report.render();
+        // System.out.printf("\n******************************\n%s\n******************************\n", html);
+        assertTrue("report contains 'ae@somewhere.invalid'", context.report.render().contains("ae@somewhere.invalid"));
     }
 }

@@ -20,9 +20,19 @@ package de.ipb_halle.signals;
 
 public class UpdateConfig {
 
-    public boolean updateDb = true;
+    public boolean updateDb;
 
-    public boolean updateSNB = true;
+    public boolean updateSNB;
 
-    public boolean updateFromLdap = true;
+    public boolean updateFromLdap;
+
+    public UpdateConfig() {
+        this(true, true, true);
+    }
+
+    public UpdateConfig(boolean db, boolean snb, boolean ldap) {
+        updateDb = db;
+        updateSNB = snb;
+        updateFromLdap = ldap;
+    }
 }

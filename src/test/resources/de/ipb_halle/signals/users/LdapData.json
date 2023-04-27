@@ -51,7 +51,7 @@
     "userPrincipalName"   : "wv@somewhere.invalid",
     "memberOf"            : [ "CN=Poets, OU=groups, DC=somewhere, DC=invalid" ],
     "objectClass"         : ["top", "person"],
-    "accountExpires"      : "840000000000000000",
+    "accountExpires"      : "0",
     "whenCreated"         : "19700305010203.0Z"
   },{
     "dn"                  : "CN=Einstein\\, Albert, OU=science, DC=somewhere, DC=invalid",
@@ -62,30 +62,55 @@
     "userPrincipalName"   : "ae@somewhere.invalid",
     "memberOf"            : [ "CN=Scientists, OU=groups, DC=somewhere, DC=invalid" ],
     "objectClass"         : ["top", "person"],
-    "accountExpires"      : "840000000000000000",
+    "accountExpires"      : "9223372036854775807",
     "whenCreated"         : "20090305010203.0Z"
  },{
     "dn"                  : "CN=All Users, OU=groups, DC=somewhere, DC=invalid",
     "cn"                  : "All Users",
     "memberOf"            : [],
-    "member"             : [ "CN=Scientists, OU=groups, DC=somewhere, DC=invalid", 
+    "member"              : [ "CN=Scientists, OU=groups, DC=somewhere, DC=invalid", 
                             "CN=Poets, OU=groups, DC=somewhere, DC=invalid" ],
     "objectClass"         : ["top", "group"]
  },{
     "dn"                  : "CN=Scientists, OU=groups, DC=somewhere, DC=invalid",
     "cn"                  : "Scientists",
-    "memberOf"            : [ "CN=All Users, OU=groups, DC=somewhere, DC=invalid" ],
-    "member"             : [ "CN=Einstein\\, Albert, OU=science, DC=somewhere, DC=invalid" ],
+    "memberOf"            : [ "CN=All Users, OU=groups, DC=somewhere, DC=invalid",
+                            "CN=testUsers, OU=groups, DC=somewhere, DC=invalid" ],
+    "member"              : [ "CN=Einstein\\, Albert, OU=science, DC=somewhere, DC=invalid" ],
     "objectClass"         : ["top", "group"]
  },{
     "dn"                  : "CN=Poets, OU=groups, DC=somewhere, DC=invalid",
     "cn"                  : "Poets",
     "memberOf"            : [ "CN=All Users, OU=groups, DC=somewhere, DC=invalid" ],
-    "member"             : [ "CN=Goethe\\, JohannW, OU=poet, DC=somewhere, DC=invalid",
+    "member"              : [ "CN=Goethe\\, JohannW, OU=poet, DC=somewhere, DC=invalid",
                             "CN=Schiller\\, Friedrich, OU=poet, DC=somewhere, DC=invalid",
                             "CN=Morgenstern\\, Christian, OU=poet, DC=somewhere, DC=invalid",
                             "CN=Heine\\, Heinrich, OU=poet, DC=somewhere, DC=invalid",
                             "CN=von der Vogelweide\\, Walther, OU=poet, DC=somewhere, DC=invalid"],
     "objectClass"         : ["top", "group"]
-  }
+  },{
+    "dn"                  : "CN=testDeniedUsers, OU=groups, DC=somewhere, DC=invalid",
+    "cn"                  : "testDeniedUsers",
+    "memberOf"            : [ ],
+    "member"              : [ ],
+    "objectClass"         : ["top", "group"]
+ },{
+    "dn"                  : "CN=testGroups, OU=groups, DC=somewhere, DC=invalid",
+    "cn"                  : "testGroups",
+    "memberOf"            : [ ],
+    "member"              : [ ],
+    "objectClass"         : ["top", "group"]
+ },{
+    "dn"                  : "CN=testRoles, OU=groups, DC=somewhere, DC=invalid",
+    "cn"                  : "testRoles",
+    "memberOf"            : [ ],
+    "member"              : [ ], 
+    "objectClass"         : ["top", "group"]
+ },{
+    "dn"                  : "CN=testUsers, OU=groups, DC=somewhere, DC=invalid",
+    "cn"                  : "testUsers",
+    "memberOf"            : [ ],
+    "member"              : [ "CN=Scientists, OU=groups, DC=somewhere, DC=invalid" ],
+    "objectClass"         : ["top", "group"]
+ }
 ]

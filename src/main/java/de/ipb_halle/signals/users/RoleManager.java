@@ -57,21 +57,6 @@ public class RoleManager {
 
     private Logger logger = LoggerFactory.getLogger(RoleManager.class);
 
-
-/*    
-    public Role getDbRole(String id) {
-        return roleDbService.loadById(id);
-    }
-
-    public Role getSnbRole(String id) {
-        return roleRestService.doGetRole(id);
-    }
-
-    public List<Role> getSnbRoles() {
-        return roleRestService.doGetRoles();
-    }
-*/
-
     public Role save(UpdateConfig updateConfig, Role role) {
         if (updateConfig.updateDb) {
             return roleDbService.save(role);

@@ -66,7 +66,8 @@ public class AccessManager {
 
     public void manageAccess(UpdateConfig updateConfig, boolean noMail) {
         UserSynchronizationContext context = new UserSynchronizationContext(updateConfig);
-        prepareReport(context);
+        MailReport report = new MailReport();
+        prepareReport(context, report);
         syncDbFromSnb(context);
         if (updateConfig.updateFromLdap) {
             syncSnbFromLdap(context);
@@ -74,12 +75,11 @@ public class AccessManager {
             logger.debug("DRY RUN: skipping updates from LDAP");
         }
         if (! noMail) {
-            sendReport(context);
+            sendReport(context, report);
         }
     }
 
-    private void prepareReport(UserSynchronizationContext context) {
-        MailReport report = new MailReport();
+    protected static void prepareReport(UserSynchronizationContext context, HtmlReport report) {
         report.addSection(SECTION_HEADER, getReportHeader(context));
         report.addSection(SECTION_NEW_USERS, new HtmlList(
             "New Accounts",
@@ -100,7 +100,7 @@ public class AccessManager {
         context.report = report;
     }
 
-    private HtmlText getReportHeader(UserSynchronizationContext context) {
+    private static HtmlText getReportHeader(UserSynchronizationContext context) {
         if (context.updateConfig.updateSNB) {
             return new HtmlText(
                 "Access Management",
@@ -112,11 +112,11 @@ public class AccessManager {
         }
     }
 
-    private void sendReport(UserSynchronizationContext context) {
+    private void sendReport(UserSynchronizationContext context, MailReport report) {
         if (context.reportRecords > 0) {
             // quick and dirty to save configuration variables
             try {
-            context.report.setSubject("Signals Tool Summary")
+            report.setSubject("Signals Tool Summary")
                 .setSmtpProtocol("smtp")
                 .setSmtpPort(25)
                 .setSmtpHost("localhost")

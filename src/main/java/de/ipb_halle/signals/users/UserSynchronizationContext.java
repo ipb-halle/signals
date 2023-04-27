@@ -18,14 +18,14 @@
 package de.ipb_halle.signals.users;
 
 import de.ipb_halle.signals.UpdateConfig;
-import de.ipb_halle.signals.reporting.MailReport;
+import de.ipb_halle.signals.reporting.HtmlReport;
 import java.util.Map;
 import java.util.Set;
 
 public class UserSynchronizationContext { 
 
     public UpdateConfig updateConfig;
-    public MailReport report;
+    public HtmlReport report;
     public int reportRecords;
     public Role standardUserRole;
     public Map<String, Group> groupsByDN;

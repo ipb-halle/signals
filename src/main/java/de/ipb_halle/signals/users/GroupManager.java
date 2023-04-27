@@ -55,19 +55,6 @@ public class GroupManager {
 
     private Logger logger = LoggerFactory.getLogger(GroupManager.class);
 
-/*  
-    public Group getDbGroup(String id) {
-        return groupDbService.loadById(id);
-    }
-
-    public Group getSnbGroup(String id) {
-        return groupRestService.doGetGroup(id);
-    }
-
-    public List<Group> getSnbGroups() {
-        return groupRestService.doGetGroups();
-    }
-*/
 
     public void save(UpdateConfig updateConfig, Group group) {
         if (updateConfig.updateDb) {
@@ -84,7 +71,6 @@ public class GroupManager {
         }
         snbUser.setSystemGroups(newGroups);
     }
-
 
     /**
      * NOTE: currently we CANNOT manage group shares or group

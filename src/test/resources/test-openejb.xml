@@ -26,11 +26,11 @@
       ldapContextProviderURL = ldap://ldap.somewhere.invalid:389
       ldapContextReferral = follow
       ldapDateFormatString = yyyyMMddHHmmss.S'Z'
-      ldapDeniedUsers = CN=testDeniedUsers,OU=groups,DC=somewhere,DC=invalid
-      ldapManagedGroups = CN=testGroups,OU=groups,DC=somewhere,DC=invalid
-      ldapManagedRoles = CN=testRoles,OU=groups,DC=somewhere,DC=invalid
-      ldapManagedUsers = CN=testUsers,OU=groups,DC=somewhere,DC=invalid
-      ldapSecurityPrincipal = CN=ldapsearch,CN=admin,DC=somewhere,DC=invalid
+      ldapDeniedUsers = CN=testDeniedUsers, OU=groups, DC=somewhere, DC=invalid
+      ldapManagedGroups = CN=testGroups, OU=groups, DC=somewhere, DC=invalid
+      ldapManagedRoles = CN=testRoles, OU=groups, DC=somewhere, DC=invalid
+      ldapManagedUsers = CN=testUsers, OU=groups, DC=somewhere, DC=invalid
+      ldapSecurityPrincipal = CN=ldapsearch, CN=admin, DC=somewhere, DC=invalid
       ldapSecurityCredentials = secretPassword
       ldapSecurityAuthentication = simple
       mailFrom = someone@somewhere.invalid
