@@ -129,27 +129,41 @@ public class LdapClient {
      * @param groupDN a distinguished group name
      * @param nesting indicate whether nested memberships should be resolved
      */
-    public void getMembers(Set<String> users, Set<String> groups, String groupDN, boolean nesting) {
-        try (LdapAdapter adapter = ldapAdapterFactory.getAdapter(signalsConfig)) {
-            BasicAttribute membersAttr = (BasicAttribute) adapter 
-                    .getAttributes(groupDN)
-                    .get(signalsConfig.getLdapAttrMembers());
+    public void getMembers(Set<String> users,
+                Set<String> groups,
+                String groupDN,
+                boolean nesting) {
 
-            if (membersAttr != null) {
-                NamingEnumeration<?> membersEnumeration = membersAttr.getAll();
-                while (membersEnumeration.hasMore()) {
-                    String dn = membersEnumeration.next().toString();
-                    if (isGroup(adapter, dn)) {
-                        if (groups.add(dn) && nesting) {
-                            getMembers(users, groups, dn, nesting);
-                        }
-                    } else {
-                        users.add(dn);
-                    }
-                }
-            }
+        try (LdapAdapter adapter = ldapAdapterFactory.getAdapter(signalsConfig)) {
+            getMembers(adapter, users, groups, groupDN, nesting);
         } catch(Exception e) {
             logger.warn("getMembers() caught an Exception for DN {}: ", groupDN, e);
+        }
+    }
+
+
+    private void getMembers(LdapAdapter adapter,
+                    Set<String> users,
+                    Set<String> groups,
+                    String groupDN,
+                    boolean nesting) throws Exception {
+
+        BasicAttribute membersAttr = (BasicAttribute) adapter
+                .getAttributes(groupDN)
+                .get(signalsConfig.getLdapAttrMembers());
+
+        if (membersAttr != null) {
+            NamingEnumeration<?> membersEnumeration = membersAttr.getAll();
+            while (membersEnumeration.hasMore()) {
+                String dn = membersEnumeration.next().toString();
+                if (isGroup(adapter, dn)) {
+                    if (groups.add(dn) && nesting) {
+                        getMembers(adapter, users, groups, dn, nesting);
+                    }
+                } else {
+                    users.add(dn);
+                }
+            }
         }
     }
 
@@ -160,34 +174,39 @@ public class LdapClient {
      */
     public Set<String> getMemberships(String objDN, boolean nesting) {
         Set<String> groups = new HashSet<> ();
-        getMemberships(groups, objDN, nesting);
+        try (LdapAdapter adapter = ldapAdapterFactory.getAdapter(signalsConfig)) {
+            getMemberships(adapter, groups, objDN, nesting);
+        } catch(Exception e) {
+            logger.warn("getMemberships() caught an Exception: ", (Throwable) e);
+        }
         return groups;
     }
 
     /**
      * recursively resolve memberships
+     * @param adapter the LDAP service adapter
      * @param groups the set to hold discovered distinguished group names
      * @param objDN the distinguished object, for which memberships are to be discovered
      * @param nesting true if nested memberships should be resolved
      */
-    private void getMemberships(Set<String> groups, String objDN, boolean nesting) {
-        try (LdapAdapter adapter = ldapAdapterFactory.getAdapter(signalsConfig)) { 
-            BasicAttribute memberOfAttr = (BasicAttribute) adapter
-                    .getAttributes(objDN)
-                    .get(signalsConfig.getLdapAttrMemberOf());
+    private void getMemberships(LdapAdapter adapter,
+                Set<String> groups,
+                String objDN,
+                boolean nesting) throws Exception {
 
-            if (memberOfAttr != null) {
-                NamingEnumeration<?> memberOfEnumeration = memberOfAttr.getAll();
+        BasicAttribute memberOfAttr = (BasicAttribute) adapter
+                .getAttributes(objDN)
+                .get(signalsConfig.getLdapAttrMemberOf());
 
-                while (memberOfEnumeration.hasMore()) {
-                    String dn = memberOfEnumeration.next().toString();
-                    if (groups.add(dn) && nesting) {
-                        getMemberships(groups, dn, nesting);
-                    }
+        if (memberOfAttr != null) {
+            NamingEnumeration<?> memberOfEnumeration = memberOfAttr.getAll();
+
+            while (memberOfEnumeration.hasMore()) {
+                String dn = memberOfEnumeration.next().toString();
+                if (groups.add(dn) && nesting) {
+                    getMemberships(adapter, groups, dn, nesting);
                 }
             }
-        } catch(Exception e) {
-            logger.warn("getMemberships() caught an Exception: ", (Throwable) e);
         }
     }
 
