@@ -21,6 +21,7 @@ import de.ipb_halle.signals.users.AccessManager;
 import de.ipb_halle.signals.users.LdapClient;
 import de.ipb_halle.signals.users.IUser;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.HashSet;
@@ -156,7 +157,15 @@ public class Signals {
     }
 
     private void manageUsers() {
-        logger.info("Managing users ...");
+        logger.info("""
+
+            ******************************************************
+            *
+            * Manage Users 
+            * {} / {}
+            *
+            ******************************************************
+            """, signalsConfig.getSnbInstanceName(), new Date().toString());
         accessManager.manageAccess(updateConfig, noMail);
     }
 

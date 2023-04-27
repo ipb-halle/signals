@@ -35,6 +35,7 @@
       ldapSecurityAuthentication = simple
       mailFrom = someone@somewhere.invalid
       mailTo = someone@somewhere.invalid
+      snbInstanceName = Unit Test
       standardUserRoleName = Standard User
       userAttrCountry = Germany
       userAttrOrganization = testOrg

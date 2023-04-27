@@ -61,6 +61,9 @@ This project bundles code for migration of IPB data sources, for backup, mainten
           ldapSecurityPrincipal = test
           ldapSecurityCredentials = 0000
           ldapSecurityAuthentication = simple
+          mailFrom = someone@somewhere.invalid
+          mailTo = someone@somewhere.invalid
+          snbInstanceName = TestOrg Trial
           standardUserRoleName = Standard User
           userAttrCountry = Germany
           userAttrOrganization = testOrg

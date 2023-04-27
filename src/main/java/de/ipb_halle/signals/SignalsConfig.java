@@ -56,6 +56,7 @@ public class SignalsConfig {
 
     private String mailFrom;                            // sender address for mail reports
     private String mailTo;                              // recipient address for mail reports
+    private String snbInstanceName;                     // name of the instance we operate on
     private String standardUserRoleName;                // Standard User
     private String userAttrCountry;                     // default country
     private String userAttrOrganization;                // default organization
@@ -91,6 +92,7 @@ public class SignalsConfig {
 
     public String getMailFrom() { return mailFrom; }
     public String getMailTo() { return mailTo; }
+    public String getSnbInstanceName() { return snbInstanceName; }
     public String getStandardUserRoleName() { return standardUserRoleName; }
     public String getUserAttrCountry() { return userAttrCountry; }
     public String getUserAttrOrganization() { return userAttrOrganization; }
