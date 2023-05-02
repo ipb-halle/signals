@@ -18,6 +18,7 @@
 package de.ipb_halle.signals.materials;
 
 import de.ipb_halle.signals.SignalsConfig;
+import de.ipb_halle.signals.UpdateConfig;
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.entity.FieldDefinition;
 import de.ipb_halle.signals.entity.FieldDefinitionDbService;
@@ -98,8 +99,9 @@ public class LibraryManagerTest {
     @Test
     public void libraryManagerTest() {
 
+        UpdateConfig config = new UpdateConfig();
         List<Library> libraries = manager.getSnbLibraries();
-        manager.save(libraries);
+        manager.save(config, libraries);
 
         Library lib = manager.getDbLibrary(TEST_LIBRARY_ID);
         assertEquals("Library name mismatch", TEST_LIBRARY_NAME, lib.getName());

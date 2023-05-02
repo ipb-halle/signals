@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals;
 
+import de.ipb_halle.signals.materials.LibraryManager;
 import de.ipb_halle.signals.users.AccessManager;
 import de.ipb_halle.signals.users.LdapClient;
 import de.ipb_halle.signals.users.IUser;
@@ -66,6 +67,9 @@ public class Signals {
     private AccessManager accessManager;
 
     @Inject
+    private LibraryManager libraryManager;
+
+    @Inject
     private LdapClient ldapClient;
 
     @Inject
@@ -90,6 +94,12 @@ public class Signals {
       .longOpt("help")
       .desc("Display the help")
       .build();
+
+    @SuppressWarnings("static-access")
+    private static final Option materialsMgrOpt = Option.builder("M")
+    .longOpt("manage-materials")
+    .desc("Synchronize materials libraries and materials")
+    .build();
 
     @SuppressWarnings("static-access")
     private static final Option userMgrOpt = Option.builder("u")
@@ -154,6 +164,20 @@ public class Signals {
         while(iter.hasNext()) {
             System.out.println(iter.next());
         }
+    }
+
+    private void manageMaterials() {
+        logger.info("""
+
+            ******************************************************
+            *
+            * Manage Users 
+            * {} / {}
+            *
+            ******************************************************
+            """, signalsConfig.getSnbInstanceName(), new Date().toString());
+
+            libraryManager.manageMaterials(updateConfig);
     }
 
     private void manageUsers() {
@@ -260,6 +284,10 @@ public class Signals {
                 signals.manageUsers();
             } 
 
+            if (cmdline.hasOption(materialsMgrOpt.getOpt())) {
+                signals.manageMaterials();
+            }
+
         } catch(MissingArgumentException mae) {
             printHelp("ERROR: " + mae.getMessage(), options);
         } catch(MissingOptionException moe) {
@@ -281,6 +309,7 @@ public class Signals {
         options.addOption(noUpdateSnbOpt);
         options.addOption(noUpdateFromLdapOpt);
         options.addOption(trustStoreOpt);
+        options.addOption(materialsMgrOpt);
         options.addOption(userMgrOpt);
 
         processCommandLine(argv, options);

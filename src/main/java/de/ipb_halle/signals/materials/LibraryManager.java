@@ -17,12 +17,18 @@
  */
 package de.ipb_halle.signals.materials;
 
+import de.ipb_halle.signals.UpdateConfig;
+
 import java.util.List;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 /** 
- * Manager for signals entities (entities API endpoint) 
+ * Manager for signals materials libraries (materials/libraries API endpoint) 
  */
 
 @Stateless
@@ -33,6 +39,9 @@ public class LibraryManager {
 
     @Inject
     private LibraryRestService restService;
+
+    private Logger logger = LoggerFactory.getLogger(LibraryManager.class);
+
     
     public Library getDbLibrary(String id) {
         return dbService.loadById(id);
@@ -42,10 +51,23 @@ public class LibraryManager {
         return restService.doGetLibraries();
     }
 
-    public void save(List<Library> libraries) {
+    public void save(UpdateConfig config, List<Library> libraries) {
         for (Library lib : libraries) {
-            dbService.save(lib);
+            logger.debug("materials library save({})", lib.getAssetDisplayName());
+            if (config.updateDb) {
+                dbService.save(lib);
+            }
         }
+    }
+
+
+    public void manageMaterials(UpdateConfig config) {
+        syncLibraries(config);
+    }
+
+    private void syncLibraries(UpdateConfig config) {
+        List<Library> libraries = getSnbLibraries();
+        save(config, libraries);
     }
 }
 
