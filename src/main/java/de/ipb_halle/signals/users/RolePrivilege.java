@@ -76,5 +76,11 @@ public enum RolePrivilege {
     canShareAnalysis,
     canMoveAnalysis,
     canTrashAnalysis,
-    canExportAnalysis
+    canExportAnalysis,
+    canComment,
+    canAddNewMonomers,
+    canReadDependentShare,
+    canSearchUsersOutsideEmailDomain,
+    canAccessMonomerCurationApp,
+    canCreateAndManageMonomerLibraries
 }
