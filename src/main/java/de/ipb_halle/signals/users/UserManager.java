@@ -75,7 +75,7 @@ public class UserManager {
             User snbUser = userRestService.doCreateUser(user);
             snbUser.setMutable(true);
             save(context.updateConfig, snbUser);
-            return userDbService.loadById(snbUser.getId());
+            user = userDbService.loadById(snbUser.getId());
         } else {
             logger.trace("DRY RUN: skipped SNB CREATE for user: {}", user.getUserName());
         }
