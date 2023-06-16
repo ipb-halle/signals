@@ -169,7 +169,7 @@ public class UserManagerTest {
 
     @Test
     public void syncUsersFromLdapTest() {
-        UpdateConfig config = new UpdateConfig(true, false, true);
+        UpdateConfig config = new UpdateConfig(true, false, true, true);
         UserSynchronizationContext context = new UserSynchronizationContext(config);
         context.groupsByDN = new HashMap<> ();
         context.rolesByDN = new HashMap<> ();

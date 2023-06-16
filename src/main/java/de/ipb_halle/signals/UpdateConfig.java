@@ -26,13 +26,16 @@ public class UpdateConfig {
 
     public boolean updateFromLdap;
 
+    public boolean syncDbFromSNB;
+
     public UpdateConfig() {
-        this(true, true, true);
+        this(true, true, true, true);
     }
 
-    public UpdateConfig(boolean db, boolean snb, boolean ldap) {
+    public UpdateConfig(boolean db, boolean snb, boolean ldap, boolean syncSNB) {
         updateDb = db;
         updateSNB = snb;
         updateFromLdap = ldap;
+        syncDbFromSNB = syncSNB;
     }
 }

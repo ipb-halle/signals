@@ -130,9 +130,13 @@ public class AccessManager {
     }
 
     private void syncDbFromSnb(UserSynchronizationContext context) {
-        roleManager.syncDbRolesFromSnb(context);
-        groupManager.syncDbGroupsFromSnb(context.updateConfig);
-        userManager.syncDbUsersFromSnb(context.updateConfig);
+        if (context.updateConfig.syncDbFromSNB) {
+            roleManager.syncDbRolesFromSnb(context);
+            groupManager.syncDbGroupsFromSnb(context.updateConfig);
+            userManager.syncDbUsersFromSnb(context.updateConfig);
+        } else {
+            logger.debug("Skipping Db syncronization from SNB");
+        }
     }
 
     private void syncSnbFromLdap(UserSynchronizationContext context) {

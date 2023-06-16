@@ -131,6 +131,11 @@ public class Signals {
     .desc("Do not perform updates from LDAP")
     .build();
 
+    @SuppressWarnings("static-acces")
+    private static final Option noSyncDbFromSNBOpt = Option.builder("noSyncSNB")
+    .longOpt("noSyncDbFromSNB")
+    .desc("Do not synchronize database from Signals Notebook")
+    .build();
 
     @SuppressWarnings("static-acces")
     private static final Option debugOpt = Option.builder("d")
@@ -268,6 +273,10 @@ public class Signals {
                 signals.updateConfig.updateFromLdap = false;
             }
 
+            if (cmdline.hasOption(noSyncDbFromSNBOpt.getOpt())) {
+                signals.updateConfig.syncDbFromSNB = false;
+            }
+
             if (cmdline.hasOption(trustStoreOpt.getOpt())) {
                 System.setProperty("javax.net.ssl.trustStore", cmdline.getOptionValue(trustStoreOpt.getOpt()));
             }
@@ -308,6 +317,7 @@ public class Signals {
         options.addOption(noMailOpt);
         options.addOption(noUpdateSnbOpt);
         options.addOption(noUpdateFromLdapOpt);
+        options.addOption(noSyncDbFromSNBOpt);
         options.addOption(trustStoreOpt);
         options.addOption(materialsMgrOpt);
         options.addOption(userMgrOpt);
