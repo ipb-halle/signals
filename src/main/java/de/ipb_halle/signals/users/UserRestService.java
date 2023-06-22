@@ -103,18 +103,19 @@ public class UserRestService implements RestService<User> {
      * POST -- create user
      */
     public User doCreateUser(User user) {
+        String request = prepareJsonString(EndPoint.CREATE, user, null, null);
         try {
             restClient.reset()
                 .setMethod(Method.POST)
                 .setEndpoint(USERS_ENDPOINT)
-                .setRequestData(prepareJsonString(EndPoint.CREATE, user, null, null))
+                .setRequestData(request) 
                 .execute(RestClient.HTTP_CREATED);
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
             return createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
 
         } catch(UnexpectedResponseCodeException ue) {
-            logger.warn("doCreateUser() got unexpected return code from API call");
+            logger.warn("doCreateUser() got unexpected return code from API call: {}", request);
         } catch(URISyntaxException me) {
             logger.warn("doCreateUser() malformed URL");
         } catch(IOException ioe) {

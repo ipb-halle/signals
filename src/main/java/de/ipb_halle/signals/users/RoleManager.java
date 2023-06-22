@@ -106,6 +106,10 @@ public class RoleManager {
         context.rolesByDN = rolesByDN;
     }
 
+    public void obtainStandardUserRole(UserSynchronizationContext context) {
+        context.standardUserRole = roleDbService.loadByName(config.getStandardUserRoleName());
+    }
+
     /**
      * @return standard user role as defined by signals config (or null if no match is found)
      */
@@ -125,10 +129,6 @@ public class RoleManager {
                     dbRole.setDeleted(false);
                     save(context.updateConfig, dbRole);
                 }
-            }
-            if ((dbRole != null)
-                    && (dbRole.getName().equals(config.getStandardUserRoleName()))) {
-                context.standardUserRole = dbRole;
             }
         }
         deleteMissingRoles(context.updateConfig, rolesFromDb.values());

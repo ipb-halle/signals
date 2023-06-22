@@ -60,10 +60,6 @@ public class AccessManager {
 
     private Logger logger = LoggerFactory.getLogger(AccessManager.class);
 
-    private Map<String, Group> groupsByDN;
-    private Map<String, Role> rolesByDN;
-    private Role standardUserRole;
-
     public void manageAccess(UpdateConfig updateConfig, boolean noMail) {
         UserSynchronizationContext context = new UserSynchronizationContext(updateConfig);
         MailReport report = new MailReport();
@@ -140,6 +136,7 @@ public class AccessManager {
     }
 
     private void syncSnbFromLdap(UserSynchronizationContext context) {
+        roleManager.obtainStandardUserRole(context);
         roleManager.obtainLdapRoles(context);
         groupManager.obtainLdapGroups(context);
         userManager.syncUsersFromLdap(context);

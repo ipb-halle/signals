@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.naming.Context;
-import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.BasicAttributes;
@@ -55,7 +54,7 @@ public class MockLdapAdapter implements AutoCloseable, LdapAdapter {
     public void close() throws IOException {
     }
 
-    public Attributes getAttributes(String dn) throws NamingException {
+    public Attributes getAttributes(String dn) throws Exception {
         return objects.get(dn);
     }
 

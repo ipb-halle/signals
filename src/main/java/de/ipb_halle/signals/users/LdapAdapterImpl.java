@@ -32,6 +32,10 @@ import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.StartTlsRequest;
 import javax.naming.ldap.StartTlsResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 /** 
  * Ldap Adapter
  * Encapsulates the concrete mechanics of connection to an 
@@ -45,9 +49,11 @@ public class LdapAdapterImpl implements LdapAdapter, AutoCloseable {
     private SignalsConfig signalsConfig;
     private Hashtable<String, String> ldapEnv;
     private LdapContext context;
+    private Logger logger;
 
     protected LdapAdapterImpl(SignalsConfig cfg) {
         signalsConfig = cfg;
+        logger = LoggerFactory.getLogger(LdapAdapterImpl.class);
     }
 
     /**
@@ -64,8 +70,23 @@ public class LdapAdapterImpl implements LdapAdapter, AutoCloseable {
     }
 
 
-    public Attributes getAttributes(String dn) throws NamingException {
-        return context.getAttributes(dn);
+    public Attributes getAttributes(String dn) throws Exception {
+        for (int maxRepeat = 2; maxRepeat > 0; maxRepeat--) {
+            try {
+                return context.getAttributes(dn);
+            } catch (NamingException ex) {
+                logger.warn("getAttributes() caught an exception: {}", ex.getMessage());
+                logger.warn("getAttributes(): new attempt will be made in 200 ms");
+            }
+            /*
+             * NOTE:
+             * Thread.sleep() is obviously in violation of the EJB contract.
+             * We do it in rare error cases only until we better understand
+             * what causes this condition and how to avoid it.
+             */
+            Thread.sleep(200);
+        }
+        throw new Exception("getAttributes() repeatedly unable to obtain attributes");
     }
 
     protected void initEnv() {
