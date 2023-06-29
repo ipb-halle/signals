@@ -24,7 +24,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 /** 
- * Single signals entity (entities API endpoint) 
+ * Location entity (/inventory/locations/ API endpoint) 
  */
 
 @Entity

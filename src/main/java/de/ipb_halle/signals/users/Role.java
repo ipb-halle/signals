@@ -45,7 +45,7 @@ public class Role implements IRole {
     private String name;
     private boolean ldapRole;
     private boolean deleted;
-    private Set<RolePrivilege> privileges;
+    private Set<String> privileges;
 
     public Role() {
         privileges = new HashSet<> ();
@@ -62,7 +62,7 @@ public class Role implements IRole {
         privileges = new HashSet<> ();
     }
 
-    public Role addPrivilege(RolePrivilege p) {
+    public Role addPrivilege(String p) {
         privileges.add(p);
         return this;
     }
@@ -89,10 +89,10 @@ public class Role implements IRole {
         sb.append("Privileges: ");
         int i = 0;
         String sep = "";
-        Iterator<RolePrivilege> iter = privileges.iterator();
+        Iterator<String> iter = privileges.iterator();
         while(iter.hasNext()) {
             sb.append(sep);
-            sb.append(iter.next().toString());
+            sb.append(iter.next());
             i++;
             if (i % 4 == 0) {
                 sep = ",\n            ";
@@ -128,7 +128,7 @@ public class Role implements IRole {
         return name;
     }
 
-    public Set<RolePrivilege> getPrivileges() {
+    public Set<String> getPrivileges() {
         return privileges;
     }
 
@@ -140,7 +140,7 @@ public class Role implements IRole {
         return id.hashCode();
     }
 
-    public boolean hasPrivilege(RolePrivilege p) {
+    public boolean hasPrivilege(String p) {
         return privileges.contains(p); 
     }
 
@@ -159,7 +159,7 @@ public class Role implements IRole {
         return ldapRole;
     }
 
-    public void removePrivilege(RolePrivilege p) {
+    public void removePrivilege(String p) {
         privileges.remove(p);
     }
 
@@ -184,7 +184,7 @@ public class Role implements IRole {
         name = n;
     }
 
-    public void setPrivileges(Set<RolePrivilege> p) {
+    public void setPrivileges(Set<String> p) {
         privileges = p;
     }
 }

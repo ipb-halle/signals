@@ -44,8 +44,8 @@ public class RoleTest {
         Role roleB = createRole("1", "TestRole", "Description of TestRole");
         IRole roleRefA = new RoleReference().setId("1");
 
-        roleA.addPrivilege(RolePrivilege.canShare);
-        roleB.addPrivilege(RolePrivilege.canArchive);
+        roleA.addPrivilege("canShare");
+        roleB.addPrivilege("canArchive");
 
         assertTrue("roles are equal", roleA.equals(roleB));
         assertTrue("hashCodes are equal", roleA.hashCode() == roleB.hashCode());

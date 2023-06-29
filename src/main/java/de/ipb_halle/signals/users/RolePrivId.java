@@ -32,7 +32,7 @@ public class RolePrivId implements Serializable {
 
     private String role_id;
 
-    private RolePrivilege privilege;
+    private String privilege;
 
 
     @Override
@@ -49,7 +49,7 @@ public class RolePrivId implements Serializable {
         return role_id; 
     }
 
-    public RolePrivilege getRolePrivilege() {
+    public String getRolePrivilege() {
         return privilege;
     }
 
@@ -69,7 +69,7 @@ public class RolePrivId implements Serializable {
         role_id = id;
     }
 
-    public void setRolePrivilege(RolePrivilege p) {
+    public void setRolePrivilege(String p) {
         privilege = p;
     }
 }

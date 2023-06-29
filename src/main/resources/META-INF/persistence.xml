@@ -26,6 +26,7 @@
         <class>de.ipb_halle.signals.users.GroupMembership</class>
         <class>de.ipb_halle.signals.users.Role</class>
         <class>de.ipb_halle.signals.users.RolePriv</class>
+        <class>de.ipb_halle.signals.users.RolePrivDef</class>
         <class>de.ipb_halle.signals.users.UserEntity</class>
         <class>de.ipb_halle.signals.users.UserRole</class>
 

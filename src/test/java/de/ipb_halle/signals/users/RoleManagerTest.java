@@ -98,6 +98,6 @@ public class RoleManagerTest {
 
         assertEquals("Role name mismatch", TEST_ROLE_NAME, role.getName());
         assertEquals("Role description mismatch", TEST_ROLE_DESCRIPTION, role.getDescription());
-        assertTrue("Role has privilege canViewMaterials", role.hasPrivilege(RolePrivilege.canViewMaterials));
+        assertTrue("Role has privilege canViewMaterials", role.hasPrivilege("canViewMaterials"));
     }
 }

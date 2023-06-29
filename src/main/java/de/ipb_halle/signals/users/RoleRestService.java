@@ -105,7 +105,7 @@ public class RoleRestService implements RestService<Role> {
     private void parsePrivileges(JsonObject json, Role role) {
         for(String key : json.keySet()) {
             if (json.getAsJsonPrimitive(key).getAsBoolean()) {
-                role.addPrivilege(RolePrivilege.valueOf(key));
+                role.addPrivilege(key);
             }
         }
     }

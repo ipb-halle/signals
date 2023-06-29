@@ -37,9 +37,14 @@ CREATE TABLE roles (
     UNIQUE (name)
 );
 
+CREATE TABLE role_priv_defs (
+    id VARCHAR NOT NULL PRIMARY KEY
+);
+
 CREATE TABLE role_privileges (
     role_id VARCHAR NOT NULL REFERENCES roles(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    privilege INTEGER NOT NULL
+    privilege VARCHAR NOT NULL REFERENCES role_priv_defs(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    UNIQUE (role_id, privilege)
 );
 
 CREATE TABLE users (

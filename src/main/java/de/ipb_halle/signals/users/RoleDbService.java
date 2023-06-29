@@ -38,9 +38,38 @@ import jakarta.persistence.criteria.Root;
 @Stateless
 public class RoleDbService {
 
+    private static Set<String> rolePrivileges;
 
     @PersistenceContext(unitName="signalsDB")
     private EntityManager em;
+
+
+    protected synchronized String getRolePrivilege(String privilege) {
+        if (rolePrivileges == null) {
+            loadRolePrivileges();
+        }
+        if (! rolePrivileges.contains(privilege)) {
+            saveRolePrivilege(privilege);
+            rolePrivileges.add(privilege);
+        }
+        return privilege;
+    }
+
+    private void loadRolePrivileges() {
+        rolePrivileges = new HashSet<> ();
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<RolePrivDef> criteriaQuery = builder.createQuery(RolePrivDef.class);
+        Root<RolePrivDef> root = criteriaQuery.from(RolePrivDef.class);
+        criteriaQuery.select(root);
+
+        for (RolePrivDef entity: em.createQuery(criteriaQuery).getResultList()) {
+            rolePrivileges.add(entity.getId());
+        }
+    }
+
+    private void saveRolePrivilege(String privilege) {
+        this.em.merge(new RolePrivDef(privilege));
+    }
 
     /**
      * @return a list of Roles
@@ -86,7 +115,8 @@ public class RoleDbService {
         return resultMap;
     }
 
-    public Set<RolePrivilege> loadRolePrivileges(RoleEntity entity) {
+
+    public Set<String> loadRolePrivileges(RoleEntity entity) {
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<RolePriv> criteriaQuery = builder.createQuery(RolePriv.class);
         Root<RolePriv> root = criteriaQuery.from(RolePriv.class);
@@ -96,7 +126,7 @@ public class RoleDbService {
                 .get(RolePrivId.ROLE_ID), 
                 entity.getId()));
 
-        Set<RolePrivilege> privileges = new HashSet<> ();
+        Set<String> privileges = new HashSet<> ();
         for (RolePriv rp : em.createQuery(criteriaQuery).getResultList()) {
             privileges.add(rp.getRolePrivilege());
         }
@@ -120,8 +150,8 @@ public class RoleDbService {
     }
 
     public void savePrivileges(Role r) {
-        for (RolePrivilege privilege : r.getPrivileges()) {
-            this.em.merge(new RolePriv(r.getId(), privilege));
+        for (String privilege : r.getPrivileges()) {
+            this.em.merge(new RolePriv(r.getId(), getRolePrivilege(privilege)));
         }
     }
 }

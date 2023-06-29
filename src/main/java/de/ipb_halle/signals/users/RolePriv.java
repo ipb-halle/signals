@@ -44,7 +44,7 @@ public class RolePriv {
         id = new RolePrivId();
     }
 
-    public RolePriv(String r, RolePrivilege p) {
+    public RolePriv(String r, String p) {
         id = new RolePrivId();
         id.setRoleId(r);
         id.setRolePrivilege(p);
@@ -64,7 +64,7 @@ public class RolePriv {
         return id.getRoleId();
     }
 
-    public RolePrivilege getRolePrivilege() {
+    public String getRolePrivilege() {
         return id.getRolePrivilege();
     }
 
@@ -77,7 +77,7 @@ public class RolePriv {
         id.setRoleId(i);
     }
 
-    public void setRolePrivilege(RolePrivilege p) {
+    public void setRolePrivilege(String p) {
         id.setRolePrivilege(p);
     }
 }
