@@ -31,13 +31,32 @@ import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.StartTlsRequest;
 import javax.naming.ldap.StartTlsResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Local
 public class LdapAdapterFactoryImpl implements LdapAdapterFactory {
+
+    private Logger logger = LoggerFactory.getLogger(LdapAdapterFactoryImpl.class);
 
     public LdapAdapter getAdapter(SignalsConfig cfg) throws Exception {
         LdapAdapterImpl adapter = new LdapAdapterImpl(cfg);
         adapter.initEnv();
-        adapter.initContext();
-        return adapter;
+        for (int maxRepeat = 2; maxRepeat > 0; maxRepeat--) {
+            try {
+                adapter.initContext();
+                return adapter;
+            } catch (NamingException ex) {
+                logger.warn("initContext() caught an exception: {}", ex.getMessage());
+                logger.warn("initContext(): new attempt will be made in 200 ms");
+            }
+            /*
+             * NOTE:
+             * Thread.sleep() is obviously in violation of the EJB contract.
+             * We do it in rare error cases only until we better understand
+             * what causes this condition and how to avoid it.
+             */
+            Thread.sleep(200);
+        }
+        throw new Exception("getAdapter() repeatedly failed to initialize context");
     }
 }
