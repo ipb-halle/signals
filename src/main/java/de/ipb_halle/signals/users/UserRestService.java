@@ -47,7 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-/** 
+/**
  * Signals API REST service for users
  */
 
@@ -79,12 +79,31 @@ public class UserRestService implements RestService<User> {
     public final String USER_DELETE_ENDPOINT = "/users/%s";                     // could also be "/users/%s?assignResourceTo=%s";
     public final String SYSTEMGROUPS_ENDPOINT = "/users/%s/systemGroups";
 
+    private final String SCIM_ACTIVATE_ENDPOINT = "/scim/v2/Users/user-%s";
+    private final String SCIM_ACTIVATE_PAYLOAD = """
+{
+  "schemas": [
+    "urn:ietf:params:scim:api:messages:2.0:PatchOp"
+  ],
+  "Operations": [
+    {
+      "op": "replace",
+      "path": "active",
+      "value": true
+    }
+  ]
+}
+""";
+
+
+
+
     private Logger logger = LoggerFactory.getLogger(UserRestService.class);
 
 
     @Inject
     private RestClientImpl restClient;
-    
+
     /**
      * deserialize user
      */
@@ -100,6 +119,29 @@ public class UserRestService implements RestService<User> {
     }
 
     /**
+     * @param user the database user to be activated
+     * @return true if REST call succeeded
+     */
+    public boolean doActivateUser(User user) {
+        try {
+            restClient.reset()
+                .setMethod(Method.PATCH)
+                .setEndpoint(String.format(SCIM_ACTIVATE_ENDPOINT, user.getId()))
+                .setContentType(RestClient.APPLICATION_SCIM_JSON)
+                .setRequestData(SCIM_ACTIVATE_PAYLOAD)
+                .execute(RestClient.HTTP_OK);
+            return true;
+        } catch(UnexpectedResponseCodeException ue) {
+            logger.warn("doActivateUser() got unexpected return code from API call");
+        } catch(URISyntaxException me) {
+            logger.warn("doActivate() malformed URL");
+        } catch(IOException ioe) {
+            logger.warn("IOException", (Throwable) ioe);
+        }
+        return false;
+    }
+
+    /**
      * POST -- create user
      */
     public User doCreateUser(User user) {
@@ -108,7 +150,7 @@ public class UserRestService implements RestService<User> {
             restClient.reset()
                 .setMethod(Method.POST)
                 .setEndpoint(USERS_ENDPOINT)
-                .setRequestData(request) 
+                .setRequestData(request)
                 .execute(RestClient.HTTP_CREATED);
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
@@ -163,7 +205,7 @@ public class UserRestService implements RestService<User> {
     }
 
     /**
-     * GET user by id 
+     * GET user by id
      */
     public User doGetUser(String id) {
         try {
@@ -199,7 +241,7 @@ public class UserRestService implements RestService<User> {
             restClient.putUriParameter("enabled", enabled ? "true" : "false");
         }
 
-        RestResultIterator<User> iter = new RestResultIterator<> (restClient, this, true); 
+        RestResultIterator<User> iter = new RestResultIterator<> (restClient, this, true);
         ArrayList<User> users = new ArrayList<> ();
 
         while(iter.hasNext()) {
@@ -256,7 +298,7 @@ public class UserRestService implements RestService<User> {
         User user = new User();
         user.setId(attributes.getAsJsonPrimitive(User.ATTR_USER_ID).getAsString());
         String alias = RestHelper.parseString(attributes, User.ATTR_ALIAS);
-        user.setAlias((alias != null) ? alias.toUpperCase() : null); 
+        user.setAlias((alias != null) ? alias.toUpperCase() : null);
         user.setCountry(attributes.getAsJsonPrimitive(User.ATTR_COUNTRY).getAsString());
         user.setCreatedAt(RestHelper.parseDate(attributes, User.ATTR_CREATED_AT, new Date(0)));
         user.setEmail(attributes.getAsJsonPrimitive(User.ATTR_EMAIL).getAsString().toLowerCase());

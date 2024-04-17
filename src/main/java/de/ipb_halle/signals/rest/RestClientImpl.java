@@ -64,8 +64,8 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** 
- * Http client reader for Signals tool 
+/**
+ * Http client reader for Signals tool
  */
 @Local
 public class RestClientImpl implements RestClient {
@@ -75,6 +75,7 @@ public class RestClientImpl implements RestClient {
     @Resource
     SignalsConfig signalsConfig;
 
+    private String contentType;
     private String endpoint;
     private Method method;
     private String requestData;
@@ -91,6 +92,7 @@ public class RestClientImpl implements RestClient {
     public RestClientImpl() {
         uriParameterMap = new HashMap<> ();
         logger = LoggerFactory.getLogger(RestResultIterator.class);
+        contentType = APPLICATION_VND_JSON;
         method = Method.GET;
     }
 
@@ -102,7 +104,7 @@ public class RestClientImpl implements RestClient {
         BodyPublisher requestBody = BodyPublishers.noBody();
 
         HttpRequest.Builder builder = HttpRequest.newBuilder(getURI())
-            .header("Accept", "application/vnd.api+json")
+            .header("Accept", contentType)
             .header("X-API-KEY", signalsConfig.getApiKey());
 
         if (requestData != null) {
@@ -112,7 +114,7 @@ public class RestClientImpl implements RestClient {
             logger.trace("***** Dump of request *****\n{}\n***** End of request dump  *****", requestData);
 
             requestBody = BodyPublishers.ofString(requestData);
-            builder = builder.header("Content-Type", "application/vnd.api+json");
+            builder = builder.header("Content-Type", contentType);
         }
 
         HttpRequest request = builder
@@ -123,7 +125,7 @@ public class RestClientImpl implements RestClient {
             .version(Version.HTTP_1_1)
             .followRedirects(Redirect.NORMAL)
             .connectTimeout(Duration.ofSeconds(20))
-            .proxy(ProxySelector.getDefault()) 
+            .proxy(ProxySelector.getDefault())
             .build();
 
         try {
@@ -180,7 +182,7 @@ public class RestClientImpl implements RestClient {
                             sb.append(URLEncoder.encode(value, UTF8));
                         } catch(UnsupportedEncodingException uee) {
                             // ignored
-                        }   
+                        }
                     });
         }
 
@@ -195,10 +197,16 @@ public class RestClientImpl implements RestClient {
     }
 
     public RestClient reset() {
+        contentType = APPLICATION_VND_JSON;
         method = Method.GET;
         requestData = null;
         response = null;
         uriParameterMap = new HashMap<> ();
+        return this;
+    }
+
+    public RestClient setContentType(String type) {
+        contentType = type;
         return this;
     }
 

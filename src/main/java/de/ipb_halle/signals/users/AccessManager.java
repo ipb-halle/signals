@@ -78,8 +78,8 @@ public class AccessManager {
     protected static void prepareReport(UserSynchronizationContext context, HtmlReport report) {
         report.addSection(SECTION_HEADER, getReportHeader(context));
         report.addSection(SECTION_NEW_USERS, new HtmlList(
-            "New Accounts",
-            "The following list of users has been discovered in LDAP and subsequently added to Signals Notebook:"
+            "New and Reactivated Accounts",
+            "The following list of users has been (re-)discovered in LDAP and subsequently added or reactivated in Signals Notebook:"
             ));
         report.addSection(SECTION_DISABLED_USERS, new HtmlList(
             "Disabled Accounts",

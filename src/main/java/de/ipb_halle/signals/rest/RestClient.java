@@ -30,8 +30,8 @@ import java.net.URISyntaxException;
 import java.net.URI;
 import jakarta.ejb.Local;
 
-/** 
- * Http client reader for Signals tool 
+/**
+ * Http client reader for Signals tool
  */
 @Local
 public interface RestClient {
@@ -41,6 +41,9 @@ public interface RestClient {
     public final int HTTP_ACCEPTED = 202;
     public final int HTTP_NO_CONTENT = 204;
 
+    public final String APPLICATION_VND_JSON = "application/vnd.api+json";
+    public final String APPLICATION_SCIM_JSON = "application/scim+json";
+
     public RestClient execute() throws IOException, URISyntaxException, UnexpectedResponseCodeException ;
 
     public RestClient execute(int expectedResponseCode) throws IOException, URISyntaxException, UnexpectedResponseCodeException ;
@@ -49,9 +52,11 @@ public interface RestClient {
 
     public int getResponseCode();
 
-    public RestClient putUriParameter(String key, String value); 
+    public RestClient putUriParameter(String key, String value);
 
     public RestClient reset();
+
+    public RestClient setContentType(String type);
 
     public RestClient setEndpoint(String path);
 

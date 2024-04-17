@@ -69,6 +69,22 @@ public class UserManager {
         return userDbService.loadById(id);
     }
 
+    public boolean doActivateUser(UserSynchronizationContext context, User user) {
+        if (context.updateConfig.updateSNB) {
+            if (userRestService.doActivateUser(user)) {
+                user.setEnabled(true);
+                save(context.updateConfig, user);
+            } else {
+                return false;
+            }
+        } else {
+            logger.trace("DRY RUN: skipped SNB ACTIVATE for user: {}", user.getUserName());
+        }
+        context.report.addContent(AccessManager.SECTION_NEW_USERS, user.getUserName());
+        context.reportRecords++;
+        return true;
+    }
+
     public User doCreateUser(UserSynchronizationContext context, User user) {
         if (context.updateConfig.updateSNB) {
             logger.info("Creating new SNB user: {}", user.getUserName());
@@ -99,10 +115,13 @@ public class UserManager {
     }
 
     public void doUpdateUser(UserSynchronizationContext context, User user) {
-
         if (context.updateConfig.updateSNB) {
-            save(context.updateConfig, user);
-            userRestService.doUpdateUser(user, context.groupsToAdd, context.groupsToRemove);
+            User restUser = userRestService.doUpdateUser(user, 
+                        context.groupsToAdd, 
+                        context.groupsToRemove);
+            if (restUser != null) {
+                save(context.updateConfig, user);
+            }
         } else {
             logger.trace("DRY RUN: skipped SNB UPDATE for user: {}", user.getUserName());
         }
@@ -115,7 +134,6 @@ public class UserManager {
             logger.trace("DRY RUN: skipped DB update for user: {}", user.getUserName());
         }
     }
-
 
     /**
      * synchronize Db from SNB
@@ -201,10 +219,16 @@ public class UserManager {
         User ldapUser = loadUserFromLdap(context, userDN);
         if (ldapUser.isEnabled()) {
             User dbUser = loadOrCreateDbUser(context, ldapUser, removeMap);
-            if (dbUser.isMutable() && dbUser.isEnabled()) {
+            if (dbUser.isMutable()) {
+                if (! dbUser.isEnabled()) {
+                    if (! doActivateUser(context, dbUser)) {
+                        logger.info("Activation failed for user: {}", dbUser.getUserName());
+                        return;
+                    }
+                }
                 syncUserLdapChanges(context, userDN, ldapUser, dbUser);
             } else {
-                logger.debug("Cannot update immutable or disabled user: {}", dbUser.getUserName());
+                logger.debug("Cannot update immutable user: {}", dbUser.getUserName());
             }
         } else {
             logger.debug("Refusing to operate on expired LDAP user: {}", ldapUser.getUserName());
