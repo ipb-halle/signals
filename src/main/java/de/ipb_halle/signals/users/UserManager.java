@@ -198,6 +198,7 @@ public class UserManager {
             logger.warn("syncUsersFromLdap() caught an exception: ", (Throwable) e);
             context.report.addContent(AccessManager.SECTION_ERRORS, "LDAP user synchronization failed: " + e.getMessage());
             context.reportRecords++;
+            context.reportAlert = true;
         }
     }
 

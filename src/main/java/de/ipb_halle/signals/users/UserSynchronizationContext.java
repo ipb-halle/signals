@@ -27,6 +27,7 @@ public class UserSynchronizationContext {
     public UpdateConfig updateConfig;
     public HtmlReport report;
     public int reportRecords;
+    public boolean reportAlert;
     public Role standardUserRole;
     public Map<String, Group> groupsByDN;
     public Map<String, Role> rolesByDN;
@@ -36,5 +37,6 @@ public class UserSynchronizationContext {
     public UserSynchronizationContext(UpdateConfig cfg) {
         updateConfig = cfg;
         reportRecords = 0;
+        reportAlert = false;
     }
 }

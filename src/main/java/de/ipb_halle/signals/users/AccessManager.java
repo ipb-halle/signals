@@ -112,13 +112,17 @@ public class AccessManager {
         if (context.reportRecords > 0) {
             // quick and dirty to save configuration variables
             try {
-            report.setSubject("Signals Tool Summary")
-                .setSmtpProtocol("smtp")
-                .setSmtpPort(25)
-                .setSmtpHost("localhost")
-                .setFrom(signalsConfig.getMailFrom())
-                .setRecipient(signalsConfig.getMailTo())
-                .send();
+                if (context.reportAlert) {
+                    report.setSubject("ALERT: Signals Tool Summary - need fix");
+                } else {
+                    report.setSubject("Signals Tool Summary");
+                }
+                report.setSmtpProtocol("smtp")
+                    .setSmtpPort(25)
+                    .setSmtpHost("localhost")
+                    .setFrom(signalsConfig.getMailFrom())
+                    .setRecipient(signalsConfig.getMailTo())
+                    .send();
             } catch (Exception e) {
                 logger.warn("sendReport() received an exception", (Throwable) e);
             }
