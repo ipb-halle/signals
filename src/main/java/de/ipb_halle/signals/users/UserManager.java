@@ -36,9 +36,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-/** 
- * The UserManager can fetch users from Signals Notebook and 
- * store them in an SQL database. This class provides some 
+/**
+ * The UserManager can fetch users from Signals Notebook and
+ * store them in an SQL database. This class provides some
  * convenience Methods for the AccessManager class.
  */
 
@@ -51,10 +51,10 @@ public class UserManager {
     @Inject
     private LdapClient ldapClient;
 
-    @Inject 
+    @Inject
     private GroupManager groupManager;
 
-    @Inject 
+    @Inject
     private RoleManager roleManager;
 
     @Inject
@@ -69,9 +69,13 @@ public class UserManager {
         return userDbService.loadById(id);
     }
 
+    private String[] getLicenses() {
+        return config.getUserAttrLicenses().split(",");
+    }
+
     public boolean doActivateUser(UserSynchronizationContext context, User user) {
         if (context.updateConfig.updateSNB) {
-            if (userRestService.doActivateUser(user)) {
+            if (userRestService.doActivateUser(user, getLicenses())) {
                 user.setEnabled(true);
                 save(context.updateConfig, user);
             } else {
@@ -88,7 +92,7 @@ public class UserManager {
     public User doCreateUser(UserSynchronizationContext context, User user) {
         if (context.updateConfig.updateSNB) {
             logger.info("Creating new SNB user: {}", user.getUserName());
-            User snbUser = userRestService.doCreateUser(user);
+            User snbUser = userRestService.doCreateUser(user, getLicenses());
             snbUser.setMutable(true);
             save(context.updateConfig, snbUser);
             user = userDbService.loadById(snbUser.getId());
@@ -102,7 +106,7 @@ public class UserManager {
 
     public void doDisableUser(UserSynchronizationContext context, User user) {
         if (context.updateConfig.updateSNB) {
-            userRestService.doDisableUser(user);
+            userRestService.doDisableUser(user, getLicenses());
             user.setEnabled(false);
             user.setRoles(new HashSet<> ());
             user.setSystemGroups(new HashSet<> ());
@@ -116,8 +120,8 @@ public class UserManager {
 
     public void doUpdateUser(UserSynchronizationContext context, User user) {
         if (context.updateConfig.updateSNB) {
-            User restUser = userRestService.doUpdateUser(user, 
-                        context.groupsToAdd, 
+            User restUser = userRestService.doUpdateUser(user,
+                        context.groupsToAdd,
                         context.groupsToRemove);
             if (restUser != null) {
                 save(context.updateConfig, user);
@@ -139,7 +143,7 @@ public class UserManager {
      * synchronize Db from SNB
      */
     public void syncDbUsersFromSnb(UpdateConfig updateConfig) {
-        // enabled users 
+        // enabled users
         for( User snbUser : userRestService.doGetUsers(null, true)) {
             syncDbUserFromSnb(updateConfig, snbUser);
         }
@@ -268,8 +272,8 @@ public class UserManager {
      */
     private void syncUserLdapChanges(
                 UserSynchronizationContext context,
-                String userDN, 
-                User ldapUser, 
+                String userDN,
+                User ldapUser,
                 User dbUser) {
 
         logger.trace("Checking LDAP user for changes: {}", dbUser.getUserName());
@@ -287,7 +291,7 @@ public class UserManager {
 
         if (dbUser.isModified(CompareType.LDAP, ldapUser)) {
             logger.debug("Updating user from LDAP: {}", dbUser.getUserName());
-            if ((context.groupsToAdd.size() > 0) 
+            if ((context.groupsToAdd.size() > 0)
                      || (context.groupsToRemove.size() > 0)) {
                 reportGroupChanges(context, ldapUser);
             }
@@ -349,19 +353,19 @@ public class UserManager {
 
     private void syncUserLdapGroupsAndRoles(
             UserSynchronizationContext context,
-            String userDN, 
+            String userDN,
             User ldapUser) {
 
         Set<String> memberships = ldapClient.getMemberships(userDN, true);
         for (String membershipDN : memberships) {
-            syncUserLdapGroups(context, membershipDN, ldapUser); 
+            syncUserLdapGroups(context, membershipDN, ldapUser);
             syncUserLdapRoles(context, membershipDN, ldapUser);
         }
     }
 
     private void syncUserLdapGroups(
             UserSynchronizationContext context,
-            String membershipDN, 
+            String membershipDN,
             User ldapUser) {
 
         Group dbGroup = context.groupsByDN.get(membershipDN);

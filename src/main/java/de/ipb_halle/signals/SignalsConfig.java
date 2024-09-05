@@ -18,7 +18,7 @@
 package de.ipb_halle.signals;
 
 
-/** 
+/**
  * Configuration reader for Signals tool.
  * Configuration values to be provided by the openejb.conf file.
  */
@@ -59,6 +59,7 @@ public class SignalsConfig {
     private String snbInstanceName;                     // name of the instance we operate on
     private String standardUserRoleName;                // Standard User
     private String userAttrCountry;                     // default country
+    private String userAttrLicenses;                    // licenses, comma separated
     private String userAttrOrganization;                // default organization
 
     public String getApiKey() { return apiKey; }
@@ -95,6 +96,7 @@ public class SignalsConfig {
     public String getSnbInstanceName() { return snbInstanceName; }
     public String getStandardUserRoleName() { return standardUserRoleName; }
     public String getUserAttrCountry() { return userAttrCountry; }
+    public String getUserAttrLicenses() { return userAttrLicenses; }
     public String getUserAttrOrganization() { return userAttrOrganization; }
 }
 

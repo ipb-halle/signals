@@ -60,16 +60,16 @@ public class UserRestService implements RestService<User> {
     }
 
     /*
-     * Parameter 'q' is a String and it is used to 
-     * filter users. Example usage: Input 'foo' as 
+     * Parameter 'q' is a String and it is used to
+     * filter users. Example usage: Input 'foo' as
      * value of 'q', will return
-     * 
+     *
      * Users whose first name starts with 'foo'.
      * Users whose last name starts with 'foo'.
      * Users whose email address starts with 'foo'.
      * Users who has role name (except "Standard User") contains 'foo'.
      * All of above are case insensitive.
-     * 
+     *
      * Parameter 'enabled'
      * Parameter page[offset]
      * Parameter page[limit]
@@ -79,23 +79,34 @@ public class UserRestService implements RestService<User> {
     public final String USER_DELETE_ENDPOINT = "/users/%s";                     // could also be "/users/%s?assignResourceTo=%s";
     public final String SYSTEMGROUPS_ENDPOINT = "/users/%s/systemGroups";
 
-    private final String SCIM_ACTIVATE_ENDPOINT = "/scim/v2/Users/user-%s";
-    private final String SCIM_ACTIVATE_PAYLOAD = """
+    private final String SCIM_PATCH_USER_ENDPOINT = "/scim/v2/Users/user-%s";
+    private final String SCIM_PATCH_USER_OPERATION = """
 {
   "schemas": [
     "urn:ietf:params:scim:api:messages:2.0:PatchOp"
   ],
-  "Operations": [
-    {
-      "op": "replace",
-      "path": "active",
-      "value": true
-    }
-  ]
+  "Operations": [ %s ]
 }
 """;
 
+    private final String SCIM_ACTIVATE_PAYLOAD = """
+    {
+      "op": "replace",
+      "path": "active",
+      "value": %s
+    }
+""";
 
+    private final String SCIM_LICENSE_PAYLOAD = """
+    {
+      "op":"replace",
+      "path":"urn:ietf:params:scim:schemas:extension:signalsnotebook:2.0:UserProperties:licenses[id eq %s]",
+      "value": {
+        "id":"%s",
+        "active": %s
+      }
+    }
+""";
 
 
     private Logger logger = LoggerFactory.getLogger(UserRestService.class);
@@ -119,16 +130,19 @@ public class UserRestService implements RestService<User> {
     }
 
     /**
+     * re-activate and assign the licenses
      * @param user the database user to be activated
      * @return true if REST call succeeded
      */
-    public boolean doActivateUser(User user) {
+    public boolean doActivateUser(User user, String[] licenses) {
         try {
+            String payload = String.format(SCIM_PATCH_USER_OPERATION,
+                String.format(SCIM_ACTIVATE_PAYLOAD, "true") + "," + getLicensePayload(licenses, true));
             restClient.reset()
                 .setMethod(Method.PATCH)
-                .setEndpoint(String.format(SCIM_ACTIVATE_ENDPOINT, user.getId()))
+                .setEndpoint(String.format(SCIM_PATCH_USER_ENDPOINT, user.getId()))
                 .setContentType(RestClient.APPLICATION_SCIM_JSON)
-                .setRequestData(SCIM_ACTIVATE_PAYLOAD)
+                .setRequestData(payload)
                 .execute(RestClient.HTTP_OK);
             return true;
         } catch(UnexpectedResponseCodeException ue) {
@@ -144,7 +158,7 @@ public class UserRestService implements RestService<User> {
     /**
      * POST -- create user
      */
-    public User doCreateUser(User user) {
+    public User doCreateUser(User user, String[] licenses) {
         String request = prepareJsonString(EndPoint.CREATE, user, null, null);
         try {
             restClient.reset()
@@ -154,7 +168,9 @@ public class UserRestService implements RestService<User> {
                 .execute(RestClient.HTTP_CREATED);
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
-            return createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
+            User snbUser = createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
+            doManageLicenses(snbUser, licenses, true);
+            return snbUser;
 
         } catch(UnexpectedResponseCodeException ue) {
             logger.warn("doCreateUser() got unexpected return code from API call: {}", request);
@@ -166,12 +182,23 @@ public class UserRestService implements RestService<User> {
         return null;
     }
 
-    public User doDisableUser(User user) {
+    /**
+     * Disable a user account via SCIM: revoke any licenses and set
+     * property "active" to false.
+     * @param user the user object
+     * @param licenses the licenses to revoke
+     */
+    public User doDisableUser(User user, String[] licenses) {
         try {
+            String payload = String.format(SCIM_PATCH_USER_OPERATION,
+                getLicensePayload(licenses, false) + "," + String.format(SCIM_ACTIVATE_PAYLOAD, "false"));
+
             restClient.reset()
-                .setMethod(Method.DELETE)
-                .setEndpoint(String.format(USER_DELETE_ENDPOINT, user.getId()))
-                .execute(RestClient.HTTP_NO_CONTENT);
+                .setMethod(Method.PATCH)
+                .setEndpoint(String.format(SCIM_PATCH_USER_ENDPOINT, user.getId()))
+                .setContentType(RestClient.APPLICATION_SCIM_JSON)
+                .setRequestData(payload)
+                .execute(RestClient.HTTP_OK);
 
         } catch(UnexpectedResponseCodeException ue) {
             logger.warn("doDisableUser() got unexpected return code from API call");
@@ -181,6 +208,41 @@ public class UserRestService implements RestService<User> {
             logger.warn("IOException", (Throwable) ioe);
         }
         return null;
+    }
+
+
+    /**
+     */
+    public boolean doManageLicenses(User user, String[] licenses, boolean active) {
+        try {
+            String payload = String.format(SCIM_PATCH_USER_OPERATION,
+                getLicensePayload(licenses, true));
+            restClient.reset()
+                .setMethod(Method.PATCH)
+                .setEndpoint(String.format(SCIM_PATCH_USER_ENDPOINT, user.getId()))
+                .setContentType(RestClient.APPLICATION_SCIM_JSON)
+                .setRequestData(payload)
+                .execute(RestClient.HTTP_OK);
+            return true;
+        } catch(UnexpectedResponseCodeException ue) {
+            logger.warn("doGrantLicense() got unexpected return code from API call");
+        } catch(URISyntaxException me) {
+            logger.warn("doGrantLicense() malformed URL");
+        } catch(IOException ioe) {
+            logger.warn("IOException", (Throwable) ioe);
+        }
+        return false;
+    }
+
+    public String getLicensePayload(String[] licenses, boolean active) {
+        StringBuilder sb = new StringBuilder();
+        String sep = "";
+        for (String lic : licenses) {
+            sb.append(sep);
+            sep = ",";
+            sb.append(String.format(SCIM_LICENSE_PAYLOAD, lic, lic, active ? "true" : "false"));
+        }
+        return sb.toString();
     }
 
     /**
@@ -227,7 +289,7 @@ public class UserRestService implements RestService<User> {
     }
 
     /**
-     * GET users -- obtain list of users 
+     * GET users -- obtain list of users
      */
     public List<User> doGetUsers(String query, Boolean enabled) {
         restClient.reset()
