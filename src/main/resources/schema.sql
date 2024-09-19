@@ -1,3 +1,62 @@
+\set SIGNALS_SCHEMA signals
+\set SIGNALS_DATABASE signals
+\set SIGNALS_USER signals
+\set SIGNALS_PW signals
+--  quoted stuff --
+\set SIGNALS_DATABASE_QUOTED '\'' :SIGNALS_DATABASE '\''
+\set SIGNALS_PW_QUOTED '\'' :SIGNALS_PW '\''
+
+/*
+ *=========================================================
+ *
+ * terminate all database sessions to get
+ * exclusive access
+ *
+ * SELECT pg_terminate_backend(pg_stat_activity.pid)
+ * FROM pg_stat_activity
+ * WHERE pg_stat_activity.datname = :SIGNALS_DATABASE_QUOTED
+ *   AND pid <> pg_backend_pid();
+ */
+
+/*
+ * clean up
+ *
+ * -- the following statement fails if SIGNALS_USER is not known!
+ * -- REASSIGN OWNED BY :SIGNALS_USER TO postgres;
+ * DROP SCHEMA IF EXISTS :SIGNALS_SCHEMA CASCADE;
+ * DROP DATABASE IF EXISTS :SIGNALS_DATABASE;
+ * DROP USER IF EXISTS :SIGNALS_USER;
+ */
+
+/*
+ * (re-)create database objects
+ */
+-- roles --
+CREATE USER :SIGNALS_USER PASSWORD :SIGNALS_PW_QUOTED;
+/*
+ * -- db --
+ * CREATE DATABASE :SIGNALS_DATABASE WITH ENCODING 'UTF8' OWNER :SIGNALS_USER;
+ */
+
+\connect :SIGNALS_DATABASE
+
+-- schema --
+CREATE SCHEMA AUTHORIZATION :SIGNALS_USER;
+
+-- adjust schema search path --
+ALTER USER :SIGNALS_USER SET search_path to :SIGNALS_SCHEMA,public;
+
+GRANT USAGE ON SCHEMA :SIGNALS_SCHEMA, public TO :SIGNALS_USER;
+GRANT CONNECT, TEMPORARY, TEMP  ON  DATABASE :SIGNALS_DATABASE to :SIGNALS_USER;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA :SIGNALS_SCHEMA to :SIGNALS_USER;
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public to :SIGNALS_USER;
+REVOKE ALL ON ALL TABLES IN SCHEMA :SIGNALS_SCHEMA FROM public;
+
+\connect - :SIGNALS_USER
+
+BEGIN TRANSACTION;
+
+-- tables --
 
 CREATE TABLE signalsentities (
     id VARCHAR NOT NULL PRIMARY KEY,
@@ -200,3 +259,8 @@ CREATE TABLE containers (
     updated_by VARCHAR /* REFERENCES users(id) */,
     unit VARCHAR
 );
+
+-- done --
+
+COMMIT;
+
