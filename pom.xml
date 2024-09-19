@@ -211,8 +211,9 @@
                     <inputSpec>${project.basedir}/extAPI/index.yaml</inputSpec>
                     <generatorName>jaxrs-cxf-client</generatorName>
                     <configOptions>
-                       <sourceFolder>src/gen/java/main</sourceFolder>
                        <apiPackage>de.ipb_halle.signalsAPI</apiPackage>
+                       <sourceFolder>src/gen/java/main</sourceFolder>
+                       <modelPackage>de.ipb_halle.signalsModel</modelPackage>
                        <useJakartaEe>true</useJakartaEe>
                     </configOptions>
                 </configuration>

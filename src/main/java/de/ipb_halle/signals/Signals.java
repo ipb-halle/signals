@@ -75,6 +75,9 @@ public class Signals {
     @Inject
     private LogConfig logConfig;
 
+    @Inject
+    private OpenApiTest openApiTest;
+
     private UpdateConfig updateConfig;
     private boolean noMail;
 
@@ -153,6 +156,11 @@ public class Signals {
     .desc("Set the truststore for startSSL. The trustStore should contain certificates for both: LDAP and SNB API.")
     .build();
 
+    @SuppressWarnings("static-acces")
+    private static final Option openApiTestOpt = Option.builder("oaTest")
+    .longOpt("openApiTest")
+    .desc("Execute openAPI test code and exit immediately afterwards.")
+    .build();
 
 
     /**
@@ -196,6 +204,20 @@ public class Signals {
             ******************************************************
             """, signalsConfig.getSnbInstanceName(), new Date().toString());
         accessManager.manageAccess(updateConfig, noMail);
+    }
+
+    private void testOpenAPI() {
+        logger.info("""
+
+            ******************************************************
+            *
+            * Manage Users 
+            * {} / {}
+            *
+            ******************************************************
+            """, signalsConfig.getSnbInstanceName(), new Date().toString());
+
+            openApiTest.test();
     }
 
     public static Signals getInstance(String fname) {
@@ -254,6 +276,12 @@ public class Signals {
             }
             String configFile = cmdline.getOptionValue(configOpt.getOpt());
             Signals signals = getInstance(configFile);
+
+            /* OpenAPI test code */
+            if (cmdline.hasOption(openApiTestOpt.getOpt())) {
+                signals.testOpenAPI();
+                return;
+            }
 
             if (cmdline.hasOption(dryRunOpt.getOpt())) {
                 signals.updateConfig.updateDb = false;
@@ -321,6 +349,7 @@ public class Signals {
         options.addOption(trustStoreOpt);
         options.addOption(materialsMgrOpt);
         options.addOption(userMgrOpt);
+        options.addOption(openApiTestOpt);
 
         processCommandLine(argv, options);
     }
