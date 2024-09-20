@@ -2,7 +2,7 @@
 *.class
 
 # OpenAPI interface definition
-extAPI/*.yaml*
+api/extAPI/*.yaml*
 
 # Log file / log dir
 logs/

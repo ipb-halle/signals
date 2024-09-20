@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
 
 /** 
  * IPB Signals client is a tool for data import and export
- * into PerkinElmer (R) Signals (TM) Notebook. 
+ * into Revvity Signals Notebook. 
  */
 
 @LocalClient
@@ -243,7 +243,7 @@ public class Signals {
     public static void printHelp(String errorMessage, Options options) {
         HelpFormatter writer = new HelpFormatter();
         String usage = "java -jar <JAR_WITH_DEPENDENCIES>";
-        String header = "\n\nIPB Signals Tool\n(c) 2022 Leibniz Institute of Plant Biochemistry\n\nManagement tool for your PerkinElmer(r) Signals(tm) Notebook instance.\n\nOPTIONS:\n";
+        String header = "\n\nIPB Signals Tool\n(c) 2022 Leibniz Institute of Plant Biochemistry\n\nManagement tool for your Revvity Signals Notebook instance.\n\nOPTIONS:\n";
         StringBuilder sb = new StringBuilder();
         if (errorMessage != null) {
             sb.append("\n");
