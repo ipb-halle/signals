@@ -25,12 +25,12 @@
   <parent>
     <groupId>de.ipb-halle</groupId>
     <artifactId>signalsTool</artifactId>
-    <version>${signalsTool.version}</version>
+    <version>1.1</version>
   </parent>
 
   <groupId>de.ipb-halle</groupId>
   <artifactId>signalsApi</artifactId>
-  <version>${signalsTool.version}</version>
+  <version>1.0</version>
   <packaging>jar</packaging>
  
   <name>Revvity OpenAPI for SignalsTool</name>
