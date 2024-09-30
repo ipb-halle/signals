@@ -1,0 +1,55 @@
+*** users.orig	2024-09-23 10:01:55.057173992 +0200
+--- users.yaml?v=1.0.652-10bfeb127a	2024-09-23 10:56:51.358006237 +0200
+***************
+*** 1312,1317 ****
+--- 1312,1325 ----
+                  $ref: '#/components/schemas/JsonApiDataIdentifier'
+          links:
+            $ref: '#/components/schemas/JsonApiLinks'
++     JsonApiRoleRelationship:
++       title: 'JsonApiRoleRelationship'
++       type: object
++       properties:
++         data:   
++           type: array
++           items:
++             $ref: '#/components/schemas/JsonApiMetaDataIdentifier'
+      JsonApiData:
+        title: 'JsonApiData'
+        type: object
+***************
+*** 1334,1339 ****
+--- 1342,1357 ----
+            type: string
+          id:
+            type: string
++     JsonApiMetaDataIdentifier:
++       title: 'JsonApiMetaDataIdentifier'
++       type: object
++       properties:
++         type:
++           type: string
++         id:
++           type: string
++         meta:
++           $ref: '#/components/schemas/JsonApiRelationship'
+      JsonApiLinks:
+        title: 'JsonApiLinks'
+        type: object
+***************
+*** 1380,1386 ****
+                  picture:
+                    $ref: '#/components/schemas/JsonApiRelationship'
+                  roles:
+!                   $ref: '#/components/schemas/JsonApiRelationship'
+                  systemGroups:
+                    $ref: '#/components/schemas/JsonApiRelationship'
+      UserGroupAttributes:
+--- 1398,1404 ----
+                  picture:
+                    $ref: '#/components/schemas/JsonApiRelationship'
+                  roles:
+!                   $ref: '#/components/schemas/JsonApiRoleRelationship'
+                  systemGroups:
+                    $ref: '#/components/schemas/JsonApiRelationship'
+      UserGroupAttributes:

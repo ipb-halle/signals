@@ -33,6 +33,7 @@
  */
 -- roles --
 CREATE USER :SIGNALS_USER PASSWORD :SIGNALS_PW_QUOTED;
+
 /*
  * -- db --
  * CREATE DATABASE :SIGNALS_DATABASE WITH ENCODING 'UTF8' OWNER :SIGNALS_USER;
@@ -60,7 +61,31 @@ BEGIN TRANSACTION;
 
 CREATE TABLE signalsentities (
     id VARCHAR NOT NULL PRIMARY KEY,
-    snb_type VARCHAR
+    snb_type VARCHAR,
+    eid VARCHAR,
+    name VARCHAR,
+    description VARCHAR,
+    created_at TIMESTAMP,
+    created_by VARCHAR,
+    owner VARCHAR,
+    edited_at TIMESTAMP,
+    edited_by VARCHAR,
+    digest BIGINT,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+);
+
+CREATE TABLE signalsentities_children (
+    signals_entity_id VARCHAR,
+    child_id VARCHAR,
+    PRIMARY KEY (signals_entity_id, child_id),
+    FOREIGN KEY (signals_entity_id) REFERENCES signalsentities(id) ON DELETE CASCADE
+);
+
+CREATE TABLE signalsentities_flags (
+    signals_entity_id VARCHAR,
+    flag_value VARCHAR,
+    PRIMARY KEY (signals_entity_id, flag_value),
+    FOREIGN KEY (signals_entity_id) REFERENCES signalsentities(id) ON DELETE CASCADE
 );
 
 CREATE TABLE location_types (

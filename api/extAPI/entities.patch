@@ -1,0 +1,139 @@
+*** entities.orig	2024-09-23 13:14:10.938631494 +0200
+--- entities.yaml?v=1.0.652-10bfeb127a	2024-09-30 11:11:31.569641824 +0200
+***************
+*** 1,4 ****
+! openapi: 3.0.1
+  info:
+    title: 'Signals Notebook APIs Document'
+    version: v1.0
+--- 1,4 ----
+! 4780openapi: 3.0.1
+  info:
+    title: 'Signals Notebook APIs Document'
+    version: v1.0
+***************
+*** 4680,4685 ****
+--- 4680,4687 ----
+            type: object
+          links:
+            $ref: '#/components/schemas/JsonApiLinks'
++         meta:
++           type: object
+      JsonApiDataIdentifier:
+        title: 'JsonApiDataIdentifier'
+        type: object
+***************
+*** 4694,4699 ****
+--- 4696,4707 ----
+        properties:
+          self:
+            type: string
++         first:
++           type: string
++         prev:
++           type: string
++         next:
++           type: string
+      UserAttributes:
+        title: 'UserAttributes'
+        type: object
+***************
+*** 4714,4723 ****
+--- 4722,4747 ----
+            type: string
+          organization:
+            type: string
++         flags:
++           type: object
++         isEnabled:
++           type: boolean
++         type:
++           type: string
++         eid:
++           type: string
++         name:
++           type: string
++         digest: 
++           type: string
++         fields:
++           type: object
+      EntityAttributes:
+        title: 'EntityAttributes'
+        type: object
+        properties:
++         id:
++           type: string
+          eid:
+            type: string
+          name:
+***************
+*** 4746,4751 ****
+--- 4770,4777 ----
+            type: array
+            items:
+              type: object
++         flags:
++           type: object
+          fields:
+            title: 'TreeMap'
+            type: object
+***************
+*** 4763,4768 ****
+--- 4789,4795 ----
+                $ref: '#/components/schemas/UserAttributes'
+              relationships:
+                type: object
++               $ref: '#/components/schemas/JsonApiRelationship'
+                properties:
+                  picture:
+                    $ref: '#/components/schemas/JsonApiRelationship'
+***************
+*** 4778,4783 ****
+--- 4805,4828 ----
+            properties:
+              attributes:
+                $ref: '#/components/schemas/EntityAttributes'
++             relationships:
++               $ref: '#/components/schemas/EntityRelationships'
++     EntityRelationships:
++       title: 'EntityRelationships'
++       type: object
++       properties:
++         createdBy:
++           $ref: '#/components/schemas/JsonApiResponse'
++         editedBy:
++           $ref: '#/components/schemas/JsonApiResponse'
++         owner:
++           $ref: '#/components/schemas/JsonApiResponse'
++         children:
++           $ref: '#/components/schemas/JsonApiResponse'
++         pdf:
++           $ref: '#/components/schemas/JsonApiResponse'
++         ancestors:
++           $ref: '#/components/schemas/JsonApiResponse'
+      EntityApiResponse:
+        allOf:
+          - $ref: '#/components/schemas/JsonApiResponse'
+***************
+*** 4785,4795 ****
+          - type: object
+            properties:
+              data:
+!               oneOf:
+!                 - $ref: '#/components/schemas/EntityApiResponseData'
+!                 - type: array
+!                   items:
+!                     $ref: '#/components/schemas/EntityApiResponseData'
+              included:
+                type: array
+                items:
+--- 4830,4838 ----
+          - type: object
+            properties:
+              data:
+!               type: array
+!               items:
+!                 $ref: '#/components/schemas/EntityApiResponseData'
+              included:
+                type: array
+                items:
