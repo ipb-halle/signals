@@ -17,7 +17,6 @@
  */
 package de.ipb_halle.signals.users;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -27,16 +26,15 @@ import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestResultIterator;
-import de.ipb_halle.signals.rest.RestService;
+import de.ipb_halle.signals.rest.RestReplyParser;
 import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
+
 import jakarta.ejb.Local;
 import jakarta.inject.Inject;
 
@@ -49,7 +47,7 @@ import org.slf4j.LoggerFactory;
  */
 
 @Local
-public class GroupRestService implements RestService<Group> {
+public class GroupRestService implements RestReplyParser<Group> {
 
     public final String GROUPS_ENDPOINT = "/groups";
     public final String GROUP_ENDPOINT = "/groups/%s";
@@ -63,7 +61,7 @@ public class GroupRestService implements RestService<Group> {
     /**
      * deserialize group
      */
-    public Group createEntity(JsonElement j) {
+    public Group parseReply(JsonElement j) {
         JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
         Group group = new Group();
@@ -101,7 +99,7 @@ public class GroupRestService implements RestService<Group> {
                 .execute(RestClient.HTTP_CREATED);
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
-            Group snbGroup = createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
+            Group snbGroup = parseReply(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
             return snbGroup;
 
         } catch(UnexpectedResponseCodeException ue) {
@@ -124,7 +122,7 @@ public class GroupRestService implements RestService<Group> {
                 .execute();
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
-            return createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
+            return parseReply(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
 
         } catch(UnexpectedResponseCodeException ue) {
             logger.warn("doGetGroup() Got unexpected return code from API call");

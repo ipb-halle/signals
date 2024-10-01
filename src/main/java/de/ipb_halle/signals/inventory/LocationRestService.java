@@ -21,18 +21,16 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.RestHelper;
-import de.ipb_halle.signals.rest.RestService;
+import de.ipb_halle.signals.rest.RestReplyParser;
 import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+
 import jakarta.ejb.Local;
 import jakarta.inject.Inject;
 
@@ -44,7 +42,7 @@ import org.slf4j.LoggerFactory;
  */
 
 @Local
-public class LocationRestService implements RestService<LocationEntity> {
+public class LocationRestService implements RestReplyParser<LocationEntity> {
 
     public final String LOCATION_ENDPOINT = "/inventory/locations/%s";
 
@@ -53,7 +51,7 @@ public class LocationRestService implements RestService<LocationEntity> {
 
     private Logger logger = LoggerFactory.getLogger(LocationRestService.class);
     
-    public LocationEntity createEntity(JsonElement json) {
+    public LocationEntity parseReply(JsonElement json) {
         JsonObject j = json.getAsJsonObject();
         JsonObject attributes = j.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
@@ -96,7 +94,7 @@ public class LocationRestService implements RestService<LocationEntity> {
     }
 
     public LocationEntity doGetLocation(String id) {
-        return createEntity(fetch(id));
+        return parseReply(fetch(id));
     }
 
     public void parseAncestor(JsonArray ancestors, LocationEntity loc) {

@@ -21,7 +21,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import de.ipb_halle.signals.rest.RestHelper;
-import de.ipb_halle.signals.rest.RestService;
+import de.ipb_halle.signals.rest.RestReplyParser;
 
 
 // import jakarta.ejb.Local;
@@ -31,13 +31,13 @@ import de.ipb_halle.signals.rest.RestService;
  * service for field values (not a real REST service)
  */
 
-public class FieldValueRestService implements RestService<FieldValue> {
+public class FieldValueRestService implements RestReplyParser<FieldValue> {
 
 
     /**
      * ATTR_COLLECTION currently not implemented!
      */
-    public FieldValue createEntity(JsonElement json) {
+    public FieldValue parseReply(JsonElement json) {
         FieldValue value = new FieldValue();
         JsonObject j = json.getAsJsonObject();
         value.setFieldDefinitionId(j.getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());

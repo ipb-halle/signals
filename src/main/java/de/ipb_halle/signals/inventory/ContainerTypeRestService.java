@@ -27,7 +27,7 @@ import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestResultIterator;
-import de.ipb_halle.signals.rest.RestService;
+import de.ipb_halle.signals.rest.RestReplyParser;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -42,14 +42,14 @@ import jakarta.inject.Inject;
  */
 
 @Local
-public class ContainerTypeRestService implements RestService<ContainerType> {
+public class ContainerTypeRestService implements RestReplyParser<ContainerType> {
 
     public final String CONTAINER_TYPE_ENDPOINT = "/inventory/types";
 
     @Inject
     private RestClient restClient;
 
-    public ContainerType createEntity(JsonElement j) {
+    public ContainerType parseReply(JsonElement j) {
         ContainerType ct = new ContainerType();
         JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
@@ -85,7 +85,7 @@ public class ContainerTypeRestService implements RestService<ContainerType> {
         Iterator<JsonElement> iter = j.iterator();
         AttachmentRestService svc = new AttachmentRestService();
         while (iter.hasNext()) {
-            ct.addAttachment(svc.createEntity(iter.next()));
+            ct.addAttachment(svc.parseReply(iter.next()));
         }
     }
 
@@ -93,7 +93,7 @@ public class ContainerTypeRestService implements RestService<ContainerType> {
         Iterator<JsonElement> iter = j.iterator();
         FieldDefinitionRestService svc = new FieldDefinitionRestService();
         while (iter.hasNext()) {
-            ct.addFieldDefinition(svc.createEntity(iter.next()));
+            ct.addFieldDefinition(svc.parseReply(iter.next()));
         }
     }
 }

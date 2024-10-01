@@ -17,19 +17,16 @@
  */
 package de.ipb_halle.signals.inventory;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestResultIterator;
-import de.ipb_halle.signals.rest.RestService;
+import de.ipb_halle.signals.rest.RestReplyParser;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import jakarta.ejb.Local;
@@ -41,7 +38,7 @@ import jakarta.inject.Inject;
  */
 
 @Local
-public class LocationTypeRestService implements RestService<LocationType> {
+public class LocationTypeRestService implements RestReplyParser<LocationType> {
 
     public final String CONTAINER_TYPE_ENDPOINT = "/inventory/types";
 
@@ -49,7 +46,7 @@ public class LocationTypeRestService implements RestService<LocationType> {
     private RestClient restClient;
 
 
-    public LocationType createEntity(JsonElement j) {
+    public LocationType parseReply(JsonElement j) {
         LocationType lt = new LocationType();
         JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 

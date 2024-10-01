@@ -21,14 +21,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.RestClientImpl;
 import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestResultIterator;
-import de.ipb_halle.signals.rest.RestService;
+import de.ipb_halle.signals.rest.RestReplyParser;
 import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
 
 import java.io.IOException;
@@ -38,7 +37,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.NoSuchElementException;
 
 import jakarta.ejb.Local;
 import jakarta.inject.Inject;
@@ -52,7 +50,7 @@ import org.slf4j.LoggerFactory;
  */
 
 @Local
-public class UserRestService implements RestService<User> {
+public class UserRestService implements RestReplyParser<User> {
 
     private enum EndPoint {
         CREATE,
@@ -118,7 +116,7 @@ public class UserRestService implements RestService<User> {
     /**
      * deserialize user
      */
-    public User createEntity(JsonElement j) {
+    public User parseReply(JsonElement j) {
         User user = parseUser(j);
 
         if (user.isEnabled()) {
@@ -168,7 +166,7 @@ public class UserRestService implements RestService<User> {
                 .execute(RestClient.HTTP_CREATED);
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
-            User snbUser = createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
+            User snbUser = parseReply(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
             doManageLicenses(snbUser, licenses, true);
             return snbUser;
 
@@ -276,7 +274,7 @@ public class UserRestService implements RestService<User> {
                 .execute();
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
-            return createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
+            return parseReply(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
 
         } catch(UnexpectedResponseCodeException ue) {
             logger.warn("doGetUser() got unexpected return code from API call");
@@ -324,7 +322,7 @@ public class UserRestService implements RestService<User> {
                 .execute();
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
-            return createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
+            return parseReply(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
 
         } catch(UnexpectedResponseCodeException ue) {
             logger.warn("doUpdateUser() got unexpected return code from API call");

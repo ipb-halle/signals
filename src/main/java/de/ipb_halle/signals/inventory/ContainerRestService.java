@@ -28,7 +28,7 @@ import de.ipb_halle.signals.materials.MaterialReference;
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.RestHelper;
-import de.ipb_halle.signals.rest.RestService;
+import de.ipb_halle.signals.rest.RestReplyParser;
 import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
 import de.ipb_halle.signals.users.UserReference;
 
@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  */
 
 @Local
-public class ContainerRestService implements RestService<Container> {
+public class ContainerRestService implements RestReplyParser<Container> {
 
     public final String CONTAINER_ENDPOINT = "/inventory/containers/%s";
 
@@ -56,7 +56,7 @@ public class ContainerRestService implements RestService<Container> {
 
     private Logger logger = LoggerFactory.getLogger(ContainerRestService.class);
     
-    public Container createEntity(JsonElement json) {
+    public Container parseReply(JsonElement json) {
         JsonObject j = json.getAsJsonObject();
         JsonObject attributes = j.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
@@ -100,7 +100,7 @@ public class ContainerRestService implements RestService<Container> {
     }
 
     public Container doGetContainer(String id) {
-        return createEntity(fetch(id));
+        return parseReply(fetch(id));
     }
 
     private void parseChangeRecords(JsonObject json, Container ct) {
@@ -119,7 +119,7 @@ public class ContainerRestService implements RestService<Container> {
         Iterator<JsonElement> iter = jArray.iterator();
         FieldValueRestService svc = new FieldValueRestService();
         while (iter.hasNext()) {
-            ct.addFieldValue(svc.createEntity(iter.next()));
+            ct.addFieldValue(svc.parseReply(iter.next()));
         }
     }
 

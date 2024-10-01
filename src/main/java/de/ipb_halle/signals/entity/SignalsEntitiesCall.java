@@ -23,8 +23,7 @@ public class SignalsEntitiesCall {
         SignalsEntity entity = null;
 
         try {
-            restClient.setEndpoint("/entities");
-            restClient.setMethod(Method.GET);
+            restClient.setEndpoint("/entities").setMethod(Method.GET);
             String jsonResponse = restClient.execute().getResponse();
 
             JsonObject jsonObject = JsonParser.parseString(jsonResponse).getAsJsonObject();

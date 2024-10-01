@@ -26,7 +26,7 @@ import de.ipb_halle.signals.field.FieldDefinitionRestService;
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.RestHelper;
-import de.ipb_halle.signals.rest.RestService;
+import de.ipb_halle.signals.rest.RestReplyParser;
 import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
 import de.ipb_halle.signals.users.UserReference;
 
@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  */
 
 @Local
-public class LibraryRestService implements RestService<Library> {
+public class LibraryRestService implements RestReplyParser<Library> {
 
     public final String MATERIALS_LIBRARIES_ENDPOINT = "/materials/libraries";
 
@@ -56,7 +56,7 @@ public class LibraryRestService implements RestService<Library> {
 
     private Logger logger = LoggerFactory.getLogger(LibraryRestService.class);
 
-    public Library createEntity(JsonElement json) {
+    public Library parseReply(JsonElement json) {
         Library lib = new Library();
         JsonObject j = json.getAsJsonObject();
         JsonObject attributes  = j.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
@@ -106,7 +106,7 @@ public class LibraryRestService implements RestService<Library> {
         Iterator<JsonElement> iter = fetch();
 
         while(iter.hasNext()) {
-            Library lib = createEntity(iter.next());
+            Library lib = parseReply(iter.next());
             libraries.add(lib);
         }
         return libraries;
@@ -128,7 +128,7 @@ public class LibraryRestService implements RestService<Library> {
         Iterator<JsonElement> iterator = jArray.iterator();
         FieldDefinitionRestService svc = new FieldDefinitionRestService();
         while (iterator.hasNext()) {
-            lib.addAssetFieldDefinition(svc.createEntity(iterator.next()));
+            lib.addAssetFieldDefinition(svc.parseReply(iterator.next()));
         }
     }
 
@@ -144,7 +144,7 @@ public class LibraryRestService implements RestService<Library> {
         Iterator<JsonElement> iterator = jArray.iterator();
         FieldDefinitionRestService svc = new FieldDefinitionRestService();
         while (iterator.hasNext()) {
-            lib.addBatchFieldDefinition(svc.createEntity(iterator.next()));
+            lib.addBatchFieldDefinition(svc.parseReply(iterator.next()));
         }
     }
 

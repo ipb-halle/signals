@@ -17,25 +17,22 @@
  */
 package de.ipb_halle.signals.users;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestResultIterator;
-import de.ipb_halle.signals.rest.RestService;
+import de.ipb_halle.signals.rest.RestReplyParser;
 import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
+
 import jakarta.ejb.Local;
 import jakarta.inject.Inject;
 
@@ -47,7 +44,7 @@ import org.slf4j.LoggerFactory;
  */
 
 @Local
-public class RoleRestService implements RestService<Role> {
+public class RoleRestService implements RestReplyParser<Role> {
 
     public final String ROLES_ENDPOINT = "/roles";
     public final String ROLE_ENDPOINT = "/roles/%s";
@@ -58,7 +55,7 @@ public class RoleRestService implements RestService<Role> {
     private Logger logger = LoggerFactory.getLogger(RoleRestService.class);
 
 
-    public Role createEntity(JsonElement j) {
+    public Role parseReply(JsonElement j) {
         JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
         Role role = new Role();
@@ -77,7 +74,7 @@ public class RoleRestService implements RestService<Role> {
                 .execute();
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
-            return createEntity(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
+            return parseReply(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
 
         } catch(UnexpectedResponseCodeException ue) {
             logger.warn("doGetRole() unexpected return code from API call");

@@ -41,7 +41,7 @@ public class SignalsEntityTest {
                     getClass().getResourceAsStream(TEST_RESOURCE));
         JsonElement j = JsonParser.parseString(test);
         SignalsEntityRestService svc = new SignalsEntityRestService ();
-        SignalsEntity entity = svc.createEntity(j);
+        SignalsEntity entity = svc.parseReply(j);
 
         assertEquals("id matches", TEST_ID, entity.getId());
     }

@@ -21,7 +21,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import de.ipb_halle.signals.rest.RestHelper;
-import de.ipb_halle.signals.rest.RestService;
+import de.ipb_halle.signals.rest.RestReplyParser;
 
 
 // import jakarta.ejb.Local;
@@ -32,7 +32,7 @@ import de.ipb_halle.signals.rest.RestService;
  */
 
 //@Local
-public class AttachmentRestService implements RestService<Attachment> {
+public class AttachmentRestService implements RestReplyParser<Attachment> {
 
     public final static String ATTR_ENTITY_ID = "entityId";
     public final static String ATTR_ATTACHMENT_ID = "attachmentId";
@@ -44,7 +44,7 @@ public class AttachmentRestService implements RestService<Attachment> {
     public final static String ATTR_VERSION_ID = "versionId";
 
 
-    public Attachment createEntity(JsonElement j) {
+    public Attachment parseReply(JsonElement j) {
         Attachment a = new Attachment();
         JsonObject def = j.getAsJsonObject();
         a.setId(RestHelper.parseString(def, Attachment.ATTR_ATTACHMENT_ID));

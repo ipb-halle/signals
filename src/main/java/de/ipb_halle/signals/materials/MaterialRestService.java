@@ -24,7 +24,7 @@ import com.google.gson.JsonParser;
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.RestHelper;
-import de.ipb_halle.signals.rest.RestService;
+import de.ipb_halle.signals.rest.RestReplyParser;
 import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
 
 import java.io.IOException;
@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  */
 
 @Local
-public class MaterialRestService implements RestService<Material> {
+public class MaterialRestService implements RestReplyParser<Material> {
 
     public final String MATERIAL_ENDPOINT = "/materials/%s";
 
@@ -50,7 +50,7 @@ public class MaterialRestService implements RestService<Material> {
 
     private Logger logger = LoggerFactory.getLogger(MaterialRestService.class);
 
-    public Material createEntity(JsonElement json) {
+    public Material parseReply(JsonElement json) {
         Material mat = new Material();
         JsonObject j = json.getAsJsonObject();
         JsonObject attributes  = j.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
@@ -81,6 +81,6 @@ public class MaterialRestService implements RestService<Material> {
     }
 
     public Material doGetMaterial(String id) {
-        return createEntity(fetch(id));
+        return parseReply(fetch(id));
     }
 }

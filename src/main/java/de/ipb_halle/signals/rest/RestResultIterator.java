@@ -17,11 +17,9 @@
  */
 package de.ipb_halle.signals.rest;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -39,7 +37,7 @@ import org.slf4j.LoggerFactory;
 public class RestResultIterator<T> implements Iterator {
     private boolean paged;
     private RestClient client;
-    private RestService<T> service;
+    private RestReplyParser<T> service;
     private JsonElement jsonResult;
     private Iterator<JsonElement> jsonIterator;
 
@@ -51,7 +49,7 @@ public class RestResultIterator<T> implements Iterator {
      * @param p if the request parameters page[offset] and page[limit] should be added to the request.
      * The values for offset and limit are 0 and 20, respectively.
      */
-    public RestResultIterator(RestClient c, RestService<T> svc, boolean p) {
+    public RestResultIterator(RestClient c, RestReplyParser<T> svc, boolean p) {
         client = c;
         paged = p;
         service = svc;
@@ -112,7 +110,7 @@ public class RestResultIterator<T> implements Iterator {
 
     public T next() {
         if (hasNext()) {
-            return service.createEntity(jsonIterator.next());
+            return service.parseReply(jsonIterator.next());
         }
         throw new NoSuchElementException();
     }

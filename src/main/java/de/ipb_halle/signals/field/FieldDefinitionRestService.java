@@ -24,7 +24,7 @@ import com.google.gson.JsonObject;
 import de.ipb_halle.signals.entity.MeasureMapper;
 import de.ipb_halle.signals.entity.Quality;
 import de.ipb_halle.signals.rest.RestHelper;
-import de.ipb_halle.signals.rest.RestService;
+import de.ipb_halle.signals.rest.RestReplyParser;
 import java.util.Iterator;
 
 
@@ -36,13 +36,13 @@ import java.util.Iterator;
  */
 
 //@Local
-public class FieldDefinitionRestService implements RestService<FieldDefinition> {
+public class FieldDefinitionRestService implements RestReplyParser<FieldDefinition> {
 
 
     /**
      * ATTR_COLLECTION currently not implemented!
      */
-    public FieldDefinition createEntity(JsonElement json) {
+    public FieldDefinition parseReply(JsonElement json) {
         FieldDefinition fd = new FieldDefinition();
         JsonObject j = json.getAsJsonObject();
         fd.setId(j.getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());

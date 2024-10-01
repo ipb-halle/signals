@@ -24,7 +24,7 @@ import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestResultIterator;
-import de.ipb_halle.signals.rest.RestService;
+import de.ipb_halle.signals.rest.RestReplyParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ import jakarta.inject.Inject;
  */
 
 @Local
-public class SignalsEntityRestService implements RestService<SignalsEntity> {
+public class SignalsEntityRestService implements RestReplyParser<SignalsEntity> {
 
     public final String SIGNALS_ENTITY_ENDPOINT = "/entities";
     public final String PARAMETER_INCLUDE_TYPES = "includeTypes";
@@ -47,7 +47,7 @@ public class SignalsEntityRestService implements RestService<SignalsEntity> {
     private RestClient restClient;
     
 
-    public SignalsEntity createEntity(JsonElement json) {
+    public SignalsEntity parseReply(JsonElement json) {
         SignalsEntity entity = new SignalsEntity();
         JsonObject attributes = json.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 

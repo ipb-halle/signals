@@ -24,8 +24,8 @@ import jakarta.ejb.Local;
  * Rest service 
  */
 @Local
-public interface RestService<T> {
+public interface RestReplyParser<T> {
 
-    public T createEntity(JsonElement j);
+    public T parseReply(JsonElement j);
 
 }

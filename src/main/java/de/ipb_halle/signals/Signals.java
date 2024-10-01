@@ -157,7 +157,7 @@ public class Signals {
 
     private static final Option importSignalsEntitiesOpt = Option.builder("importE")
             .longOpt("importSignalsEntities")
-            .desc(" Initiates a data import process from a remote REST API of signals notebook. " +
+            .desc("Initiates a data import process from a remote REST API of signals notebook. " +
                     "The process fetches a list of entities from the specified API endpoint, " +
                     "maps the data to the 'SignalsEntity' class, and persists it to the PostgreSQL " +
                     "database using Hibernate. ")
@@ -266,6 +266,8 @@ public class Signals {
         try {
             CommandLine cmdline = parser.parse(options, argv);
 
+
+
             if (cmdline.hasOption(helpOpt.getOpt())) {
                 printHelp(null, options);
                 return;
@@ -277,6 +279,12 @@ public class Signals {
             }
             String configFile = cmdline.getOptionValue(configOpt.getOpt());
             Signals signals = getInstance(configFile);
+
+            if (cmdline.hasOption(importSignalsEntitiesOpt.getOpt())) {
+                //rest call on signals REST-Api
+                signals.signalsEntityCall();
+                return;
+            }
 
             if (cmdline.hasOption(dryRunOpt.getOpt())) {
                 signals.updateConfig.updateDb = false;
@@ -320,10 +328,7 @@ public class Signals {
                 signals.manageMaterials();
             }
 
-            if (cmdline.hasOption(importSignalsEntitiesOpt.getOpt())) {
-                //implement method
-                signals.signalsEntityCall();
-            }
+
 
         } catch (MissingArgumentException mae) {
             printHelp("ERROR: " + mae.getMessage(), options);
@@ -349,6 +354,7 @@ public class Signals {
         options.addOption(trustStoreOpt);
         options.addOption(materialsMgrOpt);
         options.addOption(userMgrOpt);
+        options.addOption(importSignalsEntitiesOpt);
 
         processCommandLine(argv, options);
     }
