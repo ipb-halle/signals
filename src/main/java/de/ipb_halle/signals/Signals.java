@@ -149,7 +149,13 @@ public class Signals {
     .desc("Set the truststore for startSSL. The trustStore should contain certificates for both: LDAP and SNB API.")
     .build();
 
-    private static final Option enetetiesManager = Option.builder("ms").build();
+    private static final Option importSignalsEntitiesData = Option.builder("import-entities")
+    .longOpt("importSignalsEntities")
+            .desc(" Initiates a data import process from a remote REST API of signals notebook. " +
+                    "The process fetches a list of entities from the specified API endpoint, " +
+                    "maps the data to the 'SignalsEntity' class, and persists it to the PostgreSQL " +
+                    "database using Hibernate. ")
+    .build();
 
 
 
@@ -293,6 +299,11 @@ public class Signals {
 
             if (cmdline.hasOption(materialsMgrOpt.getOpt())) {
                 signals.manageMaterials();
+            }
+
+            if(cmdline.hasOption(importSignalsEntitiesData.getOpt())){
+                //implement method
+                signals.
             }
 
         } catch(MissingArgumentException mae) {
