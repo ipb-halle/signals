@@ -15,11 +15,12 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.entity;
+package de.ipb_halle.signals.field;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import de.ipb_halle.signals.entity.Quality;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

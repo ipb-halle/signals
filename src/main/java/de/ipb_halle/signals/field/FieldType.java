@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.entity;
+package de.ipb_halle.signals.field;
 
 
 /** 

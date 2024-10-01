@@ -17,8 +17,8 @@
  */
 package de.ipb_halle.signals.inventory;
 
-import de.ipb_halle.signals.entity.Attachment;
-import de.ipb_halle.signals.entity.FieldDefinition;
+import de.ipb_halle.signals.attachment.Attachment;
+import de.ipb_halle.signals.field.FieldDefinition;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;

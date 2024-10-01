@@ -15,14 +15,14 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.entity;
+package de.ipb_halle.signals.field;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 
+import de.ipb_halle.signals.entity.MeasureMapper;
+import de.ipb_halle.signals.entity.Quality;
 import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestService;
 import java.util.Iterator;
@@ -93,7 +93,7 @@ public class FieldDefinitionRestService implements RestService<FieldDefinition> 
         while (iter.hasNext()) {
             JsonObject j = iter.next().getAsJsonObject();
             String measure = j.getAsJsonPrimitive(Quality.ATTR_MEASURE).getAsString();
-            Quality q = MeasureMapper.getQuality(measure); 
+            Quality q = MeasureMapper.getQuality(measure);
             fd.addMeasure(q);
         }
     }

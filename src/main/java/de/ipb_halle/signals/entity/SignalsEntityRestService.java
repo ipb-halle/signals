@@ -15,13 +15,10 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals;
+package de.ipb_halle.signals.entity;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
@@ -30,7 +27,6 @@ import de.ipb_halle.signals.rest.RestResultIterator;
 import de.ipb_halle.signals.rest.RestService;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import jakarta.ejb.Local;

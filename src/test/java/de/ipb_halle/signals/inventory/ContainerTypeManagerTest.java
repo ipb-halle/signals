@@ -19,10 +19,10 @@ package de.ipb_halle.signals.inventory;
 
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
-import de.ipb_halle.signals.entity.Attachment;
-import de.ipb_halle.signals.entity.AttachmentDbService;
-import de.ipb_halle.signals.entity.FieldDefinition;
-import de.ipb_halle.signals.entity.FieldDefinitionDbService;
+import de.ipb_halle.signals.attachment.Attachment;
+import de.ipb_halle.signals.attachment.AttachmentDbService;
+import de.ipb_halle.signals.field.FieldDefinition;
+import de.ipb_halle.signals.field.FieldDefinitionDbService;
 import de.ipb_halle.signals.rest.MockRestClient;
 import java.util.List;
 import java.util.Properties;

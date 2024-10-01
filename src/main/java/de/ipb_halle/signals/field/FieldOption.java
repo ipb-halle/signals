@@ -15,12 +15,11 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.entity;
+package de.ipb_halle.signals.field;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
@@ -32,26 +31,27 @@ import jakarta.persistence.Table;
  */
 
 @Entity
-@IdClass(FieldMeasureId.class)
-@Table(name="field_measures")
-public class FieldMeasure {
+@IdClass(FieldOptionId.class)
+@Table(name="field_options")
+public class FieldOption implements Serializable {
 
+    private final static long serialVersionUID = 1L;
 
     @Id
     private String field_id;
 
     @Id
-    private Quality measure;
+    private String option;
 
     /**
      * default constructor
      */
-    public FieldMeasure() {
+    public FieldOption() {
     }
 
-    public FieldMeasure(String i, Quality q) {
-        field_id = i;
-        measure = q;
+    public FieldOption(String f, String o) {
+        field_id = f;
+        option = o;
     }
 
     @Override
@@ -59,29 +59,29 @@ public class FieldMeasure {
         if ((o == null) || (getClass() != o.getClass())) { 
             return false;
         } 
-        FieldMeasure other = (FieldMeasure) o;
+        FieldOption other = (FieldOption) o;
         return Objects.equals(field_id, other.field_id)
-            && Objects.equals(measure, other.measure);
+            && Objects.equals(option, other.option);
     }
 
     public String getFieldId() {
         return field_id;
     }
 
-    public Quality getMeasure() {
-        return measure;
+    public String getOption() {
+        return option;
     }
 
     @Override
     public int hashCode() {
-        return getFieldId().hashCode() + getMeasure().hashCode();
+        return getFieldId().hashCode() + getOption().hashCode();
     }
 
     public void setFieldId(String i) {
-        field_id = i;
+        field_id = i; 
     }
 
-    public void setMeasure(Quality q) {
-        measure = q;
+    public void setOption(String o) {
+        option = o;
     }
 }

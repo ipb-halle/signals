@@ -17,6 +17,10 @@
  */
 package de.ipb_halle.signals;
 
+import de.ipb_halle.signals.entity.SignalsEntity;
+import de.ipb_halle.signals.entity.SignalsEntityDbService;
+import de.ipb_halle.signals.entity.SignalsEntityManager;
+import de.ipb_halle.signals.entity.SignalsEntityRestService;
 import de.ipb_halle.signals.rest.MockRestClient;
 import java.util.List;
 import java.util.Properties;

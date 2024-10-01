@@ -17,13 +17,13 @@
  */
 package de.ipb_halle.signals.inventory;
 
-import de.ipb_halle.signals.entity.Attachment;
-import de.ipb_halle.signals.entity.AttachmentDbService;
-import de.ipb_halle.signals.entity.FieldDefinition;
-import de.ipb_halle.signals.entity.FieldDefinitionDbService;
+import de.ipb_halle.signals.attachment.Attachment;
+import de.ipb_halle.signals.attachment.AttachmentDbService;
+import de.ipb_halle.signals.field.FieldDefinition;
+import de.ipb_halle.signals.field.FieldDefinitionDbService;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
+
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;

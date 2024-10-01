@@ -17,31 +17,30 @@
  */
 package de.ipb_halle.signals.entity;
 
-import java.io.Serializable;
-import java.util.Objects;
+import jakarta.ejb.Stateless;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
 
 /** 
- * JPA compound Id class for field definition measures
+ * Database service for signals entities
  */
-public class FieldMeasureId implements Serializable {
-    private final static long serialVersionUID = 1L;
 
-    private String field_id;
+@Stateless
+public class SignalsEntityDbService {
 
-    private Quality measure;
 
-    @Override
-    public boolean equals(Object o) {
-        if ((o == null) || (getClass() != o.getClass())) {
-            return false;
-        } 
-        FieldMeasureId other = (FieldMeasureId) o;
-        return Objects.equals(field_id, other.field_id)
-            && Objects.equals(measure, other.measure);
+    @PersistenceContext(unitName="signalsDB")
+    private EntityManager em;
+
+    public SignalsEntity loadById(String id) {
+        return this.em.find(SignalsEntity.class, id);
     }
 
-    @Override
-    public int hashCode() {
-        return field_id.hashCode() + measure.hashCode();
+    public void save(SignalsEntity entity) {
+        this.em.merge(entity);
     }
+
 }
+
+

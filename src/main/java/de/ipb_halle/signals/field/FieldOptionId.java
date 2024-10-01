@@ -15,75 +15,34 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.entity;
+package de.ipb_halle.signals.field;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-
 
 /** 
- * Quality (measure) - field assignments
+ * SNB field options (This class exists solely for JPA purposes)
  */
-
-@Entity
-@IdClass(FieldOptionId.class)
-@Table(name="field_options")
-public class FieldOption implements Serializable {
-
+public class FieldOptionId implements Serializable {
     private final static long serialVersionUID = 1L;
 
-    @Id
     private String field_id;
 
-    @Id
     private String option;
-
-    /**
-     * default constructor
-     */
-    public FieldOption() {
-    }
-
-    public FieldOption(String f, String o) {
-        field_id = f;
-        option = o;
-    }
 
     @Override
     public boolean equals(Object o) {
-        if ((o == null) || (getClass() != o.getClass())) { 
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
         } 
-        FieldOption other = (FieldOption) o;
+        FieldOptionId other = (FieldOptionId) o;
         return Objects.equals(field_id, other.field_id)
             && Objects.equals(option, other.option);
     }
 
-    public String getFieldId() {
-        return field_id;
-    }
-
-    public String getOption() {
-        return option;
-    }
-
     @Override
     public int hashCode() {
-        return getFieldId().hashCode() + getOption().hashCode();
-    }
-
-    public void setFieldId(String i) {
-        field_id = i; 
-    }
-
-    public void setOption(String o) {
-        option = o;
+        return field_id.hashCode() + option.hashCode();
     }
 }

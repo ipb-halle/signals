@@ -21,9 +21,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 
-import de.ipb_halle.signals.entity.FieldDefinitionRestService;
+import de.ipb_halle.signals.field.FieldDefinitionRestService;
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.RestHelper;
@@ -36,7 +35,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
+
 import jakarta.ejb.Local;
 import jakarta.inject.Inject;
 

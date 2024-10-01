@@ -20,25 +20,18 @@ package de.ipb_halle.signals.inventory;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 
-import de.ipb_halle.signals.entity.Attachment;
-import de.ipb_halle.signals.entity.AttachmentRestService;
-import de.ipb_halle.signals.entity.FieldDefinition;
-import de.ipb_halle.signals.entity.FieldDefinitionRestService;
+import de.ipb_halle.signals.attachment.AttachmentRestService;
+import de.ipb_halle.signals.field.FieldDefinitionRestService;
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestResultIterator;
 import de.ipb_halle.signals.rest.RestService;
-import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
-
-import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import jakarta.ejb.Local;
 import jakarta.inject.Inject;

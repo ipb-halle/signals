@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.entity;
+package de.ipb_halle.signals.attachment;
 
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
@@ -23,22 +23,22 @@ import jakarta.persistence.PersistenceContext;
 
 
 /** 
- * DB service for field definitions
+ * DB service for attachments
  */
 
 @Stateless
-public class FieldDefinitionDbService {
+public class AttachmentDbService {
 
 
     @PersistenceContext(unitName="signalsDB")
     private EntityManager em;
 
-    public FieldDefinition loadById(String id) {
-        return this.em.find(FieldDefinition.class, id);
+    public Attachment loadById(String id) {
+        return this.em.find(Attachment.class, id);
     }
 
-    public void save(FieldDefinition fd) {
-        this.em.merge(fd);
+    public void save(Attachment a) {
+        this.em.merge(a);
     }
 }
 

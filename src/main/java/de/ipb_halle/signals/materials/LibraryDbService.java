@@ -17,8 +17,8 @@
  */
 package de.ipb_halle.signals.materials;
 
-import de.ipb_halle.signals.entity.FieldDefinitionDbService;
-import de.ipb_halle.signals.entity.FieldDefinition;
+import de.ipb_halle.signals.field.FieldDefinitionDbService;
+import de.ipb_halle.signals.field.FieldDefinition;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -26,7 +26,6 @@ import java.util.Set;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;

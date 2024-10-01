@@ -17,32 +17,39 @@
  */
 package de.ipb_halle.signals.entity;
 
-import java.io.Serializable;
-import java.util.Objects;
+import java.util.List;
+
+import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 
 
 /** 
- * SNB field options (This class exists solely for JPA purposes)
+ * Manager for signals entities (entities API endpoint) 
  */
-public class FieldOptionId implements Serializable {
-    private final static long serialVersionUID = 1L;
 
-    private String field_id;
+@Stateless
+public class SignalsEntityManager {
 
-    private String option;
+    @Inject
+    private SignalsEntityDbService dbService;
 
-    @Override
-    public boolean equals(Object o) {
-        if ((o == null) || (getClass() != o.getClass())) {
-            return false;
-        } 
-        FieldOptionId other = (FieldOptionId) o;
-        return Objects.equals(field_id, other.field_id)
-            && Objects.equals(option, other.option);
+    @Inject
+    private SignalsEntityRestService restService;
+
+
+    public SignalsEntity getDbEntity(String id) {
+        return dbService.loadById(id);
     }
 
-    @Override
-    public int hashCode() {
-        return field_id.hashCode() + option.hashCode();
+
+    public List<SignalsEntity> getSnbEntities(String includeTypes) {
+        return restService.doGetEntities(includeTypes);
+    }
+
+    public void save(List<SignalsEntity> entities) {
+        for (SignalsEntity e : entities) {
+            dbService.save(e);
+        }
     }
 }
+

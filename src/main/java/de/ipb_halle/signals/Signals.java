@@ -17,21 +17,19 @@
  */
 package de.ipb_halle.signals;
 
+import de.ipb_halle.signals.entity.SignalsEntityManager;
 import de.ipb_halle.signals.materials.LibraryManager;
 import de.ipb_halle.signals.users.AccessManager;
 import de.ipb_halle.signals.users.LdapClient;
-import de.ipb_halle.signals.users.IUser;
 
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Properties;
-import java.util.HashSet;
 import java.util.Set;
 import jakarta.annotation.Resource;
 import jakarta.ejb.embeddable.EJBContainer;
 import jakarta.inject.Inject;
 import javax.naming.Context;
-import javax.naming.InitialContext;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -41,9 +39,7 @@ import org.apache.commons.cli.MissingArgumentException;
 import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
-import org.apache.openejb.OpenEjbContainer;
 import org.apache.openejb.api.LocalClient;
 
 import org.slf4j.Logger;
@@ -152,6 +148,8 @@ public class Signals {
     .argName("FILE")
     .desc("Set the truststore for startSSL. The trustStore should contain certificates for both: LDAP and SNB API.")
     .build();
+
+    private static final Option enetetiesManager = Option.builder("ms").build();
 
 
 

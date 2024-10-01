@@ -15,12 +15,7 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+package de.ipb_halle.signals.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -17,7 +17,7 @@
  */
 package de.ipb_halle.signals.materials;
 
-import de.ipb_halle.signals.entity.FieldDefinition;
+import de.ipb_halle.signals.field.FieldDefinition;
 import de.ipb_halle.signals.users.UserReference;
 import java.util.Date;
 import java.util.HashSet;
