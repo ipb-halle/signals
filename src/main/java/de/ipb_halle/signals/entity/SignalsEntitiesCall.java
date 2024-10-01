@@ -30,6 +30,10 @@ public class SignalsEntitiesCall {
             JsonObject jsonObject = JsonParser.parseString(jsonResponse).getAsJsonObject();
             entity = parseJsonToSignalsEntity(jsonObject);
 
+            System.out.println(jsonObject);
+
+            System.out.println(entity.getId());
+
             signalsEntityDbService.save(entity);
 
         } catch (IOException e) {

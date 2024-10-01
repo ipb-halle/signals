@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals;
 
+import de.ipb_halle.signals.entity.SignalsEntitiesCall;
 import de.ipb_halle.signals.entity.SignalsEntityManager;
 import de.ipb_halle.signals.materials.LibraryManager;
 import de.ipb_halle.signals.users.AccessManager;
@@ -26,9 +27,11 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
+
 import jakarta.annotation.Resource;
 import jakarta.ejb.embeddable.EJBContainer;
 import jakarta.inject.Inject;
+
 import javax.naming.Context;
 
 import org.apache.commons.cli.CommandLine;
@@ -45,9 +48,9 @@ import org.apache.openejb.api.LocalClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** 
+/**
  * IPB Signals client is a tool for data import and export
- * into PerkinElmer (R) Signals (TM) Notebook. 
+ * into PerkinElmer (R) Signals (TM) Notebook.
  */
 
 @LocalClient
@@ -56,7 +59,7 @@ public class Signals {
     @Resource
     private SignalsConfig signalsConfig;
 
-    @Inject 
+    @Inject
     private SignalsEntityManager signalsMgr;
 
     @Inject
@@ -71,6 +74,9 @@ public class Signals {
     @Inject
     private LogConfig logConfig;
 
+    @Inject
+    private SignalsEntitiesCall signalsEntitiesCall;
+
     private UpdateConfig updateConfig;
     private boolean noMail;
 
@@ -78,85 +84,84 @@ public class Signals {
 
     @SuppressWarnings("static-access")
     private static final Option configOpt = Option.builder("c")
-      .longOpt("config")
-      .desc("Path to a the config file containing the Signals (tm) web token, base URL as well as database and LDAP connection information.")
-      .hasArg()
-      .argName("FILE")
-      .required(true)
-      .build();
+            .longOpt("config")
+            .desc("Path to a the config file containing the Signals (tm) web token, base URL as well as database and LDAP connection information.")
+            .hasArg()
+            .argName("FILE")
+            .required(true)
+            .build();
 
     @SuppressWarnings("static-access")
     private static final Option helpOpt = Option.builder("h")
-      .longOpt("help")
-      .desc("Display the help")
-      .build();
+            .longOpt("help")
+            .desc("Display the help")
+            .build();
 
     @SuppressWarnings("static-access")
     private static final Option materialsMgrOpt = Option.builder("M")
-    .longOpt("manage-materials")
-    .desc("Synchronize materials libraries and materials")
-    .build();
+            .longOpt("manage-materials")
+            .desc("Synchronize materials libraries and materials")
+            .build();
 
     @SuppressWarnings("static-access")
     private static final Option userMgrOpt = Option.builder("u")
-    .longOpt("manage-users")
-    .desc("Perform user,  group and role management")
-    .build();
+            .longOpt("manage-users")
+            .desc("Perform user,  group and role management")
+            .build();
 
     @SuppressWarnings("static-acces")
     private static final Option dryRunOpt = Option.builder("n")
-    .longOpt("dry-run")
-    .desc("Dry run - don't modify anything (includes --noUpdateSNB and --noUpdateFromLDAP).")
-    .build();
+            .longOpt("dry-run")
+            .desc("Dry run - don't modify anything (includes --noUpdateSNB and --noUpdateFromLDAP).")
+            .build();
 
     @SuppressWarnings("static-acces")
     private static final Option noMailOpt = Option.builder("m")
-    .longOpt("noMail")
-    .desc("Do not send any reports by email") 
-    .build();
+            .longOpt("noMail")
+            .desc("Do not send any reports by email")
+            .build();
 
     @SuppressWarnings("static-acces")
     private static final Option noUpdateSnbOpt = Option.builder("noSNB")
-    .longOpt("noUpdateSNB")
-    .desc("Do not perform updates to Signals Notebook")
-    .build();
+            .longOpt("noUpdateSNB")
+            .desc("Do not perform updates to Signals Notebook")
+            .build();
 
     @SuppressWarnings("static-acces")
     private static final Option noUpdateFromLdapOpt = Option.builder("noLDAP")
-    .longOpt("noUpdateFromLDAP")
-    .desc("Do not perform updates from LDAP")
-    .build();
+            .longOpt("noUpdateFromLDAP")
+            .desc("Do not perform updates from LDAP")
+            .build();
 
     @SuppressWarnings("static-acces")
     private static final Option noSyncDbFromSNBOpt = Option.builder("noSyncSNB")
-    .longOpt("noSyncDbFromSNB")
-    .desc("Do not synchronize database from Signals Notebook")
-    .build();
+            .longOpt("noSyncDbFromSNB")
+            .desc("Do not synchronize database from Signals Notebook")
+            .build();
 
     @SuppressWarnings("static-acces")
     private static final Option debugOpt = Option.builder("d")
-    .longOpt("debug")
-    .hasArg()
-    .argName("LEVEL")
-    .desc("Set log level to the selected LEVEL (one of FATAL, ERROR, WARN, INFO, DEBUG, TRACE)")
-    .build();
+            .longOpt("debug")
+            .hasArg()
+            .argName("LEVEL")
+            .desc("Set log level to the selected LEVEL (one of FATAL, ERROR, WARN, INFO, DEBUG, TRACE)")
+            .build();
 
     @SuppressWarnings("static-acces")
     private static final Option trustStoreOpt = Option.builder("ts")
-    .longOpt("trustStore")
-    .hasArg()
-    .argName("FILE")
-    .desc("Set the truststore for startSSL. The trustStore should contain certificates for both: LDAP and SNB API.")
-    .build();
+            .longOpt("trustStore")
+            .hasArg()
+            .argName("FILE")
+            .desc("Set the truststore for startSSL. The trustStore should contain certificates for both: LDAP and SNB API.")
+            .build();
 
-    private static final Option importSignalsEntitiesData = Option.builder("import-entities")
-    .longOpt("importSignalsEntities")
+    private static final Option importSignalsEntitiesOpt = Option.builder("importE")
+            .longOpt("importSignalsEntities")
             .desc(" Initiates a data import process from a remote REST API of signals notebook. " +
                     "The process fetches a list of entities from the specified API endpoint, " +
                     "maps the data to the 'SignalsEntity' class, and persists it to the PostgreSQL " +
                     "database using Hibernate. ")
-    .build();
-
+            .build();
 
 
     /**
@@ -170,7 +175,7 @@ public class Signals {
 
     private void dumpSet(Set<String> set) {
         Iterator<String> iter = set.iterator();
-        while(iter.hasNext()) {
+        while (iter.hasNext()) {
             System.out.println(iter.next());
         }
     }
@@ -178,28 +183,41 @@ public class Signals {
     private void manageMaterials() {
         logger.info("""
 
-            ******************************************************
-            *
-            * Manage Materials
-            * {} / {}
-            *
-            ******************************************************
-            """, signalsConfig.getSnbInstanceName(), new Date().toString());
+                ******************************************************
+                *
+                * Manage Materials
+                * {} / {}
+                *
+                ******************************************************
+                """, signalsConfig.getSnbInstanceName(), new Date().toString());
 
-            libraryManager.manageMaterials(updateConfig);
+        libraryManager.manageMaterials(updateConfig);
     }
 
     private void manageUsers() {
         logger.info("""
 
-            ******************************************************
-            *
-            * Manage Users 
-            * {} / {}
-            *
-            ******************************************************
-            """, signalsConfig.getSnbInstanceName(), new Date().toString());
+                ******************************************************
+                *
+                * Manage Users 
+                * {} / {}
+                *
+                ******************************************************
+                """, signalsConfig.getSnbInstanceName(), new Date().toString());
         accessManager.manageAccess(updateConfig, noMail);
+    }
+
+    private void signalsEntityCall() {
+        logger.info("""
+
+                ******************************************************
+                *
+                * signals enities call
+                * {} / {}
+                *
+                ******************************************************
+                """, signalsConfig.getSnbInstanceName(), new Date().toString());
+        signalsEntitiesCall.receiveTheEntitiesFromSignals();
     }
 
     public static Signals getInstance(String fname) {
@@ -216,7 +234,7 @@ public class Signals {
             signals = new Signals();
             ctx.bind("inject", signals);
 
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return signals;
@@ -237,8 +255,9 @@ public class Signals {
     }
 
     /**
-     * process the command line and perform requested jobs. 
-     * @param argv the command line arguments
+     * process the command line and perform requested jobs.
+     *
+     * @param argv    the command line arguments
      * @param options the defined options
      */
     public static void processCommandLine(String[] argv, Options options) {
@@ -252,7 +271,7 @@ public class Signals {
                 return;
             }
 
-            if (! cmdline.hasOption(configOpt.getOpt())) {
+            if (!cmdline.hasOption(configOpt.getOpt())) {
                 printHelp("ERROR: missing configuration file", options);
                 return;
             }
@@ -287,7 +306,7 @@ public class Signals {
 
 
             if (cmdline.hasOption(debugOpt.getOpt())) {
-                if (! signals.logConfig.setLogLevel(cmdline.getOptionValue(debugOpt.getOpt()))) {
+                if (!signals.logConfig.setLogLevel(cmdline.getOptionValue(debugOpt.getOpt()))) {
                     printHelp("ERROR: invalid log level", options);
                     return;
                 }
@@ -295,24 +314,24 @@ public class Signals {
 
             if (cmdline.hasOption(userMgrOpt.getOpt())) {
                 signals.manageUsers();
-            } 
+            }
 
             if (cmdline.hasOption(materialsMgrOpt.getOpt())) {
                 signals.manageMaterials();
             }
 
-            if(cmdline.hasOption(importSignalsEntitiesData.getOpt())){
+            if (cmdline.hasOption(importSignalsEntitiesOpt.getOpt())) {
                 //implement method
-                signals.
+                signals.signalsEntityCall();
             }
 
-        } catch(MissingArgumentException mae) {
+        } catch (MissingArgumentException mae) {
             printHelp("ERROR: " + mae.getMessage(), options);
-        } catch(MissingOptionException moe) {
+        } catch (MissingOptionException moe) {
             printHelp("ERROR: " + moe.getMessage(), options);
-        } catch(UnrecognizedOptionException uoe) {
+        } catch (UnrecognizedOptionException uoe) {
             printHelp("ERROR: " + uoe.getMessage(), options);
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
