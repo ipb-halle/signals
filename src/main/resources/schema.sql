@@ -1,7 +1,29 @@
 
 CREATE TABLE signalsentities (
-    id VARCHAR NOT NULL PRIMARY KEY,
-    snb_type VARCHAR
+    id VARCHAR PRIMARY KEY,
+    snb_type VARCHAR,
+    eid VARCHAR,
+    name VARCHAR,
+    description VARCHAR,
+    created_at TIMESTAMP,
+    created_by VARCHAR,
+    owner VARCHAR,
+    edited_at TIMESTAMP,
+    edited_by VARCHAR,
+    digest BIGINT,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE signalsentities_children (
+    signals_entity_id VARCHAR(255),
+    child_id VARCHAR(255),
+    FOREIGN KEY (signals_entity_id) REFERENCES signalsentities(id)
+);
+
+CREATE TABLE signalsentities_flags (
+    signals_entity_id VARCHAR(255),
+    flag_value VARCHAR(255),
+    FOREIGN KEY (signals_entity_id) REFERENCES signalsentities(id)
 );
 
 CREATE TABLE location_types (

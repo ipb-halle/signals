@@ -223,7 +223,7 @@ public class Signals {
                 ******************************************************
                 """, signalsConfig.getSnbInstanceName(), new Date().toString());
         signalsEntitiesCall.receiveTheEntitiesFromSignals();
-       // signalsEntityRestService.doGetEntities("journal");
+   //     signalsEntityRestService.doGetEntities("");
     }
 
     public static Signals getInstance(String fname) {

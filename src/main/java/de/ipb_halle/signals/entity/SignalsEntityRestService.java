@@ -26,7 +26,9 @@ import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestResultIterator;
 import de.ipb_halle.signals.rest.RestReplyParser;
 
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import jakarta.ejb.Local;
@@ -53,6 +55,13 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntity> 
 
         entity.setId(json.getAsJsonObject().getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
         entity.setType(attributes.getAsJsonPrimitive(RestHelper.ATTR_TYPE).getAsString());
+        System.out.printf("type: %s   \tid: %s \n", entity.getType(), entity.getId());
+
+        entity.setName(attributes.has("name") ? attributes.get("name").getAsString() : null);
+        entity.setDescription(attributes.has("description") ? attributes.get("description").getAsString() : null);
+        entity.setCreatedAt(attributes.has("createdAt") ? Date.from(Instant.parse(attributes.get("createdAt").getAsString())) : null);
+        entity.setEditedAt(attributes.has("editedAt") ? Date.from(Instant.parse(attributes.get("editedAt").getAsString())) : null);
+        entity.setDigest(attributes.has("digest") ? Long.parseLong(attributes.get("digest").getAsString()) : null);
         return entity;
     }
 
