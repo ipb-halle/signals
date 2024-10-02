@@ -56,6 +56,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+
 import jakarta.annotation.Resource;
 import jakarta.ejb.Local;
 import jakarta.ejb.Stateless;
@@ -90,7 +91,7 @@ public class RestClientImpl implements RestClient {
      * constructor
      */
     public RestClientImpl() {
-        uriParameterMap = new HashMap<> ();
+        uriParameterMap = new HashMap<>();
         logger = LoggerFactory.getLogger(RestResultIterator.class);
         contentType = APPLICATION_VND_JSON;
         method = Method.GET;
@@ -104,8 +105,8 @@ public class RestClientImpl implements RestClient {
         BodyPublisher requestBody = BodyPublishers.noBody();
 
         HttpRequest.Builder builder = HttpRequest.newBuilder(getURI())
-            .header("Accept", contentType)
-            .header("X-API-KEY", signalsConfig.getApiKey());
+                .header("Accept", contentType)
+                .header("X-API-KEY", signalsConfig.getApiKey());
 
         if (requestData != null) {
             if ((method == Method.GET) || (method == Method.DELETE)) {
@@ -118,15 +119,15 @@ public class RestClientImpl implements RestClient {
         }
 
         HttpRequest request = builder
-                    .method(method.toString(), requestBody)
-                    .build();
+                .method(method.toString(), requestBody)
+                .build();
 
-       HttpClient client = HttpClient.newBuilder()
-            .version(Version.HTTP_1_1)
-            .followRedirects(Redirect.NORMAL)
-            .connectTimeout(Duration.ofSeconds(20))
-            .proxy(ProxySelector.getDefault())
-            .build();
+        HttpClient client = HttpClient.newBuilder()
+                .version(Version.HTTP_1_1)
+                .followRedirects(Redirect.NORMAL)
+                .connectTimeout(Duration.ofSeconds(20))
+                .proxy(ProxySelector.getDefault())
+                .build();
 
         try {
             HttpResponse<String> httpResponse = client.send(request, BodyHandlers.ofString());
@@ -171,19 +172,19 @@ public class RestClientImpl implements RestClient {
         }
         StringBuilder sb = new StringBuilder(signalsConfig.getBaseUrl());
         sb.append(endpoint);
-        if (! uriParameterMap.isEmpty()) {
-            AtomicReference<String> sep = new AtomicReference<> ("");
+        if (!uriParameterMap.isEmpty()) {
+            AtomicReference<String> sep = new AtomicReference<>("");
             sb.append("?");
             uriParameterMap.forEach((key, value) -> {
-                        sb.append(sep.getAndSet("&"));
-                        try {
-                            sb.append(URLEncoder.encode(key, UTF8));
-                            sb.append("=");
-                            sb.append(URLEncoder.encode(value, UTF8));
-                        } catch(UnsupportedEncodingException uee) {
-                            // ignored
-                        }
-                    });
+                sb.append(sep.getAndSet("&"));
+                try {
+                    sb.append(URLEncoder.encode(key, UTF8));
+                    sb.append("=");
+                    sb.append(URLEncoder.encode(value, UTF8));
+                } catch (UnsupportedEncodingException uee) {
+                    // ignored
+                }
+            });
         }
 
         uri = new URI(sb.toString());
@@ -201,7 +202,7 @@ public class RestClientImpl implements RestClient {
         method = Method.GET;
         requestData = null;
         response = null;
-        uriParameterMap = new HashMap<> ();
+        uriParameterMap = new HashMap<>();
         return this;
     }
 
@@ -239,5 +240,20 @@ public class RestClientImpl implements RestClient {
         uriParameterMap.clear();
         uri = new URI(u);
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "RestClientImpl{" +
+                "signalsConfig=" + signalsConfig +
+                ", contentType='" + contentType + '\'' +
+                ", endpoint='" + endpoint + '\'' +
+                ", method=" + method +
+                ", requestData='" + requestData + '\'' +
+                ", response='" + response + '\'' +
+                ", responseCode=" + responseCode +
+                ", uri=" + uri +
+                ", uriParameterMap=" + uriParameterMap +
+                '}';
     }
 }

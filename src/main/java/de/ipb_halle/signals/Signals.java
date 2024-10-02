@@ -17,8 +17,9 @@
  */
 package de.ipb_halle.signals;
 
-import de.ipb_halle.signals.entity.SignalsEntitiesCall;
+import de.ipb_halle.signals.entity.SignalsEntitiesTestCall;
 import de.ipb_halle.signals.entity.SignalsEntityManager;
+import de.ipb_halle.signals.entity.SignalsEntityRestService;
 import de.ipb_halle.signals.materials.LibraryManager;
 import de.ipb_halle.signals.users.AccessManager;
 import de.ipb_halle.signals.users.LdapClient;
@@ -75,7 +76,10 @@ public class Signals {
     private LogConfig logConfig;
 
     @Inject
-    private SignalsEntitiesCall signalsEntitiesCall;
+    private SignalsEntitiesTestCall signalsEntitiesCall;
+
+    @Inject
+    private SignalsEntityRestService signalsEntityRestService;
 
     private UpdateConfig updateConfig;
     private boolean noMail;
@@ -155,6 +159,7 @@ public class Signals {
             .desc("Set the truststore for startSSL. The trustStore should contain certificates for both: LDAP and SNB API.")
             .build();
 
+    @SuppressWarnings("static-access")
     private static final Option importSignalsEntitiesOpt = Option.builder("importE")
             .longOpt("importSignalsEntities")
             .desc("Initiates a data import process from a remote REST API of signals notebook. " +
@@ -218,6 +223,7 @@ public class Signals {
                 ******************************************************
                 """, signalsConfig.getSnbInstanceName(), new Date().toString());
         signalsEntitiesCall.receiveTheEntitiesFromSignals();
+       // signalsEntityRestService.doGetEntities("journal");
     }
 
     public static Signals getInstance(String fname) {
