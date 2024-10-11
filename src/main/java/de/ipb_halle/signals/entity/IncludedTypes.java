@@ -8,6 +8,7 @@ public enum IncludedTypes {
     SAMPLE("sample"),
     TEXT("text"),
     TASK("task"),
+    ASSET("asset"),
     WORKSHEET("worksheet");
 
     private final String includedType;
