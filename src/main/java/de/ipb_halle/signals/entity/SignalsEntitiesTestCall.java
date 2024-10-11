@@ -31,7 +31,7 @@ public class SignalsEntitiesTestCall {
         List<SignalsEntity> entities = new ArrayList<>();
 
         try {
-            restClientImpl.setMethod(Method.GET).setEndpoint("/entities").putUriParameter(PARAMETER_INCLUDE_TYPES, IncludedTypes.BATCH.getIncludedType());
+            restClientImpl.setMethod(Method.GET).setEndpoint("/entities").putUriParameter(PARAMETER_INCLUDE_TYPES, IncludedTypes.PLATE_CONTAINER.getIncludedType());
 
             restClientImpl.toString();
 

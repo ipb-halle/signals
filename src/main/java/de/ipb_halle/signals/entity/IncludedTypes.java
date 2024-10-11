@@ -9,10 +9,12 @@ public enum IncludedTypes {
     TEXT("text"),
     TASK("task"),
     ASSET("asset"),
+    ASSET_TYPE("assetType"),
     MONOMER("monomer"),
     CHEMICAL_DRAWING("chemicalDrawing"),
     BATCH("batch"),
-    WORKSHEET("worksheet");
+    WORKSHEET("worksheet"),
+    PLATE_CONTAINER("plateContainer");
 
     private final String includedType;
 
