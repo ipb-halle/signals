@@ -15,9 +15,10 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals;
+package de.ipb_halle.signals.entity;
 
-import de.ipb_halle.signals.entity.*;
+import de.ipb_halle.signals.SignalsConfig;
+import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.rest.MockRestClient;
 import java.util.List;
 import java.util.Properties;

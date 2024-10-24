@@ -54,6 +54,9 @@ public class LibraryRestService implements RestReplyParser<Library> {
     @Inject
     private RestClient restClient;
 
+    @Inject
+    private FieldDefinitionRestService fieldDefinitionParser;
+
     private Logger logger = LoggerFactory.getLogger(LibraryRestService.class);
 
     public Library parseReply(JsonElement json) {
@@ -126,9 +129,8 @@ public class LibraryRestService implements RestReplyParser<Library> {
 
     private void parseAssetFields(JsonArray jArray, Library lib) {
         Iterator<JsonElement> iterator = jArray.iterator();
-        FieldDefinitionRestService svc = new FieldDefinitionRestService();
         while (iterator.hasNext()) {
-            lib.addAssetFieldDefinition(svc.parseReply(iterator.next()));
+            lib.addAssetFieldDefinition(fieldDefinitionParser.parseReply(iterator.next()));
         }
     }
 
@@ -142,9 +144,8 @@ public class LibraryRestService implements RestReplyParser<Library> {
 
     private void parseBatchFields(JsonArray jArray, Library lib) {
         Iterator<JsonElement> iterator = jArray.iterator();
-        FieldDefinitionRestService svc = new FieldDefinitionRestService();
         while (iterator.hasNext()) {
-            lib.addBatchFieldDefinition(svc.parseReply(iterator.next()));
+            lib.addBatchFieldDefinition(fieldDefinitionParser.parseReply(iterator.next()));
         }
     }
 

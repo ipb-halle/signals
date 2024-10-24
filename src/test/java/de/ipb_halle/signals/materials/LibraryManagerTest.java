@@ -20,8 +20,13 @@ package de.ipb_halle.signals.materials;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.UpdateConfig;
 import de.ipb_halle.signals.TestBase;
+import de.ipb_halle.signals.dynEnum.DynEnum;
+import de.ipb_halle.signals.dynEnum.DynEnumDbService;
+import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.field.FieldDefinition;
 import de.ipb_halle.signals.field.FieldDefinitionDbService;
+import de.ipb_halle.signals.field.FieldDefinitionRestService;
+import de.ipb_halle.signals.field.FieldType;
 import de.ipb_halle.signals.rest.MockRestClient;
 import java.util.List;
 import java.util.Properties;
@@ -54,6 +59,10 @@ public class LibraryManagerTest {
     private final String TEST_LIBRARY_ASSET_FIELD_ID = "6215104dab0ad27bf79429f7";
     private final String TEST_LIBRARY_ASSET_FIELD_TITLE = "Chemical Name";
 
+
+    @Inject
+    private DynEnumManager dynEnumMgr;
+
     @Inject
     private MockRestClient mockRestClient;
 
@@ -62,7 +71,8 @@ public class LibraryManagerTest {
 
     @Module
     @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class, 
-        FieldDefinition.class, FieldDefinitionDbService.class, 
+        FieldDefinition.class, FieldDefinitionDbService.class, FieldDefinitionRestService.class,
+        DynEnum.class, DynEnumDbService.class, DynEnumManager.class,
         Library.class, LibraryEntity.class, 
         LibraryFieldDefinition.class, LibraryFieldDefinitionId.class,
         LibraryDbService.class, LibraryManager.class, LibraryRestService.class })
@@ -72,7 +82,8 @@ public class LibraryManagerTest {
 
     @Module
     public PersistenceUnit persistence() {
-        return TestBase.persistence(new String[]{ Library.class.getName(), LibraryFieldDefinition.class.getName(), FieldDefinition.class.getName() });
+        return TestBase.persistence(new String[]{ Library.class.getName(), LibraryFieldDefinition.class.getName(), 
+            FieldDefinition.class.getName(), DynEnum.class.getName(), FieldType.class.getName() });
     }
 
     @Configuration
@@ -82,6 +93,7 @@ public class LibraryManagerTest {
 
     @Before
     public void testSetup() {
+        dynEnumMgr.allowEnumDiscovery();
         TestBase.prepareRestClients(mockRestClient,
             TEST_KEY_1,
             getClass().getResourceAsStream(TEST_RESOURCE_1));

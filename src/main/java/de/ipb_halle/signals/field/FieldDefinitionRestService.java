@@ -21,6 +21,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.MeasureMapper;
 import de.ipb_halle.signals.entity.Quality;
 import de.ipb_halle.signals.rest.RestHelper;
@@ -28,16 +29,29 @@ import de.ipb_halle.signals.rest.RestReplyParser;
 import java.util.Iterator;
 
 
-// import jakarta.ejb.Local;
-// import jakarta.inject.Inject;
+import jakarta.ejb.Local;
+// import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 
 /** 
  * service for field definitions (not a real REST service)
  */
 
-//@Local
+@Local
 public class FieldDefinitionRestService implements RestReplyParser<FieldDefinition> {
 
+    @Inject
+    private DynEnumManager dynEnumMgr;
+
+    /**
+     * converts a field type from JSON to the respective 
+     * database backed field type class instance.
+     * @throws RuntimeException if field type is not yet registered and 
+     * auto discovery is not allowed (default).
+     */
+    private FieldType lookupFieldType(String typeString) {
+        return (FieldType) dynEnumMgr.valueOf(FieldType.valueOf(typeString));
+    }
 
     /**
      * ATTR_COLLECTION currently not implemented!
@@ -53,7 +67,7 @@ public class FieldDefinitionRestService implements RestReplyParser<FieldDefiniti
             fd.setAttributeListEid(RestHelper.parseString(j, FieldDefinition.ATTR_ATTRIBUTE));
             fd.setCalculated(RestHelper.parseBool(j, FieldDefinition.ATTR_CALCULATED));
             fd.setDefinedBy(RestHelper.parseString(j, FieldDefinition.ATTR_DEFINED_BY));
-            fd.setFieldType(FieldType.valueOfAnyCase(RestHelper.parseString(j, FieldDefinition.ATTR_DATA_TYPE)));
+            fd.setFieldType(lookupFieldType(RestHelper.parseString(j, FieldDefinition.ATTR_DATA_TYPE)));
             fd.setHidden(RestHelper.parseBool(j, FieldDefinition.ATTR_HIDDEN));
             fd.setRequired(RestHelper.parseBool(j, FieldDefinition.ATTR_MANDATORY));
             fd.setTitle(RestHelper.parseString(j, RestHelper.ATTR_NAME));
@@ -72,7 +86,7 @@ public class FieldDefinitionRestService implements RestReplyParser<FieldDefiniti
         fd.setAttributeListEid(RestHelper.parseString(def, FieldDefinition.ATTR_ATTRIBUTE_LIST_EID));
         fd.setDefaultUnit(RestHelper.parseString(def, FieldDefinition.ATTR_DEFAULT_UNIT));
         fd.setDefinedBy(RestHelper.parseString(def, FieldDefinition.ATTR_DEFINED_BY));
-        fd.setFieldType(FieldType.valueOfAnyCase(RestHelper.parseString(def, FieldDefinition.ATTR_FIELD_TYPE))); 
+        fd.setFieldType(lookupFieldType(RestHelper.parseString(def, FieldDefinition.ATTR_FIELD_TYPE))); 
         fd.setHidden(RestHelper.parseBool(def, FieldDefinition.ATTR_HIDDEN));
         fd.setKey(RestHelper.parseString(def, FieldDefinition.ATTR_KEY));
         fd.setRequired(RestHelper.parseBool(def, FieldDefinition.ATTR_REQUIRED));

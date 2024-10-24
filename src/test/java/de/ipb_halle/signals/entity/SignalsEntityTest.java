@@ -15,15 +15,12 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals;
+package de.ipb_halle.signals.entity;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-
-import de.ipb_halle.signals.entity.SignalsEntity;
-import de.ipb_halle.signals.entity.SignalsEntityRestService;
+import de.ipb_halle.signals.TestBase;
 import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;

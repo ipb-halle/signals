@@ -1,4 +1,10 @@
 
+CREATE TABLE dyn_enums (
+    id  SERIAL NOT NULL PRIMARY KEY,
+    type VARCHAR NOT NULL,
+    value VARCHAR NOT NULL,
+    UNIQUE (type, value));
+
 CREATE TABLE signalsentities (
     id VARCHAR PRIMARY KEY,
     snb_type VARCHAR,

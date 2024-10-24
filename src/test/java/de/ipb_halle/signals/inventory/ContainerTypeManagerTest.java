@@ -21,8 +21,13 @@ import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.attachment.Attachment;
 import de.ipb_halle.signals.attachment.AttachmentDbService;
+import de.ipb_halle.signals.dynEnum.DynEnum;
+import de.ipb_halle.signals.dynEnum.DynEnumDbService;
+import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.field.FieldDefinition;
 import de.ipb_halle.signals.field.FieldDefinitionDbService;
+import de.ipb_halle.signals.field.FieldDefinitionRestService;
+import de.ipb_halle.signals.field.FieldType;
 import de.ipb_halle.signals.rest.MockRestClient;
 import java.util.List;
 import java.util.Properties;
@@ -62,10 +67,13 @@ public class ContainerTypeManagerTest {
     @Inject
     private ContainerTypeManager manager;
 
+    @Inject DynEnumManager dynEnumMgr;
+
     @Module
     @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class, 
-        Attachment.class, AttachmentDbService.class, 
-        FieldDefinition.class, FieldDefinitionDbService.class, 
+        Attachment.class, AttachmentDbService.class, DynEnumManager.class,
+        DynEnumDbService.class, DynEnum.class,
+        FieldDefinition.class, FieldDefinitionDbService.class, FieldDefinitionRestService.class,
         ContainerType.class, ContainerTypeEntity.class, 
         ContainerTypeAttachment.class, ContainerTypeAttachmentId.class,
         ContainerTypeFieldDefinition.class, ContainerTypeFieldDefinitionId.class,
@@ -78,7 +86,8 @@ public class ContainerTypeManagerTest {
     public PersistenceUnit persistence() {
         return TestBase.persistence(new String[]{ ContainerType.class.getName(), 
                 ContainerTypeFieldDefinition.class.getName(), FieldDefinition.class.getName(),
-                ContainerTypeAttachment.class.getName(), Attachment.class.getName()
+                ContainerTypeAttachment.class.getName(), Attachment.class.getName(),
+                DynEnum.class.getName(), FieldType.class.getName()
             });
     }
 
@@ -89,6 +98,7 @@ public class ContainerTypeManagerTest {
 
     @Before
     public void testSetup() {
+        dynEnumMgr.allowEnumDiscovery();
         TestBase.prepareRestClients(mockRestClient,
             TEST_KEY_1,
             getClass().getResourceAsStream(TEST_RESOURCE_1));

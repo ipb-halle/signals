@@ -50,7 +50,7 @@ public class SignalsEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
-    @Column
+    @Column(name = "created_by")
     private String createdBy;
 
     @Column
@@ -60,7 +60,7 @@ public class SignalsEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date editedAt;
 
-    @Column
+    @Column(name = "edited_by")
     private String editedBy;
 
     @Column(name = "digest")
@@ -70,6 +70,7 @@ public class SignalsEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date timeStamp;
 
+/*
     @ElementCollection
     @CollectionTable(name = "signalsentities_children", joinColumns = @JoinColumn(name = "signals_entity_id"))
     @Column(name = "child_id")
@@ -79,7 +80,7 @@ public class SignalsEntity {
     @CollectionTable(name = "signalsentities_flags", joinColumns = @JoinColumn(name = "signals_entity_id"))
     @Column(name = "flag_value")
     private List<String> flags;
-
+*/
     public String dump() {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("SignalsEntity(%s) --> %s\n", id,  type));
@@ -182,6 +183,7 @@ public class SignalsEntity {
         this.timeStamp = timeStamp;
     }
 
+/*
     public List<String> getChildren() {
         return children;
     }
@@ -197,4 +199,5 @@ public class SignalsEntity {
     public void setFlags(List<String> flags) {
         this.flags = flags;
     }
+*/
 }

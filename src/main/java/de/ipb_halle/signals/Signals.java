@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals;
 
+import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.SignalsEntitiesTestCall;
 import de.ipb_halle.signals.entity.SignalsEntityManager;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
@@ -59,6 +60,9 @@ public class Signals {
 
     @Resource
     private SignalsConfig signalsConfig;
+
+    @Inject
+    private DynEnumManager dynEnumMgr;
 
     @Inject
     private SignalsEntityManager signalsMgr;
@@ -113,37 +117,43 @@ public class Signals {
             .desc("Perform user,  group and role management")
             .build();
 
-    @SuppressWarnings("static-acces")
+    @SuppressWarnings("static-access")
     private static final Option dryRunOpt = Option.builder("n")
             .longOpt("dry-run")
             .desc("Dry run - don't modify anything (includes --noUpdateSNB and --noUpdateFromLDAP).")
             .build();
 
-    @SuppressWarnings("static-acces")
+    @SuppressWarnings("static-access")
     private static final Option noMailOpt = Option.builder("m")
             .longOpt("noMail")
             .desc("Do not send any reports by email")
             .build();
 
-    @SuppressWarnings("static-acces")
+    @SuppressWarnings("static-access")
+    private static final Option discoverOpt = Option.builder("discover")
+            .longOpt("allow-discover")
+            .desc("Allow discovery of new types (DynEnums). Otherwise the program is aborted upon discovery of an unknown type.")
+            .build();
+
+    @SuppressWarnings("static-access")
     private static final Option noUpdateSnbOpt = Option.builder("noSNB")
             .longOpt("noUpdateSNB")
             .desc("Do not perform updates to Signals Notebook")
             .build();
 
-    @SuppressWarnings("static-acces")
+    @SuppressWarnings("static-access")
     private static final Option noUpdateFromLdapOpt = Option.builder("noLDAP")
             .longOpt("noUpdateFromLDAP")
             .desc("Do not perform updates from LDAP")
             .build();
 
-    @SuppressWarnings("static-acces")
+    @SuppressWarnings("static-access")
     private static final Option noSyncDbFromSNBOpt = Option.builder("noSyncSNB")
             .longOpt("noSyncDbFromSNB")
             .desc("Do not synchronize database from Signals Notebook")
             .build();
 
-    @SuppressWarnings("static-acces")
+    @SuppressWarnings("static-access")
     private static final Option debugOpt = Option.builder("d")
             .longOpt("debug")
             .hasArg()
@@ -151,7 +161,7 @@ public class Signals {
             .desc("Set log level to the selected LEVEL (one of FATAL, ERROR, WARN, INFO, DEBUG, TRACE)")
             .build();
 
-    @SuppressWarnings("static-acces")
+    @SuppressWarnings("static-access")
     private static final Option trustStoreOpt = Option.builder("ts")
             .longOpt("trustStore")
             .hasArg()
@@ -326,6 +336,10 @@ public class Signals {
                 }
             }
 
+            if (cmdline.hasOption(discoverOpt.getOpt())) {
+                signals.dynEnumMgr.allowEnumDiscovery();
+            }
+
             if (cmdline.hasOption(userMgrOpt.getOpt())) {
                 signals.manageUsers();
             }
@@ -352,6 +366,7 @@ public class Signals {
         options.addOption(configOpt);
         options.addOption(helpOpt);
         options.addOption(debugOpt);
+        options.addOption(discoverOpt);
         options.addOption(dryRunOpt);
         options.addOption(noMailOpt);
         options.addOption(noUpdateSnbOpt);

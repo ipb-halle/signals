@@ -15,44 +15,30 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.field;
+package de.ipb_halle.signals.entity;
 
 import de.ipb_halle.signals.dynEnum.DynEnum;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
-
 /** 
- * Field types as defined by SNB Swagger API
+ * Dynamically discovered entity types from Signals Notebook
  */
 
 @Entity
-@DiscriminatorValue("FieldType")
-public class FieldType extends DynEnum <FieldType> { 
+@DiscriminatorValue("EntityType")
+public class EntityType extends DynEnum <EntityType> { 
 
     /**
      * private no-argument constructor
      */
-    private FieldType() { }
+    private EntityType() { }
 
-    private FieldType(String v) {
+    private EntityType(String v) {
         super(v);
     }
 
-    public static FieldType valueOf(String v) {
-        return new FieldType(v);
+    public static EntityType valueOf(String v) {
+        return new EntityType(v);
     }
-
-/*
-     * Return a FieldType corresponding to a given String. As 
-     * the SNB Swagger API uses mixed casing, the String will be
-     * converted to all uppercase before looking up the FieldType.
-     * @param v the string 
-     * @return the corresponding FieldType
-     *
-    public static FieldType valueOfAnyCase(String v) {
-        return valueOf(v.toUpperCase());
-    }
-*/
-
 }

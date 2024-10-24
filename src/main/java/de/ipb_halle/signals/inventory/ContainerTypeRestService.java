@@ -49,6 +49,9 @@ public class ContainerTypeRestService implements RestReplyParser<ContainerType> 
     @Inject
     private RestClient restClient;
 
+    @Inject
+    private FieldDefinitionRestService fieldDefinitionParser;
+
     public ContainerType parseReply(JsonElement j) {
         ContainerType ct = new ContainerType();
         JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
@@ -91,9 +94,8 @@ public class ContainerTypeRestService implements RestReplyParser<ContainerType> 
 
     private void parseFieldDefinitions(JsonArray j, ContainerType ct) {
         Iterator<JsonElement> iter = j.iterator();
-        FieldDefinitionRestService svc = new FieldDefinitionRestService();
         while (iter.hasNext()) {
-            ct.addFieldDefinition(svc.parseReply(iter.next()));
+            ct.addFieldDefinition(fieldDefinitionParser.parseReply(iter.next()));
         }
     }
 }
