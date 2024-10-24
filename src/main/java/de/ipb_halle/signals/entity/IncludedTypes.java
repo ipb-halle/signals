@@ -14,7 +14,9 @@ public enum IncludedTypes {
     CHEMICAL_DRAWING("chemicalDrawing"),
     BATCH("batch"),
     WORKSHEET("worksheet"),
-    PLATE_CONTAINER("plateContainer");
+    PLATE_CONTAINER("plateContainer"),
+    ATTRIBUTE("attribute"),
+    PLATE("plate");
 
     private final String includedType;
 

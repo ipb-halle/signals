@@ -33,10 +33,20 @@ public class FieldDefinitionDbService {
     @PersistenceContext(unitName="signalsDB")
     private EntityManager em;
 
+
+    /**
+     * Load a FieldDefinition entity by its ID.
+     * @param id the ID of the FieldDefinition entity
+     * @return the FieldDefinition entity
+     */
     public FieldDefinition loadById(String id) {
         return this.em.find(FieldDefinition.class, id);
     }
 
+    /**
+     * Save a FieldDefinition entity to the database.
+     * @param fd the FieldDefinition entity to save
+     */
     public void save(FieldDefinition fd) {
         this.em.merge(fd);
     }
