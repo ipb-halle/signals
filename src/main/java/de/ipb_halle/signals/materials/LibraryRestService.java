@@ -22,7 +22,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import de.ipb_halle.signals.field.FieldDefinitionRestService;
+import de.ipb_halle.signals.field.FieldDefinitionParser;
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.RestHelper;
@@ -55,7 +55,7 @@ public class LibraryRestService implements RestReplyParser<Library> {
     private RestClient restClient;
 
     @Inject
-    private FieldDefinitionRestService fieldDefinitionParser;
+    private FieldDefinitionParser fieldDefinitionParser;
 
     private Logger logger = LoggerFactory.getLogger(LibraryRestService.class);
 

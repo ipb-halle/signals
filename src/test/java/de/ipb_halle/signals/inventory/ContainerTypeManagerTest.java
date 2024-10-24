@@ -26,7 +26,7 @@ import de.ipb_halle.signals.dynEnum.DynEnumDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.field.FieldDefinition;
 import de.ipb_halle.signals.field.FieldDefinitionDbService;
-import de.ipb_halle.signals.field.FieldDefinitionRestService;
+import de.ipb_halle.signals.field.FieldDefinitionParser;
 import de.ipb_halle.signals.field.FieldType;
 import de.ipb_halle.signals.rest.MockRestClient;
 import java.util.List;
@@ -73,7 +73,7 @@ public class ContainerTypeManagerTest {
     @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class, 
         Attachment.class, AttachmentDbService.class, DynEnumManager.class,
         DynEnumDbService.class, DynEnum.class,
-        FieldDefinition.class, FieldDefinitionDbService.class, FieldDefinitionRestService.class,
+        FieldDefinition.class, FieldDefinitionDbService.class, FieldDefinitionParser.class,
         ContainerType.class, ContainerTypeEntity.class, 
         ContainerTypeAttachment.class, ContainerTypeAttachmentId.class,
         ContainerTypeFieldDefinition.class, ContainerTypeFieldDefinitionId.class,

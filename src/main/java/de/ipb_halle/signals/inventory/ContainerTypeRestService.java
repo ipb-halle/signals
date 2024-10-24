@@ -22,7 +22,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import de.ipb_halle.signals.attachment.AttachmentRestService;
-import de.ipb_halle.signals.field.FieldDefinitionRestService;
+import de.ipb_halle.signals.field.FieldDefinitionParser;
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.RestHelper;
@@ -50,7 +50,7 @@ public class ContainerTypeRestService implements RestReplyParser<ContainerType> 
     private RestClient restClient;
 
     @Inject
-    private FieldDefinitionRestService fieldDefinitionParser;
+    private FieldDefinitionParser fieldDefinitionParser;
 
     public ContainerType parseReply(JsonElement j) {
         ContainerType ct = new ContainerType();

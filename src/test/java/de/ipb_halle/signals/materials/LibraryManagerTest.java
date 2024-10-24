@@ -25,7 +25,7 @@ import de.ipb_halle.signals.dynEnum.DynEnumDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.field.FieldDefinition;
 import de.ipb_halle.signals.field.FieldDefinitionDbService;
-import de.ipb_halle.signals.field.FieldDefinitionRestService;
+import de.ipb_halle.signals.field.FieldDefinitionParser;
 import de.ipb_halle.signals.field.FieldType;
 import de.ipb_halle.signals.rest.MockRestClient;
 import java.util.List;
@@ -71,7 +71,7 @@ public class LibraryManagerTest {
 
     @Module
     @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class, 
-        FieldDefinition.class, FieldDefinitionDbService.class, FieldDefinitionRestService.class,
+        FieldDefinition.class, FieldDefinitionDbService.class, FieldDefinitionParser.class,
         DynEnum.class, DynEnumDbService.class, DynEnumManager.class,
         Library.class, LibraryEntity.class, 
         LibraryFieldDefinition.class, LibraryFieldDefinitionId.class,

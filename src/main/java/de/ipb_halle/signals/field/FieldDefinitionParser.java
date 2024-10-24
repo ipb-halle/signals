@@ -38,7 +38,7 @@ import jakarta.inject.Inject;
  */
 
 @Local
-public class FieldDefinitionRestService implements RestReplyParser<FieldDefinition> {
+public class FieldDefinitionParser implements RestReplyParser<FieldDefinition> {
 
     @Inject
     private DynEnumManager dynEnumMgr;
