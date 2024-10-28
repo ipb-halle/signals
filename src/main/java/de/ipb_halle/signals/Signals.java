@@ -18,7 +18,7 @@
 package de.ipb_halle.signals;
 
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
-import de.ipb_halle.signals.entity.SignalsEntitiesTestCall;
+import de.ipb_halle.signals.entity.SignalsEntitiesSampleCall;
 import de.ipb_halle.signals.entity.SignalsEntityManager;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
 import de.ipb_halle.signals.materials.LibraryManager;
@@ -80,7 +80,7 @@ public class Signals {
     private LogConfig logConfig;
 
     @Inject
-    private SignalsEntitiesTestCall signalsEntitiesCall;
+    private SignalsEntitiesSampleCall signalsEntitiesCall;
 
     @Inject
     private SignalsEntityRestService signalsEntityRestService;

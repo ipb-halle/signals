@@ -45,6 +45,7 @@ public class DynEnumManager {
     private boolean discoverEnums;
 
     private Map<DynEnumType, DynEnum> dynEnums;
+    private Map<Integer, DynEnum> dynEnumsById;
 
     private final Logger logger = LoggerFactory.getLogger(DynEnumManager.class);
 
@@ -54,6 +55,7 @@ public class DynEnumManager {
     public DynEnumManager() {
         discoverEnums = false;
         dynEnums = new HashMap<> ();
+        dynEnumsById = new HashMap<> ();
     }
 
     @PostConstruct
@@ -63,6 +65,7 @@ public class DynEnumManager {
                     de.getShortType(),
                     de.getValue()),
                     de);
+            dynEnumsById.put(de.getId(), de);
         }
     }
 
@@ -81,6 +84,10 @@ public class DynEnumManager {
         return e;
     }
 
+    public DynEnum valueOf(Integer id) {
+        return dynEnumsById.get(id);
+    }
+
     private DynEnum registerNewEnum(DynEnum dynEnum) {
         if (discoverEnums) {
             DynEnum de = dbService.save(dynEnum);
@@ -88,6 +95,7 @@ public class DynEnumManager {
                 de.getShortType(),
                 de.getValue());
             dynEnums.put(type, de);
+            dynEnumsById.put(de.getId(), de);
             return de;
         }
         throw new RuntimeException("Discovered new DynEnum "

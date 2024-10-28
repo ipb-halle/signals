@@ -17,8 +17,12 @@
  */
 package de.ipb_halle.signals.entity;
 
+import de.ipb_halle.signals.Signals;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
+import de.ipb_halle.signals.dynEnum.DynEnum;
+import de.ipb_halle.signals.dynEnum.DynEnumDbService;
+import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.rest.MockRestClient;
 import java.util.List;
 import java.util.Properties;
@@ -50,7 +54,7 @@ public class SignalsEntityManagerTest {
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities?includeTypes=location&page[offset]=20&page[limit]=20";
     private final String TEST_LOCATION_ID = "location:cfa1802a-6470-42b3-8c8b-9fe025c82717:ivt";
 
-    private final String TEST_ENTITY_TYPE = IncludedTypes.LOCATION.getIncludedType();
+    private final String TEST_ENTITY_TYPE = "location";
 
     @Inject
     private MockRestClient mockRestClient;
@@ -58,17 +62,22 @@ public class SignalsEntityManagerTest {
     @Inject
     private SignalsEntityManager manager;
 
+    @Inject
+    private DynEnumManager dynEnumManager;
+
     @Module
     @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
         SignalsEntity.class, SignalsEntityDbService.class, SignalsEntityManager.class,
-        SignalsEntityRestService.class })
+        SignalsEntityRestService.class, DynEnum.class, DynEnumManager.class, DynEnumDbService.class,
+            SignalsEntityDTO.class, EntityType.class})
     public EjbJar app() {
         return new EjbJar();
     }
 
     @Module
     public PersistenceUnit persistence() {
-        return TestBase.persistence(new String[]{ SignalsEntity.class.getName()});
+        return TestBase.persistence(new String[]{ SignalsEntity.class.getName(),
+        DynEnum.class.getName(), EntityType.class.getName()});
     }
 
     @Configuration
@@ -89,11 +98,13 @@ public class SignalsEntityManagerTest {
 
     @Test
     public void entityTest() {
+        dynEnumManager.allowEnumDiscovery();
+        List<SignalsEntityDTO> entities = manager.getSnbEntities(TEST_ENTITY_TYPE);
 
-        List<SignalsEntity> entities = manager.getSnbEntities(TEST_ENTITY_TYPE);
         manager.save(entities);
         SignalsEntity entity = manager.getDbEntity(TEST_LOCATION_ID);
 
-        assertEquals("entity type mismatch", TEST_ENTITY_TYPE, entity.getType());
+        EntityType type = (EntityType) dynEnumManager.valueOf(entity.getType());
+        assertEquals("entity type mismatch", TEST_ENTITY_TYPE, type.getValue());
     }
 }

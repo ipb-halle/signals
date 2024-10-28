@@ -17,15 +17,10 @@
  */
 package de.ipb_halle.signals.dynEnum;
 
-import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
-import de.ipb_halle.signals.dynEnum.DynEnum;
-import de.ipb_halle.signals.dynEnum.DynEnumDbService;
-import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.EntityType;
 import jakarta.inject.Inject;
 import java.util.Properties;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -33,13 +28,9 @@ import org.apache.openejb.jee.EjbJar;
 import org.apache.openejb.junit.ApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
-import org.apache.openejb.testing.Descriptor;
-import org.apache.openejb.testing.Descriptors;
 import org.apache.openejb.testing.Module;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertThrows;
 
@@ -52,7 +43,7 @@ public class DynEnumManagerTest {
 
     @Module
     @Classes(cdi = true, value = { DynEnumDbService.class, DynEnumManager.class, 
-        DynEnum.class, EntityType.class, })
+        DynEnum.class, EntityType.class })
     public EjbJar app() {
         return new EjbJar();
     }

@@ -67,7 +67,8 @@ public class ContainerTypeManagerTest {
     @Inject
     private ContainerTypeManager manager;
 
-    @Inject DynEnumManager dynEnumMgr;
+    @Inject
+    private DynEnumManager dynEnumMgr;
 
     @Module
     @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class, 

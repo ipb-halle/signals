@@ -42,12 +42,12 @@ public class SignalsEntityManager {
     }
 
 
-    public List<SignalsEntity> getSnbEntities(String includeTypes) {
+    public List<SignalsEntityDTO> getSnbEntities(String includeTypes) {
         return restService.doGetEntities(includeTypes);
     }
 
-    public void save(List<SignalsEntity> entities) {
-        for (SignalsEntity e : entities) {
+    public void save(List<SignalsEntityDTO> entities) {
+        for (SignalsEntityDTO e : entities) {
             dbService.save(e);
         }
     }

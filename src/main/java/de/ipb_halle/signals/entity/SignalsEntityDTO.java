@@ -1,6 +1,6 @@
 /*
  * IPB Signals client
- * Copyright 2022 Leibniz-Institut f. Pflanzenbiochemie
+ * Copyright 2024 Leibniz-Institut f. Pflanzenbiochemie
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,73 +17,79 @@
  */
 package de.ipb_halle.signals.entity;
 
-import jakarta.persistence.*;
+import de.ipb_halle.signals.dynEnum.DynEnumManager;
+import de.ipb_halle.signals.users.IUser;
+import de.ipb_halle.signals.users.UserReference;
 
 import java.util.Date;
 import java.util.List;
 
-/** 
- * Single signals entity (entities API endpoint) 
- */
+public class SignalsEntityDTO {
 
-@Entity
-@Table(name="signalsentities")
-public class SignalsEntity {
+    public final static String ATTR_EID = "eid";
+    public final static String ATTR_DESCRIPTION = "description";
+    public final static String ATTR_CREATED_AT = "createdAt";
+    public final static String ATTR_EDITED_AT = "editedAt";
+    public final static String ATTR_CREATED_BY = "relationships.createdBy.data.id";
+    public final static String ATTR_EDITED_BY = "relationships.editedBy.data.id";
+    public final static String ATTR_OWNER = "relationships.owner.data.id";
+    public final static String ATTR_FIELDS = "fields";
+    public final static String ATTR_FLAGS = "flags";
 
-    @Id
     private String id;
-
-    @Column(name = "snb_type")
-    private Integer type;
-
-    @Column
+    private EntityType type;
     private String eid;
-
-    @Column
     private String name;
-
-    @Column
-    @Lob
     private String description;
-
-    @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-
-    @Column(name = "created_by")
-    private String createdBy;
-
-    @Column
-    private String owner;
-
-    @Column(name = "edited_at")
-    @Temporal(TemporalType.TIMESTAMP)
+    private IUser createdBy;
+    private IUser owner;
     private Date editedAt;
-
-    @Column(name = "edited_by")
-    private String editedBy;
-
-    @Column(name = "digest")
+    private IUser editedBy;
     private Long digest;
-
-    @Column(name = "timestamp")
-    @Temporal(TemporalType.TIMESTAMP)
     private Date timeStamp;
+    //private List<String> children;
+    //private List<String> flags;
 
-/*
-    @ElementCollection
-    @CollectionTable(name = "signalsentities_children", joinColumns = @JoinColumn(name = "signals_entity_id"))
-    @Column(name = "child_id")
-    private List<String> children;
+    /**
+     * default constructor
+     */
+    public SignalsEntityDTO() {
+    }
 
-    @ElementCollection
-    @CollectionTable(name = "signalsentities_flags", joinColumns = @JoinColumn(name = "signals_entity_id"))
-    @Column(name = "flag_value")
-    private List<String> flags;
-*/
+    public SignalsEntityDTO(SignalsEntity entity , DynEnumManager dynEnumManager) {
+        id = entity.getId();
+        type = (EntityType) dynEnumManager.valueOf(entity.getType());
+        this.eid = entity.getEid();
+        this.name = entity.getName();
+        this.description = entity.getDescription();
+        this.createdAt = entity.getCreatedAt();
+        this.createdBy = new UserReference().setId(entity.getCreatedBy());
+        this.owner = new UserReference().setId(entity.getOwner());;
+        this.editedAt = entity.getEditedAt();
+        this.editedBy = new UserReference().setId(entity.getEditedBy());
+        this.digest = entity.getDigest();
+        this.timeStamp = entity.getTimeStamp();
+    }
+
+    public SignalsEntity createEntity() {
+        SignalsEntity entity = new SignalsEntity();
+        entity.setCreatedBy(createdBy.getId());
+        entity.setEditedBy(editedBy.getId());
+        entity.setOwner(owner.getId());
+        entity.setEid(eid);
+        entity.setId(id);
+        entity.setDescription(description);
+        entity.setName(name);
+        entity.setDigest(digest);
+        entity.setType(type.getId());
+        entity.setTimeStamp(timeStamp);
+        return entity;
+    }
+
     public String dump() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("SignalsEntity(%s) --> %s\n", id,  type));
+        sb.append(String.format("SignalsEntity(%s) --> %s\n", id, type));
         return sb.toString();
     }
 
@@ -91,7 +97,7 @@ public class SignalsEntity {
         return id;
     }
 
-    public Integer getType() {
+    public EntityType getType() {
         return type;
     }
 
@@ -99,7 +105,7 @@ public class SignalsEntity {
         id = i;
     }
 
-    public void setType(Integer t) {
+    public void setType(EntityType t) {
         type = t;
     }
 
@@ -135,19 +141,19 @@ public class SignalsEntity {
         this.createdAt = createdAt;
     }
 
-    public String getCreatedBy() {
+    public IUser getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(String createdBy) {
+    public void setCreatedBy(IUser createdBy) {
         this.createdBy = createdBy;
     }
 
-    public String getOwner() {
+    public IUser getOwner() {
         return owner;
     }
 
-    public void setOwner(String owner) {
+    public void setOwner(IUser owner) {
         this.owner = owner;
     }
 
@@ -159,11 +165,11 @@ public class SignalsEntity {
         this.editedAt = editedAt;
     }
 
-    public String getEditedBy() {
+    public IUser getEditedBy() {
         return editedBy;
     }
 
-    public void setEditedBy(String editedBy) {
+    public void setEditedBy(IUser editedBy) {
         this.editedBy = editedBy;
     }
 
@@ -201,3 +207,5 @@ public class SignalsEntity {
     }
 */
 }
+
+

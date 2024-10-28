@@ -12,7 +12,7 @@ import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.*;
 
-public class SignalsEntitiesTestCall {
+public class SignalsEntitiesSampleCall {
 
     @Inject
     SignalsEntityDbService signalsEntityDbService;
@@ -31,7 +31,10 @@ public class SignalsEntitiesTestCall {
         List<SignalsEntity> entities = new ArrayList<>();
 
         try {
-            restClientImpl.setMethod(Method.GET).setEndpoint("/entities").putUriParameter(PARAMETER_INCLUDE_TYPES, IncludedTypes.PLATE_CONTAINER.getIncludedType());
+            restClientImpl
+                    .setMethod(Method.GET)
+                    .setEndpoint(SIGNALS_ENTITY_ENDPOINT)
+                    .putUriParameter(PARAMETER_INCLUDE_TYPES, IncludedTypes.PLATE_CONTAINER.getIncludedType());
 
             restClientImpl.toString();
 
@@ -94,7 +97,7 @@ public class SignalsEntitiesTestCall {
             System.out.printf("type: %s \t id: %s \n",attributes.get("type").getAsString() , attributes.get("id").getAsString());
 
             entity.setId(attributes.has("id") ? attributes.get("id").getAsString() : null);
-            entity.setType(attributes.has("type") ? attributes.get("type").getAsString() : null);
+           // entity.setType(attributes.has("type") ? attributes.get("type").getAsString() : null);
             entity.setName(attributes.has("name") ? attributes.get("name").getAsString() : null);
             entity.setDescription(attributes.has("description") ? attributes.get("description").getAsString() : null);
             entity.setCreatedAt(attributes.has("createdAt") ? Date.from(Instant.parse(attributes.get("createdAt").getAsString())) : null);

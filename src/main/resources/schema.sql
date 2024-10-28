@@ -7,7 +7,7 @@ CREATE TABLE dyn_enums (
 
 CREATE TABLE signalsentities (
     id VARCHAR PRIMARY KEY,
-    snb_type VARCHAR,
+    snb_type INTEGER NOT NULL,
     eid VARCHAR,
     name VARCHAR,
     description VARCHAR,

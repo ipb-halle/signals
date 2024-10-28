@@ -9,11 +9,13 @@
         <jta-data-source>signalsDS</jta-data-source>
         <non-jta-data-source>signalsDSNonJTA</non-jta-data-source>
 
-        <class>de.ipb_halle.signals.entity.SignalsEntity</class>
         <class>de.ipb_halle.signals.attachment.Attachment</class>
+        <class>de.ipb_halle.signals.entity.EntityType</class>
+        <class>de.ipb_halle.signals.entity.SignalsEntity</class>
         <class>de.ipb_halle.signals.field.FieldDefinition</class>
         <class>de.ipb_halle.signals.field.FieldMeasure</class>
         <class>de.ipb_halle.signals.field.FieldOption</class>
+        <class>de.ipb_halle.signals.field.FieldType</class>
         <class>de.ipb_halle.signals.inventory.ContainerEntity</class>
         <class>de.ipb_halle.signals.inventory.ContainerType</class>
         <class>de.ipb_halle.signals.inventory.ContainerTypeAttachment</class>

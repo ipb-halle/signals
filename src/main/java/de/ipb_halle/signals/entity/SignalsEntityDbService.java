@@ -22,7 +22,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
 
-/** 
+/**
  * Database service for signals entities
  */
 
@@ -30,14 +30,15 @@ import jakarta.persistence.PersistenceContext;
 public class SignalsEntityDbService {
 
 
-    @PersistenceContext(unitName="signalsDB")
+    @PersistenceContext(unitName = "signalsDB")
     private EntityManager em;
 
     public SignalsEntity loadById(String id) {
         return this.em.find(SignalsEntity.class, id);
     }
 
-    public void save(SignalsEntity entity) {
+    public void save(SignalsEntityDTO dto) {
+        SignalsEntity entity = dto.createEntity();
         this.em.merge(entity);
     }
 
