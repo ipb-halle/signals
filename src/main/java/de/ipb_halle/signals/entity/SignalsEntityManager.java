@@ -76,9 +76,9 @@ public class SignalsEntityManager {
      * @param dateRange array with start and end points of data to be fetched
      * @param includeTypes comma separated list of entity types (experiment, notebook, asset, etc.) to be fetched
      */
-    public void fetchSnbEntities(Date[] dateRange, String includeTypes, UpdateConfig config) {
+    public void fetchSnbEntities(Date[] dateRange, EntityType[] includeTypes, UpdateConfig config) {
         Map<String, Object> cmap = new HashMap<>();
-        if ((includeTypes != null) && (! includeTypes.isEmpty())) {
+        if ((includeTypes != null) && (includeTypes.length > 0)) {
             cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, includeTypes);
         }
         if (dateRange != null) {

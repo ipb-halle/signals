@@ -5,6 +5,25 @@ CREATE TABLE dyn_enums (
     value VARCHAR NOT NULL,
     UNIQUE (type, value));
 
+INSERT INTO dyn_enums (type, value) VALUES 
+    ('EntityType', 'experiment'),
+    ('EntityType', 'journal'),
+    ('EntityType', 'request'),
+    ('EntityType', 'asset'),
+    ('EntityType', 'location'),
+    ('EntityType', 'container')
+    ('EntityType', 'sample'),
+    ('EntityType', 'text'),
+    ('EntityType', 'task'),
+    ('EntityType', 'worksheet'),
+    ('EntityType', 'assetType'),
+    ('EntityType', 'monomer'),
+    ('EntityType', 'chemicalDrawing'),
+    ('EntityType', 'batch'),
+    ('EntityType', 'plateContainer'),
+    ('EntityType', 'plate'),
+    ('EntityType', 'ado');
+
 CREATE TABLE signalsentities (
     id VARCHAR PRIMARY KEY,
     snb_type INTEGER NOT NULL REFERENCES dyn_enums(id) ON UPDATE CASCADE ON DELETE CASCADE,

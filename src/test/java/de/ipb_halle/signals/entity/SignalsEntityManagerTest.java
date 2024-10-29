@@ -99,7 +99,8 @@ public class SignalsEntityManagerTest {
     @Test
     public void entityTest() {
         dynEnumManager.allowEnumDiscovery();
-        manager.fetchSnbEntities(null, TEST_ENTITY_TYPE, new UpdateConfig());
+        EntityType[] includedTypes = new EntityType[] { EntityType.valueOf(TEST_ENTITY_TYPE) };
+        manager.fetchSnbEntities(null, includedTypes, new UpdateConfig());
         SignalsEntityDTO entity = manager.getDbEntity(TEST_LOCATION_ID);
         System.out.print(entity.dump());
         assertEquals("entity type mismatch", TEST_ENTITY_TYPE, entity.getType().getValue());

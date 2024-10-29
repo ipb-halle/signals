@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import de.ipb_halle.signals.users.UserReference;
 import jakarta.ejb.Local;
@@ -94,9 +95,7 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
                 .setMethod(Method.GET)
                 .setEndpoint(SIGNALS_ENTITY_ENDPOINT);
 
-        if (cmap.containsKey(PARAMETER_INCLUDE_TYPES)) {
-            restClient.putUriParameter(PARAMETER_INCLUDE_TYPES, (String) cmap.get(PARAMETER_INCLUDE_TYPES));
-        }
+        configureEntityTypes(cmap);
         if (cmap.containsKey(PARAMETER_START)) {
             restClient.putUriParameter(PARAMETER_START,
                     dateFormat.format((Date) cmap.get(PARAMETER_START)));
@@ -107,5 +106,17 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
         }
 
         return new RestResultIterator<SignalsEntityDTO> (restClient, this, true);
+    }
+
+    private void configureEntityTypes(Map<String, Object> cmap) {
+        if (cmap.containsKey(PARAMETER_INCLUDE_TYPES)) {
+            StringBuilder sb = new StringBuilder();
+            AtomicReference<String> sep = new AtomicReference<>("");
+            for (EntityType et : (EntityType[]) cmap.get(PARAMETER_INCLUDE_TYPES)) {
+                sb.append(sep.getAndSet(","));
+                sb.append(et.getValue());
+            }
+            restClient.putUriParameter(PARAMETER_INCLUDE_TYPES, sb.toString());
+        }
     }
 }

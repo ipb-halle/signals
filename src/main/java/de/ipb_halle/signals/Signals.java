@@ -18,7 +18,7 @@
 package de.ipb_halle.signals;
 
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
-import de.ipb_halle.signals.entity.SignalsEntitiesSampleCall;
+import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntityManager;
 import de.ipb_halle.signals.materials.LibraryManager;
 import de.ipb_halle.signals.users.AccessManager;
@@ -76,9 +76,6 @@ public class Signals {
 
     @Inject
     private LogConfig logConfig;
-
-    @Inject
-    private SignalsEntitiesSampleCall signalsEntitiesCall;
 
     @Inject
     private SignalsEntityManager signalsEntityManager;
@@ -216,7 +213,7 @@ public class Signals {
         }
 
         range[0] = dateFormat.parse(dateRange[0]);
-        if ((dateRange.length > 1) && (! dateRange[1].isEmpty())) {
+        if ((dateRange.length > 1) && (!dateRange[1].isEmpty())) {
             range[1] = dateFormat.parse(dateRange[1]);
         }
         logger.info("Fetching specified data range: {} - {}", range[0], range[1]);
@@ -284,16 +281,28 @@ public class Signals {
                 ******************************************************
                 """, signalsConfig.getSnbInstanceName(), new Date().toString());
 
-        try{
+        try {
             Date[] dateRange = parseDateRange(dateRangeArgs);
-            signalsEntityManager.fetchSnbEntities(dateRange, null, updateConfig);
+            signalsEntityManager.fetchSnbEntities(dateRange,
+                    new EntityType[]{
+                            EntityType.valueOf("experiment"),
+                            EntityType.valueOf("journal"),
+                            EntityType.valueOf("assetType"),
+                            EntityType.valueOf("asset"),
+                            EntityType.valueOf("location"),
+                            EntityType.valueOf("batch"),
+                            EntityType.valueOf("container"),
+                            EntityType.valueOf("sample"),
+                            EntityType.valueOf("text")
+                    }
+                    , updateConfig);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
     }
 
     private void dumpEntities(String[] dateRangeArgs) {
-        try{
+        try {
             Date[] dateRange = parseDateRange(dateRangeArgs);
             signalsEntityManager.listEntities(dateRange);
         } catch (ParseException e) {
