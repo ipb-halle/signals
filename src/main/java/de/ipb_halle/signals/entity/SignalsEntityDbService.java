@@ -17,9 +17,15 @@
  */
 package de.ipb_halle.signals.entity;
 
+import java.util.*;
+
+import de.ipb_halle.signals.dynEnum.DynEnumManager;
+import de.ipb_halle.signals.users.*;
 import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.*;
 
 
 /**
@@ -29,12 +35,39 @@ import jakarta.persistence.PersistenceContext;
 @Stateless
 public class SignalsEntityDbService {
 
-
     @PersistenceContext(unitName = "signalsDB")
     private EntityManager em;
 
-    public SignalsEntity loadById(String id) {
-        return this.em.find(SignalsEntity.class, id);
+    @Inject
+    private DynEnumManager dynEnumManager;
+
+    public List<SignalsEntityDTO> load(Map<String, Object> cmap) {
+        List<SignalsEntityDTO> results = new ArrayList<> ();
+        List<Predicate> predicates = new ArrayList<>();
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<SignalsEntity> criteriaQuery = builder.createQuery(SignalsEntity.class);
+        Root<SignalsEntity> root = criteriaQuery.from(SignalsEntity.class);
+        criteriaQuery.select(root);
+
+        if (cmap.containsKey(SignalsEntityRestService.PARAMETER_START)) {
+            predicates.add(builder.greaterThan(root.get("editedAt"), (Date) cmap.get(SignalsEntityRestService.PARAMETER_START)));
+        }
+        if (cmap.containsKey(SignalsEntityRestService.PARAMETER_END)) {
+            predicates.add(builder.lessThan(root.get("editedAt"), (Date) cmap.get(SignalsEntityRestService.PARAMETER_END)));
+        }
+        criteriaQuery.where(builder.and(predicates.toArray(new Predicate[0])));
+        for (SignalsEntity entity: em.createQuery(criteriaQuery).getResultList()) {
+            results.add(new SignalsEntityDTO(entity, dynEnumManager));
+        }
+        return results;
+    }
+
+    public SignalsEntityDTO loadById(String id) {
+        SignalsEntity entity = this.em.find(SignalsEntity.class, id);
+        if (entity != null) {
+            return new SignalsEntityDTO(entity, dynEnumManager);
+        }
+        return null;
     }
 
     public void save(SignalsEntityDTO dto) {

@@ -83,7 +83,7 @@ public class SignalsEntity {
 */
     public String dump() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("SignalsEntity(%s) --> %s\n", id,  type));
+        sb.append(String.format("SignalsEntity(%s) --> %d\n", id,  type));
         return sb.toString();
     }
 

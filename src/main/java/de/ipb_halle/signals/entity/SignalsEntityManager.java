@@ -17,14 +17,17 @@
  */
 package de.ipb_halle.signals.entity;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 
 
-/** 
- * Manager for signals entities (entities API endpoint) 
+/**
+ * Manager for signals entities (entities API endpoint)
  */
 
 @Stateless
@@ -37,13 +40,42 @@ public class SignalsEntityManager {
     private SignalsEntityRestService restService;
 
 
-    public SignalsEntity getDbEntity(String id) {
+    public SignalsEntityDTO getDbEntity(String id) {
         return dbService.loadById(id);
     }
 
+    public void listEntities(Date[] dateRange) {
+        System.out.print("""
+                ********************************************
+                *
+                * Signals Entities
+                *
+                ********************************************
+                """);
 
-    public List<SignalsEntityDTO> getSnbEntities(String includeTypes) {
-        return restService.doGetEntities(includeTypes);
+        Map<String, Object> cmap = new HashMap<>();
+        cmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
+        cmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
+        List<SignalsEntityDTO> results = dbService.load(cmap);
+        for (SignalsEntityDTO dto : results) {
+            System.out.print(dto.dump());
+        }
+    }
+
+
+    public void fetchSnbEntities(Date[] dateRange, String includeTypes) {
+        Map<String, Object> cmap = new HashMap<>();
+        if ((includeTypes != null) && (! includeTypes.isEmpty())) {
+            cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, includeTypes);
+        }
+        if (dateRange != null) {
+            cmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
+            cmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
+        }
+        for (SignalsEntityDTO dto : restService.doGetEntities(cmap)) {
+            // System.out.print(dto.dump());
+            dbService.save(dto);
+        }
     }
 
     public void save(List<SignalsEntityDTO> entities) {

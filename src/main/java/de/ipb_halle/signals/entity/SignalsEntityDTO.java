@@ -74,22 +74,31 @@ public class SignalsEntityDTO {
 
     public SignalsEntity createEntity() {
         SignalsEntity entity = new SignalsEntity();
+        entity.setCreatedAt(createdAt);
         entity.setCreatedBy(createdBy.getId());
+        entity.setDescription(description);
+        entity.setDigest(digest);
+        entity.setEditedAt(editedAt);
         entity.setEditedBy(editedBy.getId());
-        entity.setOwner(owner.getId());
         entity.setEid(eid);
         entity.setId(id);
-        entity.setDescription(description);
         entity.setName(name);
-        entity.setDigest(digest);
-        entity.setType(type.getId());
+        entity.setOwner(owner.getId());
         entity.setTimeStamp(timeStamp);
+        entity.setType(type.getId());
         return entity;
     }
 
     public String dump() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("SignalsEntity(%s) --> %s\n", id, type));
+        sb.append(type.getValue());
+        sb.append("  \tid=");
+        sb.append(id);
+        sb.append("  \towner=");
+        sb.append(owner.getId());
+        sb.append("  \tedited=");
+        sb.append(editedAt.toString());
+        sb.append("\n");
         return sb.toString();
     }
 

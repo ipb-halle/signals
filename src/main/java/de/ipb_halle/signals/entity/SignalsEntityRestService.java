@@ -28,10 +28,13 @@ import de.ipb_halle.signals.rest.RestResultIterator;
 import de.ipb_halle.signals.rest.RestReplyParser;
 import de.ipb_halle.signals.users.IUser;
 import de.ipb_halle.signals.users.UserReference;
+
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import de.ipb_halle.signals.users.UserReference;
 import jakarta.ejb.Local;
@@ -44,8 +47,10 @@ import jakarta.inject.Inject;
 @Local
 public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDTO> {
 
-    public final String SIGNALS_ENTITY_ENDPOINT = "/entities";
-    public final String PARAMETER_INCLUDE_TYPES = "includeTypes";
+    public final static String SIGNALS_ENTITY_ENDPOINT = "/entities";
+    public final static String PARAMETER_INCLUDE_TYPES = "includeTypes";
+    public final static String PARAMETER_START = "start";
+    public final static String PARAMETER_END = "end";
 
     @Inject
     private RestClient restClient;
@@ -55,14 +60,11 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
 
     public SignalsEntityDTO parseReply(JsonElement json) {
         SignalsEntityDTO dto = new SignalsEntityDTO();
-        JsonObject attributes = json.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
-        JsonObject relationships = json.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_RELATIONSHIPS);
+        JsonObject jsonObj = json.getAsJsonObject();
+        JsonObject attributes = jsonObj.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
         dto.setId(json.getAsJsonObject().getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
         dto.setType((EntityType) dynEnumManager.valueOf(EntityType.valueOf(attributes.getAsJsonPrimitive(RestHelper.ATTR_TYPE).getAsString())));
-
-        System.out.printf("type: %s   \tid: %s \n", dto.getType(), dto.getId());
-
         dto.setEid(attributes.has(SignalsEntityDTO.ATTR_EID)?attributes.get(SignalsEntityDTO.ATTR_EID).getAsString():null);
         dto.setName(attributes.has(RestHelper.ATTR_NAME) ? attributes.get(RestHelper.ATTR_NAME).getAsString() : null);
         dto.setDescription(attributes.has(SignalsEntityDTO.ATTR_DESCRIPTION) ? attributes.get(SignalsEntityDTO.ATTR_DESCRIPTION).getAsString() : null);
@@ -70,7 +72,7 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
         dto.setEditedAt(attributes.has(SignalsEntityDTO.ATTR_EDITED_AT) ? Date.from(Instant.parse(attributes.get(SignalsEntityDTO.ATTR_EDITED_AT).getAsString())) : null);
         dto.setDigest(attributes.has(RestHelper.ATTR_DIGEST) ? Long.parseLong(attributes.get(RestHelper.ATTR_DIGEST).getAsString()) : null);
         
-        parseRelationships(relationships, dto);
+        parseRelationships(jsonObj, dto);
         return dto;
     }
 
@@ -86,11 +88,23 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
                         RestHelper.getPrimitiveFromPath(relationships, SignalsEntityDTO.ATTR_OWNER), null)));
     }
 
-    public List<SignalsEntityDTO> doGetEntities(String includeTypes) {
+    public List<SignalsEntityDTO> doGetEntities(Map<String, Object> cmap) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
         restClient.reset()
                 .setMethod(Method.GET)
-                .setEndpoint(SIGNALS_ENTITY_ENDPOINT)
-                .putUriParameter(PARAMETER_INCLUDE_TYPES, includeTypes);
+                .setEndpoint(SIGNALS_ENTITY_ENDPOINT);
+
+        if (cmap.containsKey(PARAMETER_INCLUDE_TYPES)) {
+            restClient.putUriParameter(PARAMETER_INCLUDE_TYPES, (String) cmap.get(PARAMETER_INCLUDE_TYPES));
+        }
+        if (cmap.containsKey(PARAMETER_START)) {
+            restClient.putUriParameter(PARAMETER_START,
+                    dateFormat.format((Date) cmap.get(PARAMETER_START)));
+        }
+        if (cmap.containsKey(PARAMETER_END)) {
+            restClient.putUriParameter(PARAMETER_END,
+                    dateFormat.format((Date) cmap.get(PARAMETER_END)));
+        }
 
         RestResultIterator<SignalsEntityDTO> iter = new RestResultIterator<>(restClient, this, true);
         List<SignalsEntityDTO> entities = new ArrayList<>();

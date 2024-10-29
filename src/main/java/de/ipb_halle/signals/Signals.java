@@ -20,15 +20,13 @@ package de.ipb_halle.signals;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.SignalsEntitiesSampleCall;
 import de.ipb_halle.signals.entity.SignalsEntityManager;
-import de.ipb_halle.signals.entity.SignalsEntityRestService;
 import de.ipb_halle.signals.materials.LibraryManager;
 import de.ipb_halle.signals.users.AccessManager;
 import de.ipb_halle.signals.users.LdapClient;
 
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Properties;
-import java.util.Set;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import jakarta.annotation.Resource;
 import jakarta.ejb.embeddable.EJBContainer;
@@ -83,7 +81,7 @@ public class Signals {
     private SignalsEntitiesSampleCall signalsEntitiesCall;
 
     @Inject
-    private SignalsEntityRestService signalsEntityRestService;
+    private SignalsEntityManager signalsEntityManager;
 
     private UpdateConfig updateConfig;
     private boolean noMail;
@@ -93,7 +91,7 @@ public class Signals {
     @SuppressWarnings("static-access")
     private static final Option configOpt = Option.builder("c")
             .longOpt("config")
-            .desc("Path to a the config file containing the Signals (tm) web token, base URL as well as database and LDAP connection information.")
+            .desc("\nPath to a the config file containing the Signals (tm) web token, base URL as well as database and LDAP connection information.")
             .hasArg()
             .argName("FILE")
             .required(true)
@@ -102,55 +100,55 @@ public class Signals {
     @SuppressWarnings("static-access")
     private static final Option helpOpt = Option.builder("h")
             .longOpt("help")
-            .desc("Display the help")
+            .desc("\nDisplay the help")
             .build();
 
     @SuppressWarnings("static-access")
     private static final Option materialsMgrOpt = Option.builder("M")
             .longOpt("manage-materials")
-            .desc("Synchronize materials libraries and materials")
+            .desc("\nSynchronize materials libraries and materials")
             .build();
 
     @SuppressWarnings("static-access")
     private static final Option userMgrOpt = Option.builder("u")
             .longOpt("manage-users")
-            .desc("Perform user,  group and role management")
+            .desc("\nPerform user,  group and role management")
             .build();
 
     @SuppressWarnings("static-access")
     private static final Option dryRunOpt = Option.builder("n")
             .longOpt("dry-run")
-            .desc("Dry run - don't modify anything (includes --noUpdateSNB and --noUpdateFromLDAP).")
+            .desc("\nDry run - don't modify anything (includes --noUpdateSNB and --noUpdateFromLDAP).")
             .build();
 
     @SuppressWarnings("static-access")
     private static final Option noMailOpt = Option.builder("m")
             .longOpt("noMail")
-            .desc("Do not send any reports by email")
+            .desc("\nDo not send any reports by email")
             .build();
 
     @SuppressWarnings("static-access")
     private static final Option discoverOpt = Option.builder("discover")
             .longOpt("allow-discover")
-            .desc("Allow discovery of new types (DynEnums). Otherwise the program is aborted upon discovery of an unknown type.")
+            .desc("\nAllow discovery of new types (DynEnums). Otherwise the program is aborted upon discovery of an unknown type.")
             .build();
 
     @SuppressWarnings("static-access")
     private static final Option noUpdateSnbOpt = Option.builder("noSNB")
             .longOpt("noUpdateSNB")
-            .desc("Do not perform updates to Signals Notebook")
+            .desc("\nDo not perform updates to Signals Notebook")
             .build();
 
     @SuppressWarnings("static-access")
     private static final Option noUpdateFromLdapOpt = Option.builder("noLDAP")
             .longOpt("noUpdateFromLDAP")
-            .desc("Do not perform updates from LDAP")
+            .desc("\nDo not perform updates from LDAP")
             .build();
 
     @SuppressWarnings("static-access")
     private static final Option noSyncDbFromSNBOpt = Option.builder("noSyncSNB")
             .longOpt("noSyncDbFromSNB")
-            .desc("Do not synchronize database from Signals Notebook")
+            .desc("\nDo not synchronize database from Signals Notebook")
             .build();
 
     @SuppressWarnings("static-access")
@@ -158,7 +156,7 @@ public class Signals {
             .longOpt("debug")
             .hasArg()
             .argName("LEVEL")
-            .desc("Set log level to the selected LEVEL (one of FATAL, ERROR, WARN, INFO, DEBUG, TRACE)")
+            .desc("\nSet log level to the selected LEVEL (one of FATAL, ERROR, WARN, INFO, DEBUG, TRACE)")
             .build();
 
     @SuppressWarnings("static-access")
@@ -166,17 +164,59 @@ public class Signals {
             .longOpt("trustStore")
             .hasArg()
             .argName("FILE")
-            .desc("Set the truststore for startSSL. The trustStore should contain certificates for both: LDAP and SNB API.")
+            .desc("\nSet the truststore for startSSL. The trustStore should contain certificates for both: LDAP and SNB API.")
             .build();
 
     @SuppressWarnings("static-access")
     private static final Option importSignalsEntitiesOpt = Option.builder("importE")
             .longOpt("importSignalsEntities")
-            .desc("Initiates a data import process from a remote REST API of signals notebook. " +
+            .hasArgs()
+            .argName("=all | =START[:END]")
+            .valueSeparator(':')
+            .optionalArg(true)
+            .desc("\nInitiates a data import process from a remote REST API of signals notebook. " +
                     "The process fetches a list of entities from the specified API endpoint, " +
                     "maps the data to the 'SignalsEntity' class, and persists it to the PostgreSQL " +
-                    "database using Hibernate. ")
+                    "database using Hibernate.\n " +
+                    "If no argument is given, the call fetches all entities, which were modified " +
+                    "within the last week. If 'all' is given, all entities are fetched. If a START " +
+                    "and optionally an END date are given, only entities with modification dates " +
+                    "after START (and optionally before END) are fetched.")
             .build();
+
+
+    /**
+     * Parser for additional arguments option start and end
+     */
+    private Date[] parseDateRange(String[] dateRange) throws ParseException {
+        Date[] range = new Date[2];
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        range[1] = new Date();
+
+        if ((dateRange == null) || (dateRange.length == 0) || dateRange[0].isEmpty()) {
+            range[0] = getOneWeekAgoDate();
+            logger.info("Fetching last weeks data: {} - {}", range[0], range[1]);
+            return range;
+        }
+        if (dateRange[0].equals("all")) {
+            range[0] = new Date(0); // 1970-01-01
+            logger.info("Fetching ALL data");
+            return range;
+        }
+
+        range[0] = dateFormat.parse(dateRange[0]);
+        if ((dateRange.length > 1) && (! dateRange[1].isEmpty())) {
+            range[1] = dateFormat.parse(dateRange[1]);
+        }
+        logger.info("Fetching specified data range: {} - {}", range[0], range[1]);
+        return range;
+    }
+
+    private Date getOneWeekAgoDate() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.WEEK_OF_YEAR, -1);
+        return calendar.getTime();
+    }
 
 
     /**
@@ -222,7 +262,7 @@ public class Signals {
         accessManager.manageAccess(updateConfig, noMail);
     }
 
-    private void signalsEntityCall() {
+    private void signalsEntityCall(String[] dateRangeArgs) {
         logger.info("""
 
                 ******************************************************
@@ -232,8 +272,14 @@ public class Signals {
                 *
                 ******************************************************
                 """, signalsConfig.getSnbInstanceName(), new Date().toString());
-        signalsEntitiesCall.receiveTheEntitiesFromSignals();
-   //     signalsEntityRestService.doGetEntities("");
+
+        try{
+            Date[] dateRange = parseDateRange(dateRangeArgs);
+            signalsEntityManager.fetchSnbEntities(dateRange, null);
+            signalsEntityManager.listEntities(dateRange);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Signals getInstance(String fname) {
@@ -267,6 +313,9 @@ public class Signals {
             sb.append("\n");
         }
         String footer = sb.toString();
+        writer.setDescPadding(60);
+        writer.setOptPrefix("\n\n\u00A0\u001B[1m-");
+        writer.setNewLine("\u001B[m\n");
         writer.printHelp(usage, header, options, footer, true);
     }
 
@@ -283,7 +332,6 @@ public class Signals {
             CommandLine cmdline = parser.parse(options, argv);
 
 
-
             if (cmdline.hasOption(helpOpt.getOpt())) {
                 printHelp(null, options);
                 return;
@@ -295,12 +343,6 @@ public class Signals {
             }
             String configFile = cmdline.getOptionValue(configOpt.getOpt());
             Signals signals = getInstance(configFile);
-
-            if (cmdline.hasOption(importSignalsEntitiesOpt.getOpt())) {
-                //rest call on signals REST-Api
-                signals.signalsEntityCall();
-                return;
-            }
 
             if (cmdline.hasOption(dryRunOpt.getOpt())) {
                 signals.updateConfig.updateDb = false;
@@ -340,6 +382,13 @@ public class Signals {
                 signals.dynEnumMgr.allowEnumDiscovery();
             }
 
+            if (cmdline.hasOption(importSignalsEntitiesOpt.getOpt())) {
+                //rest call on signals REST-Api
+                String[] dateRangeArgs = cmdline.getOptionValues(importSignalsEntitiesOpt.getOpt());
+                signals.signalsEntityCall(dateRangeArgs);
+                return;
+            }
+
             if (cmdline.hasOption(userMgrOpt.getOpt())) {
                 signals.manageUsers();
             }
@@ -347,7 +396,6 @@ public class Signals {
             if (cmdline.hasOption(materialsMgrOpt.getOpt())) {
                 signals.manageMaterials();
             }
-
 
 
         } catch (MissingArgumentException mae) {

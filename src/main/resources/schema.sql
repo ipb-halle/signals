@@ -7,7 +7,7 @@ CREATE TABLE dyn_enums (
 
 CREATE TABLE signalsentities (
     id VARCHAR PRIMARY KEY,
-    snb_type INTEGER NOT NULL,
+    snb_type INTEGER NOT NULL REFERENCES dyn_enums(id) ON UPDATE CASCADE ON DELETE CASCADE,
     eid VARCHAR,
     name VARCHAR,
     description VARCHAR,
