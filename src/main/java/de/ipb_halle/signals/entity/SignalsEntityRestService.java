@@ -88,7 +88,7 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
                         RestHelper.getPrimitiveFromPath(relationships, SignalsEntityDTO.ATTR_OWNER), null)));
     }
 
-    public List<SignalsEntityDTO> doGetEntities(Map<String, Object> cmap) {
+    public RestResultIterator<SignalsEntityDTO> doGetEntities(Map<String, Object> cmap) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
         restClient.reset()
                 .setMethod(Method.GET)
@@ -106,12 +106,6 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
                     dateFormat.format((Date) cmap.get(PARAMETER_END)));
         }
 
-        RestResultIterator<SignalsEntityDTO> iter = new RestResultIterator<>(restClient, this, true);
-        List<SignalsEntityDTO> entities = new ArrayList<>();
-
-        while (iter.hasNext()) {
-            entities.add(iter.next());
-        }
-        return entities;
+        return new RestResultIterator<SignalsEntityDTO> (restClient, this, true);
     }
 }

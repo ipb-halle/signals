@@ -262,12 +262,12 @@ public class Signals {
         accessManager.manageAccess(updateConfig, noMail);
     }
 
-    private void signalsEntityCall(String[] dateRangeArgs) {
+    private void manageEntities(String[] dateRangeArgs) {
         logger.info("""
 
                 ******************************************************
                 *
-                * signals enities call
+                * Manage Signals Enities
                 * {} / {}
                 *
                 ******************************************************
@@ -275,7 +275,7 @@ public class Signals {
 
         try{
             Date[] dateRange = parseDateRange(dateRangeArgs);
-            signalsEntityManager.fetchSnbEntities(dateRange, null);
+            signalsEntityManager.fetchSnbEntities(dateRange, null, updateConfig);
             signalsEntityManager.listEntities(dateRange);
         } catch (ParseException e) {
             throw new RuntimeException(e);
@@ -385,7 +385,7 @@ public class Signals {
             if (cmdline.hasOption(importSignalsEntitiesOpt.getOpt())) {
                 //rest call on signals REST-Api
                 String[] dateRangeArgs = cmdline.getOptionValues(importSignalsEntitiesOpt.getOpt());
-                signals.signalsEntityCall(dateRangeArgs);
+                signals.manageEntities(dateRangeArgs);
                 return;
             }
 

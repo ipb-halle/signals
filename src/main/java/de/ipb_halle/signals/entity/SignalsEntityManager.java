@@ -22,8 +22,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.ipb_halle.signals.UpdateConfig;
+import de.ipb_halle.signals.rest.RestResultIterator;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -39,6 +43,7 @@ public class SignalsEntityManager {
     @Inject
     private SignalsEntityRestService restService;
 
+    private Logger logger = LogManager.getLogger(SignalsEntityManager.class);
 
     public SignalsEntityDTO getDbEntity(String id) {
         return dbService.loadById(id);
@@ -63,7 +68,12 @@ public class SignalsEntityManager {
     }
 
 
-    public void fetchSnbEntities(Date[] dateRange, String includeTypes) {
+    /*
+     * fetch entities via REST from Signals Notebook
+     * @param dateRange array with start and end points of data to be fetched
+     * @param includeTypes comma separated list of entity types (experiment, notebook, asset, etc.) to be fetched
+     */
+    public void fetchSnbEntities(Date[] dateRange, String includeTypes, UpdateConfig config) {
         Map<String, Object> cmap = new HashMap<>();
         if ((includeTypes != null) && (! includeTypes.isEmpty())) {
             cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, includeTypes);
@@ -72,9 +82,13 @@ public class SignalsEntityManager {
             cmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
             cmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
         }
-        for (SignalsEntityDTO dto : restService.doGetEntities(cmap)) {
-            // System.out.print(dto.dump());
-            dbService.save(dto);
+        RestResultIterator<SignalsEntityDTO> iter =  restService.doGetEntities(cmap);
+        while (iter.hasNext()) {
+            SignalsEntityDTO dto = iter.next();
+            logger.debug(dto.dump());
+            if (config.updateDb) {
+                dbService.save(dto);
+            }
         }
     }
 
