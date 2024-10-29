@@ -98,7 +98,6 @@ public class SignalsEntityDTO {
         sb.append(owner.getId());
         sb.append("  \tedited=");
         sb.append(editedAt.toString());
-        sb.append("\n");
         return sb.toString();
     }
 

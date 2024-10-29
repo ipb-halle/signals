@@ -49,6 +49,10 @@ public class SignalsEntityManager {
         return dbService.loadById(id);
     }
 
+    /*
+     * produce a database dump of SignalsEntities
+     * @param dateRange start and end datum of the database dump
+     */
     public void listEntities(Date[] dateRange) {
         System.out.print("""
                 ********************************************
@@ -63,10 +67,9 @@ public class SignalsEntityManager {
         cmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
         List<SignalsEntityDTO> results = dbService.load(cmap);
         for (SignalsEntityDTO dto : results) {
-            System.out.print(dto.dump());
+            System.out.println(dto.dump());
         }
     }
-
 
     /*
      * fetch entities via REST from Signals Notebook
@@ -89,12 +92,6 @@ public class SignalsEntityManager {
             if (config.updateDb) {
                 dbService.save(dto);
             }
-        }
-    }
-
-    public void save(List<SignalsEntityDTO> entities) {
-        for (SignalsEntityDTO e : entities) {
-            dbService.save(e);
         }
     }
 }

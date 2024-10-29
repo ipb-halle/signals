@@ -168,8 +168,8 @@ public class Signals {
             .build();
 
     @SuppressWarnings("static-access")
-    private static final Option importSignalsEntitiesOpt = Option.builder("importE")
-            .longOpt("importSignalsEntities")
+    private static final Option syncEntitiesOpt = Option.builder("sE")
+            .longOpt("syncEntities")
             .hasArgs()
             .argName("=all | =START[:END]")
             .valueSeparator(':')
@@ -184,6 +184,17 @@ public class Signals {
                     "after START (and optionally before END) are fetched.")
             .build();
 
+    @SuppressWarnings("static-access")
+    private static final Option dumpEntitiesOpt = Option.builder("dE")
+            .longOpt("dumpEntities")
+            .hasArgs()
+            .argName("=all | =START[:END]")
+            .valueSeparator(':')
+            .optionalArg(true)
+            .desc("\nProduce a database dump of SignalsEntities having the specified. " +
+                    "modification time. By default, entities from the last week are dumped, otherwise " +
+                    "an interval or all entities can be dumped.")
+            .build();
 
     /**
      * Parser for additional arguments option start and end
@@ -276,10 +287,19 @@ public class Signals {
         try{
             Date[] dateRange = parseDateRange(dateRangeArgs);
             signalsEntityManager.fetchSnbEntities(dateRange, null, updateConfig);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void dumpEntities(String[] dateRangeArgs) {
+        try{
+            Date[] dateRange = parseDateRange(dateRangeArgs);
             signalsEntityManager.listEntities(dateRange);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
+
     }
 
     public static Signals getInstance(String fname) {
@@ -382,13 +402,6 @@ public class Signals {
                 signals.dynEnumMgr.allowEnumDiscovery();
             }
 
-            if (cmdline.hasOption(importSignalsEntitiesOpt.getOpt())) {
-                //rest call on signals REST-Api
-                String[] dateRangeArgs = cmdline.getOptionValues(importSignalsEntitiesOpt.getOpt());
-                signals.manageEntities(dateRangeArgs);
-                return;
-            }
-
             if (cmdline.hasOption(userMgrOpt.getOpt())) {
                 signals.manageUsers();
             }
@@ -396,7 +409,15 @@ public class Signals {
             if (cmdline.hasOption(materialsMgrOpt.getOpt())) {
                 signals.manageMaterials();
             }
+            if (cmdline.hasOption(syncEntitiesOpt.getOpt())) {
+                String[] dateRangeArgs = cmdline.getOptionValues(syncEntitiesOpt.getOpt());
+                signals.manageEntities(dateRangeArgs);
+            }
 
+            if (cmdline.hasOption(dumpEntitiesOpt.getOpt())) {
+                String[] dateRangeArgs = cmdline.getOptionValues(dumpEntitiesOpt.getOpt());
+                signals.dumpEntities(dateRangeArgs);
+            }
 
         } catch (MissingArgumentException mae) {
             printHelp("ERROR: " + mae.getMessage(), options);
@@ -423,7 +444,8 @@ public class Signals {
         options.addOption(trustStoreOpt);
         options.addOption(materialsMgrOpt);
         options.addOption(userMgrOpt);
-        options.addOption(importSignalsEntitiesOpt);
+        options.addOption(syncEntitiesOpt);
+        options.addOption(dumpEntitiesOpt);
 
         processCommandLine(argv, options);
     }
