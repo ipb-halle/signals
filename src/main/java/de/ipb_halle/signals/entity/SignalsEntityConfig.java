@@ -20,8 +20,9 @@ import de.ipb_halle.signals.Signals;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.RuntimeConfig;
 import org.apache.commons.cli.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -37,8 +38,8 @@ public class SignalsEntityConfig {
     private EntityType[] includedTypes;
 
     @SuppressWarnings("static-access")
-    private static final Option syncEntitiesOpt = Option.builder("sE")
-            .longOpt("syncEntities")
+    private static final Option syncEntitiesOpt = Option.builder("eS")
+            .longOpt("entitiesSync")
             .hasArgs()
             .argName("=all | =START[:END]")
             .valueSeparator(':')
@@ -54,8 +55,8 @@ public class SignalsEntityConfig {
             .build();
 
     @SuppressWarnings("static-access")
-    private static final Option dumpEntitiesOpt = Option.builder("dE")
-            .longOpt("dumpEntities")
+    private static final Option dumpEntitiesOpt = Option.builder("ed")
+            .longOpt("entitiesDump")
             .hasArgs()
             .argName("=all | =START[:END]")
             .valueSeparator(':')
@@ -66,8 +67,8 @@ public class SignalsEntityConfig {
             .build();
 
     @SuppressWarnings("static-access")
-    private static final Option includedTypesOpt = Option.builder("iET")
-            .longOpt("includedEntityTypes")
+    private static final Option includedTypesOpt = Option.builder("eIT")
+            .longOpt("entityIncludedTypes")
             .hasArgs()
             .argName("TYPES")
             .valueSeparator(',')
@@ -77,8 +78,14 @@ public class SignalsEntityConfig {
                     "assetType, location, batch, container, sample, text.")
             .build();
 
+    /**
+     * constructor
+     * @param config SignalsConfig resource
+     * @param runtimeConfig runtime configuration, as defined by command line options.
+     * @param manager the SignalsEntityManager
+     */
     public SignalsEntityConfig(SignalsConfig config, RuntimeConfig runtimeConfig, SignalsEntityManager manager) {
-        this.logger = LogManager.getLogger(SignalsEntityConfig.class);
+        this.logger = LoggerFactory.getLogger(SignalsEntityConfig.class);
         this.signalsEntityManager = manager;
         this.signalsConfig = config;
         this.runtimeConfig = runtimeConfig;

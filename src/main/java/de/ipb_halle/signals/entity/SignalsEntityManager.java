@@ -26,8 +26,9 @@ import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.rest.RestResultIterator;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -43,7 +44,7 @@ public class SignalsEntityManager {
     @Inject
     private SignalsEntityRestService restService;
 
-    private Logger logger = LogManager.getLogger(SignalsEntityManager.class);
+    private Logger logger = LoggerFactory.getLogger(SignalsEntityManager.class);
 
     public SignalsEntityDTO getDbEntity(String id) {
         return dbService.loadById(id);

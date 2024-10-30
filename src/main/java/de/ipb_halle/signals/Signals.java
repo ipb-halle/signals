@@ -20,7 +20,10 @@ package de.ipb_halle.signals;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.SignalsEntityConfig;
 import de.ipb_halle.signals.entity.SignalsEntityManager;
+import de.ipb_halle.signals.inventory.InventoryConfig;
 import de.ipb_halle.signals.materials.LibraryManager;
+import de.ipb_halle.signals.materials.MaterialsConfig;
+import de.ipb_halle.signals.users.AccessConfig;
 import de.ipb_halle.signals.users.AccessManager;
 import de.ipb_halle.signals.users.LdapClient;
 
@@ -32,6 +35,7 @@ import jakarta.inject.Inject;
 
 import javax.naming.Context;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -78,6 +82,9 @@ public class Signals {
     @Inject
     private SignalsEntityManager signalsEntityManager;
 
+    private AccessConfig accessConfig;
+    private InventoryConfig inventoryConfig;
+    private MaterialsConfig materialsConfig;
     private RuntimeConfig runtimeConfig;
     private SignalsEntityConfig signalsEntityConfig;
     private boolean noMail;
@@ -99,17 +106,7 @@ public class Signals {
             .desc("\nDisplay the help")
             .build();
 
-    @SuppressWarnings("static-access")
-    private static final Option materialsMgrOpt = Option.builder("M")
-            .longOpt("manage-materials")
-            .desc("\nSynchronize materials libraries and materials")
-            .build();
 
-    @SuppressWarnings("static-access")
-    private static final Option userMgrOpt = Option.builder("u")
-            .longOpt("manage-users")
-            .desc("\nPerform user,  group and role management")
-            .build();
 
     /**
      * default constructor
@@ -121,10 +118,19 @@ public class Signals {
 
     // @PostConstruct annotation did not work
     private void postConstruct() {
-        signalsEntityConfig = new SignalsEntityConfig(signalsConfig,
-                runtimeConfig,
-                signalsEntityManager);
         runtimeConfig = new RuntimeConfig();
+        accessConfig = new AccessConfig(signalsConfig,
+                runtimeConfig, accessManager);
+        inventoryConfig = new InventoryConfig(signalsConfig,
+                runtimeConfig, null);
+        materialsConfig = new MaterialsConfig(signalsConfig,
+                runtimeConfig, libraryManager);
+        signalsEntityConfig = new SignalsEntityConfig(signalsConfig,
+                runtimeConfig, signalsEntityManager);
+    }
+
+    public void dumpEntities(String[] dateRangeArgs) {
+        signalsEntityConfig.dumpEntities(dateRangeArgs);
     }
 
     private void dumpSet(Set<String> set) {
@@ -150,39 +156,20 @@ public class Signals {
         return dynEnumMgr;
     }
 
-    private void manageMaterials() {
-        logger.info("""
-
-                ******************************************************
-                *
-                * Manage Materials
-                * {} / {}
-                *
-                ******************************************************
-                """, signalsConfig.getSnbInstanceName(), new Date().toString());
-
-        libraryManager.manageMaterials(runtimeConfig);
-    }
-
-    private void manageUsers() {
-        logger.info("""
-
-                ******************************************************
-                *
-                * Manage Users
-                * {} / {}
-                *
-                ******************************************************
-                """, signalsConfig.getSnbInstanceName(), new Date().toString());
-        accessManager.manageAccess(runtimeConfig);
+    public void manageAccess() {
+        accessConfig.manageAccess();
     }
 
     public void manageEntities(String[] dateRangeArgs) {
         signalsEntityConfig.manageEntities(dateRangeArgs);
     }
 
-    public void dumpEntities(String[] dateRangeArgs) {
-        signalsEntityConfig.dumpEntities(dateRangeArgs);
+    public void manageInventory() {
+        inventoryConfig.manageInventory();
+    }
+
+    public void manageMaterials() {
+        materialsConfig.manageMaterials();
     }
 
     public static Signals getInstance(String fname) {
@@ -246,18 +233,12 @@ public class Signals {
 
             String configFile = cmdline.getOptionValue(configOpt.getOpt());
             Signals signals = getInstance(configFile);
-
             RuntimeConfig.processCommandLine(cmdline, options, signals);
 
-            if (cmdline.hasOption(userMgrOpt.getOpt())) {
-                signals.manageUsers();
-            }
-
-            if (cmdline.hasOption(materialsMgrOpt.getOpt())) {
-                signals.manageMaterials();
-            }
-
+            AccessConfig.processCommandLine(cmdline, options, signals);
             SignalsEntityConfig.processCommandLine(cmdline, options, signals);
+            MaterialsConfig.processCommandLine(cmdline, options, signals);
+            InventoryConfig.processCommandLine(cmdline, options, signals);
 
         } catch (MissingArgumentException mae) {
             printHelp("ERROR: " + mae.getMessage(), options);
@@ -274,11 +255,12 @@ public class Signals {
         Options options = new Options();
         options.addOption(configOpt);
         options.addOption(helpOpt);
-        options.addOption(materialsMgrOpt);
-        options.addOption(userMgrOpt);
 
         RuntimeConfig.registerOptions(options);
+        AccessConfig.registerOptions(options);
         SignalsEntityConfig.registerOptions(options);
+        MaterialsConfig.registerOptions(options);
+        InventoryConfig.registerOptions(options);
         processCommandLine(argv, options);
     }
 }
