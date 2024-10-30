@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.ipb_halle.signals.UpdateConfig;
+import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.rest.RestResultIterator;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
@@ -77,7 +77,7 @@ public class SignalsEntityManager {
      * @param dateRange array with start and end points of data to be fetched
      * @param includeTypes comma separated list of entity types (experiment, notebook, asset, etc.) to be fetched
      */
-    public void fetchSnbEntities(Date[] dateRange, EntityType[] includeTypes, UpdateConfig config) {
+    public void fetchSnbEntities(Date[] dateRange, EntityType[] includeTypes, RuntimeConfig config) {
         Map<String, Object> cmap = new HashMap<>();
         if ((includeTypes != null) && (includeTypes.length > 0)) {
             cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, includeTypes);

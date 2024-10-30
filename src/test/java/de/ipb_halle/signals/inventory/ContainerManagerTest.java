@@ -19,11 +19,7 @@ package de.ipb_halle.signals.inventory;
 
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
-import de.ipb_halle.signals.UpdateConfig;
-import de.ipb_halle.signals.inventory.LocationDbService;
-import de.ipb_halle.signals.inventory.LocationEntity;
-import de.ipb_halle.signals.inventory.LocationManager;
-import de.ipb_halle.signals.inventory.LocationRestService;
+import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.rest.MockRestClient;
 import de.ipb_halle.signals.users.LdapClient;
 import de.ipb_halle.signals.users.MockLdapAdapter;
@@ -37,7 +33,6 @@ import de.ipb_halle.signals.users.RoleManager;
 import de.ipb_halle.signals.users.RoleRestService;
 import de.ipb_halle.signals.users.UserDbService;
 import de.ipb_halle.signals.users.UserRestService;
-import de.ipb_halle.signals.users.UserEntity;
 import de.ipb_halle.signals.users.UserManager;
 import java.util.Date;
 import java.util.Properties;
@@ -50,8 +45,6 @@ import org.apache.openejb.jee.EjbJar;
 import org.apache.openejb.junit.ApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
-import org.apache.openejb.testing.Descriptor;
-import org.apache.openejb.testing.Descriptors;
 import org.apache.openejb.testing.Module;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
 
@@ -121,7 +114,7 @@ public class ContainerManagerTest {
         user.setLastName("TwoLast");
         user.setId(TEST_USER1_ID);
         user.setEmail("user.two@someplace.invalid");
-        userManager.save(new UpdateConfig(), user);
+        userManager.save(new RuntimeConfig(), user);
 
         user = new User();
         user.setEnabled(true);
@@ -129,7 +122,7 @@ public class ContainerManagerTest {
         user.setLastName("ThreeLast");
         user.setId(TEST_USER2_ID);
         user.setEmail("user.three@someplace.invalid");
-        userManager.save(new UpdateConfig(), user);
+        userManager.save(new RuntimeConfig(), user);
 
         LocationEntity loc = new LocationEntity();
         loc.setId(TEST_LOCATION_ID);

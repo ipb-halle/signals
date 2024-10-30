@@ -18,7 +18,7 @@
 
 import de.ipb_halle.signals.Signals;
 import de.ipb_halle.signals.SignalsConfig;
-import de.ipb_halle.signals.UpdateConfig;
+import de.ipb_halle.signals.RuntimeConfig;
 import org.apache.commons.cli.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,7 +33,7 @@ public class SignalsEntityConfig {
     private Logger logger;
     private SignalsEntityManager signalsEntityManager;
     private SignalsConfig signalsConfig;
-    private UpdateConfig updateConfig;
+    private RuntimeConfig runtimeConfig;
     private EntityType[] includedTypes;
 
     @SuppressWarnings("static-access")
@@ -77,11 +77,11 @@ public class SignalsEntityConfig {
                     "assetType, location, batch, container, sample, text.")
             .build();
 
-    public SignalsEntityConfig(SignalsConfig config, UpdateConfig updateConfig, SignalsEntityManager manager) {
+    public SignalsEntityConfig(SignalsConfig config, RuntimeConfig runtimeConfig, SignalsEntityManager manager) {
         this.logger = LogManager.getLogger(SignalsEntityConfig.class);
         this.signalsEntityManager = manager;
         this.signalsConfig = config;
-        this.updateConfig = updateConfig;
+        this.runtimeConfig = runtimeConfig;
         setupDefaultIncludedTypes();
     }
 
@@ -120,7 +120,7 @@ public class SignalsEntityConfig {
             Date[] dateRange = parseDateRange(dateRangeArgs);
             signalsEntityManager.fetchSnbEntities(dateRange,
                     includedTypes,
-                    updateConfig);
+                    runtimeConfig);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }

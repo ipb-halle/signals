@@ -19,10 +19,9 @@ package de.ipb_halle.signals.users;
 
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
-import de.ipb_halle.signals.UpdateConfig;
+import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.rest.MockRestClient;
-import java.util.Iterator;
-import java.util.List;
+
 import java.util.Properties;
 import jakarta.inject.Inject;
 import org.junit.Before;
@@ -33,8 +32,6 @@ import org.apache.openejb.jee.EjbJar;
 import org.apache.openejb.junit.ApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
-import org.apache.openejb.testing.Descriptor;
-import org.apache.openejb.testing.Descriptors;
 import org.apache.openejb.testing.Module;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
 
@@ -100,7 +97,7 @@ public class GroupManagerTest {
             groupDbService.save(testGroup);
         }
         
-        manager.syncDbGroupsFromSnb(new UpdateConfig());
+        manager.syncDbGroupsFromSnb(new RuntimeConfig());
         Group group = groupDbService.loadById(TEST_GROUP_ID);
 
         assertEquals("Group name mismatch", TEST_GROUP_NAME, group.getName());

@@ -17,7 +17,7 @@
  */
 package de.ipb_halle.signals.materials;
 
-import de.ipb_halle.signals.UpdateConfig;
+import de.ipb_halle.signals.RuntimeConfig;
 
 import java.util.List;
 import jakarta.ejb.Stateless;
@@ -51,7 +51,7 @@ public class LibraryManager {
         return restService.doGetLibraries();
     }
 
-    public void save(UpdateConfig config, List<Library> libraries) {
+    public void save(RuntimeConfig config, List<Library> libraries) {
         for (Library lib : libraries) {
             logger.debug("materials library save({})", lib.getAssetDisplayName());
             if (config.updateDb) {
@@ -61,11 +61,11 @@ public class LibraryManager {
     }
 
 
-    public void manageMaterials(UpdateConfig config) {
+    public void manageMaterials(RuntimeConfig config) {
         syncLibraries(config);
     }
 
-    private void syncLibraries(UpdateConfig config) {
+    private void syncLibraries(RuntimeConfig config) {
         List<Library> libraries = getSnbLibraries();
         save(config, libraries);
     }

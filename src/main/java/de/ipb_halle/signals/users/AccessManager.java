@@ -18,13 +18,11 @@
 package de.ipb_halle.signals.users;
 
 import de.ipb_halle.signals.SignalsConfig;
-import de.ipb_halle.signals.UpdateConfig;
+import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.reporting.HtmlList;
 import de.ipb_halle.signals.reporting.HtmlReport;
 import de.ipb_halle.signals.reporting.HtmlText;
 import de.ipb_halle.signals.reporting.MailReport;
-import java.util.Iterator;
-import java.util.Map;
 
 import jakarta.annotation.Resource;
 import jakarta.ejb.Stateless;
@@ -60,17 +58,17 @@ public class AccessManager {
 
     private Logger logger = LoggerFactory.getLogger(AccessManager.class);
 
-    public void manageAccess(UpdateConfig updateConfig, boolean noMail) {
-        UserSynchronizationContext context = new UserSynchronizationContext(updateConfig);
+    public void manageAccess(RuntimeConfig runtimeConfig) {
+        UserSynchronizationContext context = new UserSynchronizationContext(runtimeConfig);
         MailReport report = new MailReport();
         prepareReport(context, report);
         syncDbFromSnb(context);
-        if (updateConfig.updateFromLdap) {
+        if (runtimeConfig.updateFromLdap) {
             syncSnbFromLdap(context);
         } else {
             logger.debug("DRY RUN: skipping updates from LDAP");
         }
-        if (! noMail) {
+        if (runtimeConfig.noMail) {
             sendReport(context, report);
         }
     }
@@ -97,7 +95,7 @@ public class AccessManager {
     }
 
     private static HtmlText getReportHeader(UserSynchronizationContext context) {
-        if (context.updateConfig.updateSNB) {
+        if (context.runtimeConfig.updateSNB) {
             return new HtmlText(
                 "Access Management",
                 "This mail informs about changes to user accounts in Signals Notebook.");
@@ -130,10 +128,10 @@ public class AccessManager {
     }
 
     private void syncDbFromSnb(UserSynchronizationContext context) {
-        if (context.updateConfig.syncDbFromSNB) {
+        if (context.runtimeConfig.syncDbFromSNB) {
             roleManager.syncDbRolesFromSnb(context);
-            groupManager.syncDbGroupsFromSnb(context.updateConfig);
-            userManager.syncDbUsersFromSnb(context.updateConfig);
+            groupManager.syncDbGroupsFromSnb(context.runtimeConfig);
+            userManager.syncDbUsersFromSnb(context.runtimeConfig);
         } else {
             logger.debug("Skipping Db syncronization from SNB");
         }

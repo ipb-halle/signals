@@ -18,12 +18,11 @@
 package de.ipb_halle.signals.users;
 
 import de.ipb_halle.signals.SignalsConfig;
-import de.ipb_halle.signals.UpdateConfig;
+import de.ipb_halle.signals.RuntimeConfig;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -56,8 +55,8 @@ public class GroupManager {
     private Logger logger = LoggerFactory.getLogger(GroupManager.class);
 
 
-    public void save(UpdateConfig updateConfig, Group group) {
-        if (updateConfig.updateDb) {
+    public void save(RuntimeConfig runtimeConfig, Group group) {
+        if (runtimeConfig.updateDb) {
             groupDbService.save(group);
         } else {
             this.logger.trace("DRY RUN: skipped DB UPDATE for group: {}", group.getName());
@@ -96,7 +95,7 @@ public class GroupManager {
                     if (! dbGroup.isLdapGroup()) {
                         logger.info("Making group {} LDAP managed", ldapGroup.getName());
                         dbGroup.setLdapGroup(true);
-                        save(context.updateConfig, dbGroup);
+                        save(context.runtimeConfig, dbGroup);
                     }
                     groupsByDN.put(dn, dbGroup);
                 }
@@ -105,7 +104,7 @@ public class GroupManager {
         context.groupsByDN = groupsByDN;
     }
 
-    public void syncDbGroupsFromSnb(UpdateConfig updateConfig) {
+    public void syncDbGroupsFromSnb(RuntimeConfig runtimeConfig) {
         Map<String, Group> groupsFromDb = groupDbService.loadMappedById(new HashMap<> ());
 
         for(Group snbGroup : groupRestService.doGetGroups()) {
@@ -113,24 +112,24 @@ public class GroupManager {
             Group dbGroup = groupsFromDb.remove(snbGroup.getId());
             if (dbGroup == null) {
                 logger.info("SNB group is NEW: {}", snbGroup.getName());
-                save(updateConfig, snbGroup);
+                save(runtimeConfig, snbGroup);
             } else {
                 if (snbGroup.isModified(CompareType.SNB, dbGroup)) {
                     logger.debug("SNB group is modified: {}", snbGroup.getName());
                     dbGroup.applyChangesFromSnb(snbGroup);
                     dbGroup.setDeleted(false);
-                    save(updateConfig, dbGroup);
+                    save(runtimeConfig, dbGroup);
                 }
             }
         }
-        deleteMissingGroups(updateConfig, groupsFromDb.values());
+        deleteMissingGroups(runtimeConfig, groupsFromDb.values());
     }
 
-    public void deleteMissingGroups(UpdateConfig updateConfig, Collection<Group> missingGroups) {
+    public void deleteMissingGroups(RuntimeConfig runtimeConfig, Collection<Group> missingGroups) {
         for (Group group : missingGroups) {
             logger.debug("Group {} not found in SNB - marking as deleted", group.getName());
             group.setDeleted(true);
-            save(updateConfig, group);
+            save(runtimeConfig, group);
         }
     }
 }

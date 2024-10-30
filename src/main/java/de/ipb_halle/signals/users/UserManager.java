@@ -18,13 +18,12 @@
 package de.ipb_halle.signals.users;
 
 import de.ipb_halle.signals.SignalsConfig;
-import de.ipb_halle.signals.UpdateConfig;
+import de.ipb_halle.signals.RuntimeConfig;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -74,10 +73,10 @@ public class UserManager {
     }
 
     public boolean doActivateUser(UserSynchronizationContext context, User user) {
-        if (context.updateConfig.updateSNB) {
+        if (context.runtimeConfig.updateSNB) {
             if (userRestService.doActivateUser(user, getLicenses())) {
                 user.setEnabled(true);
-                save(context.updateConfig, user);
+                save(context.runtimeConfig, user);
             } else {
                 return false;
             }
@@ -90,11 +89,11 @@ public class UserManager {
     }
 
     public User doCreateUser(UserSynchronizationContext context, User user) {
-        if (context.updateConfig.updateSNB) {
+        if (context.runtimeConfig.updateSNB) {
             logger.info("Creating new SNB user: {}", user.getUserName());
             User snbUser = userRestService.doCreateUser(user, getLicenses());
             snbUser.setMutable(true);
-            save(context.updateConfig, snbUser);
+            save(context.runtimeConfig, snbUser);
             user = userDbService.loadById(snbUser.getId());
         } else {
             logger.trace("DRY RUN: skipped SNB CREATE for user: {}", user.getUserName());
@@ -105,12 +104,12 @@ public class UserManager {
     }
 
     public void doDisableUser(UserSynchronizationContext context, User user) {
-        if (context.updateConfig.updateSNB) {
+        if (context.runtimeConfig.updateSNB) {
             userRestService.doDisableUser(user, getLicenses());
             user.setEnabled(false);
             user.setRoles(new HashSet<> ());
             user.setSystemGroups(new HashSet<> ());
-            save(context.updateConfig, user);
+            save(context.runtimeConfig, user);
         } else {
             logger.trace("DRY RUN: skipped SNB DISABLE for user: {}", user.getUserName());
         }
@@ -119,20 +118,20 @@ public class UserManager {
     }
 
     public void doUpdateUser(UserSynchronizationContext context, User user) {
-        if (context.updateConfig.updateSNB) {
+        if (context.runtimeConfig.updateSNB) {
             User restUser = userRestService.doUpdateUser(user,
                         context.groupsToAdd,
                         context.groupsToRemove);
             if (restUser != null) {
-                save(context.updateConfig, user);
+                save(context.runtimeConfig, user);
             }
         } else {
             logger.trace("DRY RUN: skipped SNB UPDATE for user: {}", user.getUserName());
         }
     }
 
-    public void save(UpdateConfig updateConfig, User user) {
-        if (updateConfig.updateDb) {
+    public void save(RuntimeConfig runtimeConfig, User user) {
+        if (runtimeConfig.updateDb) {
             userDbService.save(user);
         } else {
             logger.trace("DRY RUN: skipped DB update for user: {}", user.getUserName());
@@ -142,32 +141,32 @@ public class UserManager {
     /**
      * synchronize Db from SNB
      */
-    public void syncDbUsersFromSnb(UpdateConfig updateConfig) {
+    public void syncDbUsersFromSnb(RuntimeConfig runtimeConfig) {
         // enabled users
         for( User snbUser : userRestService.doGetUsers(null, true)) {
-            syncDbUserFromSnb(updateConfig, snbUser);
+            syncDbUserFromSnb(runtimeConfig, snbUser);
         }
 
         // disabled users
         for (User snbUser : userRestService.doGetUsers(null, false)) {
-            syncDbUserFromSnb(updateConfig, snbUser);
+            syncDbUserFromSnb(runtimeConfig, snbUser);
         }
     }
 
-    private void syncDbUserFromSnb(UpdateConfig updateConfig, User snbUser) {
+    private void syncDbUserFromSnb(RuntimeConfig runtimeConfig, User snbUser) {
         logger.trace("Processing SNB user: {}", snbUser.getUserName());
         User dbUser = userDbService.loadById(snbUser.getId());
         if (dbUser == null) {
             logger.info("SNB user is NEW: {}", snbUser.getUserName());
             snbUser.setMutable(false);
-            save(updateConfig, snbUser);
+            save(runtimeConfig, snbUser);
         } else {
             roleManager.resolveRoleReferences(snbUser);
             groupManager.resolveGroupReferences(snbUser);
             if (snbUser.isModified(CompareType.SNB, dbUser)) {
                 logger.debug("SNB user is modified: {}", snbUser.getUserName());
                 dbUser.applyChangesFromSnb(snbUser);
-                save(updateConfig, dbUser);
+                save(runtimeConfig, dbUser);
             }
         }
     }

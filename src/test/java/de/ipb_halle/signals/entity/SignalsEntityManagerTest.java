@@ -19,7 +19,7 @@ package de.ipb_halle.signals.entity;
 
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
-import de.ipb_halle.signals.UpdateConfig;
+import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.dynEnum.DynEnum;
 import de.ipb_halle.signals.dynEnum.DynEnumDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
@@ -100,7 +100,7 @@ public class SignalsEntityManagerTest {
     public void entityTest() {
         dynEnumManager.allowEnumDiscovery();
         EntityType[] includedTypes = new EntityType[] { EntityType.valueOf(TEST_ENTITY_TYPE) };
-        manager.fetchSnbEntities(null, includedTypes, new UpdateConfig());
+        manager.fetchSnbEntities(null, includedTypes, new RuntimeConfig());
         SignalsEntityDTO entity = manager.getDbEntity(TEST_LOCATION_ID);
         System.out.print(entity.dump());
         assertEquals("entity type mismatch", TEST_ENTITY_TYPE, entity.getType().getValue());

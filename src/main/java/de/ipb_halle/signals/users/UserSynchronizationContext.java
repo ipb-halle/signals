@@ -17,14 +17,14 @@
  */
 package de.ipb_halle.signals.users;
 
-import de.ipb_halle.signals.UpdateConfig;
+import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.reporting.HtmlReport;
 import java.util.Map;
 import java.util.Set;
 
 public class UserSynchronizationContext { 
 
-    public UpdateConfig updateConfig;
+    public RuntimeConfig runtimeConfig;
     public HtmlReport report;
     public int reportRecords;
     public boolean reportAlert;
@@ -34,8 +34,8 @@ public class UserSynchronizationContext {
     public Set<Group> groupsToAdd;
     public Set<Group> groupsToRemove;
 
-    public UserSynchronizationContext(UpdateConfig cfg) {
-        updateConfig = cfg;
+    public UserSynchronizationContext(RuntimeConfig cfg) {
+        runtimeConfig = cfg;
         reportRecords = 0;
         reportAlert = false;
     }

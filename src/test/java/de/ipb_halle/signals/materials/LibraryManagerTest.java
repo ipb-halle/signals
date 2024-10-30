@@ -18,7 +18,7 @@
 package de.ipb_halle.signals.materials;
 
 import de.ipb_halle.signals.SignalsConfig;
-import de.ipb_halle.signals.UpdateConfig;
+import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.dynEnum.DynEnum;
 import de.ipb_halle.signals.dynEnum.DynEnumDbService;
@@ -111,7 +111,7 @@ public class LibraryManagerTest {
     @Test
     public void libraryManagerTest() {
 
-        UpdateConfig config = new UpdateConfig();
+        RuntimeConfig config = new RuntimeConfig();
         List<Library> libraries = manager.getSnbLibraries();
         manager.save(config, libraries);
 

@@ -19,12 +19,11 @@ package de.ipb_halle.signals.users;
 
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
-import de.ipb_halle.signals.UpdateConfig;
+import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.reporting.HtmlReport;
 import de.ipb_halle.signals.rest.MockRestClient;
-import java.util.Iterator;
+
 import java.util.HashMap;
-import java.util.List;
 import java.util.Properties;
 import jakarta.inject.Inject;
 import org.junit.Before;
@@ -154,7 +153,7 @@ public class UserManagerTest {
     @Test
     public void syncFromSnbTest() {
 
-        manager.syncDbUsersFromSnb(new UpdateConfig());
+        manager.syncDbUsersFromSnb(new RuntimeConfig());
         User user = userDbService.loadById(TEST_USER1_ID);
 
 
@@ -169,7 +168,7 @@ public class UserManagerTest {
 
     @Test
     public void syncUsersFromLdapTest() {
-        UpdateConfig config = new UpdateConfig(true, false, true, true);
+        RuntimeConfig config = new RuntimeConfig(true, false, true, true, true);
         UserSynchronizationContext context = new UserSynchronizationContext(config);
         context.groupsByDN = new HashMap<> ();
         context.rolesByDN = new HashMap<> ();

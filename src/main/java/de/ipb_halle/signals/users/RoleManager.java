@@ -18,12 +18,11 @@
 package de.ipb_halle.signals.users;
 
 import de.ipb_halle.signals.SignalsConfig;
-import de.ipb_halle.signals.UpdateConfig;
+import de.ipb_halle.signals.RuntimeConfig;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -57,8 +56,8 @@ public class RoleManager {
 
     private Logger logger = LoggerFactory.getLogger(RoleManager.class);
 
-    public Role save(UpdateConfig updateConfig, Role role) {
-        if (updateConfig.updateDb) {
+    public Role save(RuntimeConfig runtimeConfig, Role role) {
+        if (runtimeConfig.updateDb) {
             return roleDbService.save(role);
         } else {
             this.logger.trace("DRY RUN: skipped DB UPDATE for role: {} ", role.getName());
@@ -97,7 +96,7 @@ public class RoleManager {
                     if (! dbRole.isLdapRole()) {
                         logger.info("Making role {} LDAP managed", ldapRole.getName());
                         dbRole.setLdapRole(true);
-                        dbRole = save(context.updateConfig, dbRole);
+                        dbRole = save(context.runtimeConfig, dbRole);
                     }
                     rolesByDN.put(dn, dbRole);
                 }
@@ -121,24 +120,24 @@ public class RoleManager {
             Role dbRole = rolesFromDb.remove(snbRole.getId());
             if (dbRole == null) {
                 logger.info("SNB role is NEW: {}", snbRole.getName());
-                dbRole = save(context.updateConfig, snbRole);
+                dbRole = save(context.runtimeConfig, snbRole);
             } else {
                 if (snbRole.isModified(dbRole)) {
                     logger.debug("SNB role is modified: {}", snbRole.getName());
                     dbRole.applyChangesFromSnb(snbRole);
                     dbRole.setDeleted(false);
-                    save(context.updateConfig, dbRole);
+                    save(context.runtimeConfig, dbRole);
                 }
             }
         }
-        deleteMissingRoles(context.updateConfig, rolesFromDb.values());
+        deleteMissingRoles(context.runtimeConfig, rolesFromDb.values());
     }
 
-    public void deleteMissingRoles(UpdateConfig updateConfig, Collection<Role> missingRoles) {
+    public void deleteMissingRoles(RuntimeConfig runtimeConfig, Collection<Role> missingRoles) {
         for (Role dbRole : missingRoles) {
             logger.debug("Role {} not found in SNB - marking as deleted", dbRole.getName());
             dbRole.setDeleted(true);
-            save(updateConfig, dbRole);
+            save(runtimeConfig, dbRole);
         }
     }
 }

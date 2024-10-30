@@ -78,7 +78,7 @@ public class Signals {
     @Inject
     private SignalsEntityManager signalsEntityManager;
 
-    private UpdateConfig updateConfig;
+    private RuntimeConfig runtimeConfig;
     private SignalsEntityConfig signalsEntityConfig;
     private boolean noMail;
 
@@ -111,65 +111,10 @@ public class Signals {
             .desc("\nPerform user,  group and role management")
             .build();
 
-    @SuppressWarnings("static-access")
-    private static final Option dryRunOpt = Option.builder("n")
-            .longOpt("dry-run")
-            .desc("\nDry run - don't modify anything (includes --noUpdateSNB and --noUpdateFromLDAP).")
-            .build();
-
-    @SuppressWarnings("static-access")
-    private static final Option noMailOpt = Option.builder("m")
-            .longOpt("noMail")
-            .desc("\nDo not send any reports by email")
-            .build();
-
-    @SuppressWarnings("static-access")
-    private static final Option discoverOpt = Option.builder("discover")
-            .longOpt("allow-discover")
-            .desc("\nAllow discovery of new types (DynEnums). Otherwise the program is aborted upon discovery of an unknown type.")
-            .build();
-
-    @SuppressWarnings("static-access")
-    private static final Option noUpdateSnbOpt = Option.builder("noSNB")
-            .longOpt("noUpdateSNB")
-            .desc("\nDo not perform updates to Signals Notebook")
-            .build();
-
-    @SuppressWarnings("static-access")
-    private static final Option noUpdateFromLdapOpt = Option.builder("noLDAP")
-            .longOpt("noUpdateFromLDAP")
-            .desc("\nDo not perform updates from LDAP")
-            .build();
-
-    @SuppressWarnings("static-access")
-    private static final Option noSyncDbFromSNBOpt = Option.builder("noSyncSNB")
-            .longOpt("noSyncDbFromSNB")
-            .desc("\nDo not synchronize database from Signals Notebook")
-            .build();
-
-    @SuppressWarnings("static-access")
-    private static final Option debugOpt = Option.builder("d")
-            .longOpt("debug")
-            .hasArg()
-            .argName("LEVEL")
-            .desc("\nSet log level to the selected LEVEL (one of FATAL, ERROR, WARN, INFO, DEBUG, TRACE)")
-            .build();
-
-    @SuppressWarnings("static-access")
-    private static final Option trustStoreOpt = Option.builder("ts")
-            .longOpt("trustStore")
-            .hasArg()
-            .argName("FILE")
-            .desc("\nSet the truststore for startSSL. The trustStore should contain certificates for both: LDAP and SNB API.")
-            .build();
-
-
-
     /**
      * default constructor
      */
     public Signals() {
-        updateConfig = new UpdateConfig();
         noMail = false;
         logger = LoggerFactory.getLogger(Signals.class);
     }
@@ -177,8 +122,9 @@ public class Signals {
     // @PostConstruct annotation did not work
     private void postConstruct() {
         signalsEntityConfig = new SignalsEntityConfig(signalsConfig,
-                updateConfig,
+                runtimeConfig,
                 signalsEntityManager);
+        runtimeConfig = new RuntimeConfig();
     }
 
     private void dumpSet(Set<String> set) {
@@ -186,6 +132,14 @@ public class Signals {
         while (iter.hasNext()) {
             System.out.println(iter.next());
         }
+    }
+
+    protected LogConfig getLogConfig() {
+        return logConfig;
+    }
+
+    public RuntimeConfig getRuntimeConfig() {
+        return runtimeConfig;
     }
 
     public SignalsEntityConfig getSignalsEntityConfig() {
@@ -207,7 +161,7 @@ public class Signals {
                 ******************************************************
                 """, signalsConfig.getSnbInstanceName(), new Date().toString());
 
-        libraryManager.manageMaterials(updateConfig);
+        libraryManager.manageMaterials(runtimeConfig);
     }
 
     private void manageUsers() {
@@ -215,12 +169,12 @@ public class Signals {
 
                 ******************************************************
                 *
-                * Manage Users 
+                * Manage Users
                 * {} / {}
                 *
                 ******************************************************
                 """, signalsConfig.getSnbInstanceName(), new Date().toString());
-        accessManager.manageAccess(updateConfig, noMail);
+        accessManager.manageAccess(runtimeConfig);
     }
 
     public void manageEntities(String[] dateRangeArgs) {
@@ -267,6 +221,7 @@ public class Signals {
         writer.setOptPrefix("\n\n\u00A0\u001B[1m-");
         writer.setNewLine("\u001B[m\n");
         writer.printHelp(usage, header, options, footer, true);
+        System.exit(1);
     }
 
     /**
@@ -281,56 +236,18 @@ public class Signals {
         try {
             CommandLine cmdline = parser.parse(options, argv);
 
-
             if (cmdline.hasOption(helpOpt.getOpt())) {
                 printHelp(null, options);
-                return;
             }
 
             if (!cmdline.hasOption(configOpt.getOpt())) {
                 printHelp("ERROR: missing configuration file", options);
-                return;
             }
+
             String configFile = cmdline.getOptionValue(configOpt.getOpt());
             Signals signals = getInstance(configFile);
 
-            if (cmdline.hasOption(dryRunOpt.getOpt())) {
-                signals.updateConfig.updateDb = false;
-                signals.updateConfig.updateSNB = false;
-                signals.updateConfig.updateFromLdap = false;
-            }
-
-            if (cmdline.hasOption(noMailOpt.getOpt())) {
-                signals.noMail = true;
-            }
-
-            if (cmdline.hasOption(noUpdateSnbOpt.getOpt())) {
-                signals.updateConfig.updateSNB = false;
-            }
-
-            if (cmdline.hasOption(noUpdateFromLdapOpt.getOpt())) {
-                signals.updateConfig.updateFromLdap = false;
-            }
-
-            if (cmdline.hasOption(noSyncDbFromSNBOpt.getOpt())) {
-                signals.updateConfig.syncDbFromSNB = false;
-            }
-
-            if (cmdline.hasOption(trustStoreOpt.getOpt())) {
-                System.setProperty("javax.net.ssl.trustStore", cmdline.getOptionValue(trustStoreOpt.getOpt()));
-            }
-
-
-            if (cmdline.hasOption(debugOpt.getOpt())) {
-                if (!signals.logConfig.setLogLevel(cmdline.getOptionValue(debugOpt.getOpt()))) {
-                    printHelp("ERROR: invalid log level", options);
-                    return;
-                }
-            }
-
-            if (cmdline.hasOption(discoverOpt.getOpt())) {
-                signals.dynEnumMgr.allowEnumDiscovery();
-            }
+            RuntimeConfig.processCommandLine(cmdline, options, signals);
 
             if (cmdline.hasOption(userMgrOpt.getOpt())) {
                 signals.manageUsers();
@@ -357,16 +274,10 @@ public class Signals {
         Options options = new Options();
         options.addOption(configOpt);
         options.addOption(helpOpt);
-        options.addOption(debugOpt);
-        options.addOption(discoverOpt);
-        options.addOption(dryRunOpt);
-        options.addOption(noMailOpt);
-        options.addOption(noUpdateSnbOpt);
-        options.addOption(noUpdateFromLdapOpt);
-        options.addOption(noSyncDbFromSNBOpt);
-        options.addOption(trustStoreOpt);
         options.addOption(materialsMgrOpt);
         options.addOption(userMgrOpt);
+
+        RuntimeConfig.registerOptions(options);
         SignalsEntityConfig.registerOptions(options);
         processCommandLine(argv, options);
     }
