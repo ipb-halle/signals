@@ -23,6 +23,7 @@ import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.users.*;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
+import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;
@@ -42,7 +43,7 @@ public class SignalsEntityDbService {
     private DynEnumManager dynEnumManager;
 
     public List<SignalsEntityDTO> load(Map<String, Object> cmap) {
-        List<SignalsEntityDTO> results = new ArrayList<> ();
+        List<SignalsEntityDTO> results = new ArrayList<>();
         List<Predicate> predicates = new ArrayList<>();
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<SignalsEntity> criteriaQuery = builder.createQuery(SignalsEntity.class);
@@ -50,13 +51,20 @@ public class SignalsEntityDbService {
         criteriaQuery.select(root);
 
         if (cmap.containsKey(SignalsEntityRestService.PARAMETER_START)) {
-            predicates.add(builder.greaterThan(root.get("editedAt"), (Date) cmap.get(SignalsEntityRestService.PARAMETER_START)));
+            predicates.add(builder.greaterThan(root.get("editedAt"),
+                    (Date) cmap.get(SignalsEntityRestService.PARAMETER_START)));
         }
         if (cmap.containsKey(SignalsEntityRestService.PARAMETER_END)) {
-            predicates.add(builder.lessThan(root.get("editedAt"), (Date) cmap.get(SignalsEntityRestService.PARAMETER_END)));
+            predicates.add(builder.lessThan(root.get("editedAt"),
+                    (Date) cmap.get(SignalsEntityRestService.PARAMETER_END)));
+        }
+        if (cmap.containsKey(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES)) {
+            List<Integer> enumIds = dynEnumManager.getDynEnumIds(
+                    (EntityType[]) cmap.get(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES));
+            predicates.add(root.get("type").in(enumIds));
         }
         criteriaQuery.where(builder.and(predicates.toArray(new Predicate[0])));
-        for (SignalsEntity entity: em.createQuery(criteriaQuery).getResultList()) {
+        for (SignalsEntity entity : em.createQuery(criteriaQuery).getResultList()) {
             results.add(new SignalsEntityDTO(entity, dynEnumManager));
         }
         return results;

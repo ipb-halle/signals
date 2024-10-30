@@ -17,7 +17,9 @@
  */
 package de.ipb_halle.signals.dynEnum;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import jakarta.annotation.PostConstruct;
@@ -37,14 +39,12 @@ import org.slf4j.LoggerFactory;
 @Startup
 public class DynEnumManager {
 
-    private record DynEnumType(String type, String value) {};
-
     @Inject
     private DynEnumDbService dbService;
 
     private boolean discoverEnums;
 
-    private Map<DynEnumType, DynEnum> dynEnums;
+    private Map<String, Map<String, DynEnum>> dynEnumsMapByType;
     private Map<Integer, DynEnum> dynEnumsById;
 
     private final Logger logger = LoggerFactory.getLogger(DynEnumManager.class);
@@ -54,18 +54,14 @@ public class DynEnumManager {
      */
     public DynEnumManager() {
         discoverEnums = false;
-        dynEnums = new HashMap<> ();
+        dynEnumsMapByType = new HashMap<> ();
         dynEnumsById = new HashMap<> ();
     }
 
     @PostConstruct
     public void init() {
         for (DynEnum de : dbService.load()) {
-            dynEnums.put(new DynEnumType(
-                    de.getShortType(),
-                    de.getValue()),
-                    de);
-            dynEnumsById.put(de.getId(), de);
+            putDynEnum(de);
         }
     }
 
@@ -74,14 +70,14 @@ public class DynEnumManager {
     }
 
     public DynEnum valueOf(DynEnum dynEnum) {
-        DynEnumType type = new DynEnumType(
-                dynEnum.getShortType(),
-                dynEnum.getValue());
-        DynEnum e = dynEnums.get(type);
-        if (e == null) {
-            return registerNewEnum(dynEnum);
+        String type = dynEnum.getShortType();
+        if (dynEnumsMapByType.containsKey(type)) {
+            DynEnum e = dynEnumsMapByType.get(type).get(dynEnum.getValue());
+            if (e != null) {
+                return e;
+            }
         }
-        return e;
+        return registerNewEnum(dynEnum);
     }
 
     public DynEnum valueOf(Integer id) {
@@ -91,15 +87,28 @@ public class DynEnumManager {
     private DynEnum registerNewEnum(DynEnum dynEnum) {
         if (discoverEnums) {
             DynEnum de = dbService.save(dynEnum);
-            DynEnumType type = new DynEnumType(
-                de.getShortType(),
-                de.getValue());
-            dynEnums.put(type, de);
-            dynEnumsById.put(de.getId(), de);
+            putDynEnum(de);
             return de;
         }
         throw new RuntimeException("Discovered new DynEnum "
                 + dynEnum.toString()
                 + " when auto-discovery was disabled.");
+    }
+
+    private void putDynEnum(DynEnum de) {
+        String type = de.getShortType();
+        Map<String, DynEnum> typeMap = dynEnumsMapByType
+                .getOrDefault(type, new HashMap<String, DynEnum> ());
+        typeMap.put(de.getValue(), de);
+        dynEnumsMapByType.put(type, typeMap);
+        dynEnumsById.put(de.getId(), de);
+    }
+
+    public List<Integer> getDynEnumIds(DynEnum[] dynEnums) {
+        Integer[] idList = new Integer[dynEnums.length];
+        for (int i=0; i<dynEnums.length; i++) {
+            idList[i] = valueOf(dynEnums[i]).getId();
+        }
+        return Arrays.asList(idList);
     }
 }

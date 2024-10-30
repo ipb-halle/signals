@@ -53,7 +53,7 @@ public class SignalsEntityManager {
      * produce a database dump of SignalsEntities
      * @param dateRange start and end datum of the database dump
      */
-    public void listEntities(Date[] dateRange) {
+    public void listEntities(Date[] dateRange, EntityType[] includedTypes) {
         System.out.print("""
                 ********************************************
                 *
@@ -65,6 +65,7 @@ public class SignalsEntityManager {
         Map<String, Object> cmap = new HashMap<>();
         cmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
         cmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
+        cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, includedTypes);
         List<SignalsEntityDTO> results = dbService.load(cmap);
         for (SignalsEntityDTO dto : results) {
             System.out.println(dto.dump());
