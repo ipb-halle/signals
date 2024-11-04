@@ -19,8 +19,10 @@ package de.ipb_halle.signals.inventory;
 
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
+import de.ipb_halle.signals.dynEnum.DynEnum;
+import de.ipb_halle.signals.dynEnum.DynEnumDbService;
+import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.rest.MockRestClient;
-import java.util.List;
 import java.util.Properties;
 import jakarta.inject.Inject;
 import org.junit.Before;
@@ -35,8 +37,6 @@ import org.apache.openejb.testing.Module;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
 
 @RunWith(ApplicationComposer.class)
 public class LocationTypeManagerTest {
@@ -51,18 +51,23 @@ public class LocationTypeManagerTest {
     private MockRestClient mockRestClient;
 
     @Inject
-    private LocationTypeManager manager;
+    private LocationTypeManager locationTypeManager;
+
+    @Inject
+    private DynEnumManager dynEnumManager;
 
     @Module
     @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class, // RestResultIterator.class, RestService.class,
-        LocationType.class, LocationTypeDbService.class, LocationTypeManager.class, LocationTypeRestService.class })
+            DynEnumManager.class, DynEnum.class, DynEnumDbService.class,
+            LocationType.class, LocationTypeManager.class, LocationTypeDbService.class,  LocationTypeRestService.class})
     public EjbJar app() {
         return new EjbJar();
     }
 
     @Module
     public PersistenceUnit persistence() {
-        return TestBase.persistence(new String[]{ LocationType.class.getName()});
+        return TestBase.persistence(new String[]{ LocationType.class.getName(),
+                DynEnum.class.getName()});
     }
 
     @Configuration
@@ -72,6 +77,7 @@ public class LocationTypeManagerTest {
 
     @Before
     public void testSetup() {
+        dynEnumManager.allowEnumDiscovery();
         TestBase.prepareRestClients(mockRestClient,
             TEST_KEY_1,
             getClass().getResourceAsStream(TEST_RESOURCE_1));
@@ -80,10 +86,9 @@ public class LocationTypeManagerTest {
     @Test
     public void locationTypeManagerTest() {
 
-        List<LocationType> ltypes = manager.getSnbLocationTypes();
-        manager.save(ltypes);
+        locationTypeManager.syncLocationTypes();
 
-        LocationType lt = manager.getDbLocationType(TEST_LOCATION_TYPE_ID);
+        LocationType lt = locationTypeManager.loadById(TEST_LOCATION_TYPE_ID);
         assertEquals("LocationType name mismatch", TEST_LOCATION_TYPE_NAME, lt.getName());
     }
 }

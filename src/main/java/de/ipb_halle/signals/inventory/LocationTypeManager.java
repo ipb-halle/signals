@@ -18,6 +18,8 @@
 package de.ipb_halle.signals.inventory;
 
 import java.util.List;
+
+import de.ipb_halle.signals.rest.RestResultIterator;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 
@@ -35,17 +37,14 @@ public class LocationTypeManager {
     private LocationTypeRestService restService;
 
 
-    public LocationType getDbLocationType(String id) {
+    public LocationType loadById(String id) {
         return dbService.loadById(id);
     }
 
-    public List<LocationType> getSnbLocationTypes() {
-        return restService.doGetLocationTypes();
-    }
-
-    public void save(List<LocationType> ltypes) {
-        for (LocationType lt : ltypes) {
-            dbService.save(lt);
+    public void syncLocationTypes() {
+        RestResultIterator<LocationType> locationTypeIterator = restService.doGetLocationTypes();
+        while (locationTypeIterator.hasNext()) {
+            dbService.save(locationTypeIterator.next());
         }
     }
 }

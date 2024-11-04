@@ -56,20 +56,13 @@ public class LocationTypeRestService implements RestReplyParser<LocationType> {
         return lt;
     }
 
-    public List<LocationType> doGetLocationTypes() {
-        List<LocationType> locationTypes = new ArrayList<> ();
+    public RestResultIterator<LocationType> doGetLocationTypes() {
         restClient.reset()
             .setMethod(Method.GET)
             .setEndpoint(CONTAINER_TYPE_ENDPOINT)
             .putUriParameter("entityType","location");
 
-        RestResultIterator<LocationType> iter = new RestResultIterator<> (restClient, this, true);
-//      Iterator<LocationType> iter = new ArrayList<LocationType> ().iterator();
-
-        while(iter.hasNext()) {
-            locationTypes.add(iter.next());
-        }
-        return locationTypes;
+        return new RestResultIterator<> (restClient, this, true);
     }
 }
 

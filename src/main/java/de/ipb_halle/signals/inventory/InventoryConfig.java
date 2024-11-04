@@ -33,19 +33,15 @@ import java.util.Date;
 public class InventoryConfig {
 
     @SuppressWarnings("static-access")
-    private static final Option locationSyncOpt = Option.builder("lS")
-            .longOpt("locationSync")
-            .desc("\nSynchronize location types and locations from SNB to DB.")
+    private static final Option inventorySyncOpt = Option.builder("iS")
+            .longOpt("inventorySync")
+            .desc("\nSynchronize location types, container types, locations and containers from SNB to DB.")
             .build();
 
-    @SuppressWarnings("static-access")
-    private static final Option containerSyncOpt = Option.builder("cS")
-            .longOpt("containerSync")
-            .desc("\nSynchronize container types and containers values from SNB to DB.")
-            .build();
 
     public InventoryConfig() {
     }
+
     private InventoryManager inventoryManager;
     private RuntimeConfig runtimeConfig;
     private SignalsConfig signalsConfig;
@@ -68,11 +64,11 @@ public class InventoryConfig {
                 *
                 ******************************************************
                 """, signalsConfig.getSnbInstanceName(), new Date().toString());
+        inventoryManager.syncLocationTypes();
     }
 
     public static void registerOptions(Options options) {
-        options.addOption(locationSyncOpt);
-        options.addOption(containerSyncOpt);
+        options.addOption(inventorySyncOpt);
     }
 
     /**
@@ -84,12 +80,8 @@ public class InventoryConfig {
      */
     public static void processCommandLine(CommandLine cmdline, Options options, Signals signals) {
 
-        if (cmdline.hasOption(locationSyncOpt.getOpt())) {
-            System.out.println("***************** Location Sync *********************");
-        }
-
-        if (cmdline.hasOption(containerSyncOpt.getOpt())) {
-            System.out.println("***************** Container Sync ********************");
+        if (cmdline.hasOption(inventorySyncOpt.getOpt())) {
+            signals.manageInventory();
         }
     }
 }

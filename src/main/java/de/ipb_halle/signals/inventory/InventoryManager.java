@@ -18,6 +18,7 @@
 package de.ipb_halle.signals.inventory;
 
 import de.ipb_halle.signals.inventory.LocationManager;
+import de.ipb_halle.signals.rest.RestResultIterator;
 import de.ipb_halle.signals.users.UserManager;
 
 import java.util.List;
@@ -54,16 +55,14 @@ public class InventoryManager {
     private LocationRestService locationRestService;
 
     @Inject
-    private LocationTypeDbService locationTypeDbService;
-
-    @Inject
-    private LocationTypeRestService locationTypeRestService;
-
+    private LocationTypeManager locationTypeManager;
 
     private Logger logger = LoggerFactory.getLogger(ContainerManager.class);
 
-
     public void manageInventory() {
+    }
 
+    public void syncLocationTypes() {
+        locationTypeManager.syncLocationTypes();
     }
 }

@@ -46,6 +46,7 @@ public class RestResultIterator<T> implements Iterator {
     /**
      * constructor
      * @param c the pre-configured RestClient
+     * @param svc the RestReplyParser for the current request
      * @param p if the request parameters page[offset] and page[limit] should be added to the request.
      * The values for offset and limit are 0 and 20, respectively.
      */

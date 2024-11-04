@@ -21,6 +21,7 @@ import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.SignalsEntityConfig;
 import de.ipb_halle.signals.entity.SignalsEntityManager;
 import de.ipb_halle.signals.inventory.InventoryConfig;
+import de.ipb_halle.signals.inventory.InventoryManager;
 import de.ipb_halle.signals.materials.LibraryManager;
 import de.ipb_halle.signals.materials.MaterialsConfig;
 import de.ipb_halle.signals.users.AccessConfig;
@@ -71,6 +72,9 @@ public class Signals {
     private AccessManager accessManager;
 
     @Inject
+    private InventoryManager inventoryManager;
+
+    @Inject
     private LibraryManager libraryManager;
 
     @Inject
@@ -107,7 +111,6 @@ public class Signals {
             .build();
 
 
-
     /**
      * default constructor
      */
@@ -122,7 +125,7 @@ public class Signals {
         accessConfig = new AccessConfig(signalsConfig,
                 runtimeConfig, accessManager);
         inventoryConfig = new InventoryConfig(signalsConfig,
-                runtimeConfig, null);
+                runtimeConfig, inventoryManager);
         materialsConfig = new MaterialsConfig(signalsConfig,
                 runtimeConfig, libraryManager);
         signalsEntityConfig = new SignalsEntityConfig(signalsConfig,
