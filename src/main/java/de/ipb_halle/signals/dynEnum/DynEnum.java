@@ -59,17 +59,6 @@ public abstract class DynEnum <T> {
         value = v;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if ((o != null) && o.getClass().equals(this.getClass())) {
-            DynEnum e = (DynEnum) o;
-            if ((getValue() != null) && getValue().equals(e.getValue())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public Integer getId() {
         return id;
     }
@@ -83,6 +72,16 @@ public abstract class DynEnum <T> {
         return value;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if ((o != null) && o.getClass().equals(this.getClass())) {
+            DynEnum e = (DynEnum) o;
+            if ((getValue() != null) && getValue().equals(e.getValue())) {
+                return true;
+            }
+        }
+        return false;
+    }
     @Override
     public int hashCode() {
         return value.hashCode() + this.getClass().hashCode();

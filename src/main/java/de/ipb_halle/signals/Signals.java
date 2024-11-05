@@ -36,7 +36,6 @@ import jakarta.inject.Inject;
 
 import javax.naming.Context;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -132,8 +131,8 @@ public class Signals {
                 runtimeConfig, signalsEntityManager);
     }
 
-    public void dumpEntities(String[] dateRangeArgs) {
-        signalsEntityConfig.dumpEntities(dateRangeArgs);
+    public void dumpEntities(Date[] dateRange) {
+        signalsEntityConfig.dumpEntities(dateRange);
     }
 
     private void dumpSet(Set<String> set) {
@@ -163,12 +162,12 @@ public class Signals {
         accessConfig.manageAccess();
     }
 
-    public void manageEntities(String[] dateRangeArgs) {
-        signalsEntityConfig.manageEntities(dateRangeArgs);
+    public void manageEntities(Date[] dateRange) {
+        signalsEntityConfig.manageEntities(dateRange);
     }
 
-    public void manageInventory() {
-        inventoryConfig.manageInventory();
+    public void manageInventory(Date[] dateRange) {
+        inventoryConfig.manageInventory(dateRange);
     }
 
     public void manageMaterials() {

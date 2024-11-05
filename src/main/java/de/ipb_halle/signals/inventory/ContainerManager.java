@@ -51,7 +51,7 @@ public class ContainerManager {
     public void augmentContainer(Container ct) {
         ct.setCreatedBy(userManager.getUser(ct.getCreatedBy().getId()));
         ct.setUpdatedBy(userManager.getUser(ct.getUpdatedBy().getId()));
-        ct.setLocation(locationManager.getLocation(ct.getLocation().getId(), true));
+        ct.setLocation(locationManager.loadById(ct.getLocation().getId(), true));
     }
 
     public Container getDbContainer(String id) {

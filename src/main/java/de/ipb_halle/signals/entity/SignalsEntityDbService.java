@@ -20,10 +20,8 @@ package de.ipb_halle.signals.entity;
 import java.util.*;
 
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
-import de.ipb_halle.signals.users.*;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
-import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;

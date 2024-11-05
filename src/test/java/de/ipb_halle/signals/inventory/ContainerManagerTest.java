@@ -20,6 +20,12 @@ package de.ipb_halle.signals.inventory;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.RuntimeConfig;
+import de.ipb_halle.signals.dynEnum.DynEnum;
+import de.ipb_halle.signals.dynEnum.DynEnumDbService;
+import de.ipb_halle.signals.dynEnum.DynEnumManager;
+import de.ipb_halle.signals.entity.SignalsEntity;
+import de.ipb_halle.signals.entity.SignalsEntityDTO;
+import de.ipb_halle.signals.entity.SignalsEntityDbService;
 import de.ipb_halle.signals.rest.MockRestClient;
 import de.ipb_halle.signals.users.LdapClient;
 import de.ipb_halle.signals.users.MockLdapAdapter;
@@ -82,19 +88,24 @@ public class ContainerManagerTest {
 
     @Module
     @Classes(cdi = true, value = { LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class,
-        MockRestClient.class, SignalsConfig.class,
-        LocationDbService.class, LocationManager.class, LocationRestService.class,
-        GroupDbService.class, GroupManager.class, GroupRestService.class,
-        RoleDbService.class, RoleManager.class, RoleRestService.class,
-        UserDbService.class, UserManager.class, UserRestService.class,
-        ContainerDbService.class, ContainerManager.class, ContainerRestService.class })
+            MockRestClient.class, SignalsConfig.class,
+            SignalsEntity.class, SignalsEntityDTO.class, SignalsEntityDbService.class,
+            DynEnum.class, DynEnumManager.class, DynEnumDbService.class,
+            LocationDbService.class, LocationManager.class, LocationRestService.class,
+            LocationType.class, LocationTypeDbService.class, 
+            GroupDbService.class, GroupManager.class, GroupRestService.class,
+            RoleDbService.class, RoleManager.class, RoleRestService.class,
+            UserDbService.class, UserManager.class, UserRestService.class,
+            ContainerDbService.class, ContainerManager.class, ContainerRestService.class })
     public EjbJar app() {
         return new EjbJar();
     }
 
     @Module
     public PersistenceUnit persistence() {
-        return TestBase.persistence(new String[]{ ContainerType.class.getName()});
+        return TestBase.persistence(new String[]{ ContainerType.class.getName(),
+        DynEnum.class.getName(), LocationType.class.getName(), LocationEntity.class.getName(),
+                SignalsEntity.class.getName()});
     }
 
     @Configuration

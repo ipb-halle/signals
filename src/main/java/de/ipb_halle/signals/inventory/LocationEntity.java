@@ -45,6 +45,8 @@ public class LocationEntity implements ILocation {
     public final static String ATTR_UPDATED_AT = "createdAt";
     public final static String ATTR_UPDATED_BY = "relationships.updatedBy.data.id";
 
+    public final static String ENTITY_TYPE_LOCATION = "location";
+
     @Id
     private String id;
 
@@ -233,5 +235,28 @@ public class LocationEntity implements ILocation {
 
     public void setUpdatedBy(String u) {
         updatedBy = u;
+    }
+
+    @Override
+    public String toString() {
+        return "LocationEntity{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", barcode='" + barcode + '\'' +
+                ", grid=" + grid +
+                ", rows=" + rows +
+                ", columns=" + columns +
+                ", createdAt=" + createdAt +
+                ", createdBy='" + createdBy + '\'' +
+                ", typeId='" + typeId + '\'' +
+                ", typeName='" + typeName + '\'' +
+                ", ancestorId='" + ancestorId + '\'' +
+                ", ancestorName='" + ancestorName + '\'' +
+                ", updatedAt=" + updatedAt +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", type=" + type +
+                ", ancestor=" + ancestor +
+                '}';
     }
 }

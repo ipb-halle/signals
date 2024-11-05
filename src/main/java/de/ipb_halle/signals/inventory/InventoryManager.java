@@ -17,16 +17,13 @@
  */
 package de.ipb_halle.signals.inventory;
 
-import de.ipb_halle.signals.inventory.LocationManager;
-import de.ipb_halle.signals.rest.RestResultIterator;
-import de.ipb_halle.signals.users.UserManager;
-
-import java.util.List;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Date;
 
 /** 
  * Manager for containers, container types, locations 
@@ -49,20 +46,33 @@ public class InventoryManager {
     private ContainerTypeRestService containerTypeRestService;
 
     @Inject
-    private LocationDbService locationDbService;
-
-    @Inject
-    private LocationRestService locationRestService;
+    private LocationManager locationManager;
 
     @Inject
     private LocationTypeManager locationTypeManager;
 
     private Logger logger = LoggerFactory.getLogger(ContainerManager.class);
 
-    public void manageInventory() {
+    public void manageInventory(Date[] dateRange) {
+        fetchLocationTypes();
+        fetchContainerTypes();
+        fetchLocations(dateRange);
+        fetchContainers(dateRange);
     }
 
-    public void syncLocationTypes() {
-        locationTypeManager.syncLocationTypes();
+    public void fetchContainers(Date[] dateRange) {
+
+    }
+
+    public void fetchContainerTypes() {
+
+    }
+
+    public void fetchLocations(Date[] dateRange) {
+        locationManager.fetchLocations(dateRange);
+    }
+
+    public void fetchLocationTypes() {
+        locationTypeManager.fetchLocationTypes();
     }
 }

@@ -18,9 +18,14 @@
 package de.ipb_halle.signals.inventory;
 
 import jakarta.ejb.Stateless;
-import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 /** 
@@ -30,9 +35,33 @@ import jakarta.persistence.PersistenceContext;
 @Stateless
 public class LocationTypeDbService {
 
+    private final static String LOCATION_TYPE_ENTITY_PREFIX = "location:";
+    private final static String LOCATION_TYPE_ENTITY_SUFFIX = ":ivt";
 
     @PersistenceContext(unitName="signalsDB")
     private EntityManager em;
+
+    /**
+     *
+     * @return a set of entity ids of LocationTypes. The entity ids are
+     * prefixed and suffixed to match the form of the entities endpoint
+     * (e.g. "b9fab5b8-6c26-47f8-8694-320c7c439879" is converted
+     * to "location:b9fab5b8-6c26-47f8-8694-320c7c439879:ivt")
+     */
+    public Set<String> getLocationTypIds() {
+        Set<String> entityIds = new HashSet<>();
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<LocationType> criteriaQuery = builder.createQuery(LocationType.class);
+        Root<LocationType> root = criteriaQuery.from(LocationType.class);
+        criteriaQuery.select(root);
+
+        for (LocationType locationType: em.createQuery(criteriaQuery).getResultList()) {
+            entityIds.add(LOCATION_TYPE_ENTITY_PREFIX
+                    + locationType.getId()
+                    + LOCATION_TYPE_ENTITY_SUFFIX);
+        }
+        return entityIds;
+    }
 
     public LocationType loadById(String id) {
         return this.em.find(LocationType.class, id);

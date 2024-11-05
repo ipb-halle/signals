@@ -40,7 +40,6 @@ public class RestHelper {
     public final static String ATTR_DIGEST = "digest";
     public final static String ATTR_ID = "id";
     public final static String ATTR_NAME = "name";
-    public final static String ATTR_RELATIONSHIPS = "relationships";
     public final static String ATTR_TYPE = "type";
 
     public static String formatDate(Date d) {

@@ -37,8 +37,8 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** 
- * Manager for signals locations (inventory/location API endpoint) 
+/**
+ * Manager for signals locations (inventory/location API endpoint)
  */
 
 @Local
@@ -50,7 +50,7 @@ public class LocationRestService implements RestReplyParser<LocationEntity> {
     private RestClient restClient;
 
     private Logger logger = LoggerFactory.getLogger(LocationRestService.class);
-    
+
     public LocationEntity parseReply(JsonElement json) {
         JsonObject j = json.getAsJsonObject();
         JsonObject attributes = j.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
@@ -84,11 +84,11 @@ public class LocationRestService implements RestReplyParser<LocationEntity> {
             return jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA);
 
         } catch(UnexpectedResponseCodeException ue) {
-           logger.warn("Unexpected code");
+            logger.warn("Unexpected response code when fetching location with ID: {}", id, ue);
         } catch(URISyntaxException me) {
-            logger.warn("Malformed URL");
-        } catch(IOException ioe) {
-            logger.warn("IOException",  (Throwable) ioe);
+            logger.warn("Malformed URL for ID: {}", id, me);
+        } catch (IOException ioe) {
+            logger.warn("IOException occurred while fetching location with ID: {}", id, ioe);
         }
         return null;
     }

@@ -26,21 +26,18 @@ import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestResultIterator;
 import de.ipb_halle.signals.rest.RestReplyParser;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jakarta.ejb.Local;
 import jakarta.inject.Inject;
 
 
-/** 
- * Rest service for location types 
+/**
+ * Rest service for location types
  */
 
 @Local
 public class LocationTypeRestService implements RestReplyParser<LocationType> {
 
-    public final String CONTAINER_TYPE_ENDPOINT = "/inventory/types";
+    public final String INVENTORY_TYPES_ENDPOINT = "/inventory/types";
 
     @Inject
     private RestClient restClient;
@@ -58,11 +55,11 @@ public class LocationTypeRestService implements RestReplyParser<LocationType> {
 
     public RestResultIterator<LocationType> doGetLocationTypes() {
         restClient.reset()
-            .setMethod(Method.GET)
-            .setEndpoint(CONTAINER_TYPE_ENDPOINT)
-            .putUriParameter("entityType","location");
+                .setMethod(Method.GET)
+                .setEndpoint(INVENTORY_TYPES_ENDPOINT)
+                .putUriParameter("entityType", LocationEntity.ENTITY_TYPE_LOCATION);
 
-        return new RestResultIterator<> (restClient, this, true);
+        return new RestResultIterator<>(restClient, this, true);
     }
 }
 

@@ -14,11 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- */package de.ipb_halle.signals.entity;
+ */
+package de.ipb_halle.signals.entity;
 
+import de.ipb_halle.signals.DateRangeParser;
 import de.ipb_halle.signals.Signals;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.RuntimeConfig;
+import de.ipb_halle.signals.inventory.LocationEntity;
 import org.apache.commons.cli.*;
 
 import org.slf4j.Logger;
@@ -80,9 +83,10 @@ public class SignalsEntityConfig {
 
     /**
      * constructor
-     * @param config SignalsConfig resource
+     *
+     * @param config        SignalsConfig resource
      * @param runtimeConfig runtime configuration, as defined by command line options.
-     * @param manager the SignalsEntityManager
+     * @param manager       the SignalsEntityManager
      */
     public SignalsEntityConfig(SignalsConfig config, RuntimeConfig runtimeConfig, SignalsEntityManager manager) {
         this.logger = LoggerFactory.getLogger(SignalsEntityConfig.class);
@@ -98,7 +102,7 @@ public class SignalsEntityConfig {
                 EntityType.valueOf("journal"),
                 EntityType.valueOf("assetType"),
                 EntityType.valueOf("asset"),
-                EntityType.valueOf("location"),
+                EntityType.valueOf(LocationEntity.ENTITY_TYPE_LOCATION),
                 EntityType.valueOf("batch"),
                 EntityType.valueOf("container"),
                 EntityType.valueOf("sample"),
@@ -108,11 +112,12 @@ public class SignalsEntityConfig {
 
     private void parseIncludedTypes(String[] args) {
         includedTypes = new EntityType[args.length];
-        for (int i=0; i<args.length; i++) {
+        for (int i = 0; i < args.length; i++) {
             includedTypes[i] = EntityType.valueOf(args[i]);
         }
     }
-    public void manageEntities(String[] dateRangeArgs) {
+
+    public void manageEntities(Date[] dateRange) {
         logger.info("""
 
                 ******************************************************
@@ -123,57 +128,13 @@ public class SignalsEntityConfig {
                 ******************************************************
                 """, signalsConfig.getSnbInstanceName(), new Date().toString());
 
-        try {
-            Date[] dateRange = parseDateRange(dateRangeArgs);
-            signalsEntityManager.fetchSnbEntities(dateRange,
-                    includedTypes,
-                    runtimeConfig);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-
+        signalsEntityManager.fetchSnbEntities(dateRange,
+                includedTypes,
+                runtimeConfig);
     }
 
-    public void dumpEntities(String[] dateRangeArgs) {
-        try {
-            Date[] dateRange = parseDateRange(dateRangeArgs);
-            signalsEntityManager.listEntities(dateRange, includedTypes);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Parser for additional arguments option start and end
-     */
-    private Date[] parseDateRange(String[] dateRange) throws ParseException {
-        Date[] range = new Date[2];
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        range[1] = new Date();
-
-        if ((dateRange == null) || (dateRange.length == 0) || dateRange[0].isEmpty()) {
-            range[0] = getOneWeekAgoDate();
-            logger.info("Fetching last weeks data: {} - {}", range[0], range[1]);
-            return range;
-        }
-        if (dateRange[0].equals("all")) {
-            range[0] = new Date(0); // 1970-01-01
-            logger.info("Fetching ALL data");
-            return range;
-        }
-
-        range[0] = dateFormat.parse(dateRange[0]);
-        if ((dateRange.length > 1) && (!dateRange[1].isEmpty())) {
-            range[1] = dateFormat.parse(dateRange[1]);
-        }
-        logger.info("Fetching specified data range: {} - {}", range[0], range[1]);
-        return range;
-    }
-
-    private Date getOneWeekAgoDate() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.WEEK_OF_YEAR, -1);
-        return calendar.getTime();
+    public void dumpEntities(Date[] dateRange) {
+        signalsEntityManager.listEntities(dateRange, includedTypes);
     }
 
     public static void registerOptions(Options options) {
@@ -184,7 +145,7 @@ public class SignalsEntityConfig {
     }
 
     public static void processCommandLine(CommandLine cmdline, Options options, Signals signals)
-                throws MissingArgumentException, MissingOptionException, UnrecognizedOptionException {
+            throws MissingArgumentException, MissingOptionException, UnrecognizedOptionException, ParseException {
 
         if (cmdline.hasOption(includedTypesOpt.getOpt())) {
             String[] types = cmdline.getOptionValues(includedTypesOpt.getOpt());
@@ -193,12 +154,12 @@ public class SignalsEntityConfig {
 
         if (cmdline.hasOption(syncEntitiesOpt.getOpt())) {
             String[] dateRangeArgs = cmdline.getOptionValues(syncEntitiesOpt.getOpt());
-            signals.manageEntities(dateRangeArgs);
+            signals.manageEntities(DateRangeParser.parseDateRange(dateRangeArgs));
         }
 
         if (cmdline.hasOption(dumpEntitiesOpt.getOpt())) {
             String[] dateRangeArgs = cmdline.getOptionValues(dumpEntitiesOpt.getOpt());
-            signals.dumpEntities(dateRangeArgs);
+            signals.dumpEntities(DateRangeParser.parseDateRange(dateRangeArgs));
         }
     }
 }

@@ -17,6 +17,10 @@
  */
 package de.ipb_halle.signals.inventory;
 
+import de.ipb_halle.signals.entity.EntityType;
+import de.ipb_halle.signals.entity.SignalsEntityDTO;
+import de.ipb_halle.signals.entity.SignalsEntityDbService;
+import de.ipb_halle.signals.entity.SignalsEntityRestService;
 import de.ipb_halle.signals.users.UserManager;
 
 import jakarta.ejb.Stateless;
@@ -25,13 +29,21 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.*;
 
-/** 
- * Manager for signals locations (inventory/location API endpoint) 
+
+/**
+ * Manager for signals locations (inventory/location API endpoint)
  */
 
 @Stateless
 public class LocationManager {
+
+    @Inject
+    private LocationTypeDbService locationTypeDbService;
+
+    @Inject
+    private SignalsEntityDbService signalsEntityDbService;
 
     @Inject
     private LocationDbService dbService;
@@ -42,38 +54,51 @@ public class LocationManager {
     @Inject
     private UserManager userManager;
 
-    private Logger logger =  LoggerFactory.getLogger(ContainerManager.class);
+    private Logger logger = LoggerFactory.getLogger(ContainerManager.class);
 
     public void augmentLocation(LocationEntity loc) {
 /*
-
-        cannot yet augment LocationEntity (need to introduce DTO) 
+        cannot yet augment LocationEntity (need to introduce DTO)
 
         loc.setCreatedBy(userManager.getUser(loc.getCreatedBy().getId()));
         loc.setUpdatedBy(userManager.getUser(loc.getUpdatedBy().getId()));
 */
     }
 
-    public LocationEntity getSnbLocation(String id) {
-        return restService.doGetLocation(id);
-    }
-
-    public LocationEntity getDbLocation(String id) {
+    public LocationEntity loadById(String id, boolean augmented) {
         return dbService.loadById(id);
     }
 
-    public LocationEntity getLocation(String id, boolean augmented) {
-        LocationEntity loc = dbService.loadById(id);
-        if (loc == null) {
-            loc = restService.doGetLocation(id);
+    public void fetchLocations(Date[] dateRange) {
+        Set<String> locationTypeIds = locationTypeDbService.getLocationTypIds();
+        EntityType entityTypes[] = { EntityType.valueOf(LocationEntity.ENTITY_TYPE_LOCATION) };
+        Map<String, Object> cmap = new HashMap<>();
+        cmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
+        cmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
+        cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, entityTypes );
+        List<SignalsEntityDTO> locations = signalsEntityDbService.load(cmap);
+        for (SignalsEntityDTO entityDTO : locations) {
+            if (!locationTypeIds.contains(entityDTO.getId())) {
+                fetchSingleLocation(entityDTO);
+            }
         }
-        if (augmented) {
-            augmentLocation(loc);
-        }
-        return loc;
+    }
+
+    /**
+     * fetch single location via inventory/location/EID endpoint and
+     * save the entity in the database.
+     *
+     * @param entityDTO
+     * @return the location entity
+     */
+    public LocationEntity fetchSingleLocation(SignalsEntityDTO entityDTO) {
+        LocationEntity location = restService.doGetLocation(entityDTO.getId());
+        dbService.save(location);
+        return location;
     }
 
     public void save(LocationEntity loc) {
         dbService.save(loc);
     }
+
 }

@@ -17,8 +17,6 @@
  */
 package de.ipb_halle.signals.inventory;
 
-import java.util.List;
-
 import de.ipb_halle.signals.rest.RestResultIterator;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
@@ -37,11 +35,15 @@ public class LocationTypeManager {
     private LocationTypeRestService restService;
 
 
-    public LocationType loadById(String id) {
+    public LocationType loadById(String id, boolean augment) {
         return dbService.loadById(id);
     }
 
-    public void syncLocationTypes() {
+    /**
+     * Fetch all location types from Signals Notebook and
+     * update the local database.
+     */
+    public void fetchLocationTypes() {
         RestResultIterator<LocationType> locationTypeIterator = restService.doGetLocationTypes();
         while (locationTypeIterator.hasNext()) {
             dbService.save(locationTypeIterator.next());

@@ -17,8 +17,15 @@
  */
 package de.ipb_halle.signals.inventory;
 
+import de.ipb_halle.signals.DateRangeParser;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
+import de.ipb_halle.signals.dynEnum.DynEnum;
+import de.ipb_halle.signals.dynEnum.DynEnumDbService;
+import de.ipb_halle.signals.dynEnum.DynEnumManager;
+import de.ipb_halle.signals.entity.SignalsEntity;
+import de.ipb_halle.signals.entity.SignalsEntityDTO;
+import de.ipb_halle.signals.entity.SignalsEntityDbService;
 import de.ipb_halle.signals.rest.MockRestClient;
 import de.ipb_halle.signals.users.LdapClient;
 import de.ipb_halle.signals.users.MockLdapAdapter;
@@ -32,7 +39,9 @@ import de.ipb_halle.signals.users.RoleRestService;
 import de.ipb_halle.signals.users.UserDbService;
 import de.ipb_halle.signals.users.UserManager;
 import de.ipb_halle.signals.users.UserRestService;
+
 import java.util.Properties;
+
 import jakarta.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,8 +64,8 @@ import static org.junit.Assert.assertThrows;
 public class LocationManagerTest {
 
     private final String TEST_RESOURCE_1 = "LocationManagerTest001.json";
-    private final String TEST_KEY_1 = 
-        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/locations/cfa1802a-6470-42b3-8c8b-9fe025c82717";
+    private final String TEST_KEY_1 =
+            "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/locations/cfa1802a-6470-42b3-8c8b-9fe025c82717";
     private final String TEST_LOCATION_ID = "cfa1802a-6470-42b3-8c8b-9fe025c82717";
     private final String TEST_LOCATION_BARCODE = "0000000005";
     private final String TEST_LOCATION_NAME = "R-ABC";
@@ -67,20 +76,29 @@ public class LocationManagerTest {
     @Inject
     private LocationManager manager;
 
+    @Inject
+    private DynEnumManager dynEnumManager;
+
     @Module
-    @Classes(cdi = true, value = { LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class,
-        MockRestClient.class, SignalsConfig.class,
-        GroupDbService.class, GroupManager.class, GroupRestService.class,
-        RoleDbService.class, RoleManager.class, RoleRestService.class, 
-        UserDbService.class, UserManager.class, UserRestService.class,
-        LocationDbService.class, LocationManager.class, LocationRestService.class })
+    @Classes(cdi = true, value = {LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class,
+            MockRestClient.class, SignalsConfig.class,
+            DynEnum.class, DynEnumDbService.class, DynEnumManager.class,
+            SignalsEntity.class, SignalsEntityDTO.class, SignalsEntityDbService.class,
+            GroupDbService.class, GroupManager.class, GroupRestService.class,
+            RoleDbService.class, RoleManager.class, RoleRestService.class,
+            UserDbService.class, UserManager.class, UserRestService.class,
+            LocationType.class, LocationTypeDbService.class,
+            LocationDbService.class, LocationManager.class, LocationRestService.class})
     public EjbJar app() {
         return new EjbJar();
     }
 
     @Module
     public PersistenceUnit persistence() {
-        return TestBase.persistence(new String[]{ LocationType.class.getName()});
+        return TestBase.persistence(new String[]{LocationType.class.getName(),
+                LocationEntity.class.getName(), DynEnum.class.getName(),
+                SignalsEntity.class.getName()
+        });
     }
 
     @Configuration
@@ -90,20 +108,21 @@ public class LocationManagerTest {
 
     @Before
     public void testSetup() {
+        dynEnumManager.allowEnumDiscovery();
         TestBase.prepareRestClients(mockRestClient,
-            TEST_KEY_1,
-            getClass().getResourceAsStream(TEST_RESOURCE_1));
+                TEST_KEY_1,
+                getClass().getResourceAsStream(TEST_RESOURCE_1));
     }
 
 
     @Test
     public void locationManagerTest() {
+        SignalsEntityDTO dto = new SignalsEntityDTO();
+        dto.setId(TEST_LOCATION_ID);
+        manager.fetchSingleLocation(dto);
 
-        LocationEntity loc = manager.getSnbLocation(TEST_LOCATION_ID);
-        manager.save(loc);
+        LocationEntity loc = manager.loadById(TEST_LOCATION_ID, false);
         assertEquals("Location name mismatch", TEST_LOCATION_NAME, loc.getName());
-
-        loc = manager.getDbLocation(TEST_LOCATION_ID);
         assertEquals("Location barcode mismatch", TEST_LOCATION_BARCODE, loc.getBarcode());
     }
 }

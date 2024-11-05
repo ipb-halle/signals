@@ -18,16 +18,16 @@
 package de.ipb_halle.signals.inventory;
 
 
+import de.ipb_halle.signals.DateRangeParser;
 import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.Signals;
 import de.ipb_halle.signals.SignalsConfig;
-import de.ipb_halle.signals.materials.LibraryManager;
-import de.ipb_halle.signals.materials.MaterialsConfig;
 import org.apache.commons.cli.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.ParseException;
 import java.util.Date;
 
 public class InventoryConfig {
@@ -35,7 +35,13 @@ public class InventoryConfig {
     @SuppressWarnings("static-access")
     private static final Option inventorySyncOpt = Option.builder("iS")
             .longOpt("inventorySync")
-            .desc("\nSynchronize location types, container types, locations and containers from SNB to DB.")
+            .hasArgs()
+            .argName("=all | =START[:END]")
+            .valueSeparator(':')
+            .optionalArg(true)
+            .desc("""
+                    \nSynchronize location types, container types, locations and containers 
+                    from SNB to DB. Date interval can be specified optionally, see --entitiesSync for details.""")
             .build();
 
 
@@ -54,7 +60,7 @@ public class InventoryConfig {
         this.signalsConfig = signalsConfig;
     }
 
-    public void manageInventory() {
+    public void manageInventory(Date[] dateRange) {
         logger.info("""
 
                 ******************************************************
@@ -64,7 +70,7 @@ public class InventoryConfig {
                 *
                 ******************************************************
                 """, signalsConfig.getSnbInstanceName(), new Date().toString());
-        inventoryManager.syncLocationTypes();
+        inventoryManager.manageInventory(dateRange);
     }
 
     public static void registerOptions(Options options) {
@@ -78,10 +84,11 @@ public class InventoryConfig {
      * @param options the defined options
      * @param signals the current Signals instance
      */
-    public static void processCommandLine(CommandLine cmdline, Options options, Signals signals) {
+    public static void processCommandLine(CommandLine cmdline, Options options, Signals signals) throws ParseException {
 
         if (cmdline.hasOption(inventorySyncOpt.getOpt())) {
-            signals.manageInventory();
+            String[] dateRangeArgs = cmdline.getOptionValues(inventorySyncOpt.getOpt());
+            signals.manageInventory(DateRangeParser.parseDateRange(dateRangeArgs));
         }
     }
 }

@@ -86,9 +86,9 @@ public class LocationTypeManagerTest {
     @Test
     public void locationTypeManagerTest() {
 
-        locationTypeManager.syncLocationTypes();
+        locationTypeManager.fetchLocationTypes();
 
-        LocationType lt = locationTypeManager.loadById(TEST_LOCATION_TYPE_ID);
+        LocationType lt = locationTypeManager.loadById(TEST_LOCATION_TYPE_ID, false);
         assertEquals("LocationType name mismatch", TEST_LOCATION_TYPE_NAME, lt.getName());
     }
 }
