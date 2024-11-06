@@ -18,9 +18,12 @@
 package de.ipb_halle.signals.materials;
 
 
+import de.ipb_halle.signals.DateRangeParser;
 import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.Signals;
 import de.ipb_halle.signals.SignalsConfig;
+
+import java.text.ParseException;
 import java.util.Date;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
@@ -31,6 +34,10 @@ public class MaterialsConfig {
     @SuppressWarnings("static-access")
     private static final Option materialsSyncOpt = Option.builder("mS")
             .longOpt("materialsSync")
+            .hasArgs()
+            .argName("=all | =START[:END]")
+            .valueSeparator(':')
+            .optionalArg(true)
             .desc("\nSynchronize materials libraries and materials from SNB to DB.")
             .build();
 
@@ -46,7 +53,7 @@ public class MaterialsConfig {
         this.signalsConfig = signalsConfig;
     }
 
-    public void manageMaterials() {
+    public void manageMaterials(Date[] dateRange) {
         logger.info("""
 
                 ******************************************************
@@ -57,7 +64,7 @@ public class MaterialsConfig {
                 ******************************************************
                 """, signalsConfig.getSnbInstanceName(), new Date().toString());
 
-        libraryManager.manageMaterials(runtimeConfig);
+        libraryManager.manageLibraries(runtimeConfig);
     }
 
 
@@ -73,10 +80,11 @@ public class MaterialsConfig {
      * @param signals the current Signals instance
      */
     public static void processCommandLine(CommandLine cmdline, Options options, Signals signals)
-            throws MissingArgumentException, MissingOptionException, UnrecognizedOptionException {
+            throws MissingArgumentException, MissingOptionException, UnrecognizedOptionException, ParseException {
 
         if (cmdline.hasOption(materialsSyncOpt.getOpt())) {
-            signals.manageMaterials();
+            String[] dateRangeArgs = cmdline.getOptionValues(materialsSyncOpt.getOpt());
+            signals.manageMaterials(DateRangeParser.parseDateRange(dateRangeArgs));
         }
     }
 }

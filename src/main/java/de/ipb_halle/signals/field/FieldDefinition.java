@@ -31,12 +31,12 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-/** 
+/**
  * Field definition entity
  */
 
 @Entity
-@Table(name="field_definitions")
+@Table(name = "field_definitions")
 public class FieldDefinition {
 
 
@@ -53,9 +53,9 @@ public class FieldDefinition {
     public final static String ATTR_KEY = "key";
     public final static String ATTR_MEASURE_OPTIONS = "measureOptions";
     public final static String ATTR_MEASURES = "measures";
-    public final static String ATTR_MULTISELECT = "multiSelect";
+    //public final static String ATTR_MULTISELECT = "multiSelect";
     public final static String ATTR_OPTIONS = "options";
-    public final static String ATTR_READ_ONLY = "readOnly";
+    // public final static String ATTR_READ_ONLY = "readOnly";
     public final static String ATTR_REQUIRED = "isRequired";
     public final static String ATTR_MANDATORY = "mandatory";
     public final static String ATTR_TITLE = "title";
@@ -67,23 +67,23 @@ public class FieldDefinition {
     /**
      * referred by ATTR_ATTRIBUTE_LIST_EID and ATTR_ATTRIBUTE
      */
-    @Column(name="attribute_list_eid")
+    @Column(name = "attribute_list_eid")
     private String attributeListEid;
 
     @Column
     private Boolean calculated;
 
-    @Column(name="default_unit")
+    @Column(name = "default_unit")
     private String defaultUnit;
 
-    @Column(name="defined_by")
+    @Column(name = "defined_by")
     private String definedBy;
 
     /**
      * referred by ATTR_FIELD_TYPE and ATTR_DATA_TYPE
      */
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="field_type")
+    @JoinColumn(name = "field_type")
     private FieldType fieldType;
 
     @Column
@@ -95,18 +95,18 @@ public class FieldDefinition {
     /**
      * referred by ATTR_MEASURE_OPTIONS and ATTR_MEASURES
      */
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch=FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "field_id")
     private Set<FieldMeasure> measures;
 
-    @Column(name="multiselect")
+    @Column(name = "multiselect")
     private Boolean multiSelect;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch=FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "field_id")
     private Set<FieldOption> options;
-    
-    @Column(name="read_only")
+
+    @Column(name = "read_only")
     private Boolean readOnly;
 
     /**
@@ -119,9 +119,9 @@ public class FieldDefinition {
      * referred by ATTR_TITLE and RestHelper.ATTR_NAME
      */
     @Column
-    private String title; 
+    private String title;
 
-    @Column(name="user_defined")
+    @Column(name = "user_defined")
     private Boolean userDefined;
 
 
@@ -129,8 +129,8 @@ public class FieldDefinition {
      * default constructor
      */
     public FieldDefinition() {
-        measures = new HashSet<> ();
-        options = new HashSet<> ();
+        measures = new HashSet<>();
+        options = new HashSet<>();
     }
 
     public FieldDefinition addMeasure(Quality q) {

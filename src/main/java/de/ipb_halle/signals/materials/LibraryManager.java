@@ -47,10 +47,6 @@ public class LibraryManager {
         return dbService.loadById(id);
     }
 
-    public List<Library> getSnbLibraries() {
-        return restService.doGetLibraries();
-    }
-
     public void save(RuntimeConfig config, List<Library> libraries) {
         for (Library lib : libraries) {
             logger.debug("materials library save({})", lib.getAssetDisplayName());
@@ -60,14 +56,18 @@ public class LibraryManager {
         }
     }
 
-
-    public void manageMaterials(RuntimeConfig config) {
-        syncLibraries(config);
+    public void manageLibraries(RuntimeConfig config) {
+        fetchLibraries(config);
     }
 
-    private void syncLibraries(RuntimeConfig config) {
-        List<Library> libraries = getSnbLibraries();
-        save(config, libraries);
+
+    private void fetchLibraries(RuntimeConfig config) {
+        List<Library> libraries = restService.doGetLibraries();
+        for (Library lib : libraries) {
+            if (config.updateDb) {
+                dbService.save(lib);
+            }
+        }
     }
 }
 

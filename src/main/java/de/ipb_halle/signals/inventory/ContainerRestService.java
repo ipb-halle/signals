@@ -22,7 +22,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import de.ipb_halle.signals.field.FieldValueRestService;
+import de.ipb_halle.signals.field.FieldValueParser;
 import de.ipb_halle.signals.entity.Unit;
 import de.ipb_halle.signals.materials.MaterialReference;
 import de.ipb_halle.signals.rest.Method;
@@ -117,7 +117,7 @@ public class ContainerRestService implements RestReplyParser<Container> {
 
     private void parseFieldValues(JsonArray jArray, Container ct) {
         Iterator<JsonElement> iter = jArray.iterator();
-        FieldValueRestService svc = new FieldValueRestService();
+        FieldValueParser svc = new FieldValueParser();
         while (iter.hasNext()) {
             ct.addFieldValue(svc.parseReply(iter.next()));
         }

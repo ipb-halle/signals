@@ -17,13 +17,13 @@
  */
 package de.ipb_halle.signals.field;
 
-import java.util.Objects;
-
 import de.ipb_halle.signals.entity.Quality;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
+
+import java.util.Objects;
 
 
 /** 

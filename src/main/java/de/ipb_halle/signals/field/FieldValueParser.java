@@ -31,7 +31,7 @@ import de.ipb_halle.signals.rest.RestReplyParser;
  * service for field values (not a real REST service)
  */
 
-public class FieldValueRestService implements RestReplyParser<FieldValue> {
+public class FieldValueParser implements RestReplyParser<FieldValue> {
 
 
     /**

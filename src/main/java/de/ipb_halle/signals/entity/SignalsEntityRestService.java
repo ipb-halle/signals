@@ -19,27 +19,17 @@ package de.ipb_halle.signals.entity;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
-import de.ipb_halle.signals.rest.Method;
-import de.ipb_halle.signals.rest.RestClient;
-import de.ipb_halle.signals.rest.RestHelper;
-import de.ipb_halle.signals.rest.RestResultIterator;
-import de.ipb_halle.signals.rest.RestReplyParser;
-import de.ipb_halle.signals.users.IUser;
-import de.ipb_halle.signals.users.UserReference;
-
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
-
+import de.ipb_halle.signals.rest.*;
 import de.ipb_halle.signals.users.UserReference;
 import jakarta.ejb.Local;
 import jakarta.inject.Inject;
+
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 /**

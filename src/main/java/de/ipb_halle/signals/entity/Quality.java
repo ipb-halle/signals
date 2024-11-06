@@ -17,9 +17,6 @@
  */
 package de.ipb_halle.signals.entity;
 
-import java.util.Map;
-import java.util.HashMap;
-
 /**
  * Physical quality of units of measurement
  *

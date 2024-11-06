@@ -170,8 +170,8 @@ public class Signals {
         inventoryConfig.manageInventory(dateRange);
     }
 
-    public void manageMaterials() {
-        materialsConfig.manageMaterials();
+    public void manageMaterials(Date[] dateRange) {
+        materialsConfig.manageMaterials(dateRange);
     }
 
     public static Signals getInstance(String fname) {

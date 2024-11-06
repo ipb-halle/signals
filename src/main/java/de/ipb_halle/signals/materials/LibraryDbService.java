@@ -55,7 +55,7 @@ public class LibraryDbService {
 
     private Logger logger = LoggerFactory.getLogger(LibraryDbService.class);
 
-
+/*
     private List<FieldDefinition> loadFieldDefinitions(String id, String type) {
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<LibraryFieldDefinition> criteriaQuery = builder.createQuery(LibraryFieldDefinition.class);
@@ -75,22 +75,29 @@ public class LibraryDbService {
         }
         return result;
     }
-
+*/
     
     public Library loadById(String id) {
         logger.debug("Load library: id={}", id);
         LibraryEntity entity = em.find(LibraryEntity.class, id);
-        return new Library(entity, 
+        return new Library(entity);
+            /*
+            ToDo: load FieldDefinitions via FieldDefinitionDbService
             loadFieldDefinitions(id, ASSET),
             loadFieldDefinitions(id, BATCH));
+             */
     }
 
     public void save(Library lib) {
         logger.debug("Store library: id={}", lib.getId());
         LibraryEntity le = lib.createEntity();
         em.merge(le);
+        /*
+         * ToDo: should be delegated to FieldDefinitionDbService
+         *
         saveFieldDefinitions(lib.getAssetFieldDefinitions(), le.getId(), ASSET);
         saveFieldDefinitions(lib.getBatchFieldDefinitions(), le.getId(), BATCH);
+         */
     }
 
     private void saveFieldDefinitions(Set<FieldDefinition> fieldDefinitions, String libraryId, String type) {

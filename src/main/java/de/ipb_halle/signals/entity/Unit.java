@@ -31,7 +31,7 @@ import java.util.Map;
 public class Unit implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    /* physical quantity */
+    /* physical quality */
     private Quality quality;
 
     /* unit string - e.g. mM */
@@ -155,14 +155,14 @@ public class Unit implements Serializable {
     }
 
     /**
-     * @return conversion factor to the base unit of the quantity
+     * @return conversion factor to the base unit of the quality
      */
     public double getFactor() {
         return this.factor;
     }
 
     /**
-     * @return the quantity of the unit
+     * @return the quality of the unit
      */
     public Quality getQuality() {
         return this.quality;
@@ -233,11 +233,11 @@ public class Unit implements Serializable {
 
     /**
      * return the proportionality factor to convert this unit into the target unit
-     * using a second physical quantity (e.g. transform masses into volumes using
+     * using a second physical quality (e.g. transform masses into volumes using
      * density as factor of proportionality)
      *
      * @param target     target unit (e.g. cubic centimeters)
-     * @param propFactor the quantity (e.g. 7.87 for iron density at room
+     * @param propFactor the quality (e.g. 7.87 for iron density at room
      *                   temperature)
      * @param propUnit   the unit (e.g. g / cm^3 for density)
      * @return the factor of proportionality for conversion (e.g. approx. 0.127 for

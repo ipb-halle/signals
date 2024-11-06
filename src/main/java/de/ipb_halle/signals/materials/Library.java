@@ -83,8 +83,10 @@ public class Library {
         assetFieldDefinitions = new HashSet<> ();
         batchFieldDefinitions = new HashSet<> ();
     }
-
-    public Library (LibraryEntity le, List<FieldDefinition> assetFD, List<FieldDefinition> batchFD) {
+    /*
+     * public Library (LibraryEntity le, List<FieldDefinition> assetFD, List<FieldDefinition> batchFD)
+     */
+    public Library (LibraryEntity le) {
         id = le.getId();
 
         assetDisplayName = le.getAssetDisplayName();
@@ -106,9 +108,11 @@ public class Library {
         uniqueness = le.getUniqueness();
 
         assetFieldDefinitions = new HashSet<> ();
-        assetFieldDefinitions.addAll(assetFD);
         batchFieldDefinitions = new HashSet<> ();
+        /*
+        assetFieldDefinitions.addAll(assetFD);
         batchFieldDefinitions.addAll(batchFD);
+         */
     }
 
     public LibraryEntity createEntity() {
