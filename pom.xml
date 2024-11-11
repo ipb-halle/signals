@@ -357,6 +357,7 @@
             <version>5.8.2</version>
             <scope>test</scope>
         </dependency>
+
         <!-- keeps old JUnit4 tests functional -->
         <dependency>
             <groupId>org.junit.vintage</groupId>

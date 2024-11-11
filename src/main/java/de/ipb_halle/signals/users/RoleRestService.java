@@ -59,7 +59,7 @@ public class RoleRestService implements RestReplyParser<Role> {
         JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
         Role role = new Role();
-        role.setDescription(attributes.getAsJsonPrimitive(Role.ATTR_DESCRIPTION).getAsString());
+        role.setDescription(attributes.getAsJsonPrimitive(RestHelper.ATTR_DESCRIPTION).getAsString());
         role.setId(j.getAsJsonObject().getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
         role.setName(attributes.getAsJsonPrimitive(Role.ATTR_NAME).getAsString());
         parsePrivileges(attributes.getAsJsonObject(Role.ATTR_PRIVILEGES), role);

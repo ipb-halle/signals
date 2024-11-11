@@ -48,7 +48,7 @@ public class LocationTypeRestService implements RestReplyParser<LocationType> {
         JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
         lt.setId(attributes.getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
-        lt.setDescription(attributes.getAsJsonPrimitive(LocationType.ATTR_DESCRIPTION).getAsString());
+        lt.setDescription(attributes.getAsJsonPrimitive(RestHelper.ATTR_DESCRIPTION).getAsString());
         lt.setName(attributes.getAsJsonPrimitive(LocationType.ATTR_NAME).getAsString());
         return lt;
     }

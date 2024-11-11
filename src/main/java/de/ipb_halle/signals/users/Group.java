@@ -41,7 +41,6 @@ public class Group implements IGroup {
     public final static String ATTR_ASSOCIATE_TYPE_ADD = "ADD";
     public final static String ATTR_ASSOCIATE_TYPE_REMOVE = "REMOVE";
     public final static String ATTR_CREATED_AT= "createdAt";
-    public final static String ATTR_DESCRIPTION = "description";
     public final static String ATTR_DIGEST = "digest";
     public final static String ATTR_EDITED_AT= "editedAt";
     public final static String ATTR_EID = "eid";

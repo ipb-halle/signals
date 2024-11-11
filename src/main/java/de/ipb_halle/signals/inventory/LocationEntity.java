@@ -37,7 +37,6 @@ public class LocationEntity implements ILocation {
     public final static String ATTR_BARCODE = "barcode";
     public final static String ATTR_CREATED_AT = "createdAt";
     public final static String ATTR_CREATED_BY = "relationships.createdBy.data.id";
-    public final static String ATTR_DESCRIPTION = "description";
     public final static String ATTR_GRID = "isGrid";
     public final static String ATTR_NAME = "name";
     public final static String ATTR_TYPE_ID = "typeId";

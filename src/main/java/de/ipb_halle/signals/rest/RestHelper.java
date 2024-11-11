@@ -37,6 +37,7 @@ public class RestHelper {
     // common attribute names
     public final static String ATTR_ATTRIBUTES = "attributes";
     public final static String ATTR_DATA = "data";
+    public final static String ATTR_DESCRIPTION = "description";
     public final static String ATTR_DIGEST = "digest";
     public final static String ATTR_ID = "id";
     public final static String ATTR_NAME = "name";

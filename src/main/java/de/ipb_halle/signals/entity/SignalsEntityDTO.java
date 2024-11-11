@@ -27,7 +27,6 @@ import java.util.List;
 public class SignalsEntityDTO {
 
     public final static String ATTR_EID = "eid";
-    public final static String ATTR_DESCRIPTION = "description";
     public final static String ATTR_CREATED_AT = "createdAt";
     public final static String ATTR_EDITED_AT = "editedAt";
     public final static String ATTR_CREATED_BY = "relationships.createdBy.data.id";

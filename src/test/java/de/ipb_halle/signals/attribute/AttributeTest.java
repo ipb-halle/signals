@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.entity;
+package de.ipb_halle.signals.attribute;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -43,31 +43,36 @@ import java.util.Properties;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(ApplicationComposer.class)
-public class SignalsEntityTest {
+public class AttributeTest {
 
-    private final String TEST_RESOURCE = "SignalsEntityTest001.json";
-    private final String TEST_ID = "location:44ab8051-81fe-4f48-b251-8f629a89ddf4:ivt";
+    private final String TEST_RESOURCE = "AttributeTest001.json";
+    private final String TEST_ID_1 = "attribute:1234";
+    private final String TEST_ID_2 = "attribute:17";
 
 
     @Inject
-    private SignalsEntityRestService restService;
+    private AttributeDbService dbService;
 
     @Inject
     private DynEnumManager dynEnumMgr;
 
     @Module
-    @Classes(cdi = true, value = { DynEnum.class, EntityType.class,
-            DynEnumDbService.class, DynEnumManager.class, SignalsConfig.class,
-            RestClient.class, MockRestClient.class, RestReplyParser.class,
-            SignalsEntity.class, SignalsEntityDTO.class, SignalsEntityRestService.class})
+    @Classes(cdi = true, value = {
+            Attribute.class, AttributeType.class, AttributeDefinition.class, AttributeValue.class,
+            AttributeDbService.class,
+            DynEnum.class, DynEnumDbService.class, DynEnumManager.class,
+            SignalsConfig.class,
+            RestClient.class, MockRestClient.class, RestReplyParser.class
+            })
     public EjbJar app() {
         return new EjbJar();
     }
 
     @Module
     public PersistenceUnit persistence() {
-        return TestBase.persistence(new String[]{ SignalsEntity.class.getName(),
-        DynEnum.class.getName(), EntityType.class.getName()});
+        return TestBase.persistence(new String[]{ AttributeDefinition.class.getName(),
+                AttributeType.class.getName(), AttributeValue.class.getName(),
+                DynEnum.class.getName()});
     }
 
     @Configuration
@@ -83,14 +88,20 @@ public class SignalsEntityTest {
     @Test
     public void entityTest() {
 
-        String test = TestBase.readStream(
-                    getClass().getResourceAsStream(TEST_RESOURCE));
-        JsonElement j = JsonParser.parseString(test);
-        SignalsEntityDTO dto = restService.parseReply(j);
+        Attribute attr = new Attribute();
+        attr.setId(TEST_ID_1);
+        attr.setName("testAttribute");
+        attr.setType((AttributeType) dynEnumMgr.valueOf(AttributeType.valueOf(AttributeType.CHOICE)));
+        attr.addOption("gestern");
+        attr.addOption("heute");
+        attr.addOption("morgen");
 
-        assertEquals("id matches", TEST_ID, dto.getId());
+        dbService.save(attr);
 
-        SignalsEntity entity = dto.createEntity();
-        assertEquals("id matches", TEST_ID, entity.getId());
+        Attribute fromDb = dbService.loadById(TEST_ID_1);
+
+        assertEquals("id matches", TEST_ID_1, fromDb.getId());
+        assertEquals("name matches", "testAttribute", fromDb.getName());
+        assertEquals("option count matches", 3, fromDb.getOptions().size());
     }
 }

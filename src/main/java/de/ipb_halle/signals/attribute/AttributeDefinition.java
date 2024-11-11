@@ -1,6 +1,6 @@
 /*
  * IPB Signals client
- * Copyright 2022 Leibniz-Institut f. Pflanzenbiochemie
+ * Copyright 2024 Leibniz-Institut f. Pflanzenbiochemie
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,35 +15,33 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.inventory;
+package de.ipb_halle.signals.attribute;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 /** 
- * Single signals entity (entities API endpoint) 
+ * Signals Attribute definition
  */
 
 @Entity
-@Table(name="location_types")
-public class LocationType {
-
-    public final static String ATTR_NAME = "name";
+@Table(name="attribute_definitions")
+public class AttributeDefinition {
 
     @Id
     private String id;
+
+    @Column(name = "attr_type")
+    private Integer type;
 
     @Column
     private String name;
 
     @Column
-    private String description;
+    private String format;
 
     public String dump() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("LocationType(%s): %s\n", id, name));
+        sb.append(String.format("AttributeDefinition(%s) --> %d\n", id,  type));
         return sb.toString();
     }
 
@@ -51,23 +49,31 @@ public class LocationType {
         return id;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public String getName() {
-        return name;
+    public Integer getType() {
+        return type;
     }
 
     public void setId(String i) {
         id = i;
     }
 
-    public void setDescription(String d) {
-        description = d;
+    public void setType(Integer t) {
+        type = t;
     }
 
-    public void setName(String n) {
-        name = n;
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
     }
 }

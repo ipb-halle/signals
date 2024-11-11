@@ -18,18 +18,15 @@
 package de.ipb_halle.signals.entity;
 
 import de.ipb_halle.signals.DateRangeParser;
+import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.Signals;
 import de.ipb_halle.signals.SignalsConfig;
-import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.inventory.LocationEntity;
 import org.apache.commons.cli.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 public class SignalsEntityConfig {
@@ -98,13 +95,14 @@ public class SignalsEntityConfig {
 
     private void setupDefaultIncludedTypes() {
         includedTypes = new EntityType[]{
-                EntityType.valueOf("experiment"),
-                EntityType.valueOf("journal"),
-                EntityType.valueOf("assetType"),
                 EntityType.valueOf("asset"),
-                EntityType.valueOf(LocationEntity.ENTITY_TYPE_LOCATION),
+                EntityType.valueOf("assetType"),
+                EntityType.valueOf("attribute"),
                 EntityType.valueOf("batch"),
                 EntityType.valueOf("container"),
+                EntityType.valueOf("experiment"),
+                EntityType.valueOf("journal"),
+                EntityType.valueOf(LocationEntity.ENTITY_TYPE_LOCATION),
                 EntityType.valueOf("sample"),
                 EntityType.valueOf("text")
         };

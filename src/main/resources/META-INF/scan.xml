@@ -3,6 +3,7 @@
     <classes/>
     <packages>
         <package>de.ipb_halle.signals</package>
+        <package>de.ipb_halle.signals.attribute</package>
         <package>de.ipb_halle.signals.dynEnum</package>
         <package>de.ipb_halle.signals.entity</package>
         <package>de.ipb_halle.signals.inventory</package>

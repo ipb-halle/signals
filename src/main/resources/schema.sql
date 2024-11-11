@@ -22,7 +22,10 @@ INSERT INTO dyn_enums (type, value) VALUES
     ('EntityType', 'batch'),
     ('EntityType', 'plateContainer'),
     ('EntityType', 'plate'),
-    ('EntityType', 'ado');
+    ('EntityType', 'ado'),
+    ('EntityType', 'attribute'),
+    ('AttributeType', 'choice'),
+    ('AttributeType', 'auto');
 
 CREATE TABLE signalsentities (
     id VARCHAR PRIMARY KEY,
@@ -49,6 +52,20 @@ CREATE TABLE signalsentities_flags (
     signals_entity_id VARCHAR(255),
     flag_value VARCHAR(255),
     FOREIGN KEY (signals_entity_id) REFERENCES signalsentities(id)
+);
+
+CREATE TABLE attribute_definitions (
+    id VARCHAR NOT NULL PRIMARY KEY,
+    attr_type INTEGER NOT NULL REFERENCES dyn_enums(id),
+    name VARCHAR,
+    description VARCHAR,
+    format VARCHAR
+);
+
+CREATE TABLE attribute_values (
+    id  VARCHAR NOT NULL REFERENCES attribute_definitions(id),
+    value VARCHAR,
+    PRIMARY KEY (id, value)
 );
 
 CREATE TABLE location_types (

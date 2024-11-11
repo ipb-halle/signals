@@ -35,7 +35,6 @@ public class Role implements IRole {
 
     // JSON attributes
     public final static String ATTR_COUNTS = "counts";
-    public final static String ATTR_DESCRIPTION = "description";
     public final static String ATTR_FLAGS = "flags";
     public final static String ATTR_NAME = "name";
     public final static String ATTR_PRIVILEGES = "privileges";

@@ -67,7 +67,7 @@ public class GroupRestService implements RestReplyParser<Group> {
         Group group = new Group();
         group.setId(attributes.getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
         group.setCreatedAt(RestHelper.parseDate(attributes, Group.ATTR_CREATED_AT, new Date(0)));
-        group.setDescription(getOptionalStringAttribute(attributes, Group.ATTR_DESCRIPTION));
+        group.setDescription(getOptionalStringAttribute(attributes, RestHelper.ATTR_DESCRIPTION));
         // digest
         // eid
         group.setEditedAt(RestHelper.parseDate(attributes, Group.ATTR_EDITED_AT, new Date(0)));
@@ -177,7 +177,7 @@ public class GroupRestService implements RestReplyParser<Group> {
     protected String prepareJsonString(Group group) {
         JsonObject attributes = new JsonObject();
         attributes.addProperty(Group.ATTR_NAME, group.getName());
-        attributes.addProperty(Group.ATTR_DESCRIPTION, group.getDescription());
+        attributes.addProperty(RestHelper.ATTR_DESCRIPTION, group.getDescription());
         attributes.addProperty(Group.ATTR_SYSTEM, group.isSystem());
 
         JsonObject data = new JsonObject();
