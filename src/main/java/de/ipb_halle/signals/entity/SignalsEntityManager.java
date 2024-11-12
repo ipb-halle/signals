@@ -1,6 +1,6 @@
 /*
  * IPB Signals client
- * Copyright 2022 Leibniz-Institut f. Pflanzenbiochemie
+ * Copyright 2024 Leibniz-Institut f. Pflanzenbiochemie
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

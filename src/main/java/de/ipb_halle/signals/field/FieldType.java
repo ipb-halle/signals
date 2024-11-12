@@ -28,7 +28,7 @@ import jakarta.persistence.Entity;
 
 @Entity
 @DiscriminatorValue("FieldType")
-public class           FieldType extends DynEnum <FieldType> {
+public class FieldType extends DynEnum <FieldType> {
 
     /**
      * private no-argument constructor

@@ -17,6 +17,8 @@
  */
 package de.ipb_halle.signals;
 
+import de.ipb_halle.signals.attribute.Attribute;
+import de.ipb_halle.signals.attribute.AttributeManager;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.SignalsEntityConfig;
 import de.ipb_halle.signals.entity.SignalsEntityManager;
@@ -60,6 +62,9 @@ public class Signals {
 
     @Resource
     private SignalsConfig signalsConfig;
+
+    @Inject
+    private AttributeManager attributeManager;
 
     @Inject
     private DynEnumManager dynEnumMgr;
@@ -128,7 +133,7 @@ public class Signals {
         materialsConfig = new MaterialsConfig(signalsConfig,
                 runtimeConfig, libraryManager);
         signalsEntityConfig = new SignalsEntityConfig(signalsConfig,
-                runtimeConfig, signalsEntityManager);
+                runtimeConfig, attributeManager, signalsEntityManager);
     }
 
     public void dumpEntities(Date[] dateRange) {
@@ -153,6 +158,8 @@ public class Signals {
     public SignalsEntityConfig getSignalsEntityConfig() {
         return signalsEntityConfig;
     }
+
+    public AttributeManager getAttributeManager() { return attributeManager; }
 
     public DynEnumManager getDynEnumMgr() {
         return dynEnumMgr;

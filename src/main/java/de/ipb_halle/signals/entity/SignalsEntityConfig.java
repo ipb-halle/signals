@@ -21,6 +21,7 @@ import de.ipb_halle.signals.DateRangeParser;
 import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.Signals;
 import de.ipb_halle.signals.SignalsConfig;
+import de.ipb_halle.signals.attribute.AttributeManager;
 import de.ipb_halle.signals.inventory.LocationEntity;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
@@ -32,6 +33,7 @@ import java.util.Date;
 public class SignalsEntityConfig {
 
     private Logger logger;
+    private AttributeManager attributeManager;
     private SignalsEntityManager signalsEntityManager;
     private SignalsConfig signalsConfig;
     private RuntimeConfig runtimeConfig;
@@ -84,11 +86,14 @@ public class SignalsEntityConfig {
      *
      * @param config        SignalsConfig resource
      * @param runtimeConfig runtime configuration, as defined by command line options.
-     * @param manager       the SignalsEntityManager
+     * @param attributeManager management class for attributes
+     * @param signalsEntityManager       management class for signals entities
      */
-    public SignalsEntityConfig(SignalsConfig config, RuntimeConfig runtimeConfig, SignalsEntityManager manager) {
+    public SignalsEntityConfig(SignalsConfig config, RuntimeConfig runtimeConfig,
+                               AttributeManager attributeManager, SignalsEntityManager signalsEntityManager) {
         this.logger = LoggerFactory.getLogger(SignalsEntityConfig.class);
-        this.signalsEntityManager = manager;
+        this.attributeManager = attributeManager;
+        this.signalsEntityManager = signalsEntityManager;
         this.signalsConfig = config;
         this.runtimeConfig = runtimeConfig;
         setupDefaultIncludedTypes();
@@ -121,12 +126,13 @@ public class SignalsEntityConfig {
 
                 ******************************************************
                 *
-                * Manage Signals Enities
+                * Manage Signals Attributes and Entities
                 * {} / {}
                 *
                 ******************************************************
                 """, signalsConfig.getSnbInstanceName(), new Date().toString());
 
+        attributeManager.manageAttributes();
         signalsEntityManager.fetchSnbEntities(dateRange,
                 includedTypes,
                 runtimeConfig);
@@ -140,7 +146,6 @@ public class SignalsEntityConfig {
         options.addOption(includedTypesOpt);
         options.addOption(syncEntitiesOpt);
         options.addOption(dumpEntitiesOpt);
-
     }
 
     public static void processCommandLine(CommandLine cmdline, Options options, Signals signals)
