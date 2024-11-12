@@ -22,10 +22,8 @@ import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.entity.SignalsEntityDbService;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
 import de.ipb_halle.signals.users.UserManager;
-
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,13 +69,17 @@ public class LocationManager {
 
     public void fetchLocations(Date[] dateRange) {
         Set<String> locationTypeIds = locationTypeDbService.getLocationTypIds();
-        EntityType entityTypes[] = { EntityType.valueOf(LocationEntity.ENTITY_TYPE_LOCATION) };
+        EntityType entityTypes[] = {EntityType.valueOf(LocationEntity.ENTITY_TYPE_LOCATION)};
         Map<String, Object> cmap = new HashMap<>();
         cmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
         cmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
-        cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, entityTypes );
+        cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, entityTypes);
         List<SignalsEntityDTO> locations = signalsEntityDbService.load(cmap);
         for (SignalsEntityDTO entityDTO : locations) {
+            /*
+             * LocationTypes (e.g. building, room, shelf, ...) are represented as
+             * Locations in the signalsentities table (db)! We need to exclude them.
+             */
             if (!locationTypeIds.contains(entityDTO.getId())) {
                 fetchSingleLocation(entityDTO);
             }

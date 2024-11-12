@@ -66,8 +66,8 @@ public class AttributeValueId {
 
     @Override
     public boolean equals(Object obj) {
-        if ((obj != null) && (obj instanceof AttributeValue)) {
-            AttributeValue other = (AttributeValue) obj;
+        if ((obj != null) && (obj instanceof AttributeValueId)) {
+            AttributeValueId other = (AttributeValueId) obj;
             return Objects.equals(id, other.getId()) && Objects.equals(value, other.getValue());
         }
         return false;

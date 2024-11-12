@@ -42,6 +42,10 @@ public class AttributeValue {
         this.id = new AttributeValueId(id, value);
     }
 
+    private AttributeValueId getEmbeddedId() {
+        return id;
+    }
+
     public String getId() {
         return id.getId();
     }
@@ -67,7 +71,7 @@ public class AttributeValue {
     public boolean equals(Object obj) {
         if ((obj != null) && (obj instanceof AttributeValue)) {
             AttributeValue other = (AttributeValue) obj;
-            return this.id.equals(other.getId());
+            return this.id.equals(other.getEmbeddedId());
         }
         return false;
     }

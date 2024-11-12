@@ -17,14 +17,17 @@
  */
 package de.ipb_halle.signals.attribute;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
-/** 
+/**
  * Signals Attribute definition
  */
 
 @Entity
-@Table(name="attribute_definitions")
+@Table(name = "attribute_definitions")
 public class AttributeDefinition {
 
     @Id
@@ -39,10 +42,21 @@ public class AttributeDefinition {
     @Column
     private String format;
 
+    @Column
+    private String description;
+
     public String dump() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("AttributeDefinition(%s) --> %d\n", id,  type));
+        sb.append(String.format("AttributeDefinition(%s) --> %d\n", id, type));
         return sb.toString();
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getId() {

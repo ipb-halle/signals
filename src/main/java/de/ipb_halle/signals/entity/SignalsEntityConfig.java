@@ -51,7 +51,8 @@ public class SignalsEntityConfig {
                     "If no argument is given, the call fetches all entities, which were modified " +
                     "within the last week. If 'all' is given, all entities are fetched. If a START " +
                     "and optionally an END date are given, only entities with modification dates " +
-                    "after START (and optionally before END) are fetched.")
+                    "after START (and optionally before END) are fetched.\n" +
+                    "Example: -eS 2020-01-01:2022-12-31")
             .build();
 
     @SuppressWarnings("static-access")

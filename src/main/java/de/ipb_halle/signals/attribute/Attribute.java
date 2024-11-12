@@ -25,16 +25,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/** 
+/**
  * Signals Attribute definition
  */
 
-public class Attribute{
+public class Attribute {
 
     public final static String ATTR_FORMAT = "format";
 
     private String id;
     private AttributeType type;
+    private String description;
     private String name;
     private String format;
     private Set<AttributeValue> options;
@@ -43,7 +44,7 @@ public class Attribute{
      * default constructor
      */
     public Attribute() {
-        this.options = new HashSet<> ();
+        this.options = new HashSet<>();
     }
 
     public final static String ATTR_OPTIONS = "options";
@@ -55,6 +56,7 @@ public class Attribute{
         this.id = def.getId();
         this.name = def.getName();
         this.format = def.getFormat();
+        this.description = def.getDescription();
         this.type = (AttributeType) dynEnumMgr.valueOf(def.getType());
         if (options != null) {
             setOptions((Collection) options);
@@ -65,6 +67,7 @@ public class Attribute{
         AttributeDefinition def = new AttributeDefinition();
         def.setId(id);
         def.setName(name);
+        def.setDescription(description);
         def.setFormat(format);
         def.setType(type.getId());
         return def;
@@ -72,8 +75,16 @@ public class Attribute{
 
     public String dump() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("Attribute(%s) --> %d\n", id,  type));
+        sb.append(String.format("Attribute(%s) --> %d\n", id, type));
         return sb.toString();
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getId() {
@@ -117,7 +128,7 @@ public class Attribute{
     }
 
     public void setOptions(Collection<AttributeValue> options) {
-        this.options = new HashSet<> ();
+        this.options = new HashSet<>();
         this.options.addAll(options);
     }
 }
