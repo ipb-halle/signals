@@ -20,10 +20,7 @@ package de.ipb_halle.signals.field;
 import java.io.Serializable;
 import java.util.Objects;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 
 /** 
@@ -31,27 +28,23 @@ import jakarta.persistence.Table;
  */
 
 @Entity
-@IdClass(FieldOptionId.class)
 @Table(name="field_options")
 public class FieldOption implements Serializable {
 
     private final static long serialVersionUID = 1L;
 
-    @Id
-    private String field_id;
-
-    @Id
-    private String option;
+    @EmbeddedId
+    private FieldOptionId id;
 
     /**
      * default constructor
      */
     public FieldOption() {
+        new FieldOptionId();
     }
 
     public FieldOption(String f, String o) {
-        field_id = f;
-        option = o;
+        id = new FieldOptionId(f, o);
     }
 
     @Override
@@ -60,16 +53,19 @@ public class FieldOption implements Serializable {
             return false;
         } 
         FieldOption other = (FieldOption) o;
-        return Objects.equals(field_id, other.field_id)
-            && Objects.equals(option, other.option);
+        return id.equals(other.getEmbeddedId());
+    }
+
+    public FieldOptionId getEmbeddedId() {
+        return id;
     }
 
     public String getFieldId() {
-        return field_id;
+        return id.getField_id();
     }
 
     public String getOption() {
-        return option;
+        return id.getOption();
     }
 
     @Override
@@ -78,10 +74,10 @@ public class FieldOption implements Serializable {
     }
 
     public void setFieldId(String i) {
-        field_id = i; 
+        id.setField_id(i);
     }
 
     public void setOption(String o) {
-        option = o;
+        id.setOption(o);
     }
 }

@@ -15,35 +15,33 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.field;
+package de.ipb_halle.signals.materials;
 
-import de.ipb_halle.signals.entity.Quality;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
+import java.util.Objects;
 
 
 /**
- * Quality (measure) - field assignments
+ * Container type field definition
  */
 
 @Entity
-@Table(name = "field_measures")
-public class FieldMeasure {
-
+@Table(name = "library_fields")
+public class LibraryField {
 
     @EmbeddedId
-    private FieldMeasureId id;
+    private LibraryFieldId id;
 
-    /**
-     * default constructor
-     */
-    public FieldMeasure() {
-        this.id = new FieldMeasureId();
+    public LibraryField() {
+        id = new LibraryFieldId();
     }
 
-    public FieldMeasure(String i, Quality q) {
-        this.id = new FieldMeasureId(i, q);
+    public LibraryField(String lib, String fd) {
+    id = new LibraryFieldId(lib, fd);
     }
 
     @Override
@@ -51,32 +49,30 @@ public class FieldMeasure {
         if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
-        FieldMeasure other = (FieldMeasure) o;
-        return id.equals(other.getEmbeddedId());
+        LibraryField other = (LibraryField) o;
+        return Objects.equals(id, other.id);
     }
 
-    private FieldMeasureId getEmbeddedId() {
-        return id;
+    public String getLibraryId() {
+        return id.getLibrary_id();
     }
 
     public String getFieldId() {
         return id.getField_id();
     }
 
-    public Quality getMeasure() {
-        return id.getMeasure();
-    }
-
     @Override
     public int hashCode() {
-        return id.hashCode();
+        return Objects.hash(id);
     }
 
-    public void setFieldId(String i) {
-        id.setField_id(i);
+    public LibraryField setLibraryId(String lib) {
+        id.setLibrary_id(lib);
+        return this;
     }
 
-    public void setMeasure(Quality q) {
-        id.setMeasure(q);
+    public LibraryField setFieldId(String f) {
+        id.setField_id( f);
+        return this;
     }
 }

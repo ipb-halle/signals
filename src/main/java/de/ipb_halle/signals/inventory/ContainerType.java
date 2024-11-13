@@ -18,7 +18,7 @@
 package de.ipb_halle.signals.inventory;
 
 import de.ipb_halle.signals.attachment.Attachment;
-import de.ipb_halle.signals.field.FieldDefinition;
+import de.ipb_halle.signals.field.Field;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -48,7 +48,7 @@ public class ContainerType {
 
     private String description;
 
-    private Set<FieldDefinition> fieldDefinitions;
+    private Set<Field> fields;
 
     private boolean inUse;
 
@@ -65,10 +65,10 @@ public class ContainerType {
         createdAt = new Date();
         updatedAt = new Date();
         attachments = new HashSet<> ();
-        fieldDefinitions = new HashSet<> ();
+        fields = new HashSet<> ();
     }
 
-    public  ContainerType(ContainerTypeEntity cte, List<Attachment> a, List<FieldDefinition> fd) {
+    public  ContainerType(ContainerTypeEntity cte, List<Attachment> a, List<Field> fd) {
         id = cte.getId();
         createdAt = cte.getCreatedAt();
         description = cte.getDescription();
@@ -78,9 +78,9 @@ public class ContainerType {
         updatedAt = cte.getUpdatedAt();
 
         attachments = new HashSet<> ();
-        fieldDefinitions = new HashSet<> ();
+        fields = new HashSet<> ();
         attachments.addAll(a);
-        fieldDefinitions.addAll(fd);
+        fields.addAll(fd);
     }
 
     public ContainerTypeEntity createEntity() {
@@ -107,8 +107,8 @@ public class ContainerType {
         attachments.add(a);
     }
 
-    public void addFieldDefinition(FieldDefinition f) {
-        fieldDefinitions.add(f);
+    public void addField(Field f) {
+        fields.add(f);
     }
 
     public Set<Attachment> getAttachments() {
@@ -123,8 +123,8 @@ public class ContainerType {
         return description;
     }
 
-    public Set<FieldDefinition> getFieldDefinitions() {
-        return fieldDefinitions;
+    public Set<Field> getFields() {
+        return fields;
     }
 
     public String getName() {
@@ -147,8 +147,8 @@ public class ContainerType {
         attachments.remove(a);
     }
 
-    public void removeFieldDefinition(FieldDefinition f) {
-        fieldDefinitions.remove(f);       
+    public void removeField(Field f) {
+        fields.remove(f);
     }
 
     public void setId(String i) {
@@ -167,8 +167,8 @@ public class ContainerType {
         description = d;
     }
 
-    public void setFieldDefinitions(Set<FieldDefinition> fd) {
-        fieldDefinitions = fd;
+    public void setFields(Set<Field> fd) {
+        fields = fd;
     }
 
     public void setMovable(boolean m) {

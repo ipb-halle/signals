@@ -1,0 +1,119 @@
+/*
+ * IPB Signals client
+ * Copyright 2022 Leibniz-Institut f. Pflanzenbiochemie
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+package de.ipb_halle.signals.field;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import de.ipb_halle.signals.dynEnum.DynEnumManager;
+import de.ipb_halle.signals.entity.MeasureMapper;
+import de.ipb_halle.signals.entity.Quality;
+import de.ipb_halle.signals.rest.RestHelper;
+import de.ipb_halle.signals.rest.RestReplyParser;
+import jakarta.ejb.Local;
+import jakarta.inject.Inject;
+
+import java.util.Iterator;
+
+/** 
+ * service for field definitions (not a real REST service)
+ */
+
+@Local
+public class FieldParser implements RestReplyParser<Field> {
+
+    @Inject
+    private DynEnumManager dynEnumMgr;
+
+    /**
+     * converts a field type from JSON to the respective 
+     * database backed field type class instance.
+     * @throws RuntimeException if field type is not yet registered and 
+     * auto discovery is not allowed (default).
+     */
+    private FieldType lookupFieldType(String typeString) {
+        return (FieldType) dynEnumMgr.valueOf(FieldType.valueOf(typeString));
+    }
+
+    /**
+     * ATTR_COLLECTION currently not implemented!
+     */
+    public Field parseReply(JsonElement json) {
+        Field fd = new Field();
+        JsonObject j = json.getAsJsonObject();
+        fd.setId(j.getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
+
+        if (j.has(Field.ATTR_DEFINITION)) {
+            parseDefinition(j.getAsJsonObject(Field.ATTR_DEFINITION), fd);
+        } else {
+            fd.setAttributeListEid(RestHelper.parseString(j, Field.ATTR_ATTRIBUTE));
+            fd.setCalculated(RestHelper.parseBool(j, Field.ATTR_CALCULATED));
+            fd.setDefinedBy(RestHelper.parseString(j, Field.ATTR_DEFINED_BY));
+            fd.setFieldType(lookupFieldType(RestHelper.parseString(j, Field.ATTR_DATA_TYPE)));
+            fd.setHidden(RestHelper.parseBool(j, Field.ATTR_HIDDEN));
+            fd.setRequired(RestHelper.parseBool(j, Field.ATTR_MANDATORY));
+            fd.setTitle(RestHelper.parseString(j, RestHelper.ATTR_NAME));
+
+            if (j.has(Field.ATTR_MEASURE_OPTIONS)) {
+                parseMeasures(j.getAsJsonArray(Field.ATTR_MEASURE_OPTIONS), fd);
+            }
+            if (j.has(Field.ATTR_OPTIONS)) {
+                parseOptions(j.getAsJsonArray(Field.ATTR_OPTIONS), fd);
+            }
+        }
+        return fd;
+    }
+
+    private void parseDefinition(JsonObject def, Field fd) {
+        fd.setAttributeListEid(RestHelper.parseString(def, Field.ATTR_ATTRIBUTE_LIST_EID));
+        fd.setDefaultUnit(RestHelper.parseString(def, Field.ATTR_DEFAULT_UNIT));
+        fd.setDefinedBy(RestHelper.parseString(def, Field.ATTR_DEFINED_BY));
+        fd.setFieldType(lookupFieldType(RestHelper.parseString(def, Field.ATTR_FIELD_TYPE)));
+        fd.setHidden(RestHelper.parseBool(def, Field.ATTR_HIDDEN));
+        fd.setKey(RestHelper.parseString(def, Field.ATTR_KEY));
+        fd.setRequired(RestHelper.parseBool(def, Field.ATTR_REQUIRED));
+        fd.setTitle(RestHelper.parseString(def, Field.ATTR_TITLE));
+        fd.setUserDefined(RestHelper.parseBool(def, Field.ATTR_USER_DEFINED));
+
+        if (def.has(Field.ATTR_MEASURES)) {
+            parseMeasures(def.getAsJsonArray(Field.ATTR_MEASURES), fd);
+        }
+
+        if (def.has(Field.ATTR_OPTIONS)) {
+            parseOptions(def.getAsJsonArray(Field.ATTR_OPTIONS), fd);
+        }
+    }
+
+    private void parseMeasures(JsonArray jArray, Field fd) {
+        Iterator<JsonElement> iter = jArray.iterator();
+        while (iter.hasNext()) {
+            JsonObject j = iter.next().getAsJsonObject();
+            String measure = j.getAsJsonPrimitive(Quality.ATTR_MEASURE).getAsString();
+            Quality q = MeasureMapper.getQuality(measure);
+            fd.addMeasure(new FieldMeasure(fd.getId(), q));
+        }
+    }
+
+    private void parseOptions(JsonArray jArray, Field fd) {
+        Iterator<JsonElement> iter = jArray.iterator();
+        while (iter.hasNext()) {
+            String option = iter.next().getAsJsonPrimitive().getAsString();
+            fd.addOption(new FieldOption(fd.getId(), option));
+        }
+    }
+}

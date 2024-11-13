@@ -18,6 +18,7 @@
 package de.ipb_halle.signals.field;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -87,5 +88,28 @@ public class FieldValue implements Serializable {
     public FieldValue setValue(String v) {
         value = v;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        FieldValue that = (FieldValue) object;
+        return Objects.equals(id, that.id) && Objects.equals(fieldDefinitionId, that.fieldDefinitionId) && Objects.equals(rawValue, that.rawValue) && Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, fieldDefinitionId, rawValue, value);
+    }
+
+    @Override
+    public String toString() {
+        return "FieldValue{" +
+                "id=" + id +
+                ", fieldDefinitionId='" + fieldDefinitionId + '\'' +
+                ", rawValue=" + rawValue +
+                ", value='" + value + '\'' +
+                '}';
     }
 }

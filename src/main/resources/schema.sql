@@ -160,6 +160,7 @@ CREATE TABLE field_definitions (
     default_unit VARCHAR,
     defined_by VARCHAR,
     description VARCHAR,
+    designation INTEGER NOT NULL REFERENCES dyn_enums(id),
     field_type VARCHAR,
     hidden VARCHAR,
     key VARCHAR,
@@ -211,8 +212,8 @@ CREATE TABLE container_type_attachments (
 
 CREATE TABLE container_type_fields (
     container_type_id VARCHAR NOT NULL REFERENCES container_types (id),
-    field_definition_id VARCHAR NOT NULL REFERENCES field_definitions (id),
-    PRIMARY KEY (container_type_id, field_definition_id)
+    field_id VARCHAR NOT NULL REFERENCES field_definitions (id),
+    PRIMARY KEY (container_type_id, field_id)
 );
 
 CREATE TABLE libraries (
@@ -238,9 +239,8 @@ CREATE TABLE libraries (
 
 CREATE TABLE library_fields (
     library_id VARCHAR NOT NULL REFERENCES libraries (id),
-    field_definition_id VARCHAR NOT NULL REFERENCES field_definitions (id),
-    type VARCHAR NOT NULL,
-    PRIMARY KEY (library_id, field_definition_id, type)
+    field_id VARCHAR NOT NULL REFERENCES field_definitions (id),
+    PRIMARY KEY (library_id, field_id)
 );
 
 CREATE TABLE materials (

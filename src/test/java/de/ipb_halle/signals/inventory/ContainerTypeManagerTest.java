@@ -24,10 +24,7 @@ import de.ipb_halle.signals.attachment.AttachmentDbService;
 import de.ipb_halle.signals.dynEnum.DynEnum;
 import de.ipb_halle.signals.dynEnum.DynEnumDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
-import de.ipb_halle.signals.field.FieldDefinition;
-import de.ipb_halle.signals.field.FieldDefinitionDbService;
-import de.ipb_halle.signals.field.FieldDefinitionParser;
-import de.ipb_halle.signals.field.FieldType;
+import de.ipb_halle.signals.field.*;
 import de.ipb_halle.signals.rest.MockRestClient;
 import java.util.List;
 import java.util.Properties;
@@ -74,10 +71,10 @@ public class ContainerTypeManagerTest {
     @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class, 
         Attachment.class, AttachmentDbService.class, DynEnumManager.class,
         DynEnumDbService.class, DynEnum.class,
-        FieldDefinition.class, FieldDefinitionDbService.class, FieldDefinitionParser.class,
+        Field.class, FieldDefinition.class, FieldDbService.class, FieldParser.class,
         ContainerType.class, ContainerTypeEntity.class, 
         ContainerTypeAttachment.class, ContainerTypeAttachmentId.class,
-        ContainerTypeFieldDefinition.class, ContainerTypeFieldDefinitionId.class,
+        ContainerTypeField.class, ContainerTypeFieldId.class,
         ContainerTypeDbService.class, ContainerTypeManager.class, ContainerTypeRestService.class })
     public EjbJar app() {
         return new EjbJar();
@@ -86,7 +83,7 @@ public class ContainerTypeManagerTest {
     @Module
     public PersistenceUnit persistence() {
         return TestBase.persistence(new String[]{ ContainerType.class.getName(), 
-                ContainerTypeFieldDefinition.class.getName(), FieldDefinition.class.getName(),
+                ContainerTypeField.class.getName(), FieldDefinition.class.getName(),
                 ContainerTypeAttachment.class.getName(), Attachment.class.getName(),
                 DynEnum.class.getName(), FieldType.class.getName()
             });
@@ -114,10 +111,10 @@ public class ContainerTypeManagerTest {
         return null;
     }
 
-    private FieldDefinition getFieldDefinitionById(Set<FieldDefinition> fdSet, String id) {
-        for (FieldDefinition fd : fdSet) {
-            if (fd.getId().equals(id)) {
-                return fd;
+    private Field getFieldById(Set<Field> fieldSet, String id) {
+        for (Field f : fieldSet) {
+            if (f.getId().equals(id)) {
+                return f;
             }
         }
         return null;
@@ -139,9 +136,9 @@ public class ContainerTypeManagerTest {
         assertEquals("Attachment file name matches", TEST_CONTAINER_ATTACHMENT_FILE_NAME, a.getFileName());
 
         // field definitions
-        FieldDefinition fd = getFieldDefinitionById(
-                ct.getFieldDefinitions(), 
+        Field f = getFieldById(
+                ct.getFields(),
                 TEST_CONTAINER_FIELD_ID);
-        assertEquals("Field definition key matches", TEST_CONTAINER_FIELD_KEY, fd.getKey());
+        assertEquals("Field definition key matches", TEST_CONTAINER_FIELD_KEY, f.getKey());
     }
 }

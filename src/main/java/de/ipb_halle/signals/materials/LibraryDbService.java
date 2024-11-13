@@ -17,20 +17,16 @@
  */
 package de.ipb_halle.signals.materials;
 
-import de.ipb_halle.signals.field.FieldDefinitionDbService;
+import de.ipb_halle.signals.field.Field;
+import de.ipb_halle.signals.field.FieldDbService;
 import de.ipb_halle.signals.field.FieldDefinition;
-import java.util.ArrayList;
-import java.util.List;
+
 import java.util.Set;
 
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +44,7 @@ public class LibraryDbService {
     public final String LIBRARY_FIELD_TYPE = "type";
 
     @Inject 
-    private FieldDefinitionDbService fieldService;
+    private FieldDbService fieldService;
 
     @PersistenceContext(unitName="signalsDB")
     private EntityManager em;
@@ -92,23 +88,18 @@ public class LibraryDbService {
         logger.debug("Store library: id={}", lib.getId());
         LibraryEntity le = lib.createEntity();
         em.merge(le);
-        /*
-         * ToDo: should be delegated to FieldDefinitionDbService
-         *
-        saveFieldDefinitions(lib.getAssetFieldDefinitions(), le.getId(), ASSET);
-        saveFieldDefinitions(lib.getBatchFieldDefinitions(), le.getId(), BATCH);
-         */
+        saveFields(lib.getAssetFields(), le.getId());
+        saveFields(lib.getBatchFields(), le.getId());
     }
 
-    private void saveFieldDefinitions(Set<FieldDefinition> fieldDefinitions, String libraryId, String type) {
-        for (FieldDefinition fd : fieldDefinitions) {
-            fieldService.save(fd);
-            LibraryFieldDefinition libFD = new LibraryFieldDefinition()
+    private void saveFields(Set<Field> fields, String libraryId) {
+        for (Field f : fields) {
+            fieldService.save(f);
+            LibraryField libFD = new LibraryField()
                 .setLibraryId(libraryId)
-                .setFieldDefinitionId(fd.getId())
-                .setType(type);
+                .setFieldId(f.getId());
             em.merge(libFD);
-            logger.debug("Stored library field: lib={} fd={} type={}", libraryId, fd.getId(), type);
+            logger.debug("Stored library field: lib={}/{} field={}", libraryId, f.getDesignation().getValue(), f.getId());
         }
     }
 }

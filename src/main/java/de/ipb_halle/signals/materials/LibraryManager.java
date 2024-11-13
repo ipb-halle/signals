@@ -42,25 +42,11 @@ public class LibraryManager {
 
     private Logger logger = LoggerFactory.getLogger(LibraryManager.class);
 
-    
-    public Library getDbLibrary(String id) {
-        return dbService.loadById(id);
-    }
-
-    public void save(RuntimeConfig config, List<Library> libraries) {
-        for (Library lib : libraries) {
-            logger.debug("materials library save({})", lib.getAssetDisplayName());
-            if (config.updateDb) {
-                dbService.save(lib);
-            }
-        }
-    }
 
     public void manageLibraries(RuntimeConfig config) {
         fetchLibraries(config);
     }
-
-
+    
     private void fetchLibraries(RuntimeConfig config) {
         List<Library> libraries = restService.doGetLibraries();
         for (Library lib : libraries) {

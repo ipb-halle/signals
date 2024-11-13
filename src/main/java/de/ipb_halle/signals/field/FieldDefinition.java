@@ -17,18 +17,9 @@
  */
 package de.ipb_halle.signals.field;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import de.ipb_halle.signals.entity.Quality;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 /**
@@ -39,36 +30,14 @@ import jakarta.persistence.Table;
 @Table(name = "field_definitions")
 public class FieldDefinition {
 
-
-    public final static String ATTR_ATTRIBUTE_LIST_EID = "attributeListEid";
-    public final static String ATTR_ATTRIBUTE = "attribute";
-    public final static String ATTR_CALCULATED = "calculated";
-    public final static String ATTR_COLLECTION = "collection";  // could be the same as type=list?
-    public final static String ATTR_DATA_TYPE = "dataType";
-    public final static String ATTR_DEFAULT_UNIT = "defaultUnit";
-    public final static String ATTR_DEFINED_BY = "definedBy";
-    public final static String ATTR_DEFINITION = "definition";
-    public final static String ATTR_FIELD_TYPE = "type";
-    public final static String ATTR_HIDDEN = "hidden";
-    public final static String ATTR_KEY = "key";
-    public final static String ATTR_MEASURE_OPTIONS = "measureOptions";
-    public final static String ATTR_MEASURES = "measures";
-    //public final static String ATTR_MULTISELECT = "multiSelect";
-    public final static String ATTR_OPTIONS = "options";
-    // public final static String ATTR_READ_ONLY = "readOnly";
-    public final static String ATTR_REQUIRED = "isRequired";
-    public final static String ATTR_MANDATORY = "mandatory";
-    public final static String ATTR_TITLE = "title";
-    public final static String ATTR_USER_DEFINED = "isUserDefined";
-
     @Id
     private String id;
 
-    /**
-     * referred by ATTR_ATTRIBUTE_LIST_EID and ATTR_ATTRIBUTE
-     */
     @Column(name = "attribute_list_eid")
     private String attributeListEid;
+
+    @Column(name = "designation")
+    private Integer fieldDesignation;
 
     @Column
     private Boolean calculated;
@@ -79,12 +48,8 @@ public class FieldDefinition {
     @Column(name = "defined_by")
     private String definedBy;
 
-    /**
-     * referred by ATTR_FIELD_TYPE and ATTR_DATA_TYPE
-     */
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "field_type")
-    private FieldType fieldType;
+    @Column(name = "field_type")
+    private Integer fieldType;
 
     @Column
     private Boolean hidden;
@@ -92,56 +57,21 @@ public class FieldDefinition {
     @Column
     private String key;
 
-    /**
-     * referred by ATTR_MEASURE_OPTIONS and ATTR_MEASURES
-     */
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @JoinColumn(name = "field_id")
-    private Set<FieldMeasure> measures;
-
     @Column(name = "multiselect")
     private Boolean multiSelect;
-
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @JoinColumn(name = "field_id")
-    private Set<FieldOption> options;
 
     @Column(name = "read_only")
     private Boolean readOnly;
 
-    /**
-     * referred by ATTR_REQUIRED and ATTR_MANDATORY
-     */
     @Column
     private Boolean required;
 
-    /**
-     * referred by ATTR_TITLE and RestHelper.ATTR_NAME
-     */
     @Column
     private String title;
 
     @Column(name = "user_defined")
     private Boolean userDefined;
 
-
-    /**
-     * default constructor
-     */
-    public FieldDefinition() {
-        measures = new HashSet<>();
-        options = new HashSet<>();
-    }
-
-    public FieldDefinition addMeasure(Quality q) {
-        measures.add(new FieldMeasure(id, q));
-        return this;
-    }
-
-    public FieldDefinition addOption(String o) {
-        options.add(new FieldOption(id, o));
-        return this;
-    }
 
     public String dump() {
         return String.format("FieldDefinition(%s): %s\n", id, title);
@@ -167,20 +97,12 @@ public class FieldDefinition {
         return definedBy;
     }
 
-    public FieldType getFieldType() {
+    public Integer getFieldType() {
         return fieldType;
     }
 
     public String getKey() {
         return key;
-    }
-
-    public Set<FieldMeasure> getMeasures() {
-        return measures;
-    }
-
-    public Set<FieldOption> getOptions() {
-        return options;
     }
 
     public String getTitle() {
@@ -207,12 +129,12 @@ public class FieldDefinition {
         return userDefined;
     }
 
-    public void removeMeasure(FieldMeasure m) {
-        measures.remove(m);
+    public Integer getFieldDesignation() {
+        return fieldDesignation;
     }
 
-    public void removeOption(FieldOption o) {
-        options.remove(o);
+    public void setFieldDesignation(Integer fieldDesignation) {
+        this.fieldDesignation = fieldDesignation;
     }
 
     public FieldDefinition setId(String i) {
@@ -240,7 +162,7 @@ public class FieldDefinition {
         return this;
     }
 
-    public FieldDefinition setFieldType(FieldType t) {
+    public FieldDefinition setFieldType(Integer t) {
         fieldType = t;
         return this;
     }
@@ -255,18 +177,8 @@ public class FieldDefinition {
         return this;
     }
 
-    public FieldDefinition setMeasures(Set<FieldMeasure> m) {
-        measures = m;
-        return this;
-    }
-
     public FieldDefinition setMultiSelect(Boolean b) {
         multiSelect = b;
-        return this;
-    }
-
-    public FieldDefinition setOptions(Set<FieldOption> o) {
-        options = o;
         return this;
     }
 

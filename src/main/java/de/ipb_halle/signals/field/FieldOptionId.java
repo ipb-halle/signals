@@ -17,6 +17,8 @@
  */
 package de.ipb_halle.signals.field;
 
+import jakarta.persistence.Embeddable;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -24,12 +26,24 @@ import java.util.Objects;
 /** 
  * SNB field options (This class exists solely for JPA purposes)
  */
+@Embeddable
 public class FieldOptionId implements Serializable {
     private final static long serialVersionUID = 1L;
 
     private String field_id;
 
     private String option;
+
+    /**
+     * default constructor
+     */
+    public FieldOptionId() {
+    }
+
+    public FieldOptionId(String f, String o) {
+        field_id = f;
+        option = o;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -43,6 +57,22 @@ public class FieldOptionId implements Serializable {
 
     @Override
     public int hashCode() {
-        return field_id.hashCode() + option.hashCode();
+        return Objects.hash(field_id) + Objects.hash(option);
+    }
+
+    public String getField_id() {
+        return field_id;
+    }
+
+    public void setField_id(String field_id) {
+        this.field_id = field_id;
+    }
+
+    public String getOption() {
+        return option;
+    }
+
+    public void setOption(String option) {
+        this.option = option;
     }
 }

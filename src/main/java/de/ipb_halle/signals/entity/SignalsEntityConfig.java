@@ -99,11 +99,15 @@ public class SignalsEntityConfig {
         setupDefaultIncludedTypes();
     }
 
+
     private void setupDefaultIncludedTypes() {
+        /**
+         * default included types must not include attribute,
+         * because attributes cannot be fetched together with other entities
+         */
         includedTypes = new EntityType[]{
                 EntityType.valueOf("asset"),
                 EntityType.valueOf("assetType"),
-                EntityType.valueOf("attribute"),
                 EntityType.valueOf("batch"),
                 EntityType.valueOf("container"),
                 EntityType.valueOf("experiment"),

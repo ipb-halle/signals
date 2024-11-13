@@ -17,11 +17,13 @@
  */
 package de.ipb_halle.signals.materials;
 
+import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldDefinition;
 import de.ipb_halle.signals.users.UserReference;
+
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import de.ipb_halle.signals.users.IUser;
 
@@ -53,12 +55,12 @@ public class Library {
 
 
     private String assetDisplayName;
-    private Set<FieldDefinition> assetFieldDefinitions;
+    private Set<Field> assetFields;
     private String assetNameFieldId;
     private String assetNumberingFormat;
 
     private String batchDisplayName;
-    private Set<FieldDefinition> batchFieldDefinitions;
+    private Set<Field> batchFields;
     private String batchNumberingFormat;
 
     private Date createdAt;
@@ -80,11 +82,11 @@ public class Library {
      * default constructor
      */
     public Library() {
-        assetFieldDefinitions = new HashSet<> ();
-        batchFieldDefinitions = new HashSet<> ();
+        assetFields = new HashSet<> ();
+        batchFields = new HashSet<> ();
     }
     /*
-     * public Library (LibraryEntity le, List<FieldDefinition> assetFD, List<FieldDefinition> batchFD)
+     * public Library (LibraryEntity le, List<Field> assetFD, List<Field> batchFD)
      */
     public Library (LibraryEntity le) {
         id = le.getId();
@@ -107,12 +109,9 @@ public class Library {
         name = le.getName();
         uniqueness = le.getUniqueness();
 
-        assetFieldDefinitions = new HashSet<> ();
-        batchFieldDefinitions = new HashSet<> ();
-        /*
-        assetFieldDefinitions.addAll(assetFD);
-        batchFieldDefinitions.addAll(batchFD);
-         */
+        /* complex types */
+        assetFields = new HashSet<> ();
+        batchFields = new HashSet<> ();
     }
 
     public LibraryEntity createEntity() {
@@ -145,20 +144,30 @@ public class Library {
         return sb.toString();
     }
 
-    public void addAssetFieldDefinition(FieldDefinition fd) {
-        assetFieldDefinitions.add(fd);
+    public Library addAllAssetFields(Collection fields) {
+        assetFields.addAll(fields);
+        return this;
     }
 
-    public void addBatchFieldDefinition(FieldDefinition fd) {
-        batchFieldDefinitions.add(fd);
+    public Library addAllBatchFields(Collection fields) {
+        batchFields.addAll(fields);
+        return this;
+    }
+
+    public void addAssetField(Field f) {
+        assetFields.add(f);
+    }
+
+    public void addBatchField(Field f) {
+        batchFields.add(f);
     }
 
     public String getAssetDisplayName() {
         return assetDisplayName;
     }
 
-    public Set<FieldDefinition> getAssetFieldDefinitions() {
-        return assetFieldDefinitions;
+    public Set<Field> getAssetFields() {
+        return assetFields;
     }
 
     public String getAssetNameFieldId() {
@@ -173,8 +182,8 @@ public class Library {
         return batchDisplayName;
     }
 
-    public Set<FieldDefinition> getBatchFieldDefinitions() {
-        return batchFieldDefinitions;
+    public Set<Field> getBatchFields() {
+        return batchFields;
     }
 
     public String getBatchNumberingFormat()  {
@@ -238,8 +247,8 @@ public class Library {
         return this;
     }
 
-    public Library setAssetFieldDefinitions(Set<FieldDefinition> fields) {
-        assetFieldDefinitions = fields;
+    public Library setAssetFields(Set<Field> fields) {
+        assetFields = fields;
         return this;
     }
 
@@ -258,8 +267,8 @@ public class Library {
         return this;
     }
 
-    public Library setBatchFieldDefinitions(Set<FieldDefinition> fields) {
-        batchFieldDefinitions = fields;
+    public Library setBatchFields(Set<Field> fields) {
+        batchFields = fields;
         return this;
     }
 

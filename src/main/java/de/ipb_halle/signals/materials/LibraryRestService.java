@@ -22,7 +22,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import de.ipb_halle.signals.field.FieldDefinitionParser;
+import de.ipb_halle.signals.dynEnum.DynEnumManager;
+import de.ipb_halle.signals.field.Field;
+import de.ipb_halle.signals.field.FieldDesignation;
+import de.ipb_halle.signals.field.FieldParser;
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.RestHelper;
@@ -55,7 +58,10 @@ public class LibraryRestService implements RestReplyParser<Library> {
     private RestClient restClient;
 
     @Inject
-    private FieldDefinitionParser fieldDefinitionParser;
+    private FieldParser fieldParser;
+
+    @Inject
+    private DynEnumManager dynEnumManager;
 
     private Logger logger = LoggerFactory.getLogger(LibraryRestService.class);
 
@@ -130,7 +136,10 @@ public class LibraryRestService implements RestReplyParser<Library> {
     private void parseAssetFields(JsonArray jArray, Library lib) {
         Iterator<JsonElement> iterator = jArray.iterator();
         while (iterator.hasNext()) {
-            lib.addAssetFieldDefinition(fieldDefinitionParser.parseReply(iterator.next()));
+            Field field = fieldParser.parseReply(iterator.next());
+            field.setDesignation((FieldDesignation) dynEnumManager.valueOf(FieldDesignation.valueOf(FieldDesignation.ASSET)));
+            lib.addAssetField(field);
+
         }
     }
 
@@ -145,7 +154,9 @@ public class LibraryRestService implements RestReplyParser<Library> {
     private void parseBatchFields(JsonArray jArray, Library lib) {
         Iterator<JsonElement> iterator = jArray.iterator();
         while (iterator.hasNext()) {
-            lib.addBatchFieldDefinition(fieldDefinitionParser.parseReply(iterator.next()));
+            Field field = fieldParser.parseReply(iterator.next());
+            field.setDesignation((FieldDesignation) dynEnumManager.valueOf(FieldDesignation.valueOf(FieldDesignation.BATCH)));
+            lib.addBatchField(field);
         }
     }
 

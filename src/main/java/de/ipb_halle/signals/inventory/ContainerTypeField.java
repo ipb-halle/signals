@@ -15,35 +15,33 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.field;
+package de.ipb_halle.signals.inventory;
 
-import de.ipb_halle.signals.entity.Quality;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
+import java.util.Objects;
+
 
 /**
- * Quality (measure) - field assignments
+ * Container type field definition
  */
 
 @Entity
-@Table(name = "field_measures")
-public class FieldMeasure {
-
+@Table(name = "container_type_fields")
+public class ContainerTypeField {
 
     @EmbeddedId
-    private FieldMeasureId id;
+    private ContainerTypeFieldId id;
 
-    /**
-     * default constructor
-     */
-    public FieldMeasure() {
-        this.id = new FieldMeasureId();
+
+    public ContainerTypeField() {
+        id = new ContainerTypeFieldId();
     }
 
-    public FieldMeasure(String i, Quality q) {
-        this.id = new FieldMeasureId(i, q);
+    public ContainerTypeField(String ct, String f) {
+        id = new ContainerTypeFieldId(ct, f);
     }
 
     @Override
@@ -51,20 +49,16 @@ public class FieldMeasure {
         if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
-        FieldMeasure other = (FieldMeasure) o;
-        return id.equals(other.getEmbeddedId());
+        ContainerTypeField other = (ContainerTypeField) o;
+        return Objects.equals(id, other.id);
     }
 
-    private FieldMeasureId getEmbeddedId() {
-        return id;
+    public String getContainerTypeId() {
+        return id.getContainer_type_id();
     }
 
     public String getFieldId() {
         return id.getField_id();
-    }
-
-    public Quality getMeasure() {
-        return id.getMeasure();
     }
 
     @Override
@@ -72,11 +66,13 @@ public class FieldMeasure {
         return id.hashCode();
     }
 
-    public void setFieldId(String i) {
-        id.setField_id(i);
+    public ContainerTypeField setContainerTypeId(String ct) {
+        id.setContainer_type_id(ct);
+        return this;
     }
 
-    public void setMeasure(Quality q) {
-        id.setMeasure(q);
+    public ContainerTypeField setFieldId(String f) {
+        id.setField_id(f);
+        return this;
     }
 }

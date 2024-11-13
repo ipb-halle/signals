@@ -15,31 +15,40 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.field;
+package de.ipb_halle.signals.inventory;
 
-import de.ipb_halle.signals.entity.Quality;
+import jakarta.persistence.Embeddable;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * JPA compound Id class for field definition measures
+ * Field definitions for container types. This class solely exists
+ * for JPA purposes (compound Id).
  */
-public class FieldMeasureId implements Serializable {
+@Embeddable
+public class ContainerTypeFieldId implements Serializable {
     private final static long serialVersionUID = 1L;
+
+    private String container_type_id;
 
     private String field_id;
 
-    private Quality measure;
+    public ContainerTypeFieldId(String ct, String f) {
+        container_type_id = ct;
+        field_id = f;
+    }
 
-    public FieldMeasureId(String i, Quality q) {
-        field_id = i;
-        measure = q;
+    public ContainerTypeFieldId() {
 
     }
 
-    public FieldMeasureId() {
+    public String getContainer_type_id() {
+        return container_type_id;
+    }
 
+    public void setContainer_type_id(String container_type_id) {
+        this.container_type_id = container_type_id;
     }
 
     public String getField_id() {
@@ -50,26 +59,18 @@ public class FieldMeasureId implements Serializable {
         this.field_id = field_id;
     }
 
-    public Quality getMeasure() {
-        return measure;
-    }
-
-    public void setMeasure(Quality measure) {
-        this.measure = measure;
-    }
-
     @Override
     public boolean equals(Object o) {
         if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
-        FieldMeasureId other = (FieldMeasureId) o;
-        return Objects.equals(field_id, other.field_id)
-                && Objects.equals(measure, other.measure);
+        ContainerTypeFieldId other = (ContainerTypeFieldId) o;
+        return Objects.equals(container_type_id, other.container_type_id)
+                && Objects.equals(field_id, other.field_id);
     }
 
     @Override
     public int hashCode() {
-        return field_id.hashCode() + measure.hashCode();
+        return Objects.hash(container_type_id) + Objects.hash(field_id);
     }
 }

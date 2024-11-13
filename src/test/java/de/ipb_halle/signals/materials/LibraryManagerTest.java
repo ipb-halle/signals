@@ -24,11 +24,11 @@ import de.ipb_halle.signals.dynEnum.DynEnum;
 import de.ipb_halle.signals.dynEnum.DynEnumDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.field.FieldDefinition;
-import de.ipb_halle.signals.field.FieldDefinitionDbService;
-import de.ipb_halle.signals.field.FieldDefinitionParser;
+import de.ipb_halle.signals.field.FieldDbService;
+import de.ipb_halle.signals.field.FieldParser;
 import de.ipb_halle.signals.field.FieldType;
 import de.ipb_halle.signals.rest.MockRestClient;
-import java.util.List;
+
 import java.util.Properties;
 import java.util.Set;
 import jakarta.inject.Inject;
@@ -74,10 +74,10 @@ public class LibraryManagerTest {
 
     @Module
     @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class, 
-        FieldDefinition.class, FieldDefinitionDbService.class, FieldDefinitionParser.class,
+        FieldDefinition.class, FieldDbService.class, FieldParser.class,
         DynEnum.class, DynEnumDbService.class, DynEnumManager.class,
         Library.class, LibraryEntity.class, 
-        LibraryFieldDefinition.class, LibraryFieldDefinitionId.class,
+        LibraryField.class, LibraryFieldId.class,
         LibraryDbService.class, LibraryManager.class, LibraryRestService.class })
     public EjbJar app() {
         return new EjbJar();
@@ -85,7 +85,7 @@ public class LibraryManagerTest {
 
     @Module
     public PersistenceUnit persistence() {
-        return TestBase.persistence(new String[]{ Library.class.getName(), LibraryFieldDefinition.class.getName(), 
+        return TestBase.persistence(new String[]{ Library.class.getName(), LibraryField.class.getName(),
             FieldDefinition.class.getName(), DynEnum.class.getName(), FieldType.class.getName() });
     }
 
