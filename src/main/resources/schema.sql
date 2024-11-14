@@ -173,7 +173,7 @@ CREATE TABLE field_definitions (
 
 CREATE TABLE field_measures (
     field_id VARCHAR NOT NULL REFERENCES field_definitions(id),
-    measure VARCHAR NOT NULL,
+    measure INTEGER NOT NULL,
     PRIMARY KEY (field_id, measure)
 );
 

@@ -55,7 +55,7 @@ public class LibraryFieldId implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(library_id) + Objects.hash(field_id);
+        return Objects.hash(library_id, field_id);
     }
 
     public String getLibrary_id() {

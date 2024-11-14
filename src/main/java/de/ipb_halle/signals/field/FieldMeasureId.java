@@ -18,6 +18,7 @@
 package de.ipb_halle.signals.field;
 
 import de.ipb_halle.signals.entity.Quality;
+import jakarta.persistence.Embeddable;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -25,6 +26,7 @@ import java.util.Objects;
 /**
  * JPA compound Id class for field definition measures
  */
+@Embeddable
 public class FieldMeasureId implements Serializable {
     private final static long serialVersionUID = 1L;
 

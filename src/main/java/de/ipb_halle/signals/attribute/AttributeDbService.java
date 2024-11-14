@@ -80,7 +80,7 @@ public class AttributeDbService {
         this.em.merge(entity);
         if (AttributeType.valueOf(AttributeType.CHOICE).equals(attr.getType()))
             for (AttributeValue value : attr.getOptions()) {
-                logger.trace(String.format("AttributeValue(id=%s): %s\n", value.getId(), value.getValue()));
+                logger.trace(String.format("AttributeValue(id=%s): %s", value.getId(), value.getValue()));
                 this.em.merge(value);
             }
     }
