@@ -23,14 +23,15 @@ import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.dynEnum.DynEnum;
 import de.ipb_halle.signals.dynEnum.DynEnumDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
-import de.ipb_halle.signals.field.FieldDefinition;
-import de.ipb_halle.signals.field.FieldDbService;
-import de.ipb_halle.signals.field.FieldParser;
-import de.ipb_halle.signals.field.FieldType;
+import de.ipb_halle.signals.entity.SignalsEntityDbService;
+import de.ipb_halle.signals.entity.SignalsEntityRestService;
+import de.ipb_halle.signals.field.*;
 import de.ipb_halle.signals.rest.MockRestClient;
+import de.ipb_halle.signals.util.EmbeddedKeyValue;
 
 import java.util.Properties;
 import java.util.Set;
+
 import jakarta.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,7 +49,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 
 @RunWith(ApplicationComposer.class)
-public class LibraryManagerTest {
+public class MaterialsManagerTest {
 
     private final String TEST_RESOURCE_1 = "LibraryManagerTest001.json";
     private final String TEST_KEY_1 = 
@@ -70,23 +71,25 @@ public class LibraryManagerTest {
     private LibraryDbService dbService;
     
     @Inject
-    private LibraryManager manager;
+    private MaterialsManager manager;
 
     @Module
     @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class, 
         FieldDefinition.class, FieldDbService.class, FieldParser.class,
+        FieldValue.class, SignalsEntityRestService.class, SignalsEntityDbService.class,
         DynEnum.class, DynEnumDbService.class, DynEnumManager.class,
         Library.class, LibraryEntity.class, 
-        LibraryField.class, LibraryFieldId.class,
-        LibraryDbService.class, LibraryManager.class, LibraryRestService.class })
+        LibraryField.class, EmbeddedKeyValue.class,
+        Material.class, MaterialEntity.class, MaterialDbService.class, MaterialRestService.class,
+        LibraryDbService.class, MaterialsManager.class, LibraryRestService.class })
     public EjbJar app() {
         return new EjbJar();
     }
 
     @Module
     public PersistenceUnit persistence() {
-        return TestBase.persistence(new String[]{ Library.class.getName(), LibraryField.class.getName(),
-            FieldDefinition.class.getName(), DynEnum.class.getName(), FieldType.class.getName() });
+        return TestBase.persistence(new String[]{ LibraryEntity.class.getName(),  LibraryField.class.getName(),
+            FieldDefinition.class.getName(), DynEnum.class.getName(), FieldType.class.getName(), MaterialEntity.class.getName() });
     }
 
     @Configuration

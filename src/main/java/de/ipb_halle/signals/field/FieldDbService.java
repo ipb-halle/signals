@@ -77,7 +77,7 @@ public class FieldDbService {
         Root<FieldOption> root = criteriaQuery.from(FieldOption.class);
         criteriaQuery.select(root);
 
-        criteriaQuery.where(builder.equal(root.get("id").get("field_id"), id));
+        criteriaQuery.where(builder.equal(root.get("id").get("id"), id));
         return em.createQuery(criteriaQuery).getResultList();
     }
 

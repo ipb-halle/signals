@@ -25,6 +25,10 @@ public class UserReference implements IUser {
 
     private String id;
 
+    public UserReference(String id) {
+        this.id = id;
+    }
+
     public String dump() {
         return String.format("User reference(%s)", id);
     }

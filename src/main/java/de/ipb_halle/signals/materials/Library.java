@@ -97,12 +97,12 @@ public class Library {
         batchDisplayName = le.getBatchDisplayName();
         batchNumberingFormat = le.getBatchNumberingFormat() ;
         createdAt = le.getCreatedAt();
-        createdBy = new UserReference().setId(le.getCreatedBy());
+        createdBy = new UserReference(le.getCreatedBy());
         digest = le.getDigest();
         displayImage = le.getDisplayImage();
         displayTable = le.getDisplayTable();
         editedAt = le.getEditedAt();
-        editedBy = new UserReference().setId(le.getEditedBy());
+        editedBy = new UserReference(le.getEditedBy());
         enabled = le.isEnabled();
         entityFlags = le.getEntityFlags();
         materialsSampleMapping = le.getMaterialsSampleMapping();

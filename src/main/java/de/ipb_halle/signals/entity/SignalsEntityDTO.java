@@ -21,10 +21,9 @@ import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.users.IUser;
 import de.ipb_halle.signals.users.UserReference;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
-public class SignalsEntityDTO {
+public class SignalsEntityDTO implements EntityRelationships {
 
     public final static String ATTR_EID = "eid";
     public final static String ATTR_CREATED_AT = "createdAt";
@@ -32,6 +31,7 @@ public class SignalsEntityDTO {
     public final static String ATTR_CREATED_BY = "relationships.createdBy.data.id";
     public final static String ATTR_EDITED_BY = "relationships.editedBy.data.id";
     public final static String ATTR_OWNER = "relationships.owner.data.id";
+    public final static String ATTR_ANCESTORS = "relationships.ancestors.data";
     public final static String ATTR_FIELDS = "fields";
     public final static String ATTR_FLAGS = "flags";
 
@@ -47,13 +47,14 @@ public class SignalsEntityDTO {
     private IUser editedBy;
     private Long digest;
     private Date timeStamp;
-    //private List<String> children;
+    private Set<ISignalsEntity> ancestors;
     //private List<String> flags;
 
     /**
      * default constructor
      */
     public SignalsEntityDTO() {
+        ancestors = new HashSet<>();
     }
 
     public SignalsEntityDTO(SignalsEntity entity , DynEnumManager dynEnumManager) {
@@ -63,12 +64,14 @@ public class SignalsEntityDTO {
         this.name = entity.getName();
         this.description = entity.getDescription();
         this.createdAt = entity.getCreatedAt();
-        this.createdBy = new UserReference().setId(entity.getCreatedBy());
-        this.owner = new UserReference().setId(entity.getOwner());;
+        this.createdBy = new UserReference(entity.getCreatedBy());
+        this.owner = new UserReference(entity.getOwner());;
         this.editedAt = entity.getEditedAt();
-        this.editedBy = new UserReference().setId(entity.getEditedBy());
+        this.editedBy = new UserReference(entity.getEditedBy());
         this.digest = entity.getDigest();
         this.timeStamp = entity.getTimeStamp();
+        /* complex types */
+        this.ancestors = new HashSet<> ();
     }
 
     public SignalsEntity createEntity() {
@@ -86,6 +89,11 @@ public class SignalsEntityDTO {
         entity.setTimeStamp(timeStamp);
         entity.setType(type.getId());
         return entity;
+    }
+
+    @Override
+    public void addAllAncestors(Collection<ISignalsEntity> ancestors) {
+        this.ancestors.addAll(ancestors);
     }
 
     public String dump() {
@@ -106,6 +114,16 @@ public class SignalsEntityDTO {
 
     public EntityType getType() {
         return type;
+    }
+
+    @Override
+    public Set<ISignalsEntity> getAncestors() {
+        return ancestors;
+    }
+
+    @Override
+    public void setAncestors(Set<ISignalsEntity> ancestors) {
+        this.ancestors = ancestors;
     }
 
     public void setId(String i) {
@@ -140,42 +158,52 @@ public class SignalsEntityDTO {
         this.description = description;
     }
 
+    @Override
     public Date getCreatedAt() {
         return createdAt;
     }
 
+    @Override
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
+    @Override
     public IUser getCreatedBy() {
         return createdBy;
     }
 
+    @Override
     public void setCreatedBy(IUser createdBy) {
         this.createdBy = createdBy;
     }
 
+    @Override
     public IUser getOwner() {
         return owner;
     }
 
+    @Override
     public void setOwner(IUser owner) {
         this.owner = owner;
     }
 
+    @Override
     public Date getEditedAt() {
         return editedAt;
     }
 
+    @Override
     public void setEditedAt(Date editedAt) {
         this.editedAt = editedAt;
     }
 
+    @Override
     public IUser getEditedBy() {
         return editedBy;
     }
 
+    @Override
     public void setEditedBy(IUser editedBy) {
         this.editedBy = editedBy;
     }

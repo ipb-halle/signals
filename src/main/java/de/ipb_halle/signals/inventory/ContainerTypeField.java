@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals.inventory;
 
+import de.ipb_halle.signals.util.EmbeddedKeyValue;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -33,15 +34,15 @@ import java.util.Objects;
 public class ContainerTypeField {
 
     @EmbeddedId
-    private ContainerTypeFieldId id;
+    private EmbeddedKeyValue id;
 
 
     public ContainerTypeField() {
-        id = new ContainerTypeFieldId();
+        id = new EmbeddedKeyValue();
     }
 
     public ContainerTypeField(String ct, String f) {
-        id = new ContainerTypeFieldId(ct, f);
+        id = new EmbeddedKeyValue(ct, f);
     }
 
     @Override
@@ -54,11 +55,11 @@ public class ContainerTypeField {
     }
 
     public String getContainerTypeId() {
-        return id.getContainer_type_id();
+        return id.getId();
     }
 
     public String getFieldId() {
-        return id.getField_id();
+        return id.getValue();
     }
 
     @Override
@@ -67,12 +68,12 @@ public class ContainerTypeField {
     }
 
     public ContainerTypeField setContainerTypeId(String ct) {
-        id.setContainer_type_id(ct);
+        id.setId(ct);
         return this;
     }
 
     public ContainerTypeField setFieldId(String f) {
-        id.setField_id(f);
+        id.setValue(f);
         return this;
     }
 }

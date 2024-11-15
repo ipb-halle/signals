@@ -17,16 +17,14 @@
  */
 package de.ipb_halle.signals.inventory;
 
-import de.ipb_halle.signals.entity.EntityType;
-import de.ipb_halle.signals.entity.SignalsEntityDTO;
-import de.ipb_halle.signals.entity.SignalsEntityDbService;
-import de.ipb_halle.signals.entity.SignalsEntityRestService;
+import de.ipb_halle.signals.entity.*;
 import de.ipb_halle.signals.users.UserManager;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.stream.Location;
 import java.util.*;
 
 

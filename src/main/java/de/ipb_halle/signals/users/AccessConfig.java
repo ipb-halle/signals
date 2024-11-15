@@ -21,8 +21,7 @@ package de.ipb_halle.signals.users;
 import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.Signals;
 import de.ipb_halle.signals.SignalsConfig;
-import de.ipb_halle.signals.materials.LibraryManager;
-import de.ipb_halle.signals.materials.MaterialsConfig;
+
 import java.util.Date;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;

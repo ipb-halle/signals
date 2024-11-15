@@ -78,7 +78,7 @@ public class ContainerTypeDbService {
         CriteriaQuery<ContainerTypeField> criteriaQuery = builder.createQuery(ContainerTypeField.class);
         Root<ContainerTypeField> root = criteriaQuery.from(ContainerTypeField.class);
         criteriaQuery.select(root);
-        criteriaQuery.where(builder.equal(root.get("id").get(CONTAINER_TYPE_ID), id));
+        criteriaQuery.where(builder.equal(root.get("id").get("id"), id));
 
         List<Field> result = new ArrayList();
         for (ContainerTypeField fd : em.createQuery(criteriaQuery).getResultList()) {

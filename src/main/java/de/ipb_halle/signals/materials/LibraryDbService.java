@@ -51,37 +51,16 @@ public class LibraryDbService {
 
     private Logger logger = LoggerFactory.getLogger(LibraryDbService.class);
 
-/*
-    private List<FieldDefinition> loadFieldDefinitions(String id, String type) {
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<LibraryFieldDefinition> criteriaQuery = builder.createQuery(LibraryFieldDefinition.class);
-        Root<LibraryFieldDefinition> root = criteriaQuery.from(LibraryFieldDefinition.class);
-        criteriaQuery.select(root);
-
-        List<Predicate> predicates = new ArrayList<Predicate> ();
-        predicates.add(builder.equal(root.get(LIBRARY_ID), id));
-        predicates.add(builder.equal(root.get(LIBRARY_FIELD_TYPE), type));
-
-        criteriaQuery.where(builder.and(predicates.toArray(new Predicate[]{})));
-
-        List<FieldDefinition> result = new ArrayList<> ();
-        for (LibraryFieldDefinition fd : em.createQuery(criteriaQuery).getResultList()) {
-            logger.debug("Load library field: lib={}, fd={}, type={}", id, fd.getFieldDefinitionId(), fd.getType());
-            result.add(fieldService.loadById(fd.getFieldDefinitionId()));
-        }
-        return result;
-    }
-*/
-    
     public Library loadById(String id) {
         logger.debug("Load library: id={}", id);
         LibraryEntity entity = em.find(LibraryEntity.class, id);
-        return new Library(entity);
+        Library lib = new Library(entity);
             /*
             ToDo: load FieldDefinitions via FieldDefinitionDbService
             loadFieldDefinitions(id, ASSET),
             loadFieldDefinitions(id, BATCH));
              */
+        return lib;
     }
 
     public void save(Library lib) {

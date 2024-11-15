@@ -93,12 +93,12 @@ public class Container {
         coordinateX = ce.getCoordinateX();
         coordinateY = ce.getCoordinateY();
         createdAt = ce.getCreatedAt();
-        createdBy = new UserReference().setId(ce.getCreatedBy());
+        createdBy = new UserReference(ce.getCreatedBy());
         location = new LocationReference().setId(ce.getLocationId());
         name = ce.getName();
         unit = Unit.getUnit(ce.getUnit());
         updatedAt = ce.getUpdatedAt();
-        updatedBy = new UserReference().setId(ce.getUpdatedBy());
+        updatedBy = new UserReference(ce.getUpdatedBy());
 
         fieldValues = new HashSet<> ();
         materials = new HashSet<> ();

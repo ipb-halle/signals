@@ -1,6 +1,6 @@
 /*
  * IPB Signals client
- * Copyright 2024 Leibniz-Institut f. Pflanzenbiochemie
+ * Copyright 2022 Leibniz-Institut f. Pflanzenbiochemie
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,10 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.materials;
+package de.ipb_halle.signals.entity;
 
-/**
- *
- * @author fblocal
- */
-public interface IMaterial {
-    public String dump();
+public interface ISignalsEntity {
+
     public String getId();
-    public IMaterial setId(String i);
+
 }

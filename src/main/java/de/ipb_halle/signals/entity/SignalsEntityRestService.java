@@ -1,6 +1,6 @@
 /*
  * IPB Signals client
- * Copyright 2022 Leibniz-Institut f. Pflanzenbiochemie
+ * Copyright 2024 Leibniz-Institut f. Pflanzenbiochemie
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,9 @@ import jakarta.inject.Inject;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -59,24 +61,29 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
         dto.setEid(attributes.has(SignalsEntityDTO.ATTR_EID)?attributes.get(SignalsEntityDTO.ATTR_EID).getAsString():null);
         dto.setName(attributes.has(RestHelper.ATTR_NAME) ? attributes.get(RestHelper.ATTR_NAME).getAsString() : null);
         dto.setDescription(attributes.has(RestHelper.ATTR_DESCRIPTION) ? attributes.get(RestHelper.ATTR_DESCRIPTION).getAsString() : null);
-        dto.setCreatedAt(attributes.has(SignalsEntityDTO.ATTR_CREATED_AT) ? Date.from(Instant.parse(attributes.get(SignalsEntityDTO.ATTR_CREATED_AT).getAsString())) : null);
-        dto.setEditedAt(attributes.has(SignalsEntityDTO.ATTR_EDITED_AT) ? Date.from(Instant.parse(attributes.get(SignalsEntityDTO.ATTR_EDITED_AT).getAsString())) : null);
         dto.setDigest(attributes.has(RestHelper.ATTR_DIGEST) ? Long.parseLong(attributes.get(RestHelper.ATTR_DIGEST).getAsString()) : null);
-        
+
+        parseTimestamps(attributes, dto);
         parseRelationships(jsonObj, dto);
         return dto;
     }
 
-    private void parseRelationships(JsonObject relationships, SignalsEntityDTO dto) {
-        dto.setCreatedBy(new UserReference().setId(
+    public void parseTimestamps(JsonObject attributes, EntityRelationships entityRel) {
+        entityRel.setCreatedAt(attributes.has(SignalsEntityDTO.ATTR_CREATED_AT) ? Date.from(Instant.parse(attributes.get(SignalsEntityDTO.ATTR_CREATED_AT).getAsString())) : null);
+        entityRel.setEditedAt(attributes.has(SignalsEntityDTO.ATTR_EDITED_AT) ? Date.from(Instant.parse(attributes.get(SignalsEntityDTO.ATTR_EDITED_AT).getAsString())) : null);
+    }
+
+    public void parseRelationships(JsonObject relationships, EntityRelationships entityRel) {
+        entityRel.setCreatedBy(new UserReference(
                 RestHelper.parseString(
                         RestHelper.getPrimitiveFromPath(relationships, SignalsEntityDTO.ATTR_CREATED_BY), null)));
-        dto.setEditedBy(new UserReference().setId(
+        entityRel.setEditedBy(new UserReference(
                 RestHelper.parseString(
                         RestHelper.getPrimitiveFromPath(relationships, SignalsEntityDTO.ATTR_EDITED_BY), null)));
-        dto.setOwner(new UserReference().setId(
+        entityRel.setOwner(new UserReference(
                 RestHelper.parseString(
                         RestHelper.getPrimitiveFromPath(relationships, SignalsEntityDTO.ATTR_OWNER), null)));
+        entityRel.addAllAncestors(parseAncestors(relationships));
     }
 
     public RestResultIterator<SignalsEntityDTO> doGetEntities(Map<String, Object> cmap) {
@@ -108,5 +115,9 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
             }
             restClient.putUriParameter(PARAMETER_INCLUDE_TYPES, sb.toString());
         }
+    }
+
+    private List<ISignalsEntity> parseAncestors(JsonObject json) {
+        return new ArrayList<ISignalsEntity>();
     }
 }

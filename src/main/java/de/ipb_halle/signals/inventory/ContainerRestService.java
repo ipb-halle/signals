@@ -105,11 +105,11 @@ public class ContainerRestService implements RestReplyParser<Container> {
 
     private void parseChangeRecords(JsonObject json, Container ct) {
         ct.setCreatedAt(RestHelper.parseDate(json, Container.ATTR_CREATED_AT));
-        ct.setCreatedBy(new UserReference().setId(
+        ct.setCreatedBy(new UserReference(
                     RestHelper.parseString(
                     RestHelper.getPrimitiveFromPath(json, Container.ATTR_CREATED_BY))));
         ct.setUpdatedAt(RestHelper.parseDate(json, Container.ATTR_UPDATED_AT));
-        ct.setUpdatedBy(new UserReference().setId(
+        ct.setUpdatedBy(new UserReference(
                     RestHelper.parseString(
                     RestHelper.getPrimitiveFromPath(json, Container.ATTR_UPDATED_BY))));
     }

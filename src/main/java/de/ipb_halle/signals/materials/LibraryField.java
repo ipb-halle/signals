@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals.materials;
 
+import de.ipb_halle.signals.util.EmbeddedKeyValue;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -34,14 +35,15 @@ import java.util.Objects;
 public class LibraryField {
 
     @EmbeddedId
-    private LibraryFieldId id;
+    private EmbeddedKeyValue id;
+
 
     public LibraryField() {
-        id = new LibraryFieldId();
+        id = new EmbeddedKeyValue();
     }
 
     public LibraryField(String lib, String fd) {
-    id = new LibraryFieldId(lib, fd);
+        id = new EmbeddedKeyValue(lib, fd);
     }
 
     @Override
@@ -49,16 +51,16 @@ public class LibraryField {
         if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
-        LibraryField other = (LibraryField) o;
-        return Objects.equals(id, other.id);
+        EmbeddedKeyValue other = (EmbeddedKeyValue) o;
+        return Objects.equals(id, other);
     }
 
     public String getLibraryId() {
-        return id.getLibrary_id();
+        return id.getId();
     }
 
     public String getFieldId() {
-        return id.getField_id();
+        return id.getValue();
     }
 
     @Override
@@ -67,12 +69,12 @@ public class LibraryField {
     }
 
     public LibraryField setLibraryId(String lib) {
-        id.setLibrary_id(lib);
+        id.setId(lib);
         return this;
     }
 
     public LibraryField setFieldId(String f) {
-        id.setField_id( f);
+        id.setValue(f);
         return this;
     }
 }

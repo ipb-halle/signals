@@ -17,10 +17,12 @@
  */
 package de.ipb_halle.signals.materials;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import de.ipb_halle.signals.entity.SignalsEntityRestService;
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.RestHelper;
@@ -29,6 +31,7 @@ import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Iterator;
 
 import jakarta.ejb.Local;
 import jakarta.inject.Inject;
@@ -43,23 +46,44 @@ import org.slf4j.LoggerFactory;
 @Local
 public class MaterialRestService implements RestReplyParser<Material> {
 
-    public final String MATERIAL_ENDPOINT = "/materials/%s";
+    /* could use either /materials/eid or /entities/eid */
+    public final String MATERIAL_ENDPOINT = "/entities/%s";
 
     @Inject
     private RestClient restClient;
+
+    @Inject
+    private SignalsEntityRestService entityRestService;
 
     private Logger logger = LoggerFactory.getLogger(MaterialRestService.class);
 
     public Material parseReply(JsonElement json) {
         Material mat = new Material();
-        JsonObject j = json.getAsJsonObject();
-        JsonObject attributes  = j.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
+        JsonObject jsonObj = json.getAsJsonObject();
+        JsonObject attributes  = jsonObj.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
-        mat.setId(RestHelper.parseString(j, RestHelper.ATTR_ID));
+        mat.setId(RestHelper.parseString(jsonObj, RestHelper.ATTR_ID));
+        mat.setName(attributes.has(RestHelper.ATTR_NAME) ? attributes.get(RestHelper.ATTR_NAME).getAsString() : null);
+        mat.setDescription(attributes.has(RestHelper.ATTR_DESCRIPTION) ? attributes.get(RestHelper.ATTR_DESCRIPTION).getAsString() : null);
+        mat.setDigest(attributes.has(RestHelper.ATTR_DIGEST) ? Long.parseLong(attributes.get(RestHelper.ATTR_DIGEST).getAsString()) : null);
 
+        entityRestService.parseTimestamps(attributes, mat);
+        entityRestService.parseRelationships(jsonObj, mat);
+        parseSynonyms(attributes, mat);
         return mat;
     }
-    
+
+    private void parseSynonyms(JsonObject attributes, Material material) {
+        if (attributes.has(Material.ATTR_SYNONYMS)) {
+            JsonArray array = attributes.getAsJsonArray(Material.ATTR_SYNONYMS);
+            Iterator<JsonElement> iter = array.iterator();
+            while (iter.hasNext()) {
+                Synonym synonym = new Synonym(material.getId(), iter.next().getAsString());
+                material.addSynonym(synonym);
+            }
+        }
+    }
+
     private JsonElement fetch(String id) {
         JsonElement jsonResult;
         try {

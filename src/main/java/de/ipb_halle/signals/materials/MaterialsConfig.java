@@ -41,14 +41,14 @@ public class MaterialsConfig {
             .desc("\nSynchronize materials libraries and materials from SNB to DB.")
             .build();
 
-    private LibraryManager libraryManager;
+    private MaterialsManager materialsManager;
     private RuntimeConfig runtimeConfig;
     private SignalsConfig signalsConfig;
     private Logger logger;
 
-    public MaterialsConfig(SignalsConfig signalsConfig, RuntimeConfig runtimeConfig, LibraryManager libraryManager) {
+    public MaterialsConfig(SignalsConfig signalsConfig, RuntimeConfig runtimeConfig, MaterialsManager materialsManager) {
         this.logger = LoggerFactory.getLogger(MaterialsConfig.class);
-        this.libraryManager = libraryManager;
+        this.materialsManager = materialsManager;
         this.runtimeConfig = runtimeConfig;
         this.signalsConfig = signalsConfig;
     }
@@ -64,7 +64,8 @@ public class MaterialsConfig {
                 ******************************************************
                 """, signalsConfig.getSnbInstanceName(), new Date().toString());
 
-        libraryManager.manageLibraries(runtimeConfig);
+        materialsManager.manageLibraries(runtimeConfig);
+        materialsManager.manageMaterials(runtimeConfig, dateRange);
     }
 
 

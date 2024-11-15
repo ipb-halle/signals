@@ -29,6 +29,8 @@ import de.ipb_halle.signals.rest.MockRestClient;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+
+import de.ipb_halle.signals.util.EmbeddedKeyValue;
 import jakarta.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,7 +76,7 @@ public class ContainerTypeManagerTest {
         Field.class, FieldDefinition.class, FieldDbService.class, FieldParser.class,
         ContainerType.class, ContainerTypeEntity.class, 
         ContainerTypeAttachment.class, ContainerTypeAttachmentId.class,
-        ContainerTypeField.class, ContainerTypeFieldId.class,
+        ContainerTypeField.class, EmbeddedKeyValue.class,
         ContainerTypeDbService.class, ContainerTypeManager.class, ContainerTypeRestService.class })
     public EjbJar app() {
         return new EjbJar();

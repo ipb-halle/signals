@@ -17,14 +17,13 @@
  */
 package de.ipb_halle.signals;
 
-import de.ipb_halle.signals.attribute.Attribute;
 import de.ipb_halle.signals.attribute.AttributeManager;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.SignalsEntityConfig;
 import de.ipb_halle.signals.entity.SignalsEntityManager;
 import de.ipb_halle.signals.inventory.InventoryConfig;
 import de.ipb_halle.signals.inventory.InventoryManager;
-import de.ipb_halle.signals.materials.LibraryManager;
+import de.ipb_halle.signals.materials.MaterialsManager;
 import de.ipb_halle.signals.materials.MaterialsConfig;
 import de.ipb_halle.signals.users.AccessConfig;
 import de.ipb_halle.signals.users.AccessManager;
@@ -79,7 +78,7 @@ public class Signals {
     private InventoryManager inventoryManager;
 
     @Inject
-    private LibraryManager libraryManager;
+    private MaterialsManager materialsManager;
 
     @Inject
     private LdapClient ldapClient;
@@ -131,7 +130,7 @@ public class Signals {
         inventoryConfig = new InventoryConfig(signalsConfig,
                 runtimeConfig, inventoryManager);
         materialsConfig = new MaterialsConfig(signalsConfig,
-                runtimeConfig, libraryManager);
+                runtimeConfig, materialsManager);
         signalsEntityConfig = new SignalsEntityConfig(signalsConfig,
                 runtimeConfig, attributeManager, signalsEntityManager);
     }

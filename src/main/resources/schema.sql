@@ -25,7 +25,10 @@ INSERT INTO dyn_enums (type, value) VALUES
     ('EntityType', 'ado'),
     ('EntityType', 'attribute'),
     ('AttributeType', 'choice'),
-    ('AttributeType', 'auto');
+    ('AttributeType', 'auto'),
+    ('FieldDesignation','default'),
+    ('FieldDesignation','asset'),
+    ('FieldDesignation','batch');
 
 CREATE TABLE signalsentities (
     id VARCHAR PRIMARY KEY,
@@ -42,15 +45,32 @@ CREATE TABLE signalsentities (
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+/*
+ * Children of entities: We cannot use a foreign key for
+ * child_id because the child may not yet be entered into
+ * the signalsentities table, when the child_id is discovered.
+ */
 CREATE TABLE signalsentities_children (
-    signals_entity_id VARCHAR(255),
-    child_id VARCHAR(255),
-    FOREIGN KEY (signals_entity_id) REFERENCES signalsentities(id)
+    signals_entity_id VARCHAR NOT NULL REFERENCES signalsentities(id),
+    child_id VARCHAR NOT NULL,
+    PRIMARY KEY (signals_entity_id, child_id)
+);
+
+/*
+ * Ancestors of entities: We cannot use a foreign key for
+ * ancestor_id because the ancestor may not yet be entered into
+ * the signalsentities table, when the ancestor_id is discovered.
+ */
+
+CREATE TABLE signalsentities_ancestors (
+    signals_entity_id VARCHAR NOT NULL REFERENCES signalsentities(id),
+    ancestor_id VARCHAR NOT NULL,
+    PRIMARY KEY (signals_entity_id, ancestor_id)
 );
 
 CREATE TABLE signalsentities_flags (
-    signals_entity_id VARCHAR(255),
-    flag_value VARCHAR(255),
+    signals_entity_id VARCHAR,
+    flag_value VARCHAR,
     FOREIGN KEY (signals_entity_id) REFERENCES signalsentities(id)
 );
 
@@ -67,6 +87,13 @@ CREATE TABLE attribute_values (
     value VARCHAR,
     PRIMARY KEY (id, value)
 );
+
+CREATE TABLE synonyms (
+    id VARCHAR NOT NULL REFERENCES signalsentities(id),
+    value VARCHAR NOT NULL,
+    PRIMARY KEY (id, value)
+);
+
 
 CREATE TABLE location_types (
     id VARCHAR NOT NULL PRIMARY KEY,
@@ -178,9 +205,9 @@ CREATE TABLE field_measures (
 );
 
 CREATE TABLE field_options (
-    field_id VARCHAR NOT NULL REFERENCES field_definitions(id),
-    option VARCHAR NOT NULL,
-    PRIMARY KEY (field_id, option)
+    id VARCHAR NOT NULL REFERENCES field_definitions(id),
+    value VARCHAR NOT NULL,
+    PRIMARY KEY (id, value)
 );
 
 CREATE TABLE attachments (
@@ -211,9 +238,9 @@ CREATE TABLE container_type_attachments (
 );
 
 CREATE TABLE container_type_fields (
-    container_type_id VARCHAR NOT NULL REFERENCES container_types (id),
-    field_id VARCHAR NOT NULL REFERENCES field_definitions (id),
-    PRIMARY KEY (container_type_id, field_id)
+    id VARCHAR NOT NULL REFERENCES container_types (id),
+    value VARCHAR NOT NULL REFERENCES field_definitions (id),
+    PRIMARY KEY (id, value)
 );
 
 CREATE TABLE libraries (
@@ -238,9 +265,9 @@ CREATE TABLE libraries (
 );
 
 CREATE TABLE library_fields (
-    library_id VARCHAR NOT NULL REFERENCES libraries (id),
-    field_id VARCHAR NOT NULL REFERENCES field_definitions (id),
-    PRIMARY KEY (library_id, field_id)
+    id VARCHAR NOT NULL REFERENCES libraries (id),
+    value VARCHAR NOT NULL REFERENCES field_definitions (id),
+    PRIMARY KEY (id, value)
 );
 
 CREATE TABLE materials (
