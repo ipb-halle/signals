@@ -186,6 +186,7 @@ CREATE TABLE field_definitions (
     calculated BOOLEAN,
     default_unit VARCHAR,
     defined_by VARCHAR,
+    defining_entity_id VARCHAR /* NOT NULL signalsentities(id) */,
     description VARCHAR,
     designation INTEGER NOT NULL REFERENCES dyn_enums(id),
     field_type VARCHAR,
@@ -208,6 +209,13 @@ CREATE TABLE field_options (
     id VARCHAR NOT NULL REFERENCES field_definitions(id),
     value VARCHAR NOT NULL,
     PRIMARY KEY (id, value)
+);
+
+CREATE TABLE field_values (
+    entity_id VARCHAR NOT NULL REFERENCES signalsentities(id),
+    field_id VARCHAR NOT NULL REFERENCES field_definitions(id),
+    value VARCHAR,
+    PRIMARY KEY (entity_id, field_id)
 );
 
 CREATE TABLE attachments (
@@ -271,7 +279,29 @@ CREATE TABLE library_fields (
 );
 
 CREATE TABLE materials (
-    id VARCHAR NOT NULL PRIMARY KEY
+    id VARCHAR NOT NULL PRIMARY KEY,
+    created_at TIMESTAMP,
+    created_by VARCHAR /* NOT NULL REFERENCES users(id) */,
+    description VARCHAR,
+    digest VARCHAR,
+    edited_at TIMESTAMP,
+    edited_by VARCHAR /* NOT NULL REFERENCES users(id) */,
+    library_id VARCHAR REFERENCES libraries(id),
+    name VARCHAR,
+    owner VARCHAR /* NOT NULL REFERENCES users(id) */
+);
+
+CREATE TABLE material_batches (
+    id VARCHAR NOT NULL PRIMARY KEY,
+    created_at TIMESTAMP,
+    created_by VARCHAR /* NOT NULL REFERENCES users(id) */,
+    description VARCHAR,
+    digest VARCHAR,
+    edited_at TIMESTAMP,
+    edited_by VARCHAR /* NOT NULL REFERENCES users(id) */,
+    material_id VARCHAR REFERENCES materials(id),
+    name VARCHAR,
+    owner VARCHAR /* NOT NULL REFERENCES users(id) */
 );
 
 CREATE TABLE containers (

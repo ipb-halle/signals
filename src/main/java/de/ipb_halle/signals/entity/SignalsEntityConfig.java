@@ -132,9 +132,11 @@ public class SignalsEntityConfig {
                 *
                 * Manage Signals Attributes and Entities
                 * {} / {}
+                * From: {}   to: {}
                 *
                 ******************************************************
-                """, signalsConfig.getSnbInstanceName(), new Date().toString());
+                """, signalsConfig.getSnbInstanceName(), new Date().toString(),
+                dateRange[0], dateRange[1]);
 
         attributeManager.manageAttributes();
         signalsEntityManager.fetchSnbEntities(dateRange,

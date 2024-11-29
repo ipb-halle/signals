@@ -45,8 +45,17 @@ public class FieldDefinition {
     @Column(name = "default_unit")
     private String defaultUnit;
 
+    /**
+     *  SYSTEM_DEFAULT or USER_ADDED
+     */
     @Column(name = "defined_by")
     private String definedBy;
+
+    /**
+     * The id of the entity, which defined this field.
+     */
+    @Column(name = "defining_entity_id")
+    private String definingEntityId;
 
     @Column(name = "field_type")
     private Integer fieldType;
@@ -95,6 +104,10 @@ public class FieldDefinition {
 
     public String getDefinedBy() {
         return definedBy;
+    }
+
+    public String getDefiningEntityId() {
+        return definingEntityId;
     }
 
     public Integer getFieldType() {
@@ -160,6 +173,10 @@ public class FieldDefinition {
     public FieldDefinition setDefinedBy(String d) {
         definedBy = d;
         return this;
+    }
+
+    public void setDefiningEntityId(String definingEntityId) {
+        this.definingEntityId = definingEntityId;
     }
 
     public FieldDefinition setFieldType(Integer t) {

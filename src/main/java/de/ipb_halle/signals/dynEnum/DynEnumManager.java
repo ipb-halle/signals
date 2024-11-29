@@ -27,10 +27,6 @@ import jakarta.ejb.Singleton;
 import jakarta.ejb.Startup;
 import jakarta.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
 /**
  * Database Service for DynEnums
  */
@@ -46,8 +42,6 @@ public class DynEnumManager {
 
     private Map<String, Map<String, DynEnum>> dynEnumsMapByType;
     private Map<Integer, DynEnum> dynEnumsById;
-
-    private final Logger logger = LoggerFactory.getLogger(DynEnumManager.class);
 
     /**
      * default constructor

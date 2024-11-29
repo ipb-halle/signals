@@ -53,6 +53,7 @@ public class FieldParser implements RestReplyParser<Field> {
     /**
      * ATTR_COLLECTION currently not implemented!
      */
+    @Override
     public Field parseReply(JsonElement json) {
         Field fd = new Field();
         JsonObject j = json.getAsJsonObject();
@@ -78,6 +79,14 @@ public class FieldParser implements RestReplyParser<Field> {
         }
         return fd;
     }
+
+    /**
+     *
+     * JSON object is for Material fields extraction
+     *
+     * @param def
+     * @param fd
+     */
 
     private void parseDefinition(JsonObject def, Field fd) {
         fd.setAttributeListEid(RestHelper.parseString(def, Field.ATTR_ATTRIBUTE_LIST_EID));

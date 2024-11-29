@@ -25,10 +25,6 @@ public class MaterialReference implements IMaterial {
 
     private String id;
 
-    public String dump() {
-        return String.format("MaterialReference(%s)\n", id);
-    }
-
     public String getId() {
         return id;
     }
@@ -36,6 +32,11 @@ public class MaterialReference implements IMaterial {
     public MaterialReference setId(String i) {
         id = i;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("MaterialReference(%s)\n", id);
     }
 }
 

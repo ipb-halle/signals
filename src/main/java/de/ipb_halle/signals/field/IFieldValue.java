@@ -15,13 +15,16 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.materials;
+package de.ipb_halle.signals.field;
 
-/**
- *
- * @author fblocal
- */
-public interface IMaterial {
-    public String getId();
-    public IMaterial setId(String i);
+public interface IFieldValue {
+
+    public Long getId();
+    public String getFieldId();
+    public String getFieldTitle();
+    public String getRawValue();
+    public IFieldValue setId(Long id);
+    public IFieldValue setFieldId(String fieldId);
+    public IFieldValue setFieldName(String fieldName);
+    public IFieldValue setRawValue(String rawValue);
 }

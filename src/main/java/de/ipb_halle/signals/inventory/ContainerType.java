@@ -33,7 +33,6 @@ public class ContainerType {
 
     public final static String ATTR_ATTACHMENTS = "attachments";
     public final static String ATTR_CREATED_AT = "createdAt";
-    public final static String ATTR_FIELDS = "fields";
     public final static String ATTR_IN_USE = "inUse";
     public final static String ATTR_MOVABLE = "isMovable";
     public final static String ATTR_NAME = "name";

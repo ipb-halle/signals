@@ -39,6 +39,7 @@ public class RestHelper {
     public final static String ATTR_DATA = "data";
     public final static String ATTR_DESCRIPTION = "description";
     public final static String ATTR_DIGEST = "digest";
+    public final static String ATTR_FIELDS = "fields";
     public final static String ATTR_ID = "id";
     public final static String ATTR_NAME = "name";
     public final static String ATTR_TYPE = "type";
@@ -159,6 +160,28 @@ public class RestHelper {
     public static Integer parseInt(JsonObject json, String attribute, Integer dflt) {
         if (jsonHas(json, attribute)) {
             return json.getAsJsonPrimitive(attribute).getAsInt();
+        }
+        return dflt;
+    }
+
+    public static Long parseLong(JsonPrimitive json) {
+        return json.getAsLong();
+    }
+
+    public static Long parseLong(JsonPrimitive json, Long dflt) {
+        if (json != null) {
+            return json.getAsLong();
+        }
+        return dflt;
+    }
+
+    public static Long parseLong(JsonObject json, String attribute) {
+        return parseLong(json, attribute, null);
+    }
+
+    public static Long parseLong(JsonObject json, String attribute, Long dflt) {
+        if (jsonHas(json, attribute)) {
+            return json.getAsJsonPrimitive(attribute).getAsLong();
         }
         return dflt;
     }

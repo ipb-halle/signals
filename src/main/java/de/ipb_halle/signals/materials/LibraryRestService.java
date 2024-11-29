@@ -137,6 +137,7 @@ public class LibraryRestService implements RestReplyParser<Library> {
         Iterator<JsonElement> iterator = jArray.iterator();
         while (iterator.hasNext()) {
             Field field = fieldParser.parseReply(iterator.next());
+            field.setDefiningEntityId(lib.getEId());
             field.setDesignation((FieldDesignation) dynEnumManager.valueOf(FieldDesignation.valueOf(FieldDesignation.ASSET)));
             lib.addAssetField(field);
 
@@ -155,6 +156,7 @@ public class LibraryRestService implements RestReplyParser<Library> {
         Iterator<JsonElement> iterator = jArray.iterator();
         while (iterator.hasNext()) {
             Field field = fieldParser.parseReply(iterator.next());
+            field.setDefiningEntityId(lib.getEId());
             field.setDesignation((FieldDesignation) dynEnumManager.valueOf(FieldDesignation.valueOf(FieldDesignation.BATCH)));
             lib.addBatchField(field);
         }

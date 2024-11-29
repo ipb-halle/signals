@@ -76,7 +76,7 @@ public class MaterialsManagerTest {
     @Module
     @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class, 
         FieldDefinition.class, FieldDbService.class, FieldParser.class,
-        FieldValue.class, SignalsEntityRestService.class, SignalsEntityDbService.class,
+        FieldValueEntity.class, SignalsEntityRestService.class, SignalsEntityDbService.class,
         DynEnum.class, DynEnumDbService.class, DynEnumManager.class,
         Library.class, LibraryEntity.class, 
         LibraryField.class, EmbeddedKeyValue.class,

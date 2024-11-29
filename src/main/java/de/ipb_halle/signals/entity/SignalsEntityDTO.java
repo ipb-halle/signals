@@ -32,7 +32,6 @@ public class SignalsEntityDTO implements EntityRelationships {
     public final static String ATTR_EDITED_BY = "relationships.editedBy.data.id";
     public final static String ATTR_OWNER = "relationships.owner.data.id";
     public final static String ATTR_ANCESTORS = "relationships.ancestors.data";
-    public final static String ATTR_FIELDS = "fields";
     public final static String ATTR_FLAGS = "flags";
 
     private String id;

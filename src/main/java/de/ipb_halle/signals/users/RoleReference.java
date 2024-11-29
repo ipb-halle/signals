@@ -59,4 +59,11 @@ public class RoleReference implements IRole {
         }
         return id.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return "RoleReference{" +
+                "id='" + id + '\'' +
+                '}';
+    }
 }

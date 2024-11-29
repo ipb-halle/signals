@@ -61,7 +61,7 @@ public class MaterialDbService {
         MaterialEntity entity = mat.createEntity();
         this.em.merge(entity);
         saveSynonyms(mat.getSynonyms());
-        // fieldDbService.save(mat.getFieldValues());
+        fieldDbService.save(mat.getFieldValues());
     }
 
     private void saveSynonyms(Collection<Synonym> synonyms) {

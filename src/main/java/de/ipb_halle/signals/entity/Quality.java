@@ -20,6 +20,9 @@ package de.ipb_halle.signals.entity;
 /**
  * Physical quality of units of measurement
  *
+ * Important: Must not change the order of enums as the index is
+ * used for database persistence!
+ *
  * @author fbroda
  */
 public enum Quality {

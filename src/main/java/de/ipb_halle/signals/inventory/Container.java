@@ -21,6 +21,8 @@ import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.entity.Unit;
 import de.ipb_halle.signals.materials.IMaterial;
 import de.ipb_halle.signals.users.UserReference;
+
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -43,7 +45,6 @@ public class Container {
     public final static String ATTR_CONTENT_TYPE = "entityType";
     public final static String ATTR_CREATED_AT = "createdAt";
     public final static String ATTR_CREATED_BY = "relationships.createdBy.data.id";
-    public final static String ATTR_FIELDS = "fields";
     public final static String ATTR_LOCATION_ID = "location.id";
     public final static String ATTR_UNIT = "unit";
     public final static String ATTR_UPDATED_AT = "updatedAt";
@@ -123,6 +124,10 @@ public class Container {
 
     public void addFieldValue(FieldValue v) {
         fieldValues.add(v);
+    }
+
+    public void addFieldValues(Collection<FieldValue> values) {
+        fieldValues.addAll(values);
     }
 
     public void addMaterial(IMaterial m) {

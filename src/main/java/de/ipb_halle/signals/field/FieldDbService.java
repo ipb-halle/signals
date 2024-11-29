@@ -18,15 +18,22 @@
 package de.ipb_halle.signals.field;
 
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
+import de.ipb_halle.signals.materials.LibraryDbService;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -42,6 +49,8 @@ public class FieldDbService {
 
     @Inject
     private DynEnumManager dynEnumManager;
+
+    private Logger logger = LoggerFactory.getLogger(FieldDbService.class);
 
     /**
      * Load a FieldDefinition entity by its ID.
@@ -59,6 +68,47 @@ public class FieldDbService {
                 .addAllOptions(options)
                 .addAllMeasures(measures);
         return field;
+    }
+
+    public List<Field> load(Map<String, Object> cmap) {
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<FieldDefinition> criteriaQuery = criteriaBuilder.createQuery(FieldDefinition.class);
+        Root<FieldDefinition> root = criteriaQuery.from(FieldDefinition.class);
+        criteriaQuery.select(root);
+
+        List<Predicate> predicates = new ArrayList<>();
+        if (cmap.containsKey(Field.FIELD_ID)) {
+            predicates.add(criteriaBuilder.equal(root.get("id"), cmap.get(Field.FIELD_ID)));
+        }
+        if (cmap.containsKey(Field.DEFINING_ENTITY_ID)) {
+            List<String> definingEntityIds = (List<String>) cmap.get(Field.DEFINING_ENTITY_ID);
+            /**
+             * "defining_entity_id" is a "library id" or other name is "AssetType id" from field
+             * takes all field from DB for all libraries
+             * translation in sql -> select * (Object Field) from field_definitions where defining_entity_id in ('definingEntityIds');
+             * ToDo: eventually complication with a big number of defining entitles (e.g. experiments) by querying with IN clause -> rework later
+             */
+            predicates.add(root.get(Field.DEFINING_ENTITY_ID).in(definingEntityIds));
+            //predicates.add(criteriaBuilder.equal(root.get(Field.DEFINING_ENTITY_ID), cmap.get(Field.DEFINING_ENTITY_ID)));
+        }
+        if (cmap.containsKey(Field.FIELD_TITLE)) {
+            predicates.add(criteriaBuilder.equal(root.get(Field.FIELD_TITLE), cmap.get(Field.FIELD_TITLE)));
+        }
+        criteriaQuery.where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
+
+        List<Field> results = new ArrayList<>();
+        for (FieldDefinition entity : em.createQuery(criteriaQuery).getResultList()) {
+            FieldType type = (FieldType) dynEnumManager.valueOf(entity.getFieldType());
+            FieldDesignation designation = (FieldDesignation) dynEnumManager.valueOf(entity.getFieldDesignation());
+            Field value = new Field(entity, type, designation);
+            /*
+             * load options
+             * load measures
+             */
+            logger.info(value.toString());
+            results.add(value);
+        }
+        return results;
     }
 
     private List<FieldMeasure> loadFieldMeasures(String id) {
@@ -91,6 +141,13 @@ public class FieldDbService {
         this.em.merge(field.createEntity());
         saveOptions(field);
         saveMeasures(field);
+    }
+
+    public void save(Collection<FieldValue> fieldValues) {
+        for (FieldValue value : fieldValues) {
+            FieldValueEntity entity = value.createEntity();
+            this.em.merge(entity);
+        }
     }
 
     private void saveMeasures(Field field) {

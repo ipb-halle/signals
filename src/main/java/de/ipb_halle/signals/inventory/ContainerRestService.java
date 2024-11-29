@@ -22,7 +22,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import de.ipb_halle.signals.field.FieldValueParser;
+import de.ipb_halle.signals.field.FieldValuesParser;
 import de.ipb_halle.signals.entity.Unit;
 import de.ipb_halle.signals.materials.MaterialReference;
 import de.ipb_halle.signals.rest.Method;
@@ -71,7 +71,7 @@ public class ContainerRestService implements RestReplyParser<Container> {
             RestHelper.getPrimitiveFromPath(attributes, Container.ATTR_LOCATION_ID))));
         ct.setName(RestHelper.parseString(attributes, RestHelper.ATTR_NAME));
         ct.setUnit(Unit.getUnit(RestHelper.parseString(attributes, Container.ATTR_UNIT)));
-        parseFieldValues(attributes.getAsJsonArray(Container.ATTR_FIELDS), ct);
+        parseFieldValues(attributes.getAsJsonArray(RestHelper.ATTR_FIELDS), ct);
         parseMaterials(attributes.getAsJsonArray(Container.ATTR_CONTENTS), ct);
 
         parseChangeRecords(j, ct);
@@ -116,11 +116,8 @@ public class ContainerRestService implements RestReplyParser<Container> {
 
 
     private void parseFieldValues(JsonArray jArray, Container ct) {
-        Iterator<JsonElement> iter = jArray.iterator();
-        FieldValueParser svc = new FieldValueParser();
-        while (iter.hasNext()) {
-            ct.addFieldValue(svc.parseReply(iter.next()));
-        }
+        FieldValuesParser svc = new FieldValuesParser();
+        ct.addFieldValues(svc.parseReply(jArray));
     }
 
     private void parseMaterials(JsonArray jArray, Container ct) {

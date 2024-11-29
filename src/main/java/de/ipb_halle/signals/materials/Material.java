@@ -23,6 +23,8 @@ import de.ipb_halle.signals.entity.ISignalsEntity;
 import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.users.IUser;
 import de.ipb_halle.signals.users.UserReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -32,7 +34,9 @@ import java.util.*;
 
 public class Material implements IMaterial, EntityRelationships {
 
+    public final static String ATTR_ASSET_TYPE_ID = "assetTypeId";
     public final static String ATTR_SYNONYMS = "synonyms";
+    private Logger logger = LoggerFactory.getLogger(MaterialRestService.class);
 
     public final static String ENTITY_TYPE_ASSET = "asset";
 
@@ -52,6 +56,9 @@ public class Material implements IMaterial, EntityRelationships {
     private Set<Attachment> attachments;
 
     public Material() {
+        synonyms = new HashSet<>();
+        fieldValues = new HashSet<>();
+        attachments = new HashSet<>();
     }
 
     public Material(MaterialEntity materialEntity) {
@@ -91,17 +98,13 @@ public class Material implements IMaterial, EntityRelationships {
         return this;
     }
 
-    public Material addAllFieldValues(Collection<FieldValue> values) {
+    public Material addAllFieldValues(List<FieldValue> values) {
         this.fieldValues.addAll(values);
         return this;
     }
 
     public void addSynonym(Synonym synonym) {
         synonyms.add(synonym);
-    }
-
-    public String dump() {
-        return String.format("Material(%s)\n", getId());
     }
 
     public String getId() {
@@ -260,9 +263,6 @@ public class Material implements IMaterial, EntityRelationships {
                 ", editedAt=" + editedAt +
                 ", editedBy='" + editedBy + '\'' +
                 ", digest=" + digest +
-                ", synonyms=" + synonyms +
-                ", fieldValues=" + fieldValues +
-                ", attachments=" + attachments +
                 '}';
     }
 }

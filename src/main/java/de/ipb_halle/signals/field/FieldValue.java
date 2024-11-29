@@ -1,6 +1,6 @@
 /*
  * IPB Signals client
- * Copyright 2022 Leibniz-Institut f. Pflanzenbiochemie
+ * Copyright 2024 Leibniz-Institut f. Pflanzenbiochemie
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,76 +17,86 @@
  */
 package de.ipb_halle.signals.field;
 
-import java.io.Serializable;
 import java.util.Objects;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+public class FieldValue {
 
+    public final static String ATTR_CONTENT = "content";
 
-/** 
- * Quality (measure) - field assignments
- */
-
-@Entity
-@Table(name="field_values")
-public class FieldValue implements Serializable {
-
-    private final static long serialVersionUID = 1L;
-
-    public final static String ATTR_USER_VALUE = "content.user";
-    public final static String ATTR_IS_RAW_VALUE = "content.isRawValue";
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name="field_definition_id")
-    private String fieldDefinitionId;
-
-    @Column(name="raw_value")
-    private Boolean rawValue;
-
-    @Column
-    private String value;
-
-    public String getFieldDefinitionId() {
-        return fieldDefinitionId;
+    public enum LinkType {
+        ID,
+        FIELD_ID,
+        FIELD_TITLE,
+        UNSPECIFIED
     }
 
-    public Long getId() {
-        return id;
+    private String entityId;
+    private String fieldId;
+    private String fieldTitle;
+    private String value;
+    private LinkType linkType;
+
+    public FieldValue() {
+        linkType = LinkType.UNSPECIFIED;
+    }
+
+    public FieldValue(FieldValueEntity entity) {
+        linkType = LinkType.ID;
+        entityId = entity.getEntityId();
+        fieldId = entity.getFieldDefinitionId();
+        value = entity.getValue();
+    }
+
+    public FieldValueEntity createEntity() {
+        FieldValueEntity entity = new FieldValueEntity();
+        entity.setEntityId(entityId);
+        entity.setFieldDefinitionId(fieldId);
+        entity.setValue(value);
+        return entity;
+    }
+
+    public String getEntityId() {
+        return entityId;
+    }
+
+    public String getFieldId() {
+        return fieldId;
+    }
+
+    public String getFieldTitle() {
+        return fieldTitle;
+    }
+
+    public LinkType getLinkType() {
+        return linkType;
     }
 
     public String getValue() {
         return value;
     }
 
-    public Boolean isRawValue() {
-        return rawValue;
-    }
-
-    public FieldValue setFieldDefinitionId(String i) {
-        fieldDefinitionId = i;
+    public FieldValue setEntityId(String id) {
+        this.entityId = id;
         return this;
     }
 
-    public FieldValue setId(Long i) {
-        id = i;
+    public FieldValue setFieldId(String fieldId) {
+        this.fieldId = fieldId;
         return this;
     }
 
-    public FieldValue setRawValue(Boolean r) {
-        rawValue = r;
+    public FieldValue setFieldTitle(String fieldTitle) {
+        this.fieldTitle = fieldTitle;
         return this;
     }
 
-    public FieldValue setValue(String v) {
-        value = v;
+    public FieldValue setLinkType(LinkType linkType) {
+        this.linkType = linkType;
+        return this;
+    }
+
+    public FieldValue setValue(String value) {
+        this.value = value;
         return this;
     }
 
@@ -95,21 +105,22 @@ public class FieldValue implements Serializable {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
         FieldValue that = (FieldValue) object;
-        return Objects.equals(id, that.id) && Objects.equals(fieldDefinitionId, that.fieldDefinitionId) && Objects.equals(rawValue, that.rawValue) && Objects.equals(value, that.value);
+        return Objects.equals(entityId, that.entityId) && Objects.equals(fieldId, that.fieldId) && Objects.equals(fieldTitle, that.fieldTitle) && Objects.equals(value, that.value) && linkType == that.linkType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, fieldDefinitionId, rawValue, value);
+        return Objects.hash(entityId, fieldId, fieldTitle, value, linkType);
     }
 
     @Override
     public String toString() {
         return "FieldValue{" +
-                "id=" + id +
-                ", fieldDefinitionId='" + fieldDefinitionId + '\'' +
-                ", rawValue=" + rawValue +
+                "entityId='" + entityId + '\'' +
+                ", fieldId='" + fieldId + '\'' +
+                ", fieldTitle='" + fieldTitle + '\'' +
                 ", value='" + value + '\'' +
+                ", linkType=" + linkType +
                 '}';
     }
 }

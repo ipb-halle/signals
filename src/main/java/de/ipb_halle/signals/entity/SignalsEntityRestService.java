@@ -57,11 +57,11 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
         JsonObject attributes = jsonObj.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
         dto.setId(json.getAsJsonObject().getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
-        dto.setType((EntityType) dynEnumManager.valueOf(EntityType.valueOf(attributes.getAsJsonPrimitive(RestHelper.ATTR_TYPE).getAsString())));
-        dto.setEid(attributes.has(SignalsEntityDTO.ATTR_EID)?attributes.get(SignalsEntityDTO.ATTR_EID).getAsString():null);
-        dto.setName(attributes.has(RestHelper.ATTR_NAME) ? attributes.get(RestHelper.ATTR_NAME).getAsString() : null);
-        dto.setDescription(attributes.has(RestHelper.ATTR_DESCRIPTION) ? attributes.get(RestHelper.ATTR_DESCRIPTION).getAsString() : null);
-        dto.setDigest(attributes.has(RestHelper.ATTR_DIGEST) ? Long.parseLong(attributes.get(RestHelper.ATTR_DIGEST).getAsString()) : null);
+        dto.setType((EntityType) dynEnumManager.valueOf(EntityType.valueOf(RestHelper.parseString(attributes, RestHelper.ATTR_TYPE))));
+        dto.setEid(RestHelper.parseString(attributes, SignalsEntityDTO.ATTR_EID));
+        dto.setName(RestHelper.parseString(attributes, RestHelper.ATTR_NAME));
+        dto.setDescription(RestHelper.parseString(attributes, RestHelper.ATTR_DESCRIPTION));
+        dto.setDigest(RestHelper.parseLong(attributes, RestHelper.ATTR_DIGEST));
 
         parseTimestamps(attributes, dto);
         parseRelationships(jsonObj, dto);
@@ -69,8 +69,8 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
     }
 
     public void parseTimestamps(JsonObject attributes, EntityRelationships entityRel) {
-        entityRel.setCreatedAt(attributes.has(SignalsEntityDTO.ATTR_CREATED_AT) ? Date.from(Instant.parse(attributes.get(SignalsEntityDTO.ATTR_CREATED_AT).getAsString())) : null);
-        entityRel.setEditedAt(attributes.has(SignalsEntityDTO.ATTR_EDITED_AT) ? Date.from(Instant.parse(attributes.get(SignalsEntityDTO.ATTR_EDITED_AT).getAsString())) : null);
+        entityRel.setCreatedAt(RestHelper.parseDate(attributes, SignalsEntityDTO.ATTR_CREATED_AT));
+        entityRel.setEditedAt(RestHelper.parseDate(attributes, SignalsEntityDTO.ATTR_EDITED_AT));
     }
 
     public void parseRelationships(JsonObject relationships, EntityRelationships entityRel) {

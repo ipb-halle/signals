@@ -25,12 +25,17 @@ public class Field {
     public final static String ATTR_TITLE = "title";
     public final static String ATTR_USER_DEFINED = "isUserDefined";
 
+    public final static String FIELD_TITLE = "title";
+    public final static String ENTITY_ID = "entityId";
+    public final static String DEFINING_ENTITY_ID = "definingEntityId";
+    public final static String FIELD_ID = "fieldId";
 
     private String id;
     private String attributeListEid;
     private Boolean calculated;
     private String defaultUnit;
     private String definedBy;
+    private String definingEntityId;
     private Boolean hidden;
     private String key;
     private Boolean multiSelect;
@@ -45,7 +50,7 @@ public class Field {
     private FieldDesignation designation;
 
     public Field() {
-        designation = FieldDesignation.valueOf(FieldDesignation.DEFAULT);
+        designation = FieldDesignation.valueOf(FieldDesignation.DEFAULT); //defines if filed belongs to asset, batch or is default
         this.measures = new HashSet<>();
         this.options = new HashSet<> ();
     }
@@ -56,6 +61,7 @@ public class Field {
         this.calculated = fieldDefinition.getCalculated();
         this.defaultUnit = fieldDefinition.getDefaultUnit();
         this.definedBy = fieldDefinition.getDefinedBy();
+        this.definingEntityId = fieldDefinition.getDefiningEntityId();
         this.hidden = fieldDefinition.isHidden();
         this.key = fieldDefinition.getKey();
         this.multiSelect = fieldDefinition.isMultiSelect();
@@ -78,6 +84,7 @@ public class Field {
         def.setCalculated(calculated);
         def.setDefaultUnit(defaultUnit);
         def.setDefinedBy(definedBy);
+        def.setDefiningEntityId(definingEntityId);
         def.setFieldDesignation(designation.getId());
         def.setFieldType(fieldType.getId());
         def.setHidden(hidden);
@@ -146,6 +153,14 @@ public class Field {
 
     public void setDefinedBy(String definedBy) {
         this.definedBy = definedBy;
+    }
+
+    public String getDefiningEntityId() {
+        return definingEntityId;
+    }
+
+    public void setDefiningEntityId(String definingEntityId) {
+        this.definingEntityId = definingEntityId;
     }
 
     public Boolean getHidden() {

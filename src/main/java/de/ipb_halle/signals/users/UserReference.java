@@ -41,4 +41,11 @@ public class UserReference implements IUser {
         id = u;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "UserReference{" +
+                "id='" + id + '\'' +
+                '}';
+    }
 }

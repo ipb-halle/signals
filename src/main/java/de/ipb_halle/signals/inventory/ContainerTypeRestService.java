@@ -62,8 +62,8 @@ public class ContainerTypeRestService implements RestReplyParser<ContainerType> 
         if (attributes.has(ContainerType.ATTR_ATTACHMENTS)) {
             parseAttachments(attributes.getAsJsonArray(ContainerType.ATTR_ATTACHMENTS), ct);
         }
-        if (attributes.has(ContainerType.ATTR_FIELDS)) {
-            parseFieldDefinitions(attributes.getAsJsonArray(ContainerType.ATTR_FIELDS), ct);
+        if (attributes.has(RestHelper.ATTR_FIELDS)) {
+            parseFieldDefinitions(attributes.getAsJsonArray(RestHelper.ATTR_FIELDS), ct);
         }
 
         return ct;

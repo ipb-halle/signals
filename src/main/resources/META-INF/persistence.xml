@@ -18,6 +18,7 @@
         <class>de.ipb_halle.signals.field.FieldMeasure</class>
         <class>de.ipb_halle.signals.field.FieldOption</class>
         <class>de.ipb_halle.signals.field.FieldType</class>
+        <class>de.ipb_halle.signals.field.FieldValueEntity</class>
         <class>de.ipb_halle.signals.inventory.ContainerEntity</class>
         <class>de.ipb_halle.signals.inventory.ContainerType</class>
         <class>de.ipb_halle.signals.inventory.ContainerTypeAttachment</class>
