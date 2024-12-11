@@ -17,50 +17,36 @@
  */
 package de.ipb_halle.signals.rest;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 
 import de.ipb_halle.signals.SignalsConfig;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import java.net.Authenticator;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Redirect;
 import java.net.http.HttpClient.Version;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
-import java.net.http.HttpRequest.Builder;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.net.ProxySelector;
+import java.net.URLEncoder;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 
-import java.net.URLEncoder;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import jakarta.annotation.Resource;
 import jakarta.ejb.Local;
-import jakarta.ejb.Stateless;
-import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,10 +68,11 @@ public class RestClientImpl implements RestClient {
     private String requestData;
     private String response;
     private int responseCode;
+    private RestType responseType;
     private URI uri;
     private Map<String, String> uriParameterMap;
 
-    private Logger logger;
+    private final Logger logger;
 
     /**
      * constructor
@@ -95,12 +82,15 @@ public class RestClientImpl implements RestClient {
         logger = LoggerFactory.getLogger(RestResultIterator.class);
         contentType = APPLICATION_VND_JSON;
         method = Method.GET;
+        responseType = RestType.STRING;
     }
 
+    @Override
     public RestClient execute() throws IOException, URISyntaxException, UnexpectedResponseCodeException {
         return execute(HttpURLConnection.HTTP_OK);
     }
 
+    @Override
     public RestClient execute(int expectedResponseCode) throws IOException, URISyntaxException, UnexpectedResponseCodeException {
         BodyPublisher requestBody = BodyPublishers.noBody();
 
@@ -130,9 +120,7 @@ public class RestClientImpl implements RestClient {
                 .build();
 
         try {
-            HttpResponse<String> httpResponse = client.send(request, BodyHandlers.ofString());
-            responseCode = httpResponse.statusCode();
-            setResponse(httpResponse.body());
+            invoke(client, request);
         } catch (InterruptedException ie) {
             this.logger.warn("HTTP request got interrupted");
             response = null;
@@ -150,6 +138,32 @@ public class RestClientImpl implements RestClient {
         return this;
     }
 
+    private void invoke(HttpClient client, HttpRequest request) throws InterruptedException, IOException {
+        switch(responseType) {
+            case STRING :
+                invokeString(client, request);
+                break;
+            case PATH :
+                invokePath(client, request);
+                break;
+        }
+    }
+
+    private void invokePath(HttpClient client, HttpRequest request) throws InterruptedException, IOException {
+        String tmp = UUID.randomUUID().toString();
+        HttpResponse<Path> httpResponse = client.send(request,
+                BodyHandlers.ofFile(Paths.get(/* signalsConfig.getStoragePath(), */ STAGING, tmp)));
+        responseCode = httpResponse.statusCode();
+        setResponse(httpResponse.body().toString());
+        throw new RuntimeException ("SignalsConfig.getStoragePath() not yet implemented.");
+    }
+
+    private void invokeString(HttpClient client, HttpRequest request) throws InterruptedException, IOException {
+        HttpResponse<String> httpResponse = client.send(request, BodyHandlers.ofString());
+        responseCode = httpResponse.statusCode();
+        setResponse(httpResponse.body());
+    }
+
     protected Method getMethod() {
         return method;
     }
@@ -158,10 +172,12 @@ public class RestClientImpl implements RestClient {
         return requestData;
     }
 
+    @Override
     public String getResponse() {
         return response;
     }
 
+    @Override
     public int getResponseCode() {
         return responseCode;
     }
@@ -191,41 +207,49 @@ public class RestClientImpl implements RestClient {
         return uri;
     }
 
+    @Override
     public RestClient putUriParameter(String key, String value) {
         uri = null;
         this.uriParameterMap.put(key, value);
         return this;
     }
 
+    @Override
     public RestClient reset() {
         contentType = APPLICATION_VND_JSON;
         method = Method.GET;
         requestData = null;
         response = null;
+        responseType = RestType.STRING;
         uriParameterMap = new HashMap<>();
         return this;
     }
 
+    @Override
     public RestClient setContentType(String type) {
         contentType = type;
         return this;
     }
 
+    @Override
     public RestClient setEndpoint(String path) {
         uri = null;
         endpoint = path;
         return this;
     }
 
+    @Override
     public RestClient setHeader(String key, String value) {
         return this;
     }
 
+    @Override
     public RestClient setMethod(Method m) {
         this.method = m;
         return this;
     }
 
+    @Override
     public RestClient setRequestData(String data) {
         requestData = data;
         return this;
@@ -235,6 +259,12 @@ public class RestClientImpl implements RestClient {
         response = r;
     }
 
+    public RestClient setResponseType(RestType type) {
+        responseType = type;
+        return this;
+    }
+
+    @Override
     public RestClient setURI(String u) throws URISyntaxException {
         endpoint = null;
         uriParameterMap.clear();

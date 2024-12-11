@@ -17,17 +17,9 @@
  */
 package de.ipb_halle.signals.rest;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
-import java.net.URI;
 import jakarta.ejb.Local;
 
 /**
@@ -36,6 +28,16 @@ import jakarta.ejb.Local;
 @Local
 public interface RestClient {
 
+    public enum RestType {
+        STRING,
+        PATH;
+    }
+
+    /**
+     * Name of the staging directory for attachment downloads
+     */
+    public final static String STAGING = "staging";
+
     public final int HTTP_OK = 200;
     public final int HTTP_CREATED = 201;
     public final int HTTP_ACCEPTED = 202;
@@ -43,6 +45,15 @@ public interface RestClient {
 
     public final String APPLICATION_VND_JSON = "application/vnd.api+json";
     public final String APPLICATION_SCIM_JSON = "application/scim+json";
+    public final String APPLICATION_OCTET = "application/octet-stream";
+    public final String CHEMICAL_SVG = "image/svg+xml";
+    public final String CHEMICAL_CDXML = "chemical/x-cdxml";
+    public final String CHEMICAL_MOL3000 = "chemical/x-mdl-molfile-v3000";
+    public final String CHEMICAL_SMILES = "chemical/x-daylight-smiles";
+    public final String CHEMICAL_SDFILE = "chemical/x-mdl-sdfile";
+    public final String SEQUENCE_FASTA = "biosequence/fasta";
+    public final String SEQUENCE_GENBANK = "biosequence/genbank";
+    public final String TEXT_CSV = "text/csv";
 
     public RestClient execute() throws IOException, URISyntaxException, UnexpectedResponseCodeException ;
 
