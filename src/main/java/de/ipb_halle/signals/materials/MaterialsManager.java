@@ -24,11 +24,13 @@ import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.entity.SignalsEntityDbService;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
 import de.ipb_halle.signals.field.*;
+import de.ipb_halle.signals.rest.RestClient;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -68,28 +70,28 @@ public class MaterialsManager {
     }
 
     public void manageMaterials(RuntimeConfig runtimeConfig, Date[] dateRange) {
-        Map<String, Object> hmap = new HashMap<>();
+        Map<String, Object> cmap = new HashMap<>();
         /**
-         * hmap contains entityType, start and end date e.g.:
-         * HMAP key: "includeTypes" and value: "[asset.EntityType]"
-         * HMAP key: "start" and value: "2024-01-01T00:00:00.000+0100"
-         * HMAP key: "end" and value: "2024-12-09T09:05:12.479+0100"
+         * criteria Map contains entityType, start and end date e.g.:
+         * CMAP key: "includeTypes" and value: "[asset.EntityType]"
+         * CMAP key: "start" and value: "2024-01-01T00:00:00.000+0100"
+         * CMAP key: "end" and value: "2024-12-09T09:05:12.479+0100"
          */
-        hmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
+        cmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
         if (dateRange.length > 1) {
-            hmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
+            cmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
         }
-        hmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES,
+        cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES,
                 new EntityType[]{EntityType.valueOf(Material.ENTITY_TYPE_ASSET)});
 
 
-        //hmap.forEach((key, value) -> logger.info("This is HMAP key: '{}' and value: '{}'", key, value));
+        //cmap.forEach((key, value) -> logger.info("This is HMAP key: '{}' and value: '{}'", key, value));
 
 
         /**
          * here we receive the entities asset with relatively ids
          */
-        List<SignalsEntityDTO> assetsEntities = signalsEntityDbService.load(hmap);
+        List<SignalsEntityDTO> assetsEntities = signalsEntityDbService.load(cmap);
 
         //entityDTOs.forEach((entity) -> logger.info("This is an element of list of entitiesDTO: '{}'\n", entity.dump()));
 
@@ -116,15 +118,28 @@ public class MaterialsManager {
                 .collect(Collectors.toSet());
         //hold all fields from library ids
         List<Field> allFields = getFieldsFromLibrariesIds(libraryIds);
+        Field imageField = fieldDbService.getImageField();
+        Field drawingField = fieldDbService.getDrawingField();
+        Field sequenceField = fieldDbService.getSequenceField();
+        Set<String> imageLibraryIds = getLibrariesWithImages();
+        Set<String> drawingLibraryIds = getLibrariesWithDrawings();
+        Set<String> sequenceLibraryIds = getLibrariesWithSequences();
 
         //load all fields for library by library id, where field map has a key field title and field object
         Map<String, Map<String, Field>> fieldsByLibrary = generateResultMapWithLibIdAndFieldMap(libraryIds, allFields);
 
         for (Material mat : materials) {
             updateFieldValues(fieldsByLibrary.get(mat.getLibraryId()), mat);
+            if (imageLibraryIds.contains(mat.getLibraryId())) {
+                obtainImage(mat, imageField);
+            }
+            if (drawingLibraryIds.contains(mat.getLibraryId())) {
+                obtainDrawing(mat);
+            }
+            if (sequenceLibraryIds.contains(mat.getLibraryId())) {
+                obtainSequence(mat);
+            }
         }
-
-        getFieldsAttachments(materials, allFields);
     }
 
     private void getFieldsAttachments(List<Material> materials, List<Field> allFields) {
@@ -150,11 +165,14 @@ public class MaterialsManager {
             for (FieldValue fieldValue : material.getFieldValues()) {
                 for (Field field : fieldsWithTypeAttachedFile) {
                     logger.info("Material id {} field id {}", material.getId(), field.getId());
+                    /*
                     String result = materialRestService.doGetFieldAttachments(material, field.getId());
                     if (result != null) {
                         logger.warn("THIS IS REST CALL RESULT {}", result);
                         fieldValues.add(fieldValue.setFieldId(field.getId()));
                     }
+
+                     */
                 }
             }
             logger.info(Arrays.toString(fieldValues.toArray()));
@@ -222,33 +240,54 @@ public class MaterialsManager {
             if (field != null) {
                 fieldValue.setFieldId(field.getId());
             } else {
-                // generate a new field
-                Field newField = new Field();
-                newField.setId(UUID.randomUUID().toString());
-                newField.setTitle(fieldValue.getFieldTitle());
-                newField.setUserDefined(true);
-                newField.setFieldType(FieldType.valueOf("TEXT"));
-                newField.setDesignation(FieldDesignation.valueOf(FieldDesignation.ASSET));
-                newField.setDefiningEntityId("assetType:" + mat.getLibraryId());
-
-
-                // save in db and cache
-                fieldDbService.save(newField);
-                fieldDefinitions.put(fieldValue.getFieldTitle(), newField);
+                field = createNewAssetField(mat.getLibraryId(), fieldValue.getFieldTitle());
+                fieldDefinitions.put(field.getTitle(), field);
 
                 //set Feld-ID in to FieldValue
-                fieldValue.setFieldId(newField.getId());
-                fieldValue.setValue("EMPTY");
+                fieldValue.setFieldId(field.getId());
             }
         }
     }
 
+    private Field createNewAssetField(String libraryId, String title) {
+        // generate a new field
+        Field newField = new Field();
+        newField.setId(UUID.randomUUID().toString());
+        newField.setTitle(title);
+        newField.setUserDefined(true);
+        newField.setFieldType(FieldType.valueOf("TEXT"));
+        newField.setDesignation(FieldDesignation.valueOf(FieldDesignation.ASSET));
+        newField.setDefiningEntityId("assetType:" + libraryId);
+
+        // save in db and cache
+        fieldDbService.save(newField);
+        return newField;
+    }
+
     private void obtainAttachment(Field field, Material mat) {
+        Path tempPath = materialRestService.doGetMaterialAttachment(mat, field);
         // ToDo: obtain single attachment for given Field
     }
 
     private void obtainImage(Material mat) {
-        // ToDo: obtain image for material
+        Path tempPath = materialRestService.doGetMaterialImage(mat);
+        storeAttachment(tempPath, RestClient.IMAGE_UNKNOWN);
+    }
+
+    private void obtainDrawing(Material mat) {
+        Map<String, Path> drawings = materialRestService.doGetMaterialDrawing(mat);
+        drawings.forEach((key, value) -> storeAttachment(value, key));
+    }
+
+    private void obtainSequence(Material mat) {
+        Map<String, Path> sequences = materialRestService.doGetMaterialSequence(mat);
+        sequences.forEach((key, value) -> storeAttachment(value, key));
+    }
+
+
+    private void storeAttachment(Path p, String mimeType) {
+        logger.info("Request to store path {} of type {}", p.toString(), mimeType);
+        throw new RuntimeException("NOT IMPLEMENTED.");
     }
 
     private void fetchLibraries(RuntimeConfig config) {

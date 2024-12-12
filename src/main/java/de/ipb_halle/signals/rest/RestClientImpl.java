@@ -152,10 +152,9 @@ public class RestClientImpl implements RestClient {
     private void invokePath(HttpClient client, HttpRequest request) throws InterruptedException, IOException {
         String tmp = UUID.randomUUID().toString();
         HttpResponse<Path> httpResponse = client.send(request,
-                BodyHandlers.ofFile(Paths.get(/* signalsConfig.getStoragePath(), */ STAGING, tmp)));
+                BodyHandlers.ofFile(Paths.get(signalsConfig.getStoragePath(), STAGING, tmp)));
         responseCode = httpResponse.statusCode();
         setResponse(httpResponse.body().toString());
-        throw new RuntimeException ("SignalsConfig.getStoragePath() not yet implemented.");
     }
 
     private void invokeString(HttpClient client, HttpRequest request) throws InterruptedException, IOException {
@@ -259,6 +258,7 @@ public class RestClientImpl implements RestClient {
         response = r;
     }
 
+    @Override
     public RestClient setResponseType(RestType type) {
         responseType = type;
         return this;

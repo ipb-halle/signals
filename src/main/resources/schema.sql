@@ -268,7 +268,10 @@ CREATE TABLE libraries (
     entity_flags VARCHAR,
     materials_sample_mapping VARCHAR,
     name VARCHAR,
-    uniqueness VARCHAR
+    uniqueness VARCHAR,
+    has_image BOOLEAN NOT NULL DEFAULT FALSE,
+    has_sequence BOOLEAN NOT NULL DEFAULT FALSE,
+    has_drawing BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE library_fields (

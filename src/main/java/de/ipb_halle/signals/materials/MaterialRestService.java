@@ -26,6 +26,7 @@ import de.ipb_halle.signals.attachment.Attachment;
 import de.ipb_halle.signals.attachment.AttachmentRestService;
 import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
+import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.field.FieldValuesParser;
 import de.ipb_halle.signals.rest.Method;
@@ -36,6 +37,7 @@ import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.util.*;
 
 import jakarta.ejb.Local;
@@ -60,7 +62,10 @@ public class MaterialRestService implements RestReplyParser<Material> {
      */
     public final String MATERIAL_ENDPOINT = "/materials/%s";
     public final String MATERIAL_ATTACHMENT_ENDPOINT = "/materials/%s/attachments/%s";
-
+    public final String MATERIAL_DRAWING_ENDPOINT = "/materials/%s/drawing";
+    public final String MATERIAL_IMAGE_ENDPOINT = "/materials/%s/image";
+    public final String MATERIAL_SEQUENCE_ENDPOINT = "/materials/%s/bioSequence";
+    public final String MATERIAL_PROPERTIES_ENDPOINT = "/materials/%s/properties";
 
     @Inject
     private RestClient restClient;
@@ -152,7 +157,8 @@ public class MaterialRestService implements RestReplyParser<Material> {
     private JsonElement fetch(String id) {
         JsonElement jsonResult;
         try {
-            restClient.setMethod(Method.GET)
+            restClient.reset()
+                    .setMethod(Method.GET)
                     .setEndpoint(String.format(MATERIAL_ENDPOINT, id))
                     .execute();
 
@@ -160,11 +166,36 @@ public class MaterialRestService implements RestReplyParser<Material> {
             return jsonResult.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_DATA);
 
         } catch (UnexpectedResponseCodeException ue) {
-            logger.warn("Unexpected code");
+            logger.warn("Unexpected code", ue);
         } catch (URISyntaxException me) {
-            logger.warn("Malformed URL");
+            logger.warn("Malformed URL", me);
         } catch (IOException ioe) {
-            logger.warn("IOException", (Throwable) ioe);
+            logger.warn("IOException", ioe);
+        }
+        return null;
+    }
+
+    /**
+     * Actually do a REST call to obtain a single attachment
+     * @param endpoint the specific endpoint with id
+     * @param contentType MIME type of the attachment
+     * @return path of the received attachment in the staging area
+     */
+    private Path fetchAttachment(String endpoint, String contentType) {
+        try {
+            restClient.reset()
+                    .setMethod(Method.GET)
+                    .setContentType(contentType)
+                    .setResponseType(RestClient.RestType.PATH)
+                    .setEndpoint(endpoint)
+                    .execute();
+            return Path.of(restClient.getResponse());
+        } catch (UnexpectedResponseCodeException e) {
+            logger.warn("Unexpected response code {}", restClient.getResponseCode(), e);
+        } catch (IOException e) {
+            logger.warn("caught IOException: ", e);
+        } catch (URISyntaxException e) {
+            logger.warn("URISyntaxException: ", e);
         }
         return null;
     }
@@ -205,9 +236,44 @@ public class MaterialRestService implements RestReplyParser<Material> {
         return null;
     }
 
-    public String /*Material*/ doGetFieldAttachments(Material material, String fieldId) {
-        return fetch(material.getId(), fieldId);
-        //return parseFieldAttachments(material, Objects.requireNonNull(fetch(material.getId(), fieldId)));
+    /**
+     * Obtain a material attachment as an octet stream. Chemical drawings,
+     * images and sequences require special handling.
+     * @param material
+     * @param field
+     * @return path of the downloaded attachment in the staging area
+     */
+    public Path doGetMaterialAttachment(Material material, Field field) {
+        String endpoint = String.format(MATERIAL_ATTACHMENT_ENDPOINT, material.getId(), field.getId());
+        return fetchAttachment(endpoint, RestClient.APPLICATION_OCTET);
+    }
+
+    public Map<String, Path> doGetMaterialDrawing(Material material) {
+        Map<String, Path> drawingByMimeType = new HashMap<>();
+        drawingByMimeType.put(RestClient.CHEMICAL_CDXML,
+                fetchAttachment(String.format(MATERIAL_DRAWING_ENDPOINT, material.getId()),
+                        RestClient.CHEMICAL_CDXML));
+        drawingByMimeType.put(RestClient.CHEMICAL_MOL3000,
+                fetchAttachment(String.format(MATERIAL_DRAWING_ENDPOINT, material.getId()),
+                        RestClient.CHEMICAL_MOL3000));
+        drawingByMimeType.put(RestClient.CHEMICAL_SVG,
+                fetchAttachment(String.format(MATERIAL_DRAWING_ENDPOINT, material.getId()),
+                        RestClient.CHEMICAL_SVG));
+        return drawingByMimeType;
+    }
+
+    public Path doGetMaterialImage(Material material) {
+        return fetchAttachment(String.format(MATERIAL_IMAGE_ENDPOINT, material.getId()),
+                        RestClient.APPLICATION_OCTET);
+    }
+
+    public Map<String, Path> doGetMaterialSequence(Material material) {
+        Map<String, Path> sequencesByType = new HashMap<>();
+        sequencesByType.put(RestClient.SEQUENCE_GENBANK, fetchAttachment(String.format(MATERIAL_SEQUENCE_ENDPOINT, material.getId()),
+                RestClient.SEQUENCE_GENBANK));
+        sequencesByType.put(RestClient.SEQUENCE_FASTA, fetchAttachment(String.format(MATERIAL_SEQUENCE_ENDPOINT, material.getId()),
+                RestClient.SEQUENCE_FASTA));
+        return sequencesByType;
     }
 
     public Material doGetMaterial(String id) {

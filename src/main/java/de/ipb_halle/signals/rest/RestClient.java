@@ -54,6 +54,7 @@ public interface RestClient {
     public final String SEQUENCE_FASTA = "biosequence/fasta";
     public final String SEQUENCE_GENBANK = "biosequence/genbank";
     public final String TEXT_CSV = "text/csv";
+    public final String IMAGE_UNKNOWN = "image/*";
 
     public RestClient execute() throws IOException, URISyntaxException, UnexpectedResponseCodeException ;
 
@@ -78,4 +79,6 @@ public interface RestClient {
     public RestClient setRequestData(String data);
 
     public RestClient setURI(String u) throws URISyntaxException;
+
+    public RestClient setResponseType(RestType type);
 }
