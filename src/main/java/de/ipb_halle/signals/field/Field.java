@@ -25,13 +25,17 @@ public class Field {
     public final static String ATTR_TITLE = "title";
     public final static String ATTR_USER_DEFINED = "isUserDefined";
 
+    /* keys for query criteria */
     public final static String FIELD_TITLE = "title";
     public final static String ENTITY_ID = "entityId";
     public final static String DEFINING_ENTITY_ID = "definingEntityId";
     public final static String FIELD_ID = "fieldId";
+    public final static String FIELD_DESIGNATION = "designation";
 
+    /* globally defined field Ids for drawings, images and sequences */
     public final static String FIELD_ID_CHEMICAL_DRAWING = "27b17174-c8e4-4a98-93e5-37ef97327fbd";
     public final static String FIELD_ID_IMAGE = "3f1f2fbc-fdd1-4c60-b6f8-41f54937d2cd";
+    public final static String FIELD_ID_SEQUENCE = "8bf2bdc6-b5e1-4e23-8622-40a0bc0c0d96";
 
 
     private String id;

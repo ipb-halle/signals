@@ -84,8 +84,16 @@ public class LibraryEntity {
 
     @Column
     private String uniqueness;                  // JSON
-
     
+    @Column(name="has_drawing")
+    private Boolean hasDrawing;
+    
+    @Column(name="has_image")
+    private Boolean hasImage;
+    
+    @Column(name="has_sequence")
+    private Boolean hasSequence;
+
 
     public String getAssetDisplayName() {
         return assetDisplayName;
@@ -248,4 +256,32 @@ public class LibraryEntity {
         uniqueness = u;
         return this;
     }
+
+    public Boolean getHasDrawing() {
+        return hasDrawing;
+    }
+
+    public LibraryEntity setHasDrawing(Boolean hasDrawing) {
+        this.hasDrawing = hasDrawing;
+        return this;
+    }
+
+    public Boolean getHasImage() {
+        return hasImage;
+    }
+
+    public LibraryEntity setHasImage(Boolean hasImage) {
+        this.hasImage = hasImage;
+        return this;    
+    }
+
+    public Boolean getHasSequence() {
+        return hasSequence;
+    }
+
+    public LibraryEntity setHasSequence(Boolean hasSequence) {
+        this.hasSequence = hasSequence;
+        return this;    
+    }
+
 }

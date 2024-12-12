@@ -85,15 +85,7 @@ public class MaterialsManager {
                 new EntityType[]{EntityType.valueOf(Material.ENTITY_TYPE_ASSET)});
 
 
-        //cmap.forEach((key, value) -> logger.info("This is HMAP key: '{}' and value: '{}'", key, value));
-
-
-        /**
-         * here we receive the entities asset with relatively ids
-         */
         List<SignalsEntityDTO> assetsEntities = signalsEntityDbService.load(cmap);
-
-        //entityDTOs.forEach((entity) -> logger.info("This is an element of list of entitiesDTO: '{}'\n", entity.dump()));
 
         //loading of material lists to add field
         List<Material> materials = assetsEntities.stream().
@@ -104,43 +96,74 @@ public class MaterialsManager {
                 })
                 .toList();
 
-        augmentFieldDefinitions(materials);
-
-        materials.forEach(materialDbService::save);
+        processMaterials(materials);
     }
 
 
-    //extending of field definitions
-    private void augmentFieldDefinitions(List<Material> materials) {
+    /**
+     * Process all materials. Specifically, 
+     * * provide all the field definitions for the fields obtained from 
+     *   the materials REST endpoint. The endpoint provides only field
+     *   title and field value. It specifically does not provide any
+     *   field Id. 
+     * * Furthermore, the REST endpoint provides values for
+     *   fields, which have no definition. Known examples are the fields
+     *   "title", "description" and ___. 
+     * * Additionally, this method downloads all attachments and any 
+     *   chemical drawings, images and sequences.
+     * * Finally store the material and all dependent entities and files.
+     * @param materials a list of materials
+     */
+    private void processMaterials(List<Material> materials) {
         //collects all library ids
         Set<String> libraryIds = materials.stream()
                 .map(Material::getLibraryId)
                 .collect(Collectors.toSet());
         //hold all fields from library ids
-        List<Field> allFields = getFieldsFromLibrariesIds(libraryIds);
+
         Field imageField = fieldDbService.getImageField();
         Field drawingField = fieldDbService.getDrawingField();
         Field sequenceField = fieldDbService.getSequenceField();
-        Set<String> imageLibraryIds = getLibrariesWithImages();
-        Set<String> drawingLibraryIds = getLibrariesWithDrawings();
-        Set<String> sequenceLibraryIds = getLibrariesWithSequences();
+        Set<String> drawingLibraryIds = getLibrariesWith(Library.HAS_DRAWING);
+        Set<String> imageLibraryIds = getLibrariesWith(Library.HAS_IMAGE);
+        Set<String> sequenceLibraryIds = getLibrariesWith(Library.HAS_SEQUENCE);
 
         //load all fields for library by library id, where field map has a key field title and field object
-        Map<String, Map<String, Field>> fieldsByLibrary = generateResultMapWithLibIdAndFieldMap(libraryIds, allFields);
+        Map<String, Map<String, Field>> fieldsByLibrary = mapFieldsByLibraryId(libraryIds);
 
         for (Material mat : materials) {
-            updateFieldValues(fieldsByLibrary.get(mat.getLibraryId()), mat);
+            processMaterial(fieldsByLibrary.get(mat.getLibraryId()), mat);
             if (imageLibraryIds.contains(mat.getLibraryId())) {
                 obtainImage(mat, imageField);
             }
             if (drawingLibraryIds.contains(mat.getLibraryId())) {
-                obtainDrawing(mat);
+                obtainDrawing(mat, drawingField);
             }
             if (sequenceLibraryIds.contains(mat.getLibraryId())) {
-                obtainSequence(mat);
+                obtainSequence(mat, sequenceField);
             }
+            materialDbService.save(mat);
         }
     }
+
+    /**
+     * Provide a set of library Ids, which match certain criteria, e.g.
+     * all Ids of libraries, which may contain chemical drawings, images or
+     * sequences.
+     * @param key the requested feature (see criteria map keys in Library)
+     * @return A set of library Ids
+     */
+    private Set<String> getLibrariesWith(String key) {
+        Map<String, Object> cmap = new HashMap<>();
+        cmap.put(key, Boolean.TRUE);
+        return libraryDbService.load(cmap)
+                .stream()
+                .map(lib -> lib.getId())
+                .collect(Collectors.toSet());
+    }
+
+
+    /*
 
     private void getFieldsAttachments(List<Material> materials, List<Field> allFields) {
 
@@ -165,14 +188,13 @@ public class MaterialsManager {
             for (FieldValue fieldValue : material.getFieldValues()) {
                 for (Field field : fieldsWithTypeAttachedFile) {
                     logger.info("Material id {} field id {}", material.getId(), field.getId());
-                    /*
-                    String result = materialRestService.doGetFieldAttachments(material, field.getId());
-                    if (result != null) {
-                        logger.warn("THIS IS REST CALL RESULT {}", result);
-                        fieldValues.add(fieldValue.setFieldId(field.getId()));
-                    }
+                    /
+//                    String result = materialRestService.doGetFieldAttachments(material, field.getId());
+//                    if (result != null) {
+//                        logger.warn("THIS IS REST CALL RESULT {}", result);
+//                        fieldValues.add(fieldValue.setFieldId(field.getId()));
+//                    }
 
-                     */
                 }
             }
             logger.info(Arrays.toString(fieldValues.toArray()));
@@ -193,7 +215,17 @@ public class MaterialsManager {
         return fieldsWithTypeAttachedFile;
     }
 
-    private Map<String, Map<String, Field>> generateResultMapWithLibIdAndFieldMap(Set<String> libraryIds, List<Field> allFields) {
+    */
+
+
+    /**
+     * Create a mapping of fields by libraryId
+     * @param libraryIds
+     * @return
+     */
+    private Map<String, Map<String, Field>> mapFieldsByLibraryId(Set<String> libraryIds) {
+        List<Field> allFields = getLibraryFields(libraryIds);
+
         //creating a map with library id as a key and field title/ field Object hashMap as a value
         Map<String, Map<String, Field>> resultMap = new HashMap<>();
         for (Field field : allFields) {
@@ -206,7 +238,12 @@ public class MaterialsManager {
         return resultMap;
     }
 
-    private List<Field> getFieldsFromLibrariesIds(Set<String> libraryIds) {
+    /**
+     * Obtain a List of all Fields for a given set of libraries
+     * @param libraryIds a set of library Ids
+     * @return list of Fields
+     */
+    private List<Field> getLibraryFields(Set<String> libraryIds) {
         Map<String, Object> cmap = new HashMap<>();
         // receive all fields from all libraries in one shot -> very efficient
         cmap.put(Field.DEFINING_ENTITY_ID, libraryIds.stream()
@@ -218,7 +255,13 @@ public class MaterialsManager {
         return allFields;
     }
 
-    private void updateFieldValues(Map<String, Field> fieldDefinitions, Material mat) {
+    /**
+     * Process the field definitions and attachments for a single material
+     * @param fieldDefinitions a map of field definitions by field title for the
+     * library of the requested material.
+     * @param mat the material
+     */
+    private void processMaterial(Map<String, Field> fieldDefinitions, Material mat) {
         FieldType attachment = FieldType.valueOf(FieldType.ATTACHED_FILE);
         assignSimpleFieldValues(fieldDefinitions, mat);
         fieldDefinitions.values().stream()
@@ -226,10 +269,14 @@ public class MaterialsManager {
                     return f.equals(attachment);
                 })
                 .forEach(f -> obtainAttachment(f, mat));
-
-        // obtainImage(mat);
     }
 
+    /**
+     * Assign all field definitions for simple field values (e.g. text, numbers,
+     * etc. but not attachments, images, etc.)
+     * @param fieldDefinitions map of field definitions (by title)
+     * @param mat the material
+     */
     private void assignSimpleFieldValues(Map<String, Field> fieldDefinitions, Material mat) {
         Iterator<FieldValue> iterator = mat.getFieldValues().iterator();
         while (iterator.hasNext()) {
@@ -249,6 +296,12 @@ public class MaterialsManager {
         }
     }
 
+    /**
+     * Provide a field definition for ASSET ad-hoc fields (e.g. name, description, etc.)
+     * @param libraryId the Id of the library
+     * @param title the title of the field
+     * @return a persisted Field
+     */
     private Field createNewAssetField(String libraryId, String title) {
         // generate a new field
         Field newField = new Field();
@@ -264,32 +317,65 @@ public class MaterialsManager {
         return newField;
     }
 
+    /**
+     * Provide a field definition for BATCH ad-hoc fields (e.g. name, description, etc.)
+     * @param libraryId the Id of the library
+     * @param title the title of the field
+     * @return a persisted Field
+     */
+    private Field createNewBatchField(String libraryId, String title) {
+        // generate a new field
+        Field newField = new Field();
+        newField.setId(UUID.randomUUID().toString());
+        newField.setTitle(title);
+        newField.setUserDefined(true);
+        newField.setFieldType(FieldType.valueOf("TEXT"));
+        newField.setDesignation(FieldDesignation.valueOf(FieldDesignation.BATCH));
+        newField.setDefiningEntityId("assetType:" + libraryId);
+
+        // save in db and cache
+        fieldDbService.save(newField);
+        return newField;
+    }
+
     private void obtainAttachment(Field field, Material mat) {
         Path tempPath = materialRestService.doGetMaterialAttachment(mat, field);
         // ToDo: obtain single attachment for given Field
     }
 
-    private void obtainImage(Material mat) {
+    private void obtainImage(Material mat, Field image) {
         Path tempPath = materialRestService.doGetMaterialImage(mat);
-        storeAttachment(tempPath, RestClient.IMAGE_UNKNOWN);
+        storeAttachment(image, tempPath, RestClient.IMAGE_UNKNOWN);
     }
 
-    private void obtainDrawing(Material mat) {
+    private void obtainDrawing(Material mat, Field drawing) {
         Map<String, Path> drawings = materialRestService.doGetMaterialDrawing(mat);
-        drawings.forEach((key, value) -> storeAttachment(value, key));
+        drawings.forEach((key, value) -> storeAttachment(drawing, value, key));
     }
 
-    private void obtainSequence(Material mat) {
+    private void obtainSequence(Material mat, Field sequence) {
         Map<String, Path> sequences = materialRestService.doGetMaterialSequence(mat);
-        sequences.forEach((key, value) -> storeAttachment(value, key));
+        sequences.forEach((key, value) -> storeAttachment(sequence, value, key));
     }
 
-
-    private void storeAttachment(Path p, String mimeType) {
-        logger.info("Request to store path {} of type {}", p.toString(), mimeType);
+    /**
+     * Move the temporary attachment file into permanent storage and create the
+     * appropriate database records.
+     * @param field
+     * @param p
+     * @param mimeType
+     */
+    private void storeAttachment(Field field, Path p, String mimeType) {
+        logger.info("Request to store path {} of type {} in field {}", p.toString(), mimeType, field.getId());
         throw new RuntimeException("NOT IMPLEMENTED.");
     }
 
+    /**
+     * Obtain libraries from Signals via REST call and store them in the
+     * database. If the RuntimeConfig flag updateDb is false, the list of
+     * libraries is obtained but not stored in the database ('dry run').
+     * @param config
+     */
     private void fetchLibraries(RuntimeConfig config) {
         List<Library> libraries = libraryRestService.doGetLibraries();
         for (Library lib : libraries) {

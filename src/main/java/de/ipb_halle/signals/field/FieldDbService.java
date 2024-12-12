@@ -18,7 +18,6 @@
 package de.ipb_halle.signals.field;
 
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
-import de.ipb_halle.signals.materials.LibraryDbService;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -57,14 +56,17 @@ public class FieldDbService {
      */
     public Field loadById(String id) {
         FieldDefinition fieldDefinition = this.em.find(FieldDefinition.class, id);
-        FieldType fieldType = (FieldType) dynEnumManager.valueOf(fieldDefinition.getFieldType());
-        FieldDesignation designation = (FieldDesignation) dynEnumManager.valueOf(fieldDefinition.getFieldDesignation());
-        List<FieldOption> options = loadFieldOptions(id);
-        List<FieldMeasure> measures = loadFieldMeasures(id);
-        Field field = new Field(fieldDefinition, fieldType, designation)
-                .addAllOptions(options)
-                .addAllMeasures(measures);
-        return field;
+        if (fieldDefinition != null) {
+            FieldType fieldType = (FieldType) dynEnumManager.valueOf(fieldDefinition.getFieldType());
+            FieldDesignation designation = (FieldDesignation) dynEnumManager.valueOf(fieldDefinition.getFieldDesignation());
+            List<FieldOption> options = loadFieldOptions(id);
+            List<FieldMeasure> measures = loadFieldMeasures(id);
+            Field field = new Field(fieldDefinition, fieldType, designation)
+                    .addAllOptions(options)
+                    .addAllMeasures(measures);
+            return field;
+        }
+        return null;
     }
 
     public List<Field> load(Map<String, Object> cmap) {
@@ -76,6 +78,9 @@ public class FieldDbService {
         List<Predicate> predicates = new ArrayList<>();
         if (cmap.containsKey(Field.FIELD_ID)) {
             predicates.add(criteriaBuilder.equal(root.get("id"), cmap.get(Field.FIELD_ID)));
+        }
+        if (cmap.containsKey(Field.FIELD_DESIGNATION)) {
+            predicates.add(criteriaBuilder.equal(root.get(Field.FIELD_DESIGNATION), cmap.get(Field.FIELD_DESIGNATION)));
         }
         if (cmap.containsKey(Field.DEFINING_ENTITY_ID)) {
             List<String> definingEntityIds = (List<String>) cmap.get(Field.DEFINING_ENTITY_ID);
@@ -102,7 +107,7 @@ public class FieldDbService {
              * load options
              * load measures
              */
-            logger.info("this is class FieDBService, method load. You have to implement load options and load measures to field");
+            logger.info("this is class FieldDBService, method load. You have to implement load options and load measures to field");
             results.add(value);
         }
         return results;
@@ -160,5 +165,34 @@ public class FieldDbService {
     }
 
 
+    private Field getGloballyDefinedAttachmentField(String id, String title) {
+        Field field = loadById(id);
+        if (field == null) {
+            field = new Field();
+            field.setId(id);
+            field.setTitle(title);
+            field.setCalculated(Boolean.FALSE);
+            field.setHidden(Boolean.FALSE);
+            field.setMultiSelect(Boolean.FALSE);
+            field.setRequired(Boolean.FALSE);
+            field.setFieldType(FieldType.valueOf(FieldType.ATTACHED_FILE));
+            field.setDesignation(FieldDesignation.valueOf(FieldDesignation.DEFAULT));
+            save(field);
+            return loadById(id);
+        }
+        return field;
+    }
+
+    public Field getImageField() {
+        return getGloballyDefinedAttachmentField(Field.FIELD_ID_IMAGE, "Image");
+    }
+
+    public Field getDrawingField() {
+        return getGloballyDefinedAttachmentField(Field.FIELD_ID_CHEMICAL_DRAWING, "Chemical Drawing");
+    }
+
+    public Field getSequenceField() {
+        return getGloballyDefinedAttachmentField(Field.FIELD_ID_SEQUENCE, "Sequence");
+    }
 }
 

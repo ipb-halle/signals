@@ -18,7 +18,6 @@
 package de.ipb_halle.signals.materials;
 
 import de.ipb_halle.signals.field.Field;
-import de.ipb_halle.signals.field.FieldDefinition;
 import de.ipb_halle.signals.users.UserReference;
 
 import java.util.Collection;
@@ -27,8 +26,8 @@ import java.util.HashSet;
 import java.util.Set;
 import de.ipb_halle.signals.users.IUser;
 
-/** 
- * DTO material libraries 
+/**
+ * DTO material libraries
  */
 
 public class Library {
@@ -51,8 +50,13 @@ public class Library {
     public final static String ATTR_PATH_EDITED_BY = "edited.by.data.id";
     public final static String ATTR_DISPLAY_TABLE = "displayTable";
     public final static String ATTR_MATERIALS_SAMPLE_MAPPING = "materialsSampleMapping";
-    
+
     public final static String LIBRARY_TYPE = "assetType";
+
+    /* keys for criteria map in criteria queries */
+    public final static String HAS_IMAGE = "has_image";
+    public final static String HAS_DRAWING = "has_drawing";
+    public final static String HAS_SEQUENCE = "has_sequence";
 
     private String assetDisplayName;
     private Set<Field> assetFields;
@@ -77,7 +81,11 @@ public class Library {
     private String materialsSampleMapping;      // JSON
     private String name;
     private String uniqueness;                  // JSON
-    
+
+    private Boolean hasImage;
+    private Boolean hasDrawing;
+    private Boolean hasSequence;
+
     /**
      * default constructor
      */
@@ -108,6 +116,9 @@ public class Library {
         materialsSampleMapping = le.getMaterialsSampleMapping();
         name = le.getName();
         uniqueness = le.getUniqueness();
+        hasDrawing = le.getHasDrawing();
+        hasImage = le.getHasImage();
+        hasSequence = le.getHasSequence();
 
         /* complex types */
         assetFields = new HashSet<> ();
@@ -133,7 +144,10 @@ public class Library {
             .setEntityFlags(entityFlags)
             .setMaterialsSampleMapping(materialsSampleMapping)
             .setName(name)
-            .setUniqueness(uniqueness);
+            .setUniqueness(uniqueness)
+            .setHasDrawing(hasDrawing)
+            .setHasImage(hasImage)
+            .setHasSequence(hasSequence);
 
         return entity;
     }
@@ -342,5 +356,29 @@ public class Library {
     public Library setUniqueness(String u) {
         uniqueness = u;
         return this;
+    }
+
+    public Boolean getHasImage() {
+        return hasImage;
+    }
+
+    public void setHasImage(Boolean hasImage) {
+        this.hasImage = hasImage;
+    }
+
+    public Boolean getHasDrawing() {
+        return hasDrawing;
+    }
+
+    public void setHasDrawing(Boolean hasDrawing) {
+        this.hasDrawing = hasDrawing;
+    }
+
+    public Boolean getHasSequence() {
+        return hasSequence;
+    }
+
+    public void setHasSequence(Boolean hasSequence) {
+        this.hasSequence = hasSequence;
     }
 }
