@@ -32,6 +32,7 @@ public class SignalsEntityDTO implements EntityRelationships {
     public final static String ATTR_EDITED_BY = "relationships.editedBy.data.id";
     public final static String ATTR_OWNER = "relationships.owner.data.id";
     public final static String ATTR_ANCESTORS = "relationships.ancestors.data";
+    public final static String ATTR_CHILDREN = "relationships.children.data";
     public final static String ATTR_FLAGS = "flags";
 
     private String id;
@@ -47,6 +48,7 @@ public class SignalsEntityDTO implements EntityRelationships {
     private Long digest;
     private Date timeStamp;
     private Set<ISignalsEntity> ancestors;
+    private Set<ISignalsEntity> children;
     //private List<String> flags;
 
     /**
@@ -56,7 +58,7 @@ public class SignalsEntityDTO implements EntityRelationships {
         ancestors = new HashSet<>();
     }
 
-    public SignalsEntityDTO(SignalsEntity entity , DynEnumManager dynEnumManager) {
+    public SignalsEntityDTO(SignalsEntity entity, DynEnumManager dynEnumManager) {
         id = entity.getId();
         type = (EntityType) dynEnumManager.valueOf(entity.getType());
         this.eid = entity.getEid();
@@ -64,13 +66,15 @@ public class SignalsEntityDTO implements EntityRelationships {
         this.description = entity.getDescription();
         this.createdAt = entity.getCreatedAt();
         this.createdBy = new UserReference(entity.getCreatedBy());
-        this.owner = new UserReference(entity.getOwner());;
+        this.owner = new UserReference(entity.getOwner());
+        ;
         this.editedAt = entity.getEditedAt();
         this.editedBy = new UserReference(entity.getEditedBy());
         this.digest = entity.getDigest();
         this.timeStamp = entity.getTimeStamp();
         /* complex types */
-        this.ancestors = new HashSet<> ();
+        this.ancestors = new HashSet<>();
+        this.children = new HashSet<>();
     }
 
     public SignalsEntity createEntity() {
@@ -95,8 +99,16 @@ public class SignalsEntityDTO implements EntityRelationships {
         this.ancestors.addAll(ancestors);
     }
 
+    @Override
+    public void addAllChildren(Collection<ISignalsEntity> children) {
+        //this.children.addAll(children);
+    }
+
     public String dump() {
         StringBuilder sb = new StringBuilder();
+        sb.append("  \tname=");
+        sb.append(getName());
+        sb.append("  \tvalue=");
         sb.append(type.getValue());
         sb.append("  \tid=");
         sb.append(id);

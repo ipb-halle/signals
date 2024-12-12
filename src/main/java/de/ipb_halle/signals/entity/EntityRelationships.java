@@ -27,6 +27,8 @@ public interface EntityRelationships {
 
     void addAllAncestors(Collection<ISignalsEntity> ancestors);
 
+    void addAllChildren(Collection<ISignalsEntity> children);
+
     Set<ISignalsEntity> getAncestors();
 
     void setAncestors(Set<ISignalsEntity> ancestors);

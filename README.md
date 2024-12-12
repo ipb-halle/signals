@@ -65,6 +65,7 @@ This project bundles code for migration of IPB data sources, for backup, mainten
           mailTo = someone@somewhere.invalid
           snbInstanceName = TestOrg Trial
           standardUserRoleName = Standard User
+          storagePath = /path/to/attachment/storage
           userAttrCountry = Germany
           userAttrOrganization = testOrg
         </Resource>

@@ -50,6 +50,7 @@ public class Material implements IMaterial, EntityRelationships {
     private Date editedAt;
     private IUser editedBy;
     private Long digest;
+    private String libraryName;
 
     private Set<Synonym> synonyms;
     private Set<FieldValue> fieldValues;
@@ -146,6 +147,11 @@ public class Material implements IMaterial, EntityRelationships {
     }
 
     @Override
+    public void addAllChildren(Collection<ISignalsEntity> children) {
+        //children.addAll(children);
+    }
+
+    @Override
     public Set<ISignalsEntity> getAncestors() {
         return Set.of();
     }
@@ -211,6 +217,14 @@ public class Material implements IMaterial, EntityRelationships {
 
     public void setDigest(Long digest) {
         this.digest = digest;
+    }
+
+    public String getLibraryName() {
+        return libraryName;
+    }
+
+    public void setLibraryName(String libraryName) {
+        this.libraryName = libraryName;
     }
 
     public Set<Synonym> getSynonyms() {

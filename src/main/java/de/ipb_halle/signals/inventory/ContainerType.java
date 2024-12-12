@@ -18,6 +18,7 @@
 package de.ipb_halle.signals.inventory;
 
 import de.ipb_halle.signals.attachment.Attachment;
+import de.ipb_halle.signals.attachment.AttachmentEntity;
 import de.ipb_halle.signals.field.Field;
 import java.util.Date;
 import java.util.HashSet;
@@ -41,7 +42,7 @@ public class ContainerType {
 
     private String id;
 
-    private Set<Attachment> attachments;
+    private Set<AttachmentEntity> attachments;
 
     private Date createdAt;
 
@@ -67,7 +68,7 @@ public class ContainerType {
         fields = new HashSet<> ();
     }
 
-    public  ContainerType(ContainerTypeEntity cte, List<Attachment> a, List<Field> fd) {
+    public  ContainerType(ContainerTypeEntity cte, List<AttachmentEntity> a, List<Field> fd) {
         id = cte.getId();
         createdAt = cte.getCreatedAt();
         description = cte.getDescription();
@@ -102,7 +103,7 @@ public class ContainerType {
         return id;
     }
 
-    public void addAttachment(Attachment a) {
+    public void addAttachment(AttachmentEntity a) {
         attachments.add(a);
     }
 
@@ -110,7 +111,7 @@ public class ContainerType {
         fields.add(f);
     }
 
-    public Set<Attachment> getAttachments() {
+    public Set<AttachmentEntity> getAttachments() {
         return attachments;
     }
 
@@ -154,7 +155,7 @@ public class ContainerType {
         id = i;
     }
 
-    public void setAttachments(Set<Attachment> a) {
+    public void setAttachments(Set<AttachmentEntity> a) {
         attachments = a;
     }
 

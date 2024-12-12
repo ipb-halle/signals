@@ -21,6 +21,7 @@ import de.ipb_halle.signals.DateRangeParser;
 import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.Signals;
 import de.ipb_halle.signals.SignalsConfig;
+import de.ipb_halle.signals.attachment.AttachmentManager;
 import de.ipb_halle.signals.attribute.AttributeManager;
 import de.ipb_halle.signals.inventory.LocationEntity;
 import org.apache.commons.cli.*;
@@ -34,6 +35,7 @@ public class SignalsEntityConfig {
 
     private Logger logger;
     private AttributeManager attributeManager;
+    private AttachmentManager attachmentManager;
     private SignalsEntityManager signalsEntityManager;
     private SignalsConfig signalsConfig;
     private RuntimeConfig runtimeConfig;
@@ -84,10 +86,10 @@ public class SignalsEntityConfig {
     /**
      * constructor
      *
-     * @param config        SignalsConfig resource
-     * @param runtimeConfig runtime configuration, as defined by command line options.
-     * @param attributeManager management class for attributes
-     * @param signalsEntityManager       management class for signals entities
+     * @param config               SignalsConfig resource
+     * @param runtimeConfig        runtime configuration, as defined by command line options.
+     * @param attributeManager     management class for attributes
+     * @param signalsEntityManager management class for signals entities
      */
     public SignalsEntityConfig(SignalsConfig config, RuntimeConfig runtimeConfig,
                                AttributeManager attributeManager, SignalsEntityManager signalsEntityManager) {
@@ -128,17 +130,18 @@ public class SignalsEntityConfig {
     public void manageEntities(Date[] dateRange) {
         logger.info("""
 
-                ******************************************************
-                *
-                * Manage Signals Attributes and Entities
-                * {} / {}
-                * From: {}   to: {}
-                *
-                ******************************************************
-                """, signalsConfig.getSnbInstanceName(), new Date().toString(),
+                        ******************************************************
+                        *
+                        * Manage Signals Attributes and Entities
+                        * {} / {}
+                        * From: {}   to: {}
+                        *
+                        ******************************************************
+                        """, signalsConfig.getSnbInstanceName(), new Date().toString(),
                 dateRange[0], dateRange[1]);
 
         attributeManager.manageAttributes();
+
         signalsEntityManager.fetchSnbEntities(dateRange,
                 includedTypes,
                 runtimeConfig);

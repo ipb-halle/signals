@@ -17,18 +17,16 @@
  */
 package de.ipb_halle.signals.rest;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/** 
- * Rest helper 
+/**
+ * Rest helper
  */
 public class RestHelper {
 
@@ -36,6 +34,7 @@ public class RestHelper {
 
     // common attribute names
     public final static String ATTR_ATTRIBUTES = "attributes";
+    public final static String ATTR_RELATIONSHIPS = "relationships";
     public final static String ATTR_DATA = "data";
     public final static String ATTR_DESCRIPTION = "description";
     public final static String ATTR_DIGEST = "digest";
@@ -43,6 +42,13 @@ public class RestHelper {
     public final static String ATTR_ID = "id";
     public final static String ATTR_NAME = "name";
     public final static String ATTR_TYPE = "type";
+    public final static String ATTR_LIBRARY = "library";
+    public final static String ATTR_CHILDREN = "children";
+    public final static String ATTR_META = "meta";
+    public final static String ATTR_LINKS = "links";
+    public final static String ATTR_SELF = "self";
+    public final static String ANCESTORS = "ancestors";
+    public final static String CHILDREN = "children";
 
     public static String formatDate(Date d) {
         DateFormat df = new SimpleDateFormat(SNB_DATE_FORMAT);
@@ -125,7 +131,7 @@ public class RestHelper {
             DateFormat df = new SimpleDateFormat(SNB_DATE_FORMAT);
             try {
                 return df.parse(json.getAsString());
-            } catch(Exception e) {
+            } catch (Exception e) {
             }
         }
         return dflt;
@@ -148,7 +154,7 @@ public class RestHelper {
 
     public static Integer parseInt(JsonPrimitive json, Integer dflt) {
         if (json != null) {
-            return json.getAsInt();     
+            return json.getAsInt();
         }
         return dflt;
     }

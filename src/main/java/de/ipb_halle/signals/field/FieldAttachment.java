@@ -27,22 +27,20 @@ import jakarta.persistence.Entity;
  */
 
 @Entity
-@DiscriminatorValue("FieldType")
-public class FieldType extends DynEnum <FieldType> {
-
-    public final static String ATTACHED_FILE = "ATTACHED_FILE";
+@DiscriminatorValue("FieldAttachment")
+public class FieldAttachment extends DynEnum <FieldAttachment> {
 
     /**
      * private no-argument constructor
      */
-    private FieldType() { }
+    private FieldAttachment() { }
 
-    private FieldType(String v) {
+    private FieldAttachment(String v) {
         super(v);
     }
 
-    public static FieldType valueOf(String v) {
-        return new FieldType(v);
+    public static FieldAttachment valueOf(String v) {
+        return new FieldAttachment(v);
     }
 
 /*

@@ -101,11 +101,11 @@ public class FieldDbService {
             FieldType type = (FieldType) dynEnumManager.valueOf(entity.getFieldType());
             FieldDesignation designation = (FieldDesignation) dynEnumManager.valueOf(entity.getFieldDesignation());
             Field value = new Field(entity, type, designation);
-            /*
+            /*ToDO:
              * load options
              * load measures
              */
-            logger.info(value.toString());
+            logger.info("this is class FieDBService, method load. You have to implement load options and load measures to field");
             results.add(value);
         }
         return results;

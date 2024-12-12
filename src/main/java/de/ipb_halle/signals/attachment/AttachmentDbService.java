@@ -33,11 +33,11 @@ public class AttachmentDbService {
     @PersistenceContext(unitName="signalsDB")
     private EntityManager em;
 
-    public Attachment loadById(String id) {
-        return this.em.find(Attachment.class, id);
+    public AttachmentEntity loadById(String id) {
+        return this.em.find(AttachmentEntity.class, id);
     }
 
-    public void save(Attachment a) {
+    public void save(AttachmentEntity a) {
         this.em.merge(a);
     }
 }

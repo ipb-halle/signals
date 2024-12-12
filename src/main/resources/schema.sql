@@ -220,13 +220,12 @@ CREATE TABLE field_values (
 
 CREATE TABLE attachments (
     id VARCHAR NOT NULL PRIMARY KEY,
+    name VARCHAR,
+    entity_type INTEGER NOT NULL REFERENCES dyn_enums(id),
     created_at TIMESTAMP,
-    entity_id VARCHAR,
-    entity_type VARCHAR,
-    file_name VARCHAR,
-    template BOOLEAN,
-    updated_at TIMESTAMP,
-    version_id VARCHAR
+    edited_at TIMESTAMP,
+    digest VARCHAR,
+    ancestor_id VARCHAR NOT NULL
 );
 
 CREATE TABLE container_types (

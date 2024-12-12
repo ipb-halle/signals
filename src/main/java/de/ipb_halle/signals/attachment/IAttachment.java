@@ -1,6 +1,6 @@
 /*
  * IPB Signals client
- * Copyright 2022 Leibniz-Institut f. Pflanzenbiochemie
+ * Copyright 2024 Leibniz-Institut f. Pflanzenbiochemie
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,13 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.rest;
+package de.ipb_halle.signals.attachment;
 
-import com.google.gson.JsonElement;
-import jakarta.ejb.Local;
-
-/** 
- * Rest service 
+/**
+ *
+ * @author swittche
  */
-@Local
-public interface RestReplyParser<T> {
-
-    public T parseReply(JsonElement j) throws Exception;
-
+public interface IAttachment {
+    public String getId();
+    public IAttachment setId(String i);
 }

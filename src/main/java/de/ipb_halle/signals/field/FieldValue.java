@@ -40,11 +40,11 @@ public class FieldValue {
         linkType = LinkType.UNSPECIFIED;
     }
 
-    public FieldValue(FieldValueEntity entity) {
+    public FieldValue(FieldValueEntity fieldValueEntity) {
         linkType = LinkType.ID;
-        entityId = entity.getEntityId();
-        fieldId = entity.getFieldDefinitionId();
-        value = entity.getValue();
+        entityId = fieldValueEntity.getEntityId();
+        fieldId = fieldValueEntity.getFieldDefinitionId();
+        value = fieldValueEntity.getValue();
     }
 
     public FieldValueEntity createEntity() {

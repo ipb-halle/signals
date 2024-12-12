@@ -17,45 +17,132 @@
  */
 package de.ipb_halle.signals.attachment;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import de.ipb_halle.signals.rest.RestHelper;
-import de.ipb_halle.signals.rest.RestReplyParser;
+import com.google.gson.JsonParser;
+import de.ipb_halle.signals.dynEnum.DynEnumManager;
+import de.ipb_halle.signals.entity.SignalsEntityDTO;
+import de.ipb_halle.signals.rest.*;
+import de.ipb_halle.signals.users.Group;
+import jakarta.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.Date;
+import java.util.Objects;
 
 
-// import jakarta.ejb.Local;
-// import jakarta.inject.Inject;
-
-/** 
+/**
  * service for attachments (not yet a real REST service)
  */
 
 //@Local
 public class AttachmentRestService implements RestReplyParser<Attachment> {
 
-    public final static String ATTR_ENTITY_ID = "entityId";
-    public final static String ATTR_ATTACHMENT_ID = "attachmentId";
-    public final static String ATTR_CREATED_AT = "createdAt";
-    public final static String ATTR_ENTITY_TYPE = "entityType";
-    public final static String ATTR_FILE_NAME = "fileName";
-    public final static String ATTR_TEMPLATE = "isTemplate";
-    public final static String ATTR_UPDATED_AT = "updatedAt";
-    public final static String ATTR_VERSION_ID = "versionId";
+    public final static String ATTACHMENT_ENDPOINT = "/entities/%s";
+    public final static String ATTACHMENT_ANCESTORS = "data.relationships.ancestors.data";
+    public final static String ATTACHMENT_ATTRIBUTES = "data.attributes";
+    public final static String ATTACHMENT_RELATIONSHIPS = "data.relationships";
+    public final static String ATTACHMENT_CHILDREN = "data.relationships.children.data";
+    private Logger logger = LoggerFactory.getLogger(AttachmentRestService.class);
+
+    @Inject
+    private RestClient restClient;
+
+    @Inject
+    private DynEnumManager dynEnumManager;
+
+    /**
+     * converts a field type from JSON to the respective
+     * database backed field type class instance.
+     *
+     * @throws RuntimeException if field type is not yet registered and
+     *                          auto discovery is not allowed (default).
+     */
+    private AttachmentType lookupFieldType(String typeString) {
+        return (AttachmentType) dynEnumManager.valueOf(AttachmentType.valueOf(typeString));
+    }
+
+    public Attachment parseReply(JsonElement resultObject) {
+        Attachment attachment = new Attachment();
+
+        //check if resultObject is an Object and 'data' exists
+        if (resultObject.isJsonObject() && resultObject.getAsJsonObject().has(RestHelper.ATTR_DATA)) {
+            JsonArray attachmentsChildrenDataArray = RestHelper.getFromPath(resultObject.getAsJsonObject(), ATTACHMENT_CHILDREN).getAsJsonArray();
+
+            // iteration through "data"-array elements
+            for (JsonElement attachmentChildElement : attachmentsChildrenDataArray) {
+                if (attachmentChildElement.isJsonObject()) {
+                    JsonObject childObject = attachmentChildElement.getAsJsonObject();
+
+                    // extraction fields like "type" and "id"
+                    String childId = childObject.has(RestHelper.ATTR_ID) ? childObject.get(RestHelper.ATTR_ID).getAsString() : null;
+                    String childType = Objects.requireNonNull(childId).substring(0, childId.indexOf(":"));
+                    logger.info("Attachment type -  Type: {}\n", childType);
+
+                    JsonElement attachmentDescriptionJson = fetch(childId);
+
+                    JsonObject attachmentObject = Objects.requireNonNull(attachmentDescriptionJson).getAsJsonObject();
+                    JsonObject attachmentAttributes = RestHelper.getFromPath(attachmentObject, ATTACHMENT_ATTRIBUTES).getAsJsonObject();
+                    JsonArray attachmentAncestors = RestHelper.getFromPath(attachmentObject, ATTACHMENT_ANCESTORS).getAsJsonArray();
+
+                    for (JsonElement ancestor : attachmentAncestors) {
+                        JsonObject ancestorObject = ancestor.getAsJsonObject();
+                        attachment.setAncestorId(ancestorObject.has(RestHelper.ATTR_ID) ? ancestorObject.get(RestHelper.ATTR_ID).getAsString() : null);
+                    }
+
+                    attachment.setId(childId);
+                    attachment.setName(attachmentAttributes.has(RestHelper.ATTR_NAME) ? attachmentAttributes.get(RestHelper.ATTR_NAME).getAsString() : null);
+                    attachment.setType(lookupFieldType(childType));
+                    attachment.setCreatedAt(attachmentAttributes.has(Group.ATTR_CREATED_AT) ? RestHelper.parseDate(attachmentAttributes, Group.ATTR_CREATED_AT, new Date(0)) : null);
+                    attachment.setEditedAt(attachmentAttributes.has(Group.ATTR_EDITED_AT) ? RestHelper.parseDate(attachmentAttributes, Group.ATTR_EDITED_AT, new Date(0)) : null);
+                    attachment.setDigest(attachmentAttributes.has(Group.ATTR_DIGEST) ? attachmentAttributes.get(Group.ATTR_DIGEST).getAsString() : null);
+
+                    // logger.info("THIS IS AN ATTACHMENT: {}\n", attachment.toString());
 
 
-    public Attachment parseReply(JsonElement j) {
-        Attachment a = new Attachment();
-        JsonObject def = j.getAsJsonObject();
-        a.setId(RestHelper.parseString(def, Attachment.ATTR_ATTACHMENT_ID));
-        a.setEntityId(RestHelper.parseString(def, Attachment.ATTR_ENTITY_ID));
-        a.setCreatedAt(RestHelper.parseDate(def, Attachment.ATTR_CREATED_AT));
-        a.setEntityType(RestHelper.parseString(def, Attachment.ATTR_ENTITY_TYPE));
-        a.setFileName(RestHelper.parseString(def, Attachment.ATTR_FILE_NAME));
-        a.setTemplate(RestHelper.parseBool(def, Attachment.ATTR_TEMPLATE));
-        a.setUpdatedAt(RestHelper.parseDate(def, Attachment.ATTR_UPDATED_AT));
-        a.setVersionId(RestHelper.parseString(def, Attachment.ATTR_VERSION_ID));
+                } else {
+                    logger.warn("Child element is not a JsonObject: {}\n", attachmentChildElement);
+                }
+            }
+        } else {
+            logger.warn("'children' is not a valid JSON object or does not contain 'data'.\n");
+        }
+        return attachment;
+    }
 
-        return a;
+    private JsonElement fetch(String id) {
+        JsonElement resultJsonElement;
+        try {
+            restClient.setMethod(Method.GET)
+                    .setEndpoint(String.format(ATTACHMENT_ENDPOINT, id))
+                    .execute();
+
+            String response = restClient.getResponse();
+            resultJsonElement = JsonParser.parseString(response);
+            return resultJsonElement;
+
+        } catch (UnexpectedResponseCodeException ue) {
+            logger.warn("Unexpected code:\n" + ue);
+        } catch (URISyntaxException me) {
+            logger.warn("Malformed URL:\n" + me);
+        } catch (IOException ioe) {
+            logger.warn("IOException", ioe);
+        }
+        return null;
+    }
+
+    public Attachment doGetAttachment(String id) {
+        return parseReply(Objects.requireNonNull(fetch(id)));
+    }
+
+    public boolean checkIfEntityHasChildren(SignalsEntityDTO experiment) {
+        JsonElement resultJsonElement = fetch(experiment.getId());
+        JsonObject relationship = RestHelper.getFromPath(Objects.requireNonNull(resultJsonElement).getAsJsonObject(), ATTACHMENT_RELATIONSHIPS).getAsJsonObject();
+        return relationship.has(RestHelper.ATTR_CHILDREN);
     }
 }

@@ -111,7 +111,11 @@ public class RestResultIterator<T> implements Iterator {
 
     public T next() {
         if (hasNext()) {
-            return service.parseReply(jsonIterator.next());
+            try {
+                return service.parseReply(jsonIterator.next());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
         throw new NoSuchElementException();
     }

@@ -58,46 +58,146 @@ public class SignalsConfig {
     private String mailTo;                              // recipient address for mail reports
     private String snbInstanceName;                     // name of the instance we operate on
     private String standardUserRoleName;                // Standard User
+    private String storagePath;                         // storage path for attachment files
     private String userAttrCountry;                     // default country
     private String userAttrLicenses;                    // licenses, comma separated
     private String userAttrOrganization;                // default organization
 
-    public String getApiKey() { return apiKey; }
-    public String getBaseUrl() { return baseUrl; }
+    public String getApiKey() {
+        return apiKey;
+    }
 
-    public String getGroupAttrDescription() { return groupAttrDescription; }
+    public String getBaseUrl() {
+        return baseUrl;
+    }
 
-    public String getLdapAttrAccountExpirationDate() { return ldapAttrAccountExpirationDate; }
-    public String getLdapAttrAlias() { return ldapAttrAlias; }
-    public String getLdapAttrCreatedAt() { return ldapAttrCreatedAt; }
-    public String getLdapAttrEmail() { return ldapAttrEmail; }
-    public String getLdapAttrFirstName() { return ldapAttrFirstName; }
-    public String getLdapAttrGroupName() { return ldapAttrGroupName; }
-    public String getLdapAttrLastName() { return ldapAttrLastName; }
-    public String getLdapAttrMemberOf() { return ldapAttrMemberOf; }
-    public String getLdapAttrMembers() { return ldapAttrMembers; }
-    public String getLdapAttrObjectClass() { return ldapAttrObjectClass; }
-    public String getLdapAttrObjectClassGroup() { return ldapAttrObjectClassGroup; }
-    public String getLdapAttrObjectClassUser() { return ldapAttrObjectClassUser; }
-    public String getLdapAttrUserName() { return ldapAttrUserName; }
-    public String getLdapContextProviderURL() { return ldapContextProviderURL; }
-    public String getLdapContextReferral() { return ldapContextReferral; }
-    public String getLdapDateFormatString() { return ldapDateFormatString; }
-    public String getLdapDeniedUsers() { return ldapDeniedUsers; }
-    public String getLdapManagedGroups() { return ldapManagedGroups; }
-    public String getLdapManagedRoles() { return ldapManagedRoles; }
-    public String getLdapManagedUsers() { return ldapManagedUsers; }
-    public String getLdapSecurityPrincipal() { return ldapSecurityPrincipal; }
-    public String getLdapSecurityCredentials() { return ldapSecurityCredentials; }
-    public String getLdapSecurityAuthentication() { return ldapSecurityAuthentication; }
+    public String getGroupAttrDescription() {
+        return groupAttrDescription;
+    }
 
-    public String getMailFrom() { return mailFrom; }
-    public String getMailTo() { return mailTo; }
-    public String getSnbInstanceName() { return snbInstanceName; }
-    public String getStandardUserRoleName() { return standardUserRoleName; }
-    public String getUserAttrCountry() { return userAttrCountry; }
-    public String getUserAttrLicenses() { return userAttrLicenses; }
-    public String getUserAttrOrganization() { return userAttrOrganization; }
+    public String getLdapAttrAccountExpirationDate() {
+        return ldapAttrAccountExpirationDate;
+    }
+
+    public String getLdapAttrAlias() {
+        return ldapAttrAlias;
+    }
+
+    public String getLdapAttrCreatedAt() {
+        return ldapAttrCreatedAt;
+    }
+
+    public String getLdapAttrEmail() {
+        return ldapAttrEmail;
+    }
+
+    public String getLdapAttrFirstName() {
+        return ldapAttrFirstName;
+    }
+
+    public String getLdapAttrGroupName() {
+        return ldapAttrGroupName;
+    }
+
+    public String getLdapAttrLastName() {
+        return ldapAttrLastName;
+    }
+
+    public String getLdapAttrMemberOf() {
+        return ldapAttrMemberOf;
+    }
+
+    public String getLdapAttrMembers() {
+        return ldapAttrMembers;
+    }
+
+    public String getLdapAttrObjectClass() {
+        return ldapAttrObjectClass;
+    }
+
+    public String getLdapAttrObjectClassGroup() {
+        return ldapAttrObjectClassGroup;
+    }
+
+    public String getLdapAttrObjectClassUser() {
+        return ldapAttrObjectClassUser;
+    }
+
+    public String getLdapAttrUserName() {
+        return ldapAttrUserName;
+    }
+
+    public String getLdapContextProviderURL() {
+        return ldapContextProviderURL;
+    }
+
+    public String getLdapContextReferral() {
+        return ldapContextReferral;
+    }
+
+    public String getLdapDateFormatString() {
+        return ldapDateFormatString;
+    }
+
+    public String getLdapDeniedUsers() {
+        return ldapDeniedUsers;
+    }
+
+    public String getLdapManagedGroups() {
+        return ldapManagedGroups;
+    }
+
+    public String getLdapManagedRoles() {
+        return ldapManagedRoles;
+    }
+
+    public String getLdapManagedUsers() {
+        return ldapManagedUsers;
+    }
+
+    public String getLdapSecurityPrincipal() {
+        return ldapSecurityPrincipal;
+    }
+
+    public String getLdapSecurityCredentials() {
+        return ldapSecurityCredentials;
+    }
+
+    public String getLdapSecurityAuthentication() {
+        return ldapSecurityAuthentication;
+    }
+
+    public String getMailFrom() {
+        return mailFrom;
+    }
+
+    public String getMailTo() {
+        return mailTo;
+    }
+
+    public String getSnbInstanceName() {
+        return snbInstanceName;
+    }
+
+    public String getStandardUserRoleName() {
+        return standardUserRoleName;
+    }
+
+    public String getStoragePath() {
+        return storagePath;
+    }
+
+    public String getUserAttrCountry() {
+        return userAttrCountry;
+    }
+
+    public String getUserAttrLicenses() {
+        return userAttrLicenses;
+    }
+
+    public String getUserAttrOrganization() {
+        return userAttrOrganization;
+    }
 }
 
 

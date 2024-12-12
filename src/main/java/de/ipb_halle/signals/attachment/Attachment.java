@@ -1,6 +1,6 @@
 /*
  * IPB Signals client
- * Copyright 2022 Leibniz-Institut f. Pflanzenbiochemie
+ * Copyright 2024 Leibniz-Institut f. Pflanzenbiochemie
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,130 +15,137 @@
  * limitations under the License.
  *
  */
+
 package de.ipb_halle.signals.attachment;
 
+
 import java.util.Date;
+import java.util.Objects;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-
-/** 
- * Attachment 
+/**
+ * Attachment DTO
  */
+public class Attachment implements IAttachment {
 
-@Entity
-@Table(name="attachments")
-public class Attachment {
-
-
-    public final static String ATTR_ENTITY_ID = "entityId";
-    public final static String ATTR_ATTACHMENT_ID = "attachmentId";
     public final static String ATTR_CREATED_AT = "createdAt";
-    public final static String ATTR_ENTITY_TYPE = "entityType";
-    public final static String ATTR_FILE_NAME = "fileName";
-    public final static String ATTR_TEMPLATE = "isTemplate";
-    public final static String ATTR_UPDATED_AT = "updatedAt";
-    public final static String ATTR_VERSION_ID = "versionId";
 
-    @Id
-    private String id;
-
-    @Column(name="created_at")
-    private Date createdAt;
-
-    @Column(name="entity_id")
     private String entityId;
+    private String name;
+    private AttachmentType type;
+    private Date createdAt;
+    private Date editedAt;
+    private String digest;
+    private String ancestorId;
 
-    @Column(name="entity_type")
-    private String entityType;
-
-    @Column(name="file_name")
-    private String fileName;
-
-    @Column
-    private Boolean template;
-
-    @Column(name="updated_at")
-    private Date updatedAt;
-
-    @Column(name="version_id")
-    private String versionId;
-
-    public String dump() {
-        return String.format("Attachment(%s): %s\n", id, fileName);
+    public Attachment() {
     }
 
+    public Attachment(String entityId, String name, Date createdAt, Date editedAt, AttachmentType type, String digest, String ancestorId) {
+        this.entityId = entityId;
+        this.name = name;
+        this.type = type;
+        this.createdAt = createdAt;
+        this.editedAt = editedAt;
+        this.digest = digest;
+        this.ancestorId = ancestorId;
+    }
+
+    public AttachmentEntity createEntity() {
+        AttachmentEntity attachmentEntity = new AttachmentEntity();
+        attachmentEntity.setId(entityId);
+        attachmentEntity.setName(name);
+        attachmentEntity.setEntityType(type.getId());
+        attachmentEntity.setCreatedAt(createdAt);
+        attachmentEntity.setEditedAt(editedAt);
+        attachmentEntity.setDigest(digest);
+        attachmentEntity.setAncestorId(ancestorId);
+        return attachmentEntity;
+    }
+
+    @Override
     public String getId() {
-        return id;
+        return entityId;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Date getCreatedAt() {
         return createdAt;
     }
 
-    public String getEntityId() {
-        return entityId;
+    public Date getEditedAt() {
+        return editedAt;
     }
 
-    public String getEntityType() {
-        return entityType;
+    public AttachmentType getType() {
+        return type;
     }
 
-    public String getFileName() {
-        return fileName;
+    public String getDigest() {
+        return digest;
     }
 
-    public Date getUpdatedAt() {
-        return updatedAt;
+    public String getAncestorId() {
+        return ancestorId;
     }
 
-    public String getVersionId() {
-        return versionId;
-    }
-
-    public Boolean isTemplate() {
-        return template;
-    }
-
-    public Attachment setId(String i) {
-        id = i;
+    @Override
+    public IAttachment setId(String id) {
+        this.entityId = id;
         return this;
     }
 
-    public Attachment setCreatedAt(Date d) {
-        createdAt = d;
-        return this;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public Attachment setEntityId(String i) {
-        entityId = i;
-        return this;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public Attachment setEntityType(String t) {
-        entityType = t;
-        return this;
+    public void setEditedAt(Date editedAt) {
+        this.editedAt = editedAt;
     }
 
-    public Attachment setFileName(String f) {
-        fileName = f;
-        return this;
+    public void setType(AttachmentType type) {
+        this.type = type;
     }
 
-    public Attachment setTemplate(Boolean t) {
-        template = t;
-        return this;
+
+    public void setDigest(String digest) {
+        this.digest = digest;
     }
 
-    public Attachment setUpdatedAt(Date d) {
-        updatedAt = d;
-        return this;
+
+    public void setAncestorId(String ancestorId) {
+        this.ancestorId = ancestorId;
     }
 
-    public Attachment setVersionId(String i) {
-        versionId = i;
-        return this;
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Attachment that = (Attachment) object;
+        return Objects.equals(entityId, that.entityId) && Objects.equals(name, that.name) && Objects.equals(createdAt, that.createdAt) && Objects.equals(editedAt, that.editedAt) && Objects.equals(type, that.type) && Objects.equals(digest, that.digest) && Objects.equals(ancestorId, that.ancestorId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(entityId, name, createdAt, editedAt, type, digest, ancestorId);
+    }
+
+    @Override
+    public String toString() {
+        return "Attachment{" +
+                "entityId='" + entityId + '\'' +
+                ", name='" + name + '\'' +
+                ", createdAt=" + createdAt +
+                ", editedAt=" + editedAt +
+                ", type=" + type +
+                ", digest='" + digest + '\'' +
+                ", ancestorId='" + ancestorId + '\'' +
+                '}';
     }
 }

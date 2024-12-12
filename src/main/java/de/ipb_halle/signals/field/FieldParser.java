@@ -27,31 +27,41 @@ import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestReplyParser;
 import jakarta.ejb.Local;
 import jakarta.inject.Inject;
+import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 
-/** 
+import org.slf4j.Logger;
+
+/**
  * service for field definitions (not a real REST service)
  */
 
 @Local
 public class FieldParser implements RestReplyParser<Field> {
 
+    private Logger logger = LoggerFactory.getLogger(FieldParser.class);
+
     @Inject
     private DynEnumManager dynEnumMgr;
 
     /**
-     * converts a field type from JSON to the respective 
+     * converts a field type from JSON to the respective
      * database backed field type class instance.
-     * @throws RuntimeException if field type is not yet registered and 
-     * auto discovery is not allowed (default).
+     *
+     * @throws RuntimeException if field type is not yet registered and
+     *                          auto discovery is not allowed (default).
      */
     private FieldType lookupFieldType(String typeString) {
         return (FieldType) dynEnumMgr.valueOf(FieldType.valueOf(typeString));
     }
 
+    private FieldAttachment lookupFieldAttachment(String typeString) {
+        return (FieldAttachment) dynEnumMgr.valueOf(FieldType.valueOf(typeString));
+    }
+
     /**
-     * ATTR_COLLECTION currently not implemented!
+     * ToDO: ATTR_COLLECTION currently not implemented!
      */
     @Override
     public Field parseReply(JsonElement json) {
@@ -81,7 +91,6 @@ public class FieldParser implements RestReplyParser<Field> {
     }
 
     /**
-     *
      * JSON object is for Material fields extraction
      *
      * @param def

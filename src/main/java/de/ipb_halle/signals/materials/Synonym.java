@@ -58,4 +58,10 @@ public class Synonym {
         id.setValue(o);
     }
 
+    @Override
+    public String toString() {
+        return "Synonym{" +
+                "id=" + id +
+                '}';
+    }
 }

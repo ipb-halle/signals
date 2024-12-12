@@ -37,8 +37,8 @@ import jakarta.ejb.Local;
 import jakarta.inject.Inject;
 
 
-/** 
- * Rest service for container types 
+/**
+ * Rest service for container types
  */
 
 @Local
@@ -70,25 +70,25 @@ public class ContainerTypeRestService implements RestReplyParser<ContainerType> 
     }
 
     public List<ContainerType> doGetContainerTypes() {
-        List<ContainerType> containerTypes = new ArrayList<> ();
+        List<ContainerType> containerTypes = new ArrayList<>();
         restClient.reset()
-            .setMethod(Method.GET)
-            .setEndpoint(CONTAINER_TYPE_ENDPOINT)
-            .putUriParameter("entityType","container");
+                .setMethod(Method.GET)
+                .setEndpoint(CONTAINER_TYPE_ENDPOINT)
+                .putUriParameter("entityType", "container");
 
-        RestResultIterator<ContainerType> iter = new RestResultIterator<> (restClient, this, true);
+        RestResultIterator<ContainerType> iter = new RestResultIterator<>(restClient, this, true);
 
-        while(iter.hasNext()) {
+        while (iter.hasNext()) {
             containerTypes.add(iter.next());
         }
         return containerTypes;
     }
 
-    private void parseAttachments(JsonArray j, ContainerType ct) {
+    private void parseAttachments(JsonArray j, ContainerType ct){
         Iterator<JsonElement> iter = j.iterator();
         AttachmentRestService svc = new AttachmentRestService();
         while (iter.hasNext()) {
-            ct.addAttachment(svc.parseReply(iter.next()));
+            ct.addAttachment(svc.parseReply(iter.next()).createEntity());
         }
     }
 
