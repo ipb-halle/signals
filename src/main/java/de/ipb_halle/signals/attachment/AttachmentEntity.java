@@ -1,6 +1,6 @@
 /*
  * IPB Signals client
- * Copyright 2022 Leibniz-Institut f. Pflanzenbiochemie
+ * Copyright 2024 Leibniz-Institut f. Pflanzenbiochemie
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 /**
- * Attachment
+ * Attachment entity
  */
 
 @Entity
@@ -34,86 +34,33 @@ import jakarta.persistence.Table;
 public class AttachmentEntity {
 
     @Id
-    private String id;
+    private Integer id;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "entity_id")
+    private String entityId;
 
-    @Column(name = "entity_type")
-    private Integer entityType;
-
-    @Column(name = "created_at")
-    private Date createdAt;
-
-    @Column(name = "edited_at")
-    private Date editedAt;
-
-    @Column
-    private String digest;
+    @Column(name = "field_id")
+    private String fieldId;
 
     @Column(name = "ancestor_id")
     private String ancestorId;
 
     public String dump() {
-        return String.format("Attachment(%s): %s\n", id, name);
+        return String.format("Attachment(%d): %s\n", id, entityId);
     }
 
-    public String getId() {
+
+    public Integer getId() {
         return id;
     }
 
-    public AttachmentEntity setId(String i) {
+    public AttachmentEntity setId(Integer i) {
         id = i;
         return this;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public Integer getEntityType() {
-        return entityType;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public Date getEditedAt() {
-        return editedAt;
-    }
-
-    public String getDigest() {
-        return digest;
-    }
-
     public String getAncestorId() {
         return ancestorId;
-    }
-
-    public AttachmentEntity setName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    public AttachmentEntity setEntityType(Integer entityType) {
-        this.entityType = entityType;
-        return this;
-    }
-
-    public AttachmentEntity setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-        return this;
-    }
-
-    public AttachmentEntity setEditedAt(Date editedAt) {
-        this.editedAt = editedAt;
-        return this;
-    }
-
-    public AttachmentEntity setDigest(String digest) {
-        this.digest = digest;
-        return this;
     }
 
     public AttachmentEntity setAncestorId(String ancestorId) {
@@ -121,15 +68,28 @@ public class AttachmentEntity {
         return this;
     }
 
+    public String getEntityId() {
+        return entityId;
+    }
+
+    public AttachmentEntity setEntityId(String entityId) {
+        this.entityId = entityId;
+        return this;
+    }
+
+    public String getFieldId() {
+        return fieldId;
+    }
+
+    public AttachmentEntity setFieldId(String fieldId) {
+        this.fieldId = fieldId;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "AttachmentEntity{" +
                 "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", entityType=" + entityType +
-                ", createdAt=" + createdAt +
-                ", editedAt=" + editedAt +
-                ", digest='" + digest + '\'' +
                 ", ancestorId='" + ancestorId + '\'' +
                 '}';
     }

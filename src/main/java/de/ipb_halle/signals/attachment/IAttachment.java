@@ -22,6 +22,6 @@ package de.ipb_halle.signals.attachment;
  * @author swittche
  */
 public interface IAttachment {
-    public String getId();
-    public IAttachment setId(String i);
+    public Integer getId();
+    public IAttachment setId(Integer i);
 }

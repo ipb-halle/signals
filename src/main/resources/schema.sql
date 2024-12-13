@@ -227,13 +227,22 @@ CREATE TABLE field_values (
 );
 
 CREATE TABLE attachments (
-    id VARCHAR NOT NULL PRIMARY KEY,
-    name VARCHAR,
-    entity_type INTEGER NOT NULL REFERENCES dyn_enums(id),
-    created_at TIMESTAMP,
-    edited_at TIMESTAMP,
-    digest VARCHAR,
-    ancestor_id VARCHAR NOT NULL
+    id SERIAL NOT NULL PRIMARY KEY,
+    entity_id VARCHAR REFERENCES signalsentities(id),
+    field_id VARCHAR REFERENCES field_definitions(id),
+    ancestor_id VARCHAR NOT NULL REFERENCES signalsentities(id)
+);
+
+CREATE TABLE attachment_revisions (
+    id SERIAL NOT NULL PRIMARY KEY,
+    attachment_id INTEGER NOT NULL REFERENCES attachments(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    original_name VARCHAR
+);
+
+CREATE TABLE attachment_files (
+    id SERIAL NOT NULL PRIMARY KEY,
+    revision_id INTEGER NOT NULL REFERENCES attachment_revisions(id),
+    mime_type VARCHAR
 );
 
 CREATE TABLE container_types (
@@ -244,12 +253,6 @@ CREATE TABLE container_types (
     movable BOOLEAN,
     name VARCHAR,
     updated_at TIMESTAMP
-);
-
-CREATE TABLE container_type_attachments (
-    container_type_id VARCHAR NOT NULL REFERENCES container_types (id),
-    attachment_id VARCHAR NOT NULL REFERENCES attachments (id),
-    PRIMARY KEY (container_type_id, attachment_id)
 );
 
 CREATE TABLE container_type_fields (

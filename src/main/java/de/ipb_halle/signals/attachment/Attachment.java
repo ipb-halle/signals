@@ -19,8 +19,10 @@
 package de.ipb_halle.signals.attachment;
 
 
-import java.util.Date;
-import java.util.Objects;
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+
+import java.util.*;
 
 /**
  * Attachment DTO
@@ -29,123 +31,97 @@ public class Attachment implements IAttachment {
 
     public final static String ATTR_CREATED_AT = "createdAt";
 
+    private Integer id;
     private String entityId;
-    private String name;
-    private AttachmentType type;
-    private Date createdAt;
-    private Date editedAt;
-    private String digest;
+    private String fieldId;
     private String ancestorId;
 
+    private List<AttachmentRevision> revisions;
+    private Map<Integer, Set<AttachmentFile>> files;
+
     public Attachment() {
+        revisions = new ArrayList<>();
     }
 
-    public Attachment(String entityId, String name, Date createdAt, Date editedAt, AttachmentType type, String digest, String ancestorId) {
-        this.entityId = entityId;
-        this.name = name;
-        this.type = type;
-        this.createdAt = createdAt;
-        this.editedAt = editedAt;
-        this.digest = digest;
-        this.ancestorId = ancestorId;
+    public Attachment(AttachmentEntity e) {
+        this.id = e.getId();
+        this.entityId = e.getEntityId();
+        this.fieldId = e.getFieldId();
+        this.ancestorId = e.getAncestorId();
+        revisions = new ArrayList<>();
     }
 
     public AttachmentEntity createEntity() {
         AttachmentEntity attachmentEntity = new AttachmentEntity();
-        attachmentEntity.setId(entityId);
-        attachmentEntity.setName(name);
-        attachmentEntity.setEntityType(type.getId());
-        attachmentEntity.setCreatedAt(createdAt);
-        attachmentEntity.setEditedAt(editedAt);
-        attachmentEntity.setDigest(digest);
+        attachmentEntity.setId(id);
+        attachmentEntity.setEntityId(entityId);
+        attachmentEntity.setFieldId(fieldId);
         attachmentEntity.setAncestorId(ancestorId);
         return attachmentEntity;
     }
 
+    public void addRevisions(Collection<AttachmentRevision> revs) {
+        revisions.addAll(revs);
+    }
+
+    public void addFiles(Collection<AttachmentFile> fileList) {
+        for (AttachmentFile file : fileList) {
+            Set<AttachmentFile> revisionFiles = files.getOrDefault(
+                    file.getRevisionId(),
+                    new HashSet<AttachmentFile>());
+            revisionFiles.add(file);
+            files.put(file.getRevisionId(), revisionFiles);
+        }
+    }
+
+    public List<AttachmentRevision> getRevisions() {
+        return revisions;
+    }
+
+    public Set<AttachmentFile> getFiles(Integer revisionId) {
+        return files.get(revisionId);
+    }
+
+    public AttachmentRevision getLatestRevision() {
+        int numRevisions = revisions.size();
+        if (numRevisions > 0) {
+            return revisions.get(numRevisions - 1);
+        }
+        return null;
+    }
+
     @Override
-    public String getId() {
+    public Integer getId() {
+        return id;
+    }
+
+    @Override
+    public IAttachment setId(Integer id) {
+        this.id = id;
+        return this;
+    }
+
+    public String getEntityId() {
         return entityId;
     }
 
-    public String getName() {
-        return name;
+    public void setEntityId(String entityId) {
+        this.entityId = entityId;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
+    public String getFieldId() {
+        return fieldId;
     }
 
-    public Date getEditedAt() {
-        return editedAt;
-    }
-
-    public AttachmentType getType() {
-        return type;
-    }
-
-    public String getDigest() {
-        return digest;
+    public void setFieldId(String fieldId) {
+        this.fieldId = fieldId;
     }
 
     public String getAncestorId() {
         return ancestorId;
     }
 
-    @Override
-    public IAttachment setId(String id) {
-        this.entityId = id;
-        return this;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public void setEditedAt(Date editedAt) {
-        this.editedAt = editedAt;
-    }
-
-    public void setType(AttachmentType type) {
-        this.type = type;
-    }
-
-
-    public void setDigest(String digest) {
-        this.digest = digest;
-    }
-
-
     public void setAncestorId(String ancestorId) {
         this.ancestorId = ancestorId;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        Attachment that = (Attachment) object;
-        return Objects.equals(entityId, that.entityId) && Objects.equals(name, that.name) && Objects.equals(createdAt, that.createdAt) && Objects.equals(editedAt, that.editedAt) && Objects.equals(type, that.type) && Objects.equals(digest, that.digest) && Objects.equals(ancestorId, that.ancestorId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(entityId, name, createdAt, editedAt, type, digest, ancestorId);
-    }
-
-    @Override
-    public String toString() {
-        return "Attachment{" +
-                "entityId='" + entityId + '\'' +
-                ", name='" + name + '\'' +
-                ", createdAt=" + createdAt +
-                ", editedAt=" + editedAt +
-                ", type=" + type +
-                ", digest='" + digest + '\'' +
-                ", ancestorId='" + ancestorId + '\'' +
-                '}';
     }
 }
