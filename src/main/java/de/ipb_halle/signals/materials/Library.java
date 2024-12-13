@@ -53,11 +53,6 @@ public class Library {
 
     public final static String LIBRARY_TYPE = "assetType";
 
-    /* keys for criteria map in criteria queries */
-    public final static String HAS_IMAGE = "has_image";
-    public final static String HAS_DRAWING = "has_drawing";
-    public final static String HAS_SEQUENCE = "has_sequence";
-
     private String assetDisplayName;
     private Set<Field> assetFields;
     private String assetNameFieldId;
@@ -81,10 +76,6 @@ public class Library {
     private String materialsSampleMapping;      // JSON
     private String name;
     private String uniqueness;                  // JSON
-
-    private Boolean hasImage;
-    private Boolean hasDrawing;
-    private Boolean hasSequence;
 
     /**
      * default constructor
@@ -116,9 +107,6 @@ public class Library {
         materialsSampleMapping = le.getMaterialsSampleMapping();
         name = le.getName();
         uniqueness = le.getUniqueness();
-        hasDrawing = le.getHasDrawing();
-        hasImage = le.getHasImage();
-        hasSequence = le.getHasSequence();
 
         /* complex types */
         assetFields = new HashSet<> ();
@@ -144,10 +132,7 @@ public class Library {
             .setEntityFlags(entityFlags)
             .setMaterialsSampleMapping(materialsSampleMapping)
             .setName(name)
-            .setUniqueness(uniqueness)
-            .setHasDrawing(hasDrawing)
-            .setHasImage(hasImage)
-            .setHasSequence(hasSequence);
+            .setUniqueness(uniqueness);
 
         return entity;
     }
@@ -356,29 +341,5 @@ public class Library {
     public Library setUniqueness(String u) {
         uniqueness = u;
         return this;
-    }
-
-    public Boolean getHasImage() {
-        return hasImage;
-    }
-
-    public void setHasImage(Boolean hasImage) {
-        this.hasImage = hasImage;
-    }
-
-    public Boolean getHasDrawing() {
-        return hasDrawing;
-    }
-
-    public void setHasDrawing(Boolean hasDrawing) {
-        this.hasDrawing = hasDrawing;
-    }
-
-    public Boolean getHasSequence() {
-        return hasSequence;
-    }
-
-    public void setHasSequence(Boolean hasSequence) {
-        this.hasSequence = hasSequence;
     }
 }

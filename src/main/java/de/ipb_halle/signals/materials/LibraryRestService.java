@@ -87,6 +87,7 @@ public class LibraryRestService implements RestReplyParser<Library> {
         lib.setDisplayTable(RestHelper.getAsJsonString(attributes, Library.ATTR_DISPLAY_TABLE));
         lib.setEntityFlags(RestHelper.getAsJsonString(attributes, Library.ATTR_ENTITY_FLAGS));
         lib.setMaterialsSampleMapping(RestHelper.getAsJsonString(attributes, Library.ATTR_MATERIALS_SAMPLE_MAPPING));
+
         return lib;
     }
     

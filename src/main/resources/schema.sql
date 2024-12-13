@@ -30,6 +30,14 @@ INSERT INTO dyn_enums (type, value) VALUES
     ('FieldDesignation','asset'),
     ('FieldDesignation','batch');
 
+CREATE TABLE local_config (
+    id  SERIAL NOT NULL PRIMARY KEY,
+    entity_id VARCHAR NOT NULL,
+    feature VARCHAR NOT NULL,
+    value VARCHAR,
+    UNIQUE (feature, entity_id)
+);
+
 CREATE TABLE signalsentities (
     id VARCHAR PRIMARY KEY,
     snb_type INTEGER NOT NULL REFERENCES dyn_enums(id) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -268,10 +276,7 @@ CREATE TABLE libraries (
     entity_flags VARCHAR,
     materials_sample_mapping VARCHAR,
     name VARCHAR,
-    uniqueness VARCHAR,
-    has_image BOOLEAN NOT NULL DEFAULT FALSE,
-    has_sequence BOOLEAN NOT NULL DEFAULT FALSE,
-    has_drawing BOOLEAN NOT NULL DEFAULT FALSE
+    uniqueness VARCHAR
 );
 
 CREATE TABLE library_fields (

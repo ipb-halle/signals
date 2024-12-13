@@ -59,9 +59,11 @@ public class ContainerTypeRestService implements RestReplyParser<ContainerType> 
         ct.setId(j.getAsJsonObject().getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
         ct.setDescription(attributes.getAsJsonPrimitive(RestHelper.ATTR_DESCRIPTION).getAsString());
         ct.setName(attributes.getAsJsonPrimitive(ContainerType.ATTR_NAME).getAsString());
+        /*
         if (attributes.has(ContainerType.ATTR_ATTACHMENTS)) {
             parseAttachments(attributes.getAsJsonArray(ContainerType.ATTR_ATTACHMENTS), ct);
         }
+        */
         if (attributes.has(RestHelper.ATTR_FIELDS)) {
             parseFieldDefinitions(attributes.getAsJsonArray(RestHelper.ATTR_FIELDS), ct);
         }

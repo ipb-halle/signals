@@ -65,15 +65,6 @@ public class LibraryDbService {
         criteriaQuery.select(root);
 
         List<Predicate> predicates = new ArrayList<>();
-        if (cmap.containsKey(Library.HAS_DRAWING)) {
-            predicates.add(criteriaBuilder.equal(root.get(Library.HAS_DRAWING), cmap.get(Library.HAS_DRAWING)));
-        }
-        if (cmap.containsKey(Library.HAS_IMAGE)) {
-            predicates.add(criteriaBuilder.equal(root.get(Library.HAS_IMAGE), cmap.get(Library.HAS_IMAGE)));
-        }
-        if (cmap.containsKey(Library.HAS_SEQUENCE)) {
-            predicates.add(criteriaBuilder.equal(root.get(Library.HAS_SEQUENCE), cmap.get(Library.HAS_SEQUENCE)));
-        }
         criteriaQuery.where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
 
         List<Library> results = new ArrayList<>();

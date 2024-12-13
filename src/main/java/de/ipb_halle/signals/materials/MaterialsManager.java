@@ -18,6 +18,9 @@
 package de.ipb_halle.signals.materials;
 
 import de.ipb_halle.signals.RuntimeConfig;
+import de.ipb_halle.signals.config.Feature;
+import de.ipb_halle.signals.config.LocalConfig;
+import de.ipb_halle.signals.config.LocalConfigDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntityDTO;
@@ -47,6 +50,9 @@ public class MaterialsManager {
 
     @Inject
     private LibraryRestService libraryRestService;
+
+    @Inject
+    private LocalConfigDbService localConfigDbService;
 
     @Inject
     private MaterialDbService materialDbService;
@@ -124,9 +130,9 @@ public class MaterialsManager {
         Field imageField = fieldDbService.getImageField();
         Field drawingField = fieldDbService.getDrawingField();
         Field sequenceField = fieldDbService.getSequenceField();
-        Set<String> drawingLibraryIds = getLibrariesWith(Library.HAS_DRAWING);
-        Set<String> imageLibraryIds = getLibrariesWith(Library.HAS_IMAGE);
-        Set<String> sequenceLibraryIds = getLibrariesWith(Library.HAS_SEQUENCE);
+        Set<String> drawingLibraryIds = getLibrariesWith(Feature.HAS_DRAWING);
+        Set<String> imageLibraryIds = getLibrariesWith(Feature.HAS_IMAGE);
+        Set<String> sequenceLibraryIds = getLibrariesWith(Feature.HAS_SEQUENCE);
 
         //load all fields for library by library id, where field map has a key field title and field object
         Map<String, Map<String, Field>> fieldsByLibrary = mapFieldsByLibraryId(libraryIds);
@@ -150,73 +156,17 @@ public class MaterialsManager {
      * Provide a set of library Ids, which match certain criteria, e.g.
      * all Ids of libraries, which may contain chemical drawings, images or
      * sequences.
-     * @param key the requested feature (see criteria map keys in Library)
+     * @param feature the requested feature (see criteria map keys in Library)
      * @return A set of library Ids
      */
-    private Set<String> getLibrariesWith(String key) {
+    private Set<String> getLibrariesWith(Feature feature) {
         Map<String, Object> cmap = new HashMap<>();
-        cmap.put(key, Boolean.TRUE);
-        return libraryDbService.load(cmap)
+        cmap.put(LocalConfig.CRITERIA_FEATURE, feature.toString());
+        return localConfigDbService.load(cmap)
                 .stream()
-                .map(lib -> lib.getId())
+                .map(cfg -> cfg.getEntityId())
                 .collect(Collectors.toSet());
     }
-
-
-    /*
-
-    private void getFieldsAttachments(List<Material> materials, List<Field> allFields) {
-
-        List<Field> fieldsWithTypeAttachedFile = getFieldsWithTypeAttachedFile(allFields);
-
-        //map with key material id and value list of field values which contains id of fields with type attached files
-        Map<String, List<FieldValue>> materialsMapWithFieldValuesAttachedFile = getMaterialFieldValuesWithAttachedFile(materials, fieldsWithTypeAttachedFile);
-
-        for (String materialId : materialsMapWithFieldValuesAttachedFile.keySet()) {
-            for (FieldValue value : materialsMapWithFieldValuesAttachedFile.get(materialId)) {
-                logger.info("This is field value with id {}\n", value.getFieldId());
-            }
-        }
-
-        //materialRestService.doGetFieldAttachments(materials, )
-    }
-
-    private Map<String, List<FieldValue>> getMaterialFieldValuesWithAttachedFile(List<Material> materials, List<Field> fieldsWithTypeAttachedFile) {
-        Map<String, List<FieldValue>> fieldValuesAndMaterialIds = new HashMap<>();
-        for (Material material : materials) {
-            List<FieldValue> fieldValues = new ArrayList<>();
-            for (FieldValue fieldValue : material.getFieldValues()) {
-                for (Field field : fieldsWithTypeAttachedFile) {
-                    logger.info("Material id {} field id {}", material.getId(), field.getId());
-                    /
-//                    String result = materialRestService.doGetFieldAttachments(material, field.getId());
-//                    if (result != null) {
-//                        logger.warn("THIS IS REST CALL RESULT {}", result);
-//                        fieldValues.add(fieldValue.setFieldId(field.getId()));
-//                    }
-
-                }
-            }
-            logger.info(Arrays.toString(fieldValues.toArray()));
-            fieldValuesAndMaterialIds.put(material.getId(), fieldValues);
-        }
-        return fieldValuesAndMaterialIds;
-    }
-
-    private List<Field> getFieldsWithTypeAttachedFile(List<Field> allFields) {
-        List<Field> fieldsWithTypeAttachedFile = new ArrayList<>();
-        for (Field field : allFields) {
-            if (field.getFieldType().equals(FieldType.valueOf(FieldType.ATTACHED_FILE))) {
-                String fieldId = field.getId();
-                fieldsWithTypeAttachedFile.add(field);
-                //logger.info("field IDS {}\n and field types {}\n field title {} \n and field ancestor {}\n", fieldId, field.getFieldType(), field.getTitle(), field.getDefiningEntityId());
-            }
-        }
-        return fieldsWithTypeAttachedFile;
-    }
-
-    */
-
 
     /**
      * Create a mapping of fields by libraryId
