@@ -24,7 +24,7 @@ import jakarta.persistence.*;
 public class LocalConfig {
 
     public final static String CRITERIA_FEATURE = "feature";
-    public final static String CRITERIA_ENTITY_ID = "entity_id";
+    public final static String CRITERIA_ENTITY_ID = "entityId";
 
     @Id
     private Integer id;

@@ -20,6 +20,8 @@ package de.ipb_halle.signals.materials;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.TestBase;
+import de.ipb_halle.signals.config.LocalConfig;
+import de.ipb_halle.signals.config.LocalConfigDbService;
 import de.ipb_halle.signals.dynEnum.DynEnum;
 import de.ipb_halle.signals.dynEnum.DynEnumDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
@@ -74,7 +76,8 @@ public class MaterialsManagerTest {
     private MaterialsManager manager;
 
     @Module
-    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class, 
+    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
+        LocalConfig.class, LocalConfigDbService.class,
         FieldDefinition.class, FieldDbService.class, FieldParser.class,
         FieldValueEntity.class, SignalsEntityRestService.class, SignalsEntityDbService.class,
         DynEnum.class, DynEnumDbService.class, DynEnumManager.class,
@@ -89,6 +92,7 @@ public class MaterialsManagerTest {
     @Module
     public PersistenceUnit persistence() {
         return TestBase.persistence(new String[]{ LibraryEntity.class.getName(),  LibraryField.class.getName(),
+                LocalConfig.class.getName(),
             FieldDefinition.class.getName(), DynEnum.class.getName(), FieldType.class.getName(), MaterialEntity.class.getName() });
     }
 

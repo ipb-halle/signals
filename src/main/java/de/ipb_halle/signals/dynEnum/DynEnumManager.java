@@ -26,6 +26,8 @@ import jakarta.annotation.PostConstruct;
 import jakarta.ejb.Singleton;
 import jakarta.ejb.Startup;
 import jakarta.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Database Service for DynEnums
@@ -34,6 +36,8 @@ import jakarta.inject.Inject;
 @Singleton(name = "dynEnumManager")
 @Startup
 public class DynEnumManager {
+
+    private final Logger logger = LoggerFactory.getLogger(DynEnumManager.class);
 
     @Inject
     private DynEnumDbService dbService;
@@ -48,8 +52,8 @@ public class DynEnumManager {
      */
     public DynEnumManager() {
         discoverEnums = false;
-        dynEnumsMapByType = new HashMap<> ();
-        dynEnumsById = new HashMap<> ();
+        dynEnumsMapByType = new HashMap<>();
+        dynEnumsById = new HashMap<>();
     }
 
     @PostConstruct
@@ -92,7 +96,7 @@ public class DynEnumManager {
     private void putDynEnum(DynEnum de) {
         String type = de.getShortType();
         Map<String, DynEnum> typeMap = dynEnumsMapByType
-                .getOrDefault(type, new HashMap<String, DynEnum> ());
+                .getOrDefault(type, new HashMap<String, DynEnum>());
         typeMap.put(de.getValue(), de);
         dynEnumsMapByType.put(type, typeMap);
         dynEnumsById.put(de.getId(), de);
@@ -100,7 +104,7 @@ public class DynEnumManager {
 
     public List<Integer> getDynEnumIds(DynEnum[] dynEnums) {
         Integer[] idList = new Integer[dynEnums.length];
-        for (int i=0; i<dynEnums.length; i++) {
+        for (int i = 0; i < dynEnums.length; i++) {
             idList[i] = valueOf(dynEnums[i]).getId();
         }
         return Arrays.asList(idList);

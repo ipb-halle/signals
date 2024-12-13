@@ -70,12 +70,12 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
     }
 
 
-    public void parseTimestamps(JsonObject attributes, EntityRelationships entityRelationships) {
+    public static void parseTimestamps(JsonObject attributes, EntityRelationships entityRelationships) {
         entityRelationships.setCreatedAt(RestHelper.parseDate(attributes, SignalsEntityDTO.ATTR_CREATED_AT));
         entityRelationships.setEditedAt(RestHelper.parseDate(attributes, SignalsEntityDTO.ATTR_EDITED_AT));
     }
 
-    public void parseRelationships(JsonObject relationships, EntityRelationships entityRelationships) {
+    public static void parseRelationships(JsonObject relationships, EntityRelationships entityRelationships) {
         entityRelationships.setCreatedBy(new UserReference(
                 RestHelper.parseString(
                         RestHelper.getPrimitiveFromPath(relationships, SignalsEntityDTO.ATTR_CREATED_BY), null)));
@@ -102,7 +102,7 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
 
     }
 
-    private Collection<ISignalsEntity> parseChildren(JsonObject relationships) {
+    private static Collection<ISignalsEntity> parseChildren(JsonObject relationships) {
         return null;
     }
 
@@ -137,7 +137,7 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
         }
     }
 
-    private List<ISignalsEntity> parseAncestors(JsonObject json) {
+    private static List<ISignalsEntity> parseAncestors(JsonObject json) {
         return new ArrayList<ISignalsEntity>();
     }
 }

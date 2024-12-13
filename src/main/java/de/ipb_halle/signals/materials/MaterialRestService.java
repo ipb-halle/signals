@@ -24,7 +24,9 @@ import com.google.gson.JsonParser;
 
 import de.ipb_halle.signals.attachment.Attachment;
 import de.ipb_halle.signals.attachment.AttachmentRestService;
+import de.ipb_halle.signals.entity.EntityRelationships;
 import de.ipb_halle.signals.entity.EntityType;
+import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
 import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldValue;
@@ -70,12 +72,6 @@ public class MaterialRestService implements RestReplyParser<Material> {
     @Inject
     private RestClient restClient;
 
-    @Inject
-    private SignalsEntityRestService entityRestService;
-
-    @Inject
-    private AttachmentRestService attachmentRestService;
-
     private Logger logger = LoggerFactory.getLogger(MaterialRestService.class);
 
     public Material parseReply(JsonElement json) {
@@ -95,8 +91,8 @@ public class MaterialRestService implements RestReplyParser<Material> {
 
         EntityType entityType = EntityType.valueOf(RestHelper.parseString(attributes, RestHelper.ATTR_TYPE));
 
-        entityRestService.parseTimestamps(attributes, material);
-        entityRestService.parseRelationships(materialJson, material);
+        SignalsEntityRestService.parseTimestamps(attributes, material);
+        SignalsEntityRestService.parseRelationships(materialJson, material);
 
         parseFields(attributes, material);
         parseSynonyms(attributes, material);

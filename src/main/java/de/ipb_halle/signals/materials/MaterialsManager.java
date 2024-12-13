@@ -105,7 +105,6 @@ public class MaterialsManager {
         processMaterials(materials);
     }
 
-
     /**
      * Process all materials. Specifically, 
      * * provide all the field definitions for the fields obtained from 
@@ -125,11 +124,7 @@ public class MaterialsManager {
         Set<String> libraryIds = materials.stream()
                 .map(Material::getLibraryId)
                 .collect(Collectors.toSet());
-        //hold all fields from library ids
 
-        Field imageField = fieldDbService.getImageField();
-        Field drawingField = fieldDbService.getDrawingField();
-        Field sequenceField = fieldDbService.getSequenceField();
         Set<String> drawingLibraryIds = getLibrariesWith(Feature.HAS_DRAWING);
         Set<String> imageLibraryIds = getLibrariesWith(Feature.HAS_IMAGE);
         Set<String> sequenceLibraryIds = getLibrariesWith(Feature.HAS_SEQUENCE);
@@ -138,15 +133,17 @@ public class MaterialsManager {
         Map<String, Map<String, Field>> fieldsByLibrary = mapFieldsByLibraryId(libraryIds);
 
         for (Material mat : materials) {
-            processMaterial(fieldsByLibrary.get(mat.getLibraryId()), mat);
+            Map<String, Field> libraryFields = fieldsByLibrary.get(mat.getLibraryId());
+            processMaterial(libraryFields, mat);
+
             if (imageLibraryIds.contains(mat.getLibraryId())) {
-                obtainImage(mat, imageField);
+                obtainImage(mat, libraryFields);
             }
             if (drawingLibraryIds.contains(mat.getLibraryId())) {
-                obtainDrawing(mat, drawingField);
+                obtainDrawing(mat, libraryFields);
             }
             if (sequenceLibraryIds.contains(mat.getLibraryId())) {
-                obtainSequence(mat, sequenceField);
+                obtainSequence(mat, libraryFields);
             }
             materialDbService.save(mat);
         }
@@ -161,7 +158,7 @@ public class MaterialsManager {
      */
     private Set<String> getLibrariesWith(Feature feature) {
         Map<String, Object> cmap = new HashMap<>();
-        cmap.put(LocalConfig.CRITERIA_FEATURE, feature.toString());
+        cmap.put(LocalConfig.CRITERIA_FEATURE, feature);
         return localConfigDbService.load(cmap)
                 .stream()
                 .map(cfg -> cfg.getEntityId())
@@ -224,41 +221,53 @@ public class MaterialsManager {
     /**
      * Assign all field definitions for simple field values (e.g. text, numbers,
      * etc. but not attachments, images, etc.)
-     * @param fieldDefinitions map of field definitions (by title)
+     * @param libraryFields map of field definitions (by title)
      * @param mat the material
      */
-    private void assignSimpleFieldValues(Map<String, Field> fieldDefinitions, Material mat) {
+    private void assignSimpleFieldValues(Map<String, Field> libraryFields, Material mat) {
         Iterator<FieldValue> iterator = mat.getFieldValues().iterator();
         while (iterator.hasNext()) {
             FieldValue fieldValue = iterator.next();
 
             // check in fieldCache
-            Field field = fieldDefinitions.get(fieldValue.getFieldTitle());
-            if (field != null) {
-                fieldValue.setFieldId(field.getId());
-            } else {
-                field = createNewAssetField(mat.getLibraryId(), fieldValue.getFieldTitle());
-                fieldDefinitions.put(field.getTitle(), field);
-
-                //set Feld-ID in to FieldValue
-                fieldValue.setFieldId(field.getId());
-            }
+            final Field field = obtainAssetField(libraryFields,
+                    mat.getLibraryId(),
+                    fieldValue.getFieldTitle(),
+                    FieldType.valueOf(FieldType.TEXT));
+            fieldValue.setFieldId(field.getId());
         }
     }
 
     /**
+     * Get a asset field from the field by title map. Create a new field if necessary.
+     * @param libraryFields the map of fields by field title
+     * @param libraryId the library id
+     * @param title the title of the field
+     * @param type the type of the field
+     * @return a persisted field
+     */
+    private Field obtainAssetField(Map<String, Field> libraryFields, String libraryId, String title, FieldType type) {
+        Field field = libraryFields.get(title);
+        if (field == null) {
+            field = createNewAssetField(libraryId, title, type);
+            libraryFields.put(title, field);
+        }
+        return field;
+    }
+    /**
      * Provide a field definition for ASSET ad-hoc fields (e.g. name, description, etc.)
      * @param libraryId the Id of the library
      * @param title the title of the field
+     * @param type the type of the field (TEXT or ATTACHED_FILE)
      * @return a persisted Field
      */
-    private Field createNewAssetField(String libraryId, String title) {
+    private Field createNewAssetField(String libraryId, String title, FieldType type) {
         // generate a new field
         Field newField = new Field();
         newField.setId(UUID.randomUUID().toString());
         newField.setTitle(title);
         newField.setUserDefined(true);
-        newField.setFieldType(FieldType.valueOf("TEXT"));
+        newField.setFieldType(type);
         newField.setDesignation(FieldDesignation.valueOf(FieldDesignation.ASSET));
         newField.setDefiningEntityId("assetType:" + libraryId);
 
@@ -279,7 +288,7 @@ public class MaterialsManager {
         newField.setId(UUID.randomUUID().toString());
         newField.setTitle(title);
         newField.setUserDefined(true);
-        newField.setFieldType(FieldType.valueOf("TEXT"));
+        newField.setFieldType(FieldType.valueOf(FieldType.TEXT));
         newField.setDesignation(FieldDesignation.valueOf(FieldDesignation.BATCH));
         newField.setDefiningEntityId("assetType:" + libraryId);
 
@@ -293,17 +302,29 @@ public class MaterialsManager {
         // ToDo: obtain single attachment for given Field
     }
 
-    private void obtainImage(Material mat, Field image) {
+    private void obtainImage(Material mat, Map<String, Field> libraryFields) {
+        final Field image = obtainAssetField(libraryFields,
+                mat.getLibraryId(),
+                Field.FIELD_ID_IMAGE,
+                FieldType.valueOf(FieldType.ATTACHED_FILE));
         Path tempPath = materialRestService.doGetMaterialImage(mat);
         storeAttachment(image, tempPath, RestClient.IMAGE_UNKNOWN);
     }
 
-    private void obtainDrawing(Material mat, Field drawing) {
+    private void obtainDrawing(Material mat, Map<String, Field> libraryFields) {
+        final Field drawing = obtainAssetField(libraryFields,
+                mat.getLibraryId(),
+                Field.FIELD_ID_CHEMICAL_DRAWING,
+                FieldType.valueOf(FieldType.ATTACHED_FILE));
         Map<String, Path> drawings = materialRestService.doGetMaterialDrawing(mat);
         drawings.forEach((key, value) -> storeAttachment(drawing, value, key));
     }
 
-    private void obtainSequence(Material mat, Field sequence) {
+    private void obtainSequence(Material mat, Map<String, Field> libraryFields) {
+        final Field sequence = obtainAssetField(libraryFields,
+                mat.getLibraryId(),
+                Field.FIELD_ID_SEQUENCE,
+                FieldType.valueOf(FieldType.ATTACHED_FILE));
         Map<String, Path> sequences = materialRestService.doGetMaterialSequence(mat);
         sequences.forEach((key, value) -> storeAttachment(sequence, value, key));
     }

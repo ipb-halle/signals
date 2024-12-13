@@ -30,6 +30,7 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("FieldType")
 public class FieldType extends DynEnum <FieldType> {
 
+    public final static String TEXT = "TEXT";
     public final static String ATTACHED_FILE = "ATTACHED_FILE";
 
     /**

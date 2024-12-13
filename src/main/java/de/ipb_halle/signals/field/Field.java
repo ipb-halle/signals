@@ -30,7 +30,7 @@ public class Field {
     public final static String ENTITY_ID = "entityId";
     public final static String DEFINING_ENTITY_ID = "definingEntityId";
     public final static String FIELD_ID = "fieldId";
-    public final static String FIELD_DESIGNATION = "designation";
+    public final static String FIELD_DESIGNATION = "fieldDesignation";
 
     /* globally defined field Ids for drawings, images and sequences */
     public final static String FIELD_ID_CHEMICAL_DRAWING = "27b17174-c8e4-4a98-93e5-37ef97327fbd";
