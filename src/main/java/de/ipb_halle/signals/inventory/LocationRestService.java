@@ -52,11 +52,11 @@ public class LocationRestService implements RestReplyParser<LocationEntity> {
     private Logger logger = LoggerFactory.getLogger(LocationRestService.class);
 
     public LocationEntity parseReply(JsonElement json) {
-        JsonObject j = json.getAsJsonObject();
-        JsonObject attributes = j.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
+        JsonObject jsonObj = json.getAsJsonObject();
+        JsonObject attributes = jsonObj.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
         LocationEntity loc = new LocationEntity();
-        loc.setId(RestHelper.parseString(j, RestHelper.ATTR_ID));
+        loc.setId(RestHelper.parseString(jsonObj, RestHelper.ATTR_ID));
         loc.setBarcode(RestHelper.parseString(attributes, LocationEntity.ATTR_BARCODE));
         loc.setCreatedAt(RestHelper.parseDate(attributes, LocationEntity.ATTR_CREATED_AT));
         loc.setName(RestHelper.parseString(attributes, LocationEntity.ATTR_NAME));
@@ -67,7 +67,8 @@ public class LocationRestService implements RestReplyParser<LocationEntity> {
         loc.setUpdatedAt(RestHelper.parseDate(attributes, LocationEntity.ATTR_UPDATED_AT));
 
         parseAncestor(attributes.getAsJsonArray(LocationEntity.ATTR_ANCESTORS), loc);
-        parseChangeRecords(j, loc);
+        parseChangeRecords(jsonObj, loc);
+        parseFields(attributes, loc);
 
         logger.info("*********** CreatedBy {} ******", loc.getCreatedBy());
         return loc;
@@ -113,5 +114,9 @@ public class LocationRestService implements RestReplyParser<LocationEntity> {
                     RestHelper.getPrimitiveFromPath(json, LocationEntity.ATTR_CREATED_BY)));
         loc.setUpdatedBy(RestHelper.parseString(
                     RestHelper.getPrimitiveFromPath(json, LocationEntity.ATTR_UPDATED_BY)));
+    }
+
+    private void parseFields(JsonObject attributes, LocationEntity loc) {
+        logger.warn("parseFields() NOT IMPLEMENTED!");
     }
 }

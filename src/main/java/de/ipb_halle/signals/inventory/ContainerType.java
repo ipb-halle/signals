@@ -68,7 +68,7 @@ public class ContainerType {
         fields = new HashSet<> ();
     }
 
-    public  ContainerType(ContainerTypeEntity cte, List<AttachmentEntity> a, List<Field> fd) {
+    public  ContainerType(ContainerTypeEntity cte, List<Field> fd) {
         id = cte.getId();
         createdAt = cte.getCreatedAt();
         description = cte.getDescription();
@@ -78,8 +78,8 @@ public class ContainerType {
         updatedAt = cte.getUpdatedAt();
 
         attachments = new HashSet<> ();
+        // attachments.addAll(a);
         fields = new HashSet<> ();
-        attachments.addAll(a);
         fields.addAll(fd);
     }
 

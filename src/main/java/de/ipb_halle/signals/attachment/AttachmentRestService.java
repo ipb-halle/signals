@@ -95,12 +95,12 @@ public class AttachmentRestService implements RestReplyParser<Attachment> {
                         attachment.setAncestorId(ancestorObject.has(RestHelper.ATTR_ID) ? ancestorObject.get(RestHelper.ATTR_ID).getAsString() : null);
                     }
 
-                    attachment.setId(childId);
-                    attachment.setName(attachmentAttributes.has(RestHelper.ATTR_NAME) ? attachmentAttributes.get(RestHelper.ATTR_NAME).getAsString() : null);
-                    attachment.setType(lookupFieldType(childType));
-                    attachment.setCreatedAt(attachmentAttributes.has(Group.ATTR_CREATED_AT) ? RestHelper.parseDate(attachmentAttributes, Group.ATTR_CREATED_AT, new Date(0)) : null);
-                    attachment.setEditedAt(attachmentAttributes.has(Group.ATTR_EDITED_AT) ? RestHelper.parseDate(attachmentAttributes, Group.ATTR_EDITED_AT, new Date(0)) : null);
-                    attachment.setDigest(attachmentAttributes.has(Group.ATTR_DIGEST) ? attachmentAttributes.get(Group.ATTR_DIGEST).getAsString() : null);
+//                    attachment.setId(childId);
+//                    attachment.setName(attachmentAttributes.has(RestHelper.ATTR_NAME) ? attachmentAttributes.get(RestHelper.ATTR_NAME).getAsString() : null);
+//                    attachment.setType(lookupFieldType(childType));
+//                    attachment.setCreatedAt(attachmentAttributes.has(Group.ATTR_CREATED_AT) ? RestHelper.parseDate(attachmentAttributes, Group.ATTR_CREATED_AT, new Date(0)) : null);
+//                    attachment.setEditedAt(attachmentAttributes.has(Group.ATTR_EDITED_AT) ? RestHelper.parseDate(attachmentAttributes, Group.ATTR_EDITED_AT, new Date(0)) : null);
+//                    attachment.setDigest(attachmentAttributes.has(Group.ATTR_DIGEST) ? attachmentAttributes.get(Group.ATTR_DIGEST).getAsString() : null);
 
                     // logger.info("THIS IS AN ATTACHMENT: {}\n", attachment.toString());
 

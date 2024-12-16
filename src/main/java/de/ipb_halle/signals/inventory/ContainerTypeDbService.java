@@ -55,20 +55,21 @@ public class ContainerTypeDbService {
     /**
      * @param id the ContainerType Id
      * @return a list of Attatchment for that container type
-     */
+     *
     private List<AttachmentEntity> loadAttachments(String id) {
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<ContainerTypeAttachment> criteriaQuery = builder.createQuery(ContainerTypeAttachment.class);
-        Root<ContainerTypeAttachment> root = criteriaQuery.from(ContainerTypeAttachment.class);
-        criteriaQuery.select(root);
-        criteriaQuery.where(builder.equal(root.get(CONTAINER_TYPE_ID), id));
+    CriteriaBuilder builder = em.getCriteriaBuilder();
+    CriteriaQuery<ContainerTypeAttachment> criteriaQuery = builder.createQuery(ContainerTypeAttachment.class);
+    Root<ContainerTypeAttachment> root = criteriaQuery.from(ContainerTypeAttachment.class);
+    criteriaQuery.select(root);
+    criteriaQuery.where(builder.equal(root.get(CONTAINER_TYPE_ID), id));
 
-        List<AttachmentEntity> result = new ArrayList<>();
-        for (ContainerTypeAttachment cta : em.createQuery(criteriaQuery).getResultList()) {
-            result.add(attachmentService.loadById(cta.getAttachmentId()));
-        }
-        return result;
+    List<AttachmentEntity> result = new ArrayList<>();
+    for (ContainerTypeAttachment cta : em.createQuery(criteriaQuery).getResultList()) {
+    result.add(attachmentService.loadById(cta.getAttachmentId()));
     }
+    return result;
+    }
+     */
 
     /**
      * @param id the ContainerType Id
@@ -91,21 +92,23 @@ public class ContainerTypeDbService {
     public ContainerType loadById(String id) {
         ContainerTypeEntity cte = this.em.find(ContainerTypeEntity.class, id);
         return new ContainerType(cte,
-                loadAttachments(cte.getId()),
+                // loadAttachments(cte.getId()),
                 loadFields(cte.getId()));
     }
 
     public void save(ContainerType ct) {
         ContainerTypeEntity cte = ct.createEntity();
         this.em.merge(cte);
+        /*
         for (AttachmentEntity a : ct.getAttachments()) {
             attachmentService.save(a);
             ContainerTypeAttachment cta = new ContainerTypeAttachment()
-                    .setContainerTypeId(cte.getId())
+                    .setContainerTypeId(cte.getId());
                     .setAttachmentId(a.getId());
             em.merge(cta);
             attachmentService.save(a);
         }
+         */
         for (Field fd : ct.getFields()) {
             fieldService.save(fd);
             ContainerTypeField ctfd = new ContainerTypeField()

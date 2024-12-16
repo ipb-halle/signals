@@ -77,7 +77,7 @@ public class AttachmentManager {
         //Logger
         // attachments.forEach(attachment -> logger.info(attachment.toString()));
 
-        attachments.forEach(attachmentDbService::save);
+        //attachments.forEach(attachmentDbService::save);
     }
 
 
