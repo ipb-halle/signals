@@ -20,14 +20,13 @@ package de.ipb_halle.signals.rest;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /** 
@@ -65,7 +64,7 @@ public class RestResultIterator<T> implements Iterator {
         try {
             client.execute();
 
-            jsonResult = JsonParser.parseString(client.getResponse());
+            jsonResult = JsonParser.parseString(client.getResponse().getString());
             jsonIterator = jsonResult.getAsJsonObject().getAsJsonArray(RestHelper.ATTR_DATA).iterator();
 
         } catch(UnexpectedResponseCodeException ue) {
@@ -82,7 +81,7 @@ public class RestResultIterator<T> implements Iterator {
             client.setURI(uri)
                 .execute();
 
-            jsonResult = JsonParser.parseString(client.getResponse());
+            jsonResult = JsonParser.parseString(client.getResponse().getString());
             jsonIterator = jsonResult.getAsJsonObject().getAsJsonArray(RestHelper.ATTR_DATA).iterator();
 
         } catch(UnexpectedResponseCodeException ue) {

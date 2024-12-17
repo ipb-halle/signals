@@ -17,9 +17,13 @@
  */
 package de.ipb_halle.signals.materials;
 
-import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.RuntimeConfig;
+import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
+import de.ipb_halle.signals.attachment.AttachmentDbService;
+import de.ipb_halle.signals.attachment.AttachmentEntity;
+import de.ipb_halle.signals.attachment.AttachmentFile;
+import de.ipb_halle.signals.attachment.AttachmentRevision;
 import de.ipb_halle.signals.config.LocalConfig;
 import de.ipb_halle.signals.config.LocalConfigDbService;
 import de.ipb_halle.signals.dynEnum.DynEnum;
@@ -29,26 +33,23 @@ import de.ipb_halle.signals.entity.SignalsEntityDbService;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
 import de.ipb_halle.signals.field.*;
 import de.ipb_halle.signals.rest.MockRestClient;
+import de.ipb_halle.signals.storage.StorageService;
 import de.ipb_halle.signals.util.EmbeddedKeyValue;
-
-import java.util.Properties;
-import java.util.Set;
-
 import jakarta.inject.Inject;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import org.apache.openejb.jee.EjbJar;
+import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
 import org.apache.openejb.junit.ApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
 import org.apache.openejb.testing.Module;
-import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import java.util.Properties;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
 
 @RunWith(ApplicationComposer.class)
 public class MaterialsManagerTest {
@@ -81,8 +82,9 @@ public class MaterialsManagerTest {
         FieldDefinition.class, FieldDbService.class, FieldParser.class,
         FieldValueEntity.class, SignalsEntityRestService.class, SignalsEntityDbService.class,
         DynEnum.class, DynEnumDbService.class, DynEnumManager.class,
-        Library.class, LibraryEntity.class, 
-        LibraryField.class, EmbeddedKeyValue.class,
+        Library.class, LibraryEntity.class, AttachmentDbService.class, AttachmentEntity.class,
+            AttachmentRevision.class, AttachmentFile.class,
+        LibraryField.class, EmbeddedKeyValue.class, StorageService.class,
         Material.class, MaterialEntity.class, MaterialDbService.class, MaterialRestService.class,
         LibraryDbService.class, MaterialsManager.class, LibraryRestService.class })
     public EjbJar app() {
@@ -92,7 +94,8 @@ public class MaterialsManagerTest {
     @Module
     public PersistenceUnit persistence() {
         return TestBase.persistence(new String[]{ LibraryEntity.class.getName(),  LibraryField.class.getName(),
-                LocalConfig.class.getName(),
+                LocalConfig.class.getName(),AttachmentEntity.class.getName(),
+                AttachmentRevision.class.getName(), AttachmentFile.class.getName(),
             FieldDefinition.class.getName(), DynEnum.class.getName(), FieldType.class.getName(), MaterialEntity.class.getName() });
     }
 

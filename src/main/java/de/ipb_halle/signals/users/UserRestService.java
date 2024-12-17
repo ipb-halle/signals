@@ -165,7 +165,7 @@ public class UserRestService implements RestReplyParser<User> {
                 .setRequestData(request)
                 .execute(RestClient.HTTP_CREATED);
 
-            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
             User snbUser = parseReply(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
             doManageLicenses(snbUser, licenses, true);
             return snbUser;
@@ -252,7 +252,7 @@ public class UserRestService implements RestReplyParser<User> {
                 .setEndpoint(String.format(SYSTEMGROUPS_ENDPOINT, user.getId()))
                 .execute();
 
-            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
             parseMemberships(user, jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA).getAsJsonArray());
 
         } catch(UnexpectedResponseCodeException ue) {
@@ -273,7 +273,7 @@ public class UserRestService implements RestReplyParser<User> {
                 .setEndpoint(String.format(USER_ENDPOINT, id))
                 .execute();
 
-            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
             return parseReply(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
 
         } catch(UnexpectedResponseCodeException ue) {
@@ -321,7 +321,7 @@ public class UserRestService implements RestReplyParser<User> {
                 .setRequestData(prepareJsonString(EndPoint.UPDATE, user, groupsToAdd, groupsToRemove))
                 .execute();
 
-            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
             return parseReply(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
 
         } catch(UnexpectedResponseCodeException ue) {

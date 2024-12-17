@@ -98,7 +98,7 @@ public class GroupRestService implements RestReplyParser<Group> {
                 .setRequestData(prepareJsonString(group))
                 .execute(RestClient.HTTP_CREATED);
 
-            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
             Group snbGroup = parseReply(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
             return snbGroup;
 
@@ -121,7 +121,7 @@ public class GroupRestService implements RestReplyParser<Group> {
                 .setEndpoint(String.format(GROUP_ENDPOINT, id))
                 .execute();
 
-            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
             return parseReply(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
 
         } catch(UnexpectedResponseCodeException ue) {

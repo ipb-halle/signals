@@ -22,7 +22,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
-import de.ipb_halle.signals.field.FieldType;
 import de.ipb_halle.signals.inventory.LocationRestService;
 import de.ipb_halle.signals.rest.*;
 import jakarta.inject.Inject;
@@ -109,7 +108,7 @@ public class AttributeRestService implements RestReplyParser<Attribute> {
                     .setEndpoint(String.format(ATTRIBUTES_ENDPOINT, id))
                     .execute();
 
-            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
             return jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA);
 
         } catch(UnexpectedResponseCodeException ue) {
@@ -129,7 +128,7 @@ public class AttributeRestService implements RestReplyParser<Attribute> {
                     .setEndpoint(ATTRIBUTES_LIST_ENDPOINT)
                     .execute();
 
-            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
             return jsonResult.getAsJsonObject().getAsJsonArray(RestHelper.ATTR_DATA);
 
         } catch(UnexpectedResponseCodeException ue) {

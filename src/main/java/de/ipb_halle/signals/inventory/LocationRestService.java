@@ -21,21 +21,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
-import de.ipb_halle.signals.rest.Method;
-import de.ipb_halle.signals.rest.RestClient;
-import de.ipb_halle.signals.rest.RestHelper;
-import de.ipb_halle.signals.rest.RestReplyParser;
-import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
+import de.ipb_halle.signals.rest.*;
+import jakarta.ejb.Local;
+import jakarta.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-
-import jakarta.ejb.Local;
-import jakarta.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Manager for signals locations (inventory/location API endpoint)
@@ -81,7 +74,7 @@ public class LocationRestService implements RestReplyParser<LocationEntity> {
                 .setEndpoint(String.format(LOCATION_ENDPOINT, id))
                 .execute();
 
-            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
             return jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA);
 
         } catch(UnexpectedResponseCodeException ue) {

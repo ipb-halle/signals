@@ -22,6 +22,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.nio.file.Path;
+import java.util.Objects;
+
 @Entity
 @Table(name = "attachment_files")
 public class AttachmentFile {
@@ -36,6 +39,11 @@ public class AttachmentFile {
 
     @Column(name = "mime_type")
     private String mimeType;
+
+    @Column
+    private String digest;
+
+    private transient Path tempPath;
 
     public Integer getId() {
         return id;
@@ -59,5 +67,34 @@ public class AttachmentFile {
 
     public void setMimeType(String mimeType) {
         this.mimeType = mimeType;
+    }
+
+    public String getDigest() {
+        return digest;
+    }
+
+    public void setDigest(String digest) {
+        this.digest = digest;
+    }
+
+    public Path getTempPath() {
+        return tempPath;
+    }
+
+    public void setTempPath(Path tempPath) {
+        this.tempPath = tempPath;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        AttachmentFile that = (AttachmentFile) object;
+        return Objects.equals(id, that.id) && Objects.equals(mimeType, that.mimeType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, mimeType);
     }
 }

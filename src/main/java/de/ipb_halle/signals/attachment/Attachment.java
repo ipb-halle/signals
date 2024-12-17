@@ -19,9 +19,6 @@
 package de.ipb_halle.signals.attachment;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-
 import java.util.*;
 
 /**
@@ -30,6 +27,15 @@ import java.util.*;
 public class Attachment implements IAttachment {
 
     public final static String ATTR_CREATED_AT = "createdAt";
+
+    public final static String ANCESTOR_ID = "ancestorId";
+    public final static String ATTACHMENT_ID = "id";
+    public final static String ENTITY_ID = "entityId";
+    public final static String FIELD_ID = "fieldId";
+
+    public final static String LATEST_ONLY = "latestRevision";
+    public final static String STAGING = "staging";
+
 
     private Integer id;
     private String entityId;
@@ -64,14 +70,30 @@ public class Attachment implements IAttachment {
         revisions.addAll(revs);
     }
 
+    public void addRevision(AttachmentRevision rev) {
+        revisions.add(rev);
+    }
+
     public void addFiles(Collection<AttachmentFile> fileList) {
         for (AttachmentFile file : fileList) {
-            Set<AttachmentFile> revisionFiles = files.getOrDefault(
-                    file.getRevisionId(),
-                    new HashSet<AttachmentFile>());
-            revisionFiles.add(file);
-            files.put(file.getRevisionId(), revisionFiles);
+            addFile(file);
         }
+    }
+
+    public void addFile(AttachmentFile file) {
+        Set<AttachmentFile> revisionFiles = files.getOrDefault(
+                file.getRevisionId(),
+                new HashSet<AttachmentFile>());
+        revisionFiles.add(file);
+        files.put(file.getRevisionId(), revisionFiles);
+    }
+
+    /**
+     * remove null keys of objects after persisting and assigning
+     * an entity id
+     */
+    public void discard() {
+        files.remove(null);
     }
 
     public List<AttachmentRevision> getRevisions() {
@@ -98,6 +120,7 @@ public class Attachment implements IAttachment {
     @Override
     public IAttachment setId(Integer id) {
         this.id = id;
+        revisions.forEach(rev -> rev.setAttachmentId(id));
         return this;
     }
 

@@ -52,7 +52,7 @@ public class RoleRestService implements RestReplyParser<Role> {
     @Inject
     private RestClient restClient;
 
-    private Logger logger = LoggerFactory.getLogger(RoleRestService.class);
+    private final Logger logger = LoggerFactory.getLogger(RoleRestService.class);
 
 
     public Role parseReply(JsonElement j) {
@@ -73,7 +73,7 @@ public class RoleRestService implements RestReplyParser<Role> {
                 .setEndpoint(String.format(ROLE_ENDPOINT, id))
                 .execute();
 
-            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse());
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
             return parseReply(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
 
         } catch(UnexpectedResponseCodeException ue) {
@@ -81,7 +81,7 @@ public class RoleRestService implements RestReplyParser<Role> {
         } catch(URISyntaxException me) {
             logger.warn("doGetRole() malformed URL");
         } catch(IOException ioe) {
-            logger.warn("IOException", (Throwable) ioe);
+            logger.warn("IOException", ioe);
         }
         return null;
     }

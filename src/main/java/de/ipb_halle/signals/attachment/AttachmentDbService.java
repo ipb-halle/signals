@@ -17,18 +17,18 @@
  */
 package de.ipb_halle.signals.attachment;
 
-import de.ipb_halle.signals.config.LocalConfig;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
-/** 
+/**
  * DB service for attachments
  */
 
@@ -36,8 +36,49 @@ import java.util.List;
 public class AttachmentDbService {
 
 
-    @PersistenceContext(unitName="signalsDB")
+    @PersistenceContext(unitName = "signalsDB")
     private EntityManager em;
+
+    /**
+     * @param cmap query criteria
+     * @return
+     */
+    public List<Attachment> load(Map<String, Object> cmap) {
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<AttachmentEntity> criteriaQuery = criteriaBuilder.createQuery(AttachmentEntity.class);
+        Root<AttachmentEntity> root = criteriaQuery.from(AttachmentEntity.class);
+        CriteriaQuery<AttachmentEntity> select = criteriaQuery.select(root);
+
+        List<Predicate> predicates = new ArrayList<>();
+        if (cmap.containsKey(Attachment.ANCESTOR_ID)) {
+            predicates.add(criteriaBuilder.equal(root.get(Attachment.ANCESTOR_ID), cmap.get(Attachment.ANCESTOR_ID)));
+        }
+        if (cmap.containsKey(Attachment.ATTACHMENT_ID)) {
+            predicates.add(criteriaBuilder.equal(root.get(Attachment.ATTACHMENT_ID), cmap.get(Attachment.ATTACHMENT_ID)));
+        }
+        if (cmap.containsKey(Attachment.ENTITY_ID)) {
+            predicates.add(criteriaBuilder.equal(root.get(Attachment.ENTITY_ID), cmap.get(Attachment.ENTITY_ID)));
+        }
+        if (cmap.containsKey(Attachment.FIELD_ID)) {
+            predicates.add(criteriaBuilder.equal(root.get(Attachment.FIELD_ID), cmap.get(Attachment.FIELD_ID)));
+        }
+
+        criteriaQuery.where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
+
+        List<Attachment> result = new ArrayList<>();
+        for (AttachmentEntity entity : em.createQuery(criteriaQuery).getResultList()) {
+            Attachment attachment = new Attachment(entity);
+            List<AttachmentRevision> revisions = loadRevisions(
+                    attachment.getId(),
+                    (boolean) cmap.getOrDefault(Attachment.LATEST_ONLY, Boolean.FALSE));
+            attachment.addRevisions(revisions);
+            for (AttachmentRevision revision : revisions) {
+                attachment.addFiles(loadAttachmentFiles(revision.getId()));
+            }
+            result.add(attachment);
+        }
+        return result;
+    }
 
     public Attachment loadLatestRevisionById(int id) {
         AttachmentEntity entity = this.em.find(AttachmentEntity.class, id);
@@ -64,6 +105,7 @@ public class AttachmentDbService {
         }
         predicates.add(criteriaBuilder.equal(root.get(AttachmentRevision.ATTACHMENT_ID), attachmentId));
         criteriaQuery.where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
+        criteriaQuery.orderBy(criteriaBuilder.asc(root.get(AttachmentRevision.ID)));
         return em.createQuery(criteriaQuery).getResultList();
     }
 
@@ -76,23 +118,23 @@ public class AttachmentDbService {
         return em.createQuery(criteriaQuery).getResultList();
     }
 
-    public void save(Attachment a) {
-        this.em.merge(a.createEntity());
-        saveRevisions(a.getRevisions());
-        saveFiles(a);
+    public void save(Attachment attachment) {
+        AttachmentEntity entity = this.em.merge(attachment.createEntity());
+        attachment.setId(entity.getId());
+        saveRevisions(attachment);
     }
 
-    private void saveRevisions(List<AttachmentRevision> revisions) {
-        revisions.forEach(r -> this.em.merge(r));
-    }
-
-    private void saveFiles(Attachment attachment) {
-        attachment.getRevisions().forEach(r -> saveFiles(attachment.getFiles(r.getId())));
-    }
-
-    private void saveFiles(Collection<AttachmentFile> files) {
-        if ((files != null) && (!files.isEmpty())) {
-            files.forEach(f -> this.em.merge(f));
+    private void saveRevisions(Attachment attachment) {
+        for (AttachmentRevision rev : attachment.getRevisions()) {
+            rev.setAttachmentId(attachment.getId());
+            AttachmentRevision persisted = this.em.merge(rev);
+            Set<AttachmentFile> files = attachment.getFiles(rev.getId());
+            for (AttachmentFile file : files) {
+                file.setRevisionId(persisted.getId());
+                file.setId(this.em.merge(file).getId());
+            }
+            attachment.addFiles(files);
+            attachment.discard();
         }
     }
 }

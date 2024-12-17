@@ -18,9 +18,10 @@
 package de.ipb_halle.signals.rest;
 
 
+import jakarta.ejb.Local;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
-import jakarta.ejb.Local;
 
 /**
  * Http client reader for Signals tool
@@ -30,14 +31,12 @@ public interface RestClient {
 
     public enum RestType {
         STRING,
-        PATH;
+        STREAM;
     }
 
     /**
      * Name of the staging directory for attachment downloads
      */
-    public final static String STAGING = "staging";
-
     public final int HTTP_OK = 200;
     public final int HTTP_CREATED = 201;
     public final int HTTP_ACCEPTED = 202;
@@ -60,7 +59,7 @@ public interface RestClient {
 
     public RestClient execute(int expectedResponseCode) throws IOException, URISyntaxException, UnexpectedResponseCodeException ;
 
-    public String getResponse();
+    public RestReply getResponse();
 
     public int getResponseCode();
 

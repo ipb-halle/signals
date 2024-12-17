@@ -1,6 +1,6 @@
 /*
  * IPB Signals client
- * Copyright 2022 Leibniz-Institut f. Pflanzenbiochemie
+ * Copyright 2024 Leibniz-Institut f. Pflanzenbiochemie
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,16 @@ package de.ipb_halle.signals.rest;
 
 
 import de.ipb_halle.signals.SignalsConfig;
+import de.ipb_halle.signals.attachment.Attachment;
+import jakarta.annotation.Resource;
+import jakarta.ejb.Local;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
-
+import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Redirect;
 import java.net.http.HttpClient.Version;
@@ -34,22 +37,18 @@ import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.net.ProxySelector;
-import java.net.URLEncoder;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-
-import jakarta.annotation.Resource;
-import jakarta.ejb.Local;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Http client reader for Signals tool
@@ -57,6 +56,7 @@ import org.slf4j.LoggerFactory;
 @Local
 public class RestClientImpl implements RestClient {
 
+    private final static String SHA256 = "SHA-256";
     private final static String UTF8 = "UTF-8";
 
     @Resource
@@ -66,7 +66,7 @@ public class RestClientImpl implements RestClient {
     private String endpoint;
     private Method method;
     private String requestData;
-    private String response;
+    private RestReply response;
     private int responseCode;
     private RestType responseType;
     private URI uri;
@@ -139,28 +139,35 @@ public class RestClientImpl implements RestClient {
     }
 
     private void invoke(HttpClient client, HttpRequest request) throws InterruptedException, IOException {
-        switch(responseType) {
-            case STRING :
+        switch (responseType) {
+            case STRING:
                 invokeString(client, request);
                 break;
-            case PATH :
-                invokePath(client, request);
+            case STREAM:
+                invokeStream(client, request);
                 break;
         }
     }
 
-    private void invokePath(HttpClient client, HttpRequest request) throws InterruptedException, IOException {
+    private void invokeStream(HttpClient client, HttpRequest request) throws InterruptedException, IOException {
         String tmp = UUID.randomUUID().toString();
-        HttpResponse<Path> httpResponse = client.send(request,
-                BodyHandlers.ofFile(Paths.get(signalsConfig.getStoragePath(), STAGING, tmp)));
+        HttpResponse<InputStream> httpResponse = client.send(request, BodyHandlers.ofInputStream());
         responseCode = httpResponse.statusCode();
-        setResponse(httpResponse.body().toString());
+
+        Path path = Paths.get(signalsConfig.getStoragePath(), Attachment.STAGING, tmp);
+        try (DigestInputStream digester = new DigestInputStream(httpResponse.body(), MessageDigest.getInstance(SHA256))) {
+            Files.copy(digester, path, StandardCopyOption.ATOMIC_MOVE);
+            response = new RestReply(path, digester.getMessageDigest().toString(), contentType);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+        setResponse(path.toString());
     }
 
     private void invokeString(HttpClient client, HttpRequest request) throws InterruptedException, IOException {
         HttpResponse<String> httpResponse = client.send(request, BodyHandlers.ofString());
         responseCode = httpResponse.statusCode();
-        setResponse(httpResponse.body());
+        response = new RestReply(httpResponse.body(), contentType);
     }
 
     protected Method getMethod() {
@@ -172,7 +179,7 @@ public class RestClientImpl implements RestClient {
     }
 
     @Override
-    public String getResponse() {
+    public RestReply getResponse() {
         return response;
     }
 
@@ -254,8 +261,13 @@ public class RestClientImpl implements RestClient {
         return this;
     }
 
-    protected void setResponse(String r) {
+    protected void setResponse(RestReply r) {
         response = r;
+    }
+
+    protected void setResponse(String r) {
+        responseType = RestType.STRING;
+        response = new RestReply(r, contentType);
     }
 
     @Override

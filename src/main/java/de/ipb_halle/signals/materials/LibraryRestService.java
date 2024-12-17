@@ -21,29 +21,22 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldDesignation;
 import de.ipb_halle.signals.field.FieldParser;
-import de.ipb_halle.signals.rest.Method;
-import de.ipb_halle.signals.rest.RestClient;
-import de.ipb_halle.signals.rest.RestHelper;
-import de.ipb_halle.signals.rest.RestReplyParser;
-import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
+import de.ipb_halle.signals.rest.*;
 import de.ipb_halle.signals.users.UserReference;
+import jakarta.ejb.Local;
+import jakarta.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import jakarta.ejb.Local;
-import jakarta.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** 
  * REST service for material libraries
@@ -98,7 +91,7 @@ public class LibraryRestService implements RestReplyParser<Library> {
                 .setEndpoint(MATERIALS_LIBRARIES_ENDPOINT)
                 .execute();
 
-            jsonResult = JsonParser.parseString(restClient.getResponse());
+            jsonResult = JsonParser.parseString(restClient.getResponse().getString());
             return jsonResult.getAsJsonObject().getAsJsonArray(RestHelper.ATTR_DATA).iterator();
 
         } catch(UnexpectedResponseCodeException ue) {

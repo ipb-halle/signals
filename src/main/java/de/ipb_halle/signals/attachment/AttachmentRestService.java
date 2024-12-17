@@ -20,19 +20,16 @@ package de.ipb_halle.signals.attachment;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import com.google.gson.JsonParser;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.rest.*;
-import de.ipb_halle.signals.users.Group;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Date;
 import java.util.Objects;
 
 
@@ -122,10 +119,9 @@ public class AttachmentRestService implements RestReplyParser<Attachment> {
                     .setEndpoint(String.format(ATTACHMENT_ENDPOINT, id))
                     .execute();
 
-            String response = restClient.getResponse();
+            String response = restClient.getResponse().getString();
             resultJsonElement = JsonParser.parseString(response);
             return resultJsonElement;
-
         } catch (UnexpectedResponseCodeException ue) {
             logger.warn("Unexpected code:\n" + ue);
         } catch (URISyntaxException me) {
