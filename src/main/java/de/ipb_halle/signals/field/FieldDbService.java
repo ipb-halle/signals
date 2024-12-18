@@ -107,7 +107,7 @@ public class FieldDbService {
              * load options
              * load measures
              */
-            logger.info("this is class FieldDBService, method load. You have to implement load options and load measures to field");
+            //logger.info("this is class FieldDBService, method load. You have to implement load options and load measures to field");
             results.add(value);
         }
         return results;
@@ -162,37 +162,6 @@ public class FieldDbService {
         for (FieldOption option : field.getOptions()) {
             this.em.merge(option);
         }
-    }
-
-
-    private Field getGloballyDefinedAttachmentField(String id, String title) {
-        Field field = loadById(id);
-        if (field == null) {
-            field = new Field();
-            field.setId(id);
-            field.setTitle(title);
-            field.setCalculated(Boolean.FALSE);
-            field.setHidden(Boolean.FALSE);
-            field.setMultiSelect(Boolean.FALSE);
-            field.setRequired(Boolean.FALSE);
-            field.setFieldType(FieldType.valueOf(FieldType.ATTACHED_FILE));
-            field.setDesignation(FieldDesignation.valueOf(FieldDesignation.DEFAULT));
-            save(field);
-            return loadById(id);
-        }
-        return field;
-    }
-
-    public Field getImageField() {
-        return getGloballyDefinedAttachmentField(Field.FIELD_ID_IMAGE, "Image");
-    }
-
-    public Field getDrawingField() {
-        return getGloballyDefinedAttachmentField(Field.FIELD_ID_CHEMICAL_DRAWING, "Chemical Drawing");
-    }
-
-    public Field getSequenceField() {
-        return getGloballyDefinedAttachmentField(Field.FIELD_ID_SEQUENCE, "Sequence");
     }
 }
 

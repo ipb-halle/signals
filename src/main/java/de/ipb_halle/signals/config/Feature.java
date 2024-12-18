@@ -17,7 +17,5 @@
  */package de.ipb_halle.signals.config;
 
 public enum Feature {
-    HAS_IMAGE,
-    HAS_DRAWING,
-    HAS_SEQUENCE
+    PLACEHOLDER_FOR_LATER_USE
 }

@@ -25,6 +25,7 @@ public class RestReply {
     private Path path;
     private String digest;
     private String mimeType;
+    private Long fileSize;
     private RestClient.RestType type;
 
     public RestReply(String st, String m) {
@@ -62,5 +63,13 @@ public class RestReply {
 
     public void setMimeType(String m) {
         mimeType = m;
+    }
+
+    public Long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(Long fileSize) {
+        this.fileSize = fileSize;
     }
 }

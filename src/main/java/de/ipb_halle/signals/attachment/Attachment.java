@@ -27,6 +27,10 @@ import java.util.*;
 public class Attachment implements IAttachment {
 
     public final static String ATTR_CREATED_AT = "createdAt";
+    public final static String ATTR_FILE_ID = "fileId";
+    public final static String ATTR_FILE_NAME = "fileName";
+    public final static String ATTR_MIME_TYPE = "mimeType";
+    public final static String ATTR_FILE_SIZE = "size";
 
     public final static String ANCESTOR_ID = "ancestorId";
     public final static String ATTACHMENT_ID = "id";
@@ -47,6 +51,7 @@ public class Attachment implements IAttachment {
 
     public Attachment() {
         revisions = new ArrayList<>();
+        files = new HashMap<>();
     }
 
     public Attachment(AttachmentEntity e) {
@@ -55,6 +60,7 @@ public class Attachment implements IAttachment {
         this.fieldId = e.getFieldId();
         this.ancestorId = e.getAncestorId();
         revisions = new ArrayList<>();
+        files = new HashMap<> ();
     }
 
     public AttachmentEntity createEntity() {

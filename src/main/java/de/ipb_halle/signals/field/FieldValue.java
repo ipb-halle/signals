@@ -35,6 +35,7 @@ public class FieldValue {
     private String fieldTitle;
     private String value;
     private LinkType linkType;
+    private transient Field adHocField;
 
     public FieldValue() {
         linkType = LinkType.UNSPECIFIED;
@@ -111,6 +112,14 @@ public class FieldValue {
     @Override
     public int hashCode() {
         return Objects.hash(entityId, fieldId, fieldTitle, value, linkType);
+    }
+
+    public Field getAdHocField() {
+        return adHocField;
+    }
+
+    public void setAdHocField(Field adHocField) {
+        this.adHocField = adHocField;
     }
 
     @Override

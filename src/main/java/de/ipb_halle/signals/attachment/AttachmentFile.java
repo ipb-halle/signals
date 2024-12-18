@@ -17,10 +17,7 @@
  */
 package de.ipb_halle.signals.attachment;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.nio.file.Path;
 import java.util.Objects;
@@ -31,6 +28,7 @@ public class AttachmentFile {
 
     public final static String ATTACHMENT_REVISION = "revisionId";
 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Integer id;
 
@@ -42,6 +40,9 @@ public class AttachmentFile {
 
     @Column
     private String digest;
+
+    @Column
+    private Long size;
 
     private transient Path tempPath;
 
@@ -83,6 +84,14 @@ public class AttachmentFile {
 
     public void setTempPath(Path tempPath) {
         this.tempPath = tempPath;
+    }
+
+    public Long getSize() {
+        return size;
+    }
+
+    public void setSize(Long size) {
+        this.size = size;
     }
 
     @Override

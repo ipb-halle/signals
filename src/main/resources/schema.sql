@@ -197,7 +197,7 @@ CREATE TABLE field_definitions (
     defining_entity_id VARCHAR /* NOT NULL signalsentities(id) */,
     description VARCHAR,
     designation INTEGER NOT NULL REFERENCES dyn_enums(id),
-    field_type VARCHAR,
+    field_type INTEGER NOT NULL REFERENCES dyn_enums(id),
     hidden VARCHAR,
     key VARCHAR,
     multiselect BOOLEAN,
@@ -236,13 +236,18 @@ CREATE TABLE attachments (
 CREATE TABLE attachment_revisions (
     id SERIAL NOT NULL PRIMARY KEY,
     attachment_id INTEGER NOT NULL REFERENCES attachments(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    original_name VARCHAR
+    original_name VARCHAR,
+    mime_type VARCHAR,          /* as defined by field value */
+    file_id VARCHAR,
+    size BIGINT
 );
 
 CREATE TABLE attachment_files (
     id SERIAL NOT NULL PRIMARY KEY,
     revision_id INTEGER NOT NULL REFERENCES attachment_revisions(id),
-    mime_type VARCHAR
+    mime_type VARCHAR,
+    size BIGINT,
+    digest VARCHAR
 );
 
 CREATE TABLE container_types (

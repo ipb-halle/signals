@@ -104,6 +104,11 @@ public class Material implements IMaterial, EntityRelationships {
         return this;
     }
 
+    public Material addFieldValue(FieldValue value) {
+        fieldValues.add(value);
+        return this;
+    }
+
     public void addSynonym(Synonym synonym) {
         synonyms.add(synonym);
     }

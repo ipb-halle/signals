@@ -45,6 +45,7 @@ public class RestHelper {
     public final static String ATTR_LIBRARY = "library";
     public final static String ATTR_CHILDREN = "children";
     public final static String ATTR_META = "meta";
+    public final static String ATTR_VALUE = "value";
     public final static String ATTR_LINKS = "links";
     public final static String ATTR_SELF = "self";
     public final static String ANCESTORS = "ancestors";

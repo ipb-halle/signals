@@ -46,6 +46,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.HexFormat;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -156,12 +157,13 @@ public class RestClientImpl implements RestClient {
 
         Path path = Paths.get(signalsConfig.getStoragePath(), Attachment.STAGING, tmp);
         try (DigestInputStream digester = new DigestInputStream(httpResponse.body(), MessageDigest.getInstance(SHA256))) {
-            Files.copy(digester, path, StandardCopyOption.ATOMIC_MOVE);
-            response = new RestReply(path, digester.getMessageDigest().toString(), contentType);
+            Files.copy(digester, path, StandardCopyOption.REPLACE_EXISTING);
+            byte[] digest = digester.getMessageDigest().digest();
+            response = new RestReply(path, HexFormat.of().formatHex(digest), contentType);
+            response.setFileSize(Files.size(path));
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
-        setResponse(path.toString());
     }
 
     private void invokeString(HttpClient client, HttpRequest request) throws InterruptedException, IOException {

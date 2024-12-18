@@ -19,7 +19,7 @@ public class Field {
     public final static String ATTR_MEASURES = "measures";
     //public final static String ATTR_MULTISELECT = "multiSelect";
     public final static String ATTR_OPTIONS = "options";
-    // public final static String ATTR_READ_ONLY = "readOnly";
+    public final static String ATTR_READ_ONLY = "readOnly";
     public final static String ATTR_REQUIRED = "isRequired";
     public final static String ATTR_MANDATORY = "mandatory";
     public final static String ATTR_TITLE = "title";
@@ -31,12 +31,6 @@ public class Field {
     public final static String DEFINING_ENTITY_ID = "definingEntityId";
     public final static String FIELD_ID = "fieldId";
     public final static String FIELD_DESIGNATION = "fieldDesignation";
-
-    /* globally defined field Ids for drawings, images and sequences */
-    public final static String FIELD_ID_CHEMICAL_DRAWING = "27b17174-c8e4-4a98-93e5-37ef97327fbd";
-    public final static String FIELD_ID_IMAGE = "3f1f2fbc-fdd1-4c60-b6f8-41f54937d2cd";
-    public final static String FIELD_ID_SEQUENCE = "8bf2bdc6-b5e1-4e23-8622-40a0bc0c0d96";
-
 
     private String id;
     private String attributeListEid;
@@ -290,6 +284,7 @@ public class Field {
                 ", title='" + title + '\'' +
                 ", userDefined=" + userDefined +
                 ", fieldType=" + fieldType +
+                "(" + fieldType.getId() + ") " +
                 ", measures=" + measures +
                 ", options=" + options +
                 ", designation=" + designation +

@@ -21,11 +21,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import de.ipb_halle.signals.attachment.Attachment;
+import de.ipb_halle.signals.attachment.AttachmentRevision;
 import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
 import de.ipb_halle.signals.field.Field;
+import de.ipb_halle.signals.field.FieldType;
 import de.ipb_halle.signals.field.FieldValue;
-import de.ipb_halle.signals.field.FieldValuesParser;
 import de.ipb_halle.signals.rest.*;
 import jakarta.ejb.Local;
 import jakarta.inject.Inject;
@@ -34,10 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * REST service for materials
@@ -70,8 +69,9 @@ public class MaterialRestService implements RestReplyParser<Material> {
         /**
          * link to materialJson -> materials/{eid}/data
          */
-        JsonObject materialJson = json.getAsJsonObject();
-        JsonObject attributes = materialJson.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
+
+        JsonObject materialJson = json.getAsJsonObject().get(RestHelper.ATTR_DATA).getAsJsonObject();
+        JsonObject attributes = materialJson.get(RestHelper.ATTR_ATTRIBUTES).getAsJsonObject();
 
         material.setId(RestHelper.parseString(attributes, RestHelper.ATTR_ID));
         material.setName(RestHelper.parseString(attributes, RestHelper.ATTR_NAME));
@@ -85,49 +85,69 @@ public class MaterialRestService implements RestReplyParser<Material> {
         SignalsEntityRestService.parseTimestamps(attributes, material);
         SignalsEntityRestService.parseRelationships(materialJson, material);
 
-        parseFields(attributes, material);
         parseSynonyms(attributes, material);
         return material;
     }
 
-    private void parseFields(JsonObject library, Material material) {
-        /**
-         * example of library:
-         * {"library":"Compounds","assetTypeId":"6215104dab0ad27bf7942a45","assetId":"66e80ed8ebc08a375f43022d","id":"asset:66e80ed8ebc08a375f43022d",
-         * "eid":"asset:66e80ed8ebc08a375f43022d","name":"Compound000010","synonyms":["Essigsäureethylester"],"description":"",
-         * "createdAt":"2024-09-16T10:56:24.746Z","editedAt":"2024-09-16T10:56:24.746Z","type":"asset","digest":"49706234",
-         * "fields":{"CAS Number":{"value":"141-78-6"},"Chemical Name":{"value":"ethyl acetate"},"Description":{"value":""},
-         * "Exact Mass":{"value":"88.05243"},"Material Library Type":{"value":"Compounds"},"Materials Access":{"value":["IPB"]},
-         * "Molecular Formula":{"value":"C<sub>4</sub>H<sub>8</sub>O<sub>2</sub>"},"Molecular Weight":{"value":"88.11 g/mol"},
-         * "Name":{"value":"Compound000010"}},"flags":{"canTrash":true}}
-         */
-        FieldValuesParser fieldValuesParser = new FieldValuesParser();
-        /**
-         * fieldValueList contains values of field title/value pair e.g.:
-         * they are : "141-78-6", "ethyl acetate" from JSON OBJECT fieldTitleValuePair, which looks like:
-         * "CAS Number":{"value":"141-78-6"},"Chemical Name":{"value":"ethyl acetate"}, etc.
-         */
-        List<FieldValue> fieldValueList = new ArrayList<>();
-
-        try {
-            //parses fields from library json, received from material/libraries/attributes/assets/fields
-            JsonObject fieldTitleValuePair = library.getAsJsonObject(RestHelper.ATTR_FIELDS);
-
-            //loop through field object and extract key/value pars from each field
-            fieldValueList = fieldValuesParser.parseReply(fieldTitleValuePair);
-            // fieldValueList.forEach(fieldValue -> logger.info("This is a field value: '{}'\n", fieldValue.toString()));
-
-        } catch (IllegalStateException e) {
-            logger.error("Error parsing field values. JSON: {}", library.get(RestHelper.ATTR_FIELDS), e);
-            throw e;
+    /**
+     * @param json
+     * @param fields     all fields of a given material mapped by fieldId
+     * @param definingId material id (asset-Id or batch-Id)
+     * @return list of field values. Previously unknown Fields are assigned to
+     * the field adHocField.
+     */
+    private List<FieldValue> parseFields(JsonElement json, Map<String, Field> fields, String definingId) {
+        List<FieldValue> values = new ArrayList<>();
+        JsonObject jsonObj = json.getAsJsonObject();
+        if (jsonObj.has(RestHelper.ATTR_DATA)) {
+            JsonArray data = jsonObj.get(RestHelper.ATTR_DATA).getAsJsonArray();
+            for (JsonElement datum : data) {
+                values.add(parseSingleField(datum, fields));
+            }
         }
-        //logger.info("Material title {}", material.getName());
+        return values;
+    }
 
-        for (FieldValue fieldValue : fieldValueList) {
-            fieldValue.setEntityId(material.getId());
+    /**
+     *
+     * @param json
+     * @param fields field definitions by fieldId
+     * @return the FieldValue
+     */
+    private FieldValue parseSingleField(JsonElement json, Map<String, Field> fields) {
+        JsonObject jsonObj = json.getAsJsonObject();
+        JsonObject meta = RestHelper.getFromPath(json, RestHelper.ATTR_META).getAsJsonObject();
+        JsonObject attributes = RestHelper.getFromPath(json, RestHelper.ATTR_ATTRIBUTES).getAsJsonObject();
 
+        String id = RestHelper.parseString(attributes, RestHelper.ATTR_ID);
+        String value = RestHelper.getAsJsonString(attributes, RestHelper.ATTR_VALUE);
+        String name = RestHelper.parseString(attributes, RestHelper.ATTR_NAME);
+        Field field = fields.get(id);
+
+        FieldValue fieldValue = new FieldValue();
+        fieldValue.setFieldId(id);
+        fieldValue.setValue(value);
+        fieldValue.setFieldTitle(name);
+        if (field == null) {
+            fieldValue.setAdHocField(parseFieldDefinition(meta));
         }
-        material.addAllFieldValues(fieldValueList);
+        return fieldValue;
+    }
+
+    private Field parseFieldDefinition(JsonObject json) {
+        Field field = new Field();
+        JsonObject definition = json.get(Field.ATTR_DEFINITION).getAsJsonObject();
+        field.setId(RestHelper.parseString(definition, RestHelper.ATTR_ID));
+        field.setTitle(RestHelper.parseString(definition, RestHelper.ATTR_NAME));
+        field.setFieldType(FieldType.valueOf(RestHelper.parseString(definition, Field.ATTR_DATA_TYPE)));
+        field.setHidden(RestHelper.parseBool(definition, Field.ATTR_HIDDEN, false));
+        field.setCalculated(RestHelper.parseBool(definition, Field.ATTR_CALCULATED, false));
+        field.setReadOnly(RestHelper.parseBool(definition, Field.ATTR_READ_ONLY, false));
+        boolean required = RestHelper.parseBool(definition, Field.ATTR_REQUIRED, false)
+                || RestHelper.parseBool(definition, Field.ATTR_MANDATORY, false);
+        field.setRequired(required);
+        field.setDefinedBy(RestHelper.parseString(definition, Field.ATTR_DEFINED_BY));
+        return field;
     }
 
     private void parseSynonyms(JsonObject attributes, Material material) {
@@ -141,16 +161,28 @@ public class MaterialRestService implements RestReplyParser<Material> {
         }
     }
 
-    private JsonElement fetch(String id) {
-        JsonElement jsonResult;
+    public void parseAttachmentRevisionInfo(AttachmentRevision revision, FieldValue value) {
+        JsonObject json = JsonParser.parseString(value.getValue()).getAsJsonObject();
+
+        revision.setOriginalName(RestHelper.parseString(json, Attachment.ATTR_FILE_NAME));
+        revision.setMimeType(RestHelper.parseString(json, Attachment.ATTR_MIME_TYPE));
+        revision.setFileId(RestHelper.parseString(json, Attachment.ATTR_FILE_ID));
+        revision.setSize(RestHelper.parseLong(json, Attachment.ATTR_FILE_SIZE));
+    }
+
+    public String parseAttachmentMimeType(FieldValue value) {
+        JsonObject json = JsonParser.parseString(value.getValue()).getAsJsonObject();
+        return RestHelper.parseString(json, Attachment.ATTR_MIME_TYPE);
+    }
+
+    private JsonElement fetch(String endpoint, String id) {
         try {
             restClient.reset()
                     .setMethod(Method.GET)
-                    .setEndpoint(String.format(MATERIAL_ENDPOINT, id))
+                    .setEndpoint(String.format(endpoint, id))
                     .execute();
 
-            jsonResult = JsonParser.parseString(restClient.getResponse().getString());
-            return jsonResult.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_DATA);
+            return JsonParser.parseString(restClient.getResponse().getString());
 
         } catch (UnexpectedResponseCodeException ue) {
             logger.warn("Unexpected code", ue);
@@ -164,7 +196,8 @@ public class MaterialRestService implements RestReplyParser<Material> {
 
     /**
      * Actually do a REST call to obtain a single attachment
-     * @param endpoint the specific endpoint with id
+     *
+     * @param endpoint    the specific endpoint with id
      * @param contentType MIME type of the attachment
      * @return path of the received attachment in the staging area
      */
@@ -188,34 +221,24 @@ public class MaterialRestService implements RestReplyParser<Material> {
         return null;
     }
 
-    public Material parseFieldAttachments(Material material, JsonElement resultJson) {
-        JsonObject resultObject = resultJson.getAsJsonObject();
-        logger.info("result object field attachment", resultObject);
-
-        FieldValue fieldValue = new FieldValue();
-
-        Set<FieldValue> updatedFieldValues = material.getFieldValues();
-        updatedFieldValues.add(fieldValue);
-        return material;
-    }
-
     /**
      * Obtain a material attachment as an octet stream. Chemical drawings,
      * images and sequences require special handling.
+     *
      * @param material
      * @param field
      * @return path of the downloaded attachment in the staging area
      */
-    public RestReply doGetMaterialAttachment(Material material, Field field) {
+    public RestReply doGetMaterialAttachment(Material material, Field field, String mimeType) {
         String endpoint = String.format(MATERIAL_ATTACHMENT_ENDPOINT, material.getId(), field.getId());
-        return fetchAttachment(endpoint, RestClient.APPLICATION_OCTET);
+        return fetchAttachment(endpoint, mimeType);
     }
 
     public List<RestReply> doGetMaterialDrawing(Material material) {
         List<RestReply> result = new ArrayList<>();
-        for (String type : new String[] {RestClient.CHEMICAL_CDXML,
+        for (String type : new String[]{RestClient.CHEMICAL_CDXML,
                 RestClient.CHEMICAL_MOL3000,
-                RestClient.CHEMICAL_SVG } ) {
+                RestClient.CHEMICAL_SVG}) {
             RestReply attachment = fetchAttachment(String.format(MATERIAL_DRAWING_ENDPOINT, material.getId()),
                     type);
             if (attachment != null) {
@@ -227,14 +250,9 @@ public class MaterialRestService implements RestReplyParser<Material> {
         return result;
     }
 
-    public RestReply doGetMaterialImage(Material material) {
-        return fetchAttachment(String.format(MATERIAL_IMAGE_ENDPOINT, material.getId()),
-                        RestClient.APPLICATION_OCTET);
-    }
-
     public List<RestReply> doGetMaterialSequence(Material material) {
         List<RestReply> sequences = new ArrayList<>();
-        for (String type : new String[] {RestClient.SEQUENCE_GENBANK, RestClient.SEQUENCE_FASTA } ) {
+        for (String type : new String[]{RestClient.SEQUENCE_GENBANK, RestClient.SEQUENCE_FASTA}) {
             RestReply attachment = fetchAttachment(String.format(MATERIAL_SEQUENCE_ENDPOINT, material.getId()),
                     type);
             if (attachment != null) {
@@ -246,7 +264,11 @@ public class MaterialRestService implements RestReplyParser<Material> {
         return sequences;
     }
 
+    public List<FieldValue> doGetMaterialProperties(String id, Map<String, Field> fields) {
+        return parseFields(fetch(MATERIAL_PROPERTIES_ENDPOINT, id), fields, id);
+    }
+
     public Material doGetMaterial(String id) {
-        return parseReply(fetch(id));
+        return parseReply(fetch(MATERIAL_ENDPOINT, id));
     }
 }

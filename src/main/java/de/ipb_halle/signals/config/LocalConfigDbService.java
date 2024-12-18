@@ -17,10 +17,6 @@
  */
 package de.ipb_halle.signals.config;
 
-import de.ipb_halle.signals.attachment.AttachmentEntity;
-import de.ipb_halle.signals.field.Field;
-import de.ipb_halle.signals.field.FieldDefinition;
-import jakarta.ejb.Local;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

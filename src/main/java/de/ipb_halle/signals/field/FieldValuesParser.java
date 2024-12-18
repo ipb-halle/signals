@@ -34,7 +34,7 @@ import java.util.List;
 /**
  * service for field values (not a real REST service)
  */
-
+@Deprecated
 public class FieldValuesParser implements RestReplyParser<List<FieldValue>> {
 
     private Logger logger = LoggerFactory.getLogger(FieldValuesParser.class);

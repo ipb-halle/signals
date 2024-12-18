@@ -58,6 +58,9 @@ public class StorageService {
         standardMimeExtensions.put("biosequence/genbank", "gb");
         standardMimeExtensions.put("text/csv", "csv");
         standardMimeExtensions.put("image/*", "image");
+        standardMimeExtensions.put("image/png", "png");
+        standardMimeExtensions.put("image/jpeg", "jpeg");
+        standardMimeExtensions.put("image/tiff", "tiff");
     }
 
     private Logger logger = LoggerFactory.getLogger(StorageService.class);
@@ -76,13 +79,13 @@ public class StorageService {
 
     private Path computeDestination(AttachmentFile file) {
         int id = file.getId();
-        String a = String.format("%02d", (id / 10000) % 100);
-        String b = String.format("%02d", (id / 100) % 100);
-        String c = String.format("%02d", id % 100);
+        String a = String.format("%02d", (id / 1_000_000) % 100);
+        String b = String.format("%02d", (id / 10_000) % 100);
+        String c = String.format("%02d", (id / 100) % 100);
         String name = String.format("%d.%d.%s",
                 file.getId(),
                 file.getRevisionId(),
                 standardMimeExtensions.getOrDefault(file.getMimeType(), "dat"));
-        return Paths.get(signalsConfig.getStoragePath(), Attachment.STAGING, a, b, c, name);
+        return Paths.get(signalsConfig.getStoragePath(), a, b, c, name);
     }
 }

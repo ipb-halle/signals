@@ -17,10 +17,7 @@
  */
 package de.ipb_halle.signals.attachment;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.util.Date;
 
@@ -34,6 +31,7 @@ public class AttachmentRevision {
     public final static String ID = "id";
     public final static String ATTACHMENT_ID = "attachmentId";
 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Integer id;
 
@@ -42,6 +40,15 @@ public class AttachmentRevision {
 
     @Column(name = "original_name")
     private String originalName;
+
+    @Column
+    private Long size;
+
+    @Column(name = "file_id")
+    private String fileId;
+
+    @Column(name = "mime_type")
+    private String mimeType;
 
     public Integer getId() {
         return id;
@@ -65,5 +72,29 @@ public class AttachmentRevision {
 
     public void setOriginalName(String originalName) {
         this.originalName = originalName;
+    }
+
+    public Long getSize() {
+        return size;
+    }
+
+    public void setSize(Long size) {
+        this.size = size;
+    }
+
+    public String getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(String fileId) {
+        this.fileId = fileId;
+    }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
     }
 }

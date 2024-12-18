@@ -20,10 +20,7 @@ package de.ipb_halle.signals.attachment;
 import java.sql.Struct;
 import java.util.Date;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 /**
  * Attachment entity
@@ -33,6 +30,7 @@ import jakarta.persistence.Table;
 @Table(name = "attachments")
 public class AttachmentEntity {
 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Integer id;
 
