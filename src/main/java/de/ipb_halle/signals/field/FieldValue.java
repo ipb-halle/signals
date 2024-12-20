@@ -23,6 +23,11 @@ public class FieldValue {
 
     public final static String ATTR_CONTENT = "content";
 
+    // criteria constants; FieldValueEntity uses EmbeddedKeyValue
+    public static final String ENTITY_ID ="EntityId" ;
+    public static final String FIELD_ID ="FieldId" ;
+    public static final String ID = "id";
+
     public enum LinkType {
         ID,
         FIELD_ID,
@@ -129,7 +134,8 @@ public class FieldValue {
                 ", fieldId='" + fieldId + '\'' +
                 ", fieldTitle='" + fieldTitle + '\'' +
                 ", value='" + value + '\'' +
-                ", linkType=" + linkType +
+                ", linkType=" + linkType +'\'' +
+                ", adHocField=" + adHocField+
                 '}';
     }
 }

@@ -22,7 +22,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
-import de.ipb_halle.signals.entity.SignalsEntityDTO;
+import de.ipb_halle.signals.entity.SignalsIEntityDTO;
 import de.ipb_halle.signals.rest.*;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
@@ -136,7 +136,7 @@ public class AttachmentRestService implements RestReplyParser<Attachment> {
         return parseReply(Objects.requireNonNull(fetch(id)));
     }
 
-    public boolean checkIfEntityHasChildren(SignalsEntityDTO experiment) {
+    public boolean checkIfEntityHasChildren(SignalsIEntityDTO experiment) {
         JsonElement resultJsonElement = fetch(experiment.getId());
         JsonObject relationship = RestHelper.getFromPath(Objects.requireNonNull(resultJsonElement).getAsJsonObject(), ATTACHMENT_RELATIONSHIPS).getAsJsonObject();
         return relationship.has(RestHelper.ATTR_CHILDREN);

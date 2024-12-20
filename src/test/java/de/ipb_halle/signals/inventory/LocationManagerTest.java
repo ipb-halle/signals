@@ -17,14 +17,13 @@
  */
 package de.ipb_halle.signals.inventory;
 
-import de.ipb_halle.signals.DateRangeParser;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.dynEnum.DynEnum;
 import de.ipb_halle.signals.dynEnum.DynEnumDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.SignalsEntity;
-import de.ipb_halle.signals.entity.SignalsEntityDTO;
+import de.ipb_halle.signals.entity.SignalsIEntityDTO;
 import de.ipb_halle.signals.entity.SignalsEntityDbService;
 import de.ipb_halle.signals.rest.MockRestClient;
 import de.ipb_halle.signals.users.LdapClient;
@@ -51,8 +50,6 @@ import org.apache.openejb.jee.EjbJar;
 import org.apache.openejb.junit.ApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
-import org.apache.openejb.testing.Descriptor;
-import org.apache.openejb.testing.Descriptors;
 import org.apache.openejb.testing.Module;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
 
@@ -83,7 +80,7 @@ public class LocationManagerTest {
     @Classes(cdi = true, value = {LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class,
             MockRestClient.class, SignalsConfig.class,
             DynEnum.class, DynEnumDbService.class, DynEnumManager.class,
-            SignalsEntity.class, SignalsEntityDTO.class, SignalsEntityDbService.class,
+            SignalsEntity.class, SignalsIEntityDTO.class, SignalsEntityDbService.class,
             GroupDbService.class, GroupManager.class, GroupRestService.class,
             RoleDbService.class, RoleManager.class, RoleRestService.class,
             UserDbService.class, UserManager.class, UserRestService.class,
@@ -117,7 +114,7 @@ public class LocationManagerTest {
 
     @Test
     public void locationManagerTest() {
-        SignalsEntityDTO dto = new SignalsEntityDTO();
+        SignalsIEntityDTO dto = new SignalsIEntityDTO();
         dto.setId(TEST_LOCATION_ID);
         manager.fetchSingleLocation(dto);
 

@@ -18,7 +18,9 @@
 package de.ipb_halle.signals.materials;
 
 import de.ipb_halle.signals.attachment.Attachment;
-import de.ipb_halle.signals.entity.EntityRelationships;
+import de.ipb_halle.signals.entity.EntityType;
+import de.ipb_halle.signals.entity.IEntityRelationships;
+import de.ipb_halle.signals.entity.IObjectMetaData;
 import de.ipb_halle.signals.entity.ISignalsEntity;
 import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.users.IUser;
@@ -31,14 +33,16 @@ import java.util.*;
 /**
  * Material DTO
  */
-
-public class Material implements IMaterial, EntityRelationships {
+public class Material implements IMaterial, IObjectMetaData {
 
     public final static String ATTR_ASSET_TYPE_ID = "assetTypeId";
+    public final static String ATTR_ASSET_ID = "assetId";
     public final static String ATTR_SYNONYMS = "synonyms";
+    public static final String MATERIAL_ASSET_PREFIX = "asset:" ;
     private Logger logger = LoggerFactory.getLogger(MaterialRestService.class);
 
     public final static String ENTITY_TYPE_ASSET = "asset";
+    public final static String ENTITY_TYPE_BATCH = "batch";
 
     private String id;
     private String name;
@@ -50,11 +54,17 @@ public class Material implements IMaterial, EntityRelationships {
     private Date editedAt;
     private IUser editedBy;
     private Long digest;
-    private String libraryName;
 
     private Set<Synonym> synonyms;
     private Set<FieldValue> fieldValues;
     private Set<Attachment> attachments;
+    private EntityType entityType;
+
+    /**
+     * Parent material (i.e. asset) of a material batch. Is null
+     * for assets.
+     */
+    private IMaterial material;
 
     public Material() {
         synonyms = new HashSet<>();
@@ -62,7 +72,7 @@ public class Material implements IMaterial, EntityRelationships {
         attachments = new HashSet<>();
     }
 
-    public Material(MaterialEntity materialEntity) {
+    public Material(MaterialEntity materialEntity, EntityType entityType) {
         this.id = materialEntity.getId();
         this.name = materialEntity.getName();
         this.description = materialEntity.getDescription();
@@ -77,6 +87,14 @@ public class Material implements IMaterial, EntityRelationships {
         this.synonyms = new HashSet<>();
         this.fieldValues = new HashSet<>();
         this.attachments = new HashSet<>();
+        if (!(EntityType.valueOf(Material.ENTITY_TYPE_ASSET).equals(entityType)
+                || EntityType.valueOf(Material.ENTITY_TYPE_BATCH).equals(entityType))) {
+            throw new IllegalArgumentException("Attempt to create Material of inappropriate EntityType");
+        }
+        this.entityType = entityType;
+        if (materialEntity.getMaterialId() != null) {
+            this.material = new MaterialReference().setId(materialEntity.getMaterialId());
+        }
     }
 
     public MaterialEntity createEntity() {
@@ -91,6 +109,10 @@ public class Material implements IMaterial, EntityRelationships {
         entity.setEditedBy(editedBy.getId());
         entity.setName(name);
         entity.setOwner(owner.getId());
+        entity.setEntityType(entityType.getId());
+        if (material != null) {
+            entity.setMaterialId(material.getId());
+        }
         return entity;
     }
 
@@ -147,27 +169,6 @@ public class Material implements IMaterial, EntityRelationships {
     }
 
     @Override
-    public void addAllAncestors(Collection<ISignalsEntity> ancestors) {
-        ancestors.addAll(ancestors);
-    }
-
-    @Override
-    public void addAllChildren(Collection<ISignalsEntity> children) {
-        //children.addAll(children);
-    }
-
-    @Override
-    public Set<ISignalsEntity> getAncestors() {
-        return Set.of();
-    }
-
-    @Override
-    public void setAncestors(Set<ISignalsEntity> ancestors) {
-        // xxxxx ToDo ancestors
-        // this.ancestors = ancestors;
-    }
-
-    @Override
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -192,6 +193,7 @@ public class Material implements IMaterial, EntityRelationships {
         return owner;
     }
 
+    @Override
     public void setOwner(IUser owner) {
         this.owner = owner;
     }
@@ -224,14 +226,6 @@ public class Material implements IMaterial, EntityRelationships {
         this.digest = digest;
     }
 
-    public String getLibraryName() {
-        return libraryName;
-    }
-
-    public void setLibraryName(String libraryName) {
-        this.libraryName = libraryName;
-    }
-
     public Set<Synonym> getSynonyms() {
         return synonyms;
     }
@@ -254,6 +248,22 @@ public class Material implements IMaterial, EntityRelationships {
 
     public void setAttachments(Set<Attachment> attachments) {
         this.attachments = attachments;
+    }
+
+    public EntityType getEntityType() {
+        return entityType;
+    }
+
+    public void setEntityType(EntityType entityType) {
+        this.entityType = entityType;
+    }
+
+    public IMaterial getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(IMaterial material) {
+        this.material = material;
     }
 
     @Override

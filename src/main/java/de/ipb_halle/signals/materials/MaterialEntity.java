@@ -57,6 +57,12 @@ public class MaterialEntity {
     @Column(name = "digest")
     private Long digest;
 
+    @Column(name = "entity_type")
+    private Integer entityType;
+
+    @Column(name = "material_id")
+    private String materialId;
+
     public String getId() {
         return id;
     }
@@ -137,6 +143,22 @@ public class MaterialEntity {
         this.digest = digest;
     }
 
+    public Integer getEntityType() {
+        return entityType;
+    }
+
+    public void setEntityType(Integer entityType) {
+        this.entityType = entityType;
+    }
+
+    public String getMaterialId() {
+        return materialId;
+    }
+
+    public void setMaterialId(String materialId) {
+        this.materialId = materialId;
+    }
+
     @Override
     public String toString() {
         return "MaterialEntity{" +
@@ -144,12 +166,8 @@ public class MaterialEntity {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", libraryId='" + libraryId + '\'' +
-                ", createdAt=" + createdAt +
-                ", createdBy='" + createdBy + '\'' +
-                ", owner='" + owner + '\'' +
-                ", editedAt=" + editedAt +
-                ", editedBy='" + editedBy + '\'' +
-                ", digest=" + digest +
+                ", materialId='" + materialId + '\'' +
+                ", entityType=" + entityType +
                 '}';
     }
 }

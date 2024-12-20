@@ -304,6 +304,8 @@ CREATE TABLE materials (
     library_id VARCHAR REFERENCES libraries(id),
     name VARCHAR,
     owner VARCHAR /* NOT NULL REFERENCES users(id) */
+    entity_type INTEGER NOT NULL REFERENCES dyn_enums(id),
+    material_id VARCHAR REFERENCES materials(id)
 );
 
 CREATE TABLE material_batches (

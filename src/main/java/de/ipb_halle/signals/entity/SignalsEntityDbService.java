@@ -40,8 +40,8 @@ public class SignalsEntityDbService {
     @Inject
     private DynEnumManager dynEnumManager;
 
-    public List<SignalsEntityDTO> load(Map<String, Object> cmap) {
-        List<SignalsEntityDTO> results = new ArrayList<>();
+    public List<SignalsIEntityDTO> load(Map<String, Object> cmap) {
+        List<SignalsIEntityDTO> results = new ArrayList<>();
         List<Predicate> predicates = new ArrayList<>();
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<SignalsEntity> criteriaQuery = builder.createQuery(SignalsEntity.class);
@@ -63,20 +63,20 @@ public class SignalsEntityDbService {
         }
         criteriaQuery.where(builder.and(predicates.toArray(new Predicate[0])));
         for (SignalsEntity entity : em.createQuery(criteriaQuery).getResultList()) {
-            results.add(new SignalsEntityDTO(entity, dynEnumManager));
+            results.add(new SignalsIEntityDTO(entity, dynEnumManager));
         }
         return results;
     }
 
-    public SignalsEntityDTO loadById(String id) {
+    public SignalsIEntityDTO loadById(String id) {
         SignalsEntity entity = this.em.find(SignalsEntity.class, id);
         if (entity != null) {
-            return new SignalsEntityDTO(entity, dynEnumManager);
+            return new SignalsIEntityDTO(entity, dynEnumManager);
         }
         return null;
     }
 
-    public void save(SignalsEntityDTO dto) {
+    public void save(SignalsIEntityDTO dto) {
         SignalsEntity entity = dto.createEntity();
         this.em.merge(entity);
     }

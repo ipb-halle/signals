@@ -46,7 +46,7 @@ public class SignalsEntityManager {
 
     private Logger logger = LoggerFactory.getLogger(SignalsEntityManager.class);
 
-    public SignalsEntityDTO getDbEntity(String id) {
+    public SignalsIEntityDTO getDbEntity(String id) {
         return dbService.loadById(id);
     }
 
@@ -67,8 +67,8 @@ public class SignalsEntityManager {
         cmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
         cmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
         cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, includedTypes);
-        List<SignalsEntityDTO> results = dbService.load(cmap);
-        for (SignalsEntityDTO dto : results) {
+        List<SignalsIEntityDTO> results = dbService.load(cmap);
+        for (SignalsIEntityDTO dto : results) {
             System.out.println(dto.dump());
         }
     }
@@ -87,9 +87,9 @@ public class SignalsEntityManager {
             cmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
             cmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
         }
-        RestResultIterator<SignalsEntityDTO> iter =  restService.doGetEntities(cmap);
+        RestResultIterator<SignalsIEntityDTO> iter =  restService.doGetEntities(cmap);
         while (iter.hasNext()) {
-            SignalsEntityDTO dto = iter.next();
+            SignalsIEntityDTO dto = iter.next();
             logger.debug(dto.dump());
             if (config.updateDb) {
                 dbService.save(dto);

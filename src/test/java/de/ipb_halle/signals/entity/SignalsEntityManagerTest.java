@@ -66,7 +66,7 @@ public class SignalsEntityManagerTest {
     @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
         SignalsEntity.class, SignalsEntityDbService.class, SignalsEntityManager.class,
         SignalsEntityRestService.class, DynEnum.class, DynEnumManager.class, DynEnumDbService.class,
-            SignalsEntityDTO.class, EntityType.class})
+            SignalsIEntityDTO.class, EntityType.class})
     public EjbJar app() {
         return new EjbJar();
     }
@@ -98,7 +98,7 @@ public class SignalsEntityManagerTest {
         dynEnumManager.allowEnumDiscovery();
         EntityType[] includedTypes = new EntityType[] { EntityType.valueOf(TEST_ENTITY_TYPE) };
         manager.fetchSnbEntities(null, includedTypes, new RuntimeConfig());
-        SignalsEntityDTO entity = manager.getDbEntity(TEST_LOCATION_ID);
+        SignalsIEntityDTO entity = manager.getDbEntity(TEST_LOCATION_ID);
         System.out.print(entity.dump());
         assertEquals("entity type mismatch", TEST_ENTITY_TYPE, entity.getType().getValue());
     }

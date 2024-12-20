@@ -59,14 +59,14 @@ public class AttachmentManager {
          */
         //hmap.forEach((mapkey, mapvalue) -> logger.info("THIS IS ATTACHMENT manager key: '{}' and value: '{}' of hmap", mapkey, mapvalue));
 
-        List<SignalsEntityDTO> signalsEntityDTOS = signalsEntityDbService.load(hmap);
+        List<SignalsIEntityDTO> signalsEntityDTOS = signalsEntityDbService.load(hmap);
 
         //signalsEntityDTOList.forEach((entity) -> logger.info("This is an element of list of entitiesDTO: '{}'\n", entity.dump()));
 
         //loading of attachment lists to add fields
         List<AttachmentEntity> attachments = new ArrayList<>();
 
-        for (SignalsEntityDTO entityDTO : signalsEntityDTOS) {
+        for (SignalsIEntityDTO entityDTO : signalsEntityDTOS) {
             logger.info("Processing {} in order to extract the attachments {}\n", entityDTO.getType(), entityDTO.getId());
             if (attachmentRestService.checkIfEntityHasChildren(entityDTO)) {
                 attachments.add(attachmentRestService.doGetAttachment(entityDTO.getId()).createEntity());

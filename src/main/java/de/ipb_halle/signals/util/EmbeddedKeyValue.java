@@ -5,6 +5,8 @@ import java.util.Objects;
 
 @Embeddable
 public class EmbeddedKeyValue {
+    public static final String ID = "id";
+    public static final String VALUE = "value";
     private final static long serialVersionUID = 1L;
 
     private String id;

@@ -276,6 +276,7 @@ public class Field {
                 ", calculated=" + calculated +
                 ", defaultUnit='" + defaultUnit + '\'' +
                 ", definedBy='" + definedBy + '\'' +
+                ", definingEntityId='" + definingEntityId + '\'' +
                 ", hidden=" + hidden +
                 ", key='" + key + '\'' +
                 ", multiSelect=" + multiSelect +
@@ -290,4 +291,6 @@ public class Field {
                 ", designation=" + designation +
                 '}';
     }
+
+
 }

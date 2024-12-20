@@ -17,18 +17,22 @@
  */
 package de.ipb_halle.signals.materials;
 
+import de.ipb_halle.signals.dynEnum.DynEnumManager;
+import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.field.FieldDbService;
+import de.ipb_halle.signals.field.FieldOption;
 import de.ipb_halle.signals.field.FieldValue;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Stateless
 public class MaterialDbService {
@@ -37,27 +41,43 @@ public class MaterialDbService {
     private EntityManager em;
 
     @Inject
+    private DynEnumManager dynEnumManager;
+
+    @Inject
     private FieldDbService fieldDbService;
 
     private Logger logger = LoggerFactory.getLogger(LibraryDbService.class);
 
     public Material loadById(String id) {
         MaterialEntity entity = this.em.find(MaterialEntity.class, id);
-        Material mat = new Material(entity);
-        mat.addAllSynonyms(loadSynonyms(id));
-        mat.addAllFieldValues(loadFieldValues(id));
+        Material mat = new Material(entity, (EntityType) dynEnumManager.valueOf(entity.getEntityType()));
+        loadFieldValues(mat, id);
+        if (mat.getEntityType().equals(EntityType.valueOf(Material.ENTITY_TYPE_ASSET))) {
+            loadSynonyms(mat, id);
+        }
+        if (entity.getMaterialId() != null) {
+            mat.setMaterial(loadById(entity.getMaterialId()));
+        }
         return mat;
     }
 
-    private List<FieldValue> loadFieldValues(String id) {
-        return new ArrayList<FieldValue> ();
+    private void loadFieldValues(Material mat, String id) {
+        Map<String, Object> cmap = new HashMap<>();
+        cmap.put(FieldValue.ENTITY_ID, id);
+        mat.addAllFieldValues(fieldDbService.loadFieldValues(cmap));
     }
 
-    private List<Synonym> loadSynonyms(String id) {
-        return new ArrayList<Synonym>();
+    private void loadSynonyms(Material mat, String id) {
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<Synonym> criteriaQuery = builder.createQuery(Synonym.class);
+        Root<Synonym> root = criteriaQuery.from(Synonym.class);
+        criteriaQuery.select(root);
+        criteriaQuery.where(builder.equal(root.get(Synonym.ENTITY_ID).get(Synonym.ENTITY_ID), id));
+        mat.addAllSynonyms(em.createQuery(criteriaQuery).getResultList());
     }
 
     public void save(Material mat) {
+
         MaterialEntity entity = mat.createEntity();
         this.em.merge(entity);
         saveSynonyms(mat.getSynonyms());

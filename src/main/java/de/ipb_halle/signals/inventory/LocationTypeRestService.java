@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals.inventory;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -50,7 +51,13 @@ public class LocationTypeRestService implements RestReplyParser<LocationType> {
         lt.setId(attributes.getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
         lt.setDescription(attributes.getAsJsonPrimitive(RestHelper.ATTR_DESCRIPTION).getAsString());
         lt.setName(attributes.getAsJsonPrimitive(LocationType.ATTR_NAME).getAsString());
+        parseFields(lt, attributes.getAsJsonArray(RestHelper.ATTR_FIELDS));
+
         return lt;
+    }
+
+    private void parseFields(LocationType locationType, JsonArray fields) {
+        // ToDO: parse the field definitions
     }
 
     public RestResultIterator<LocationType> doGetLocationTypes() {

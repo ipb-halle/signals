@@ -24,7 +24,6 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.stream.Location;
 import java.util.*;
 
 
@@ -72,8 +71,8 @@ public class LocationManager {
         cmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
         cmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
         cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, entityTypes);
-        List<SignalsEntityDTO> locations = signalsEntityDbService.load(cmap);
-        for (SignalsEntityDTO entityDTO : locations) {
+        List<SignalsIEntityDTO> locations = signalsEntityDbService.load(cmap);
+        for (SignalsIEntityDTO entityDTO : locations) {
             /*
              * LocationTypes (e.g. building, room, shelf, ...) are represented as
              * Locations in the signalsentities table (db)! We need to exclude them.
@@ -91,7 +90,7 @@ public class LocationManager {
      * @param entityDTO
      * @return the location entity
      */
-    public LocationEntity fetchSingleLocation(SignalsEntityDTO entityDTO) {
+    public LocationEntity fetchSingleLocation(SignalsIEntityDTO entityDTO) {
         LocationEntity location = restService.doGetLocation(entityDTO.getId());
         dbService.save(location);
         return location;

@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
-public interface EntityRelationships {
+public interface IEntityRelationships extends IObjectMetaData {
 
     void addAllAncestors(Collection<ISignalsEntity> ancestors);
 
@@ -33,23 +33,4 @@ public interface EntityRelationships {
 
     void setAncestors(Set<ISignalsEntity> ancestors);
 
-    Date getCreatedAt();
-
-    void setCreatedAt(Date createdAt);
-
-    IUser getCreatedBy();
-
-    void setCreatedBy(IUser createdBy);
-
-    IUser getOwner();
-
-    void setOwner(IUser owner);
-
-    Date getEditedAt();
-
-    void setEditedAt(Date editedAt);
-
-    IUser getEditedBy();
-
-    void setEditedBy(IUser editedBy);
 }

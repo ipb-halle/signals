@@ -10,6 +10,8 @@ import jakarta.persistence.Table;
 public class Synonym {
     private final static long serialVersionUID = 1L;
 
+    public final static String ENTITY_ID = "id";
+
     @EmbeddedId
     private EmbeddedKeyValue id;
 

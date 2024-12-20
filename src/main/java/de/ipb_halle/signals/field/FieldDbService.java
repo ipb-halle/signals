@@ -18,8 +18,10 @@
 package de.ipb_halle.signals.field;
 
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
+import de.ipb_halle.signals.util.EmbeddedKeyValue;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -102,13 +104,10 @@ public class FieldDbService {
         for (FieldDefinition entity : em.createQuery(criteriaQuery).getResultList()) {
             FieldType type = (FieldType) dynEnumManager.valueOf(entity.getFieldType());
             FieldDesignation designation = (FieldDesignation) dynEnumManager.valueOf(entity.getFieldDesignation());
-            Field value = new Field(entity, type, designation);
-            /*ToDO:
-             * load options
-             * load measures
-             */
-            //logger.info("this is class FieldDBService, method load. You have to implement load options and load measures to field");
-            results.add(value);
+            Field field = new Field(entity, type, designation);
+            field.addAllOptions(loadFieldOptions(field.getId()));
+            field.addAllMeasures(loadFieldMeasures(field.getId()));
+            results.add(field);
         }
         return results;
     }
@@ -131,6 +130,29 @@ public class FieldDbService {
 
         criteriaQuery.where(builder.equal(root.get("id").get("id"), id));
         return em.createQuery(criteriaQuery).getResultList();
+    }
+
+    public List<FieldValue> loadFieldValues(Map<String, Object> cmap) {
+        List<FieldValue> results = new ArrayList<>();
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<FieldValueEntity> query = builder.createQuery(FieldValueEntity.class);
+        Root<FieldValueEntity> root = query.from(FieldValueEntity.class);
+        query.select(root);
+
+        List<Predicate> predicates = new ArrayList<>();
+        if (cmap.containsKey(FieldValue.FIELD_ID)) {
+            predicates.add(builder.equal(root.get(FieldValue.ID).get(EmbeddedKeyValue.VALUE), cmap.get(FieldValue.FIELD_ID)));
+        }
+        if (cmap.containsKey(FieldValue.ENTITY_ID)) {
+            predicates.add(builder.equal(root.get(FieldValue.ID).get(EmbeddedKeyValue.ID), cmap.get(FieldValue.ENTITY_ID)));
+        }
+        query.where(builder.and(predicates.toArray(new Predicate[0])));
+
+        for (FieldValueEntity fve : em.createQuery(query).getResultList()) {
+            FieldValue fv = new FieldValue(fve);
+            results.add(fv);
+        }
+        return results;
     }
 
     /**

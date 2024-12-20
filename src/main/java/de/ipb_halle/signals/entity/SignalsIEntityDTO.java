@@ -23,7 +23,7 @@ import de.ipb_halle.signals.users.UserReference;
 
 import java.util.*;
 
-public class SignalsEntityDTO implements EntityRelationships {
+public class SignalsIEntityDTO implements IEntityRelationships {
 
     public final static String ATTR_EID = "eid";
     public final static String ATTR_CREATED_AT = "createdAt";
@@ -54,11 +54,11 @@ public class SignalsEntityDTO implements EntityRelationships {
     /**
      * default constructor
      */
-    public SignalsEntityDTO() {
+    public SignalsIEntityDTO() {
         ancestors = new HashSet<>();
     }
 
-    public SignalsEntityDTO(SignalsEntity entity, DynEnumManager dynEnumManager) {
+    public SignalsIEntityDTO(SignalsEntity entity, DynEnumManager dynEnumManager) {
         id = entity.getId();
         type = (EntityType) dynEnumManager.valueOf(entity.getType());
         this.eid = entity.getEid();

@@ -59,7 +59,7 @@ public class SignalsEntityTest {
     @Classes(cdi = true, value = { DynEnum.class, EntityType.class,
             DynEnumDbService.class, DynEnumManager.class, SignalsConfig.class,
             RestClient.class, MockRestClient.class, RestReplyParser.class,
-            SignalsEntity.class, SignalsEntityDTO.class, SignalsEntityRestService.class})
+            SignalsEntity.class, SignalsIEntityDTO.class, SignalsEntityRestService.class})
     public EjbJar app() {
         return new EjbJar();
     }
@@ -86,7 +86,7 @@ public class SignalsEntityTest {
         String test = TestBase.readStream(
                     getClass().getResourceAsStream(TEST_RESOURCE));
         JsonElement j = JsonParser.parseString(test);
-        SignalsEntityDTO dto = restService.parseReply(j);
+        SignalsIEntityDTO dto = restService.parseReply(j);
 
         assertEquals("id matches", TEST_ID, dto.getId());
 
