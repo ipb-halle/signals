@@ -104,27 +104,24 @@ public class MaterialsManager {
                 new EntityType[]{EntityType.valueOf(Material.ENTITY_TYPE_ASSET),
                         EntityType.valueOf(Material.ENTITY_TYPE_BATCH)});
 
+        Map<String, Map<String, Field>> allFields = mapFieldsByLibraryId();
+
         //List of all asset entities
-        List<SignalsIEntityDTO> assetsEntities = signalsEntityDbService.load(cmap);
-
-        //loading of material lists to add field
-        List<Material> materials = assetsEntities.stream().map(asset -> {
-            logger.info("Processing material {}", asset.getId());
-            return materialRestService.doGetMaterial(asset.getId());
-        }).toList();
-
-        //we look if material has an attachment and which one if it is a case. After that it will be processed and stored in DB and on the server
-        processMaterials(materials);
+        List<SignalsIEntityDTO> entityDTOs = signalsEntityDbService.load(cmap);
+        int i = 1;
+        for (SignalsIEntityDTO dto : entityDTOs) {
+            if ((i % 1000) == 0) {
+                this.logger.info("Processed material #{}", i);
+            }
+            fetchMaterial(dto, allFields);
+        }
     }
-
 
     /**
      * This method creates mapping of fields by libraryId
-     *
-     * @param libraryIds
-     * @return
+     * @return all fields mapped by libraryId (outer map) and fieldId (inner map)
      */
-    private Map<String, Map<String, Field>> mapFieldsByLibraryId(Set<String> libraryIds) {
+    private Map<String, Map<String, Field>> mapFieldsByLibraryId() {
         /**
          * Information about field:
          * Field{id='6329671b759ae07953c8117a',
@@ -137,6 +134,8 @@ public class MaterialsManager {
          * title='Chemical Compounds Image', userDefined=null, fieldType=ATTACHED_FILE.FieldType(28) ,
          * measures=[], options=[], designation=asset.FieldDesignation}
          */
+        List<Library> libraries = libraryDbService.load(new HashMap<String, Object>());
+        Set<String> libraryIds = libraries.stream().map(Library::getId).collect(Collectors.toSet());
         List<Field> allFields = receiveAllFieldsOfAllLibraries(libraryIds);
 
         //creating a map with library id as a key and field title/ field Object hashMap as a value
@@ -176,65 +175,32 @@ public class MaterialsManager {
      * example fo criteria map:
      * key "definingEntityId" and value [assetType:6215104dab0ad27bf7942a53, assetType:6329671b759ae07953c8117b, assetType:6215104dab0ad27bf7942a45]
      */
-    private List<Field> receiveAllFieldsOfAllLibraries(Set<String> libraryIds) {
+    private List<Field> receiveAllFieldsOfAllLibraries(Collection<String> libraryIds) {
         Map<String, Object> cmap = new HashMap<>();
         // receive all fields from all libraries in one shot -> very efficient
         cmap.put(Field.DEFINING_ENTITY_ID, libraryIds.stream().map(id -> Library.LIBRARY_TYPE + ":" + id).collect(Collectors.toList()));
         return fieldDbService.load(cmap);
     }
 
-    /**
-     * This method processes the field definitions and attachments for a single material
-     *
-     * @param fieldsById a map of field definitions by fieldId for the
-     *                   library of the requested material.
-     * @param mat        the material
-     */
-
-    //=============PROCESS MATERIALS AND FIELDS=============================================================
 
     /**
-     * Process all materials. Specifically, obtain all the
-     * field values including their proper field definitions and
-     * all attachments including any chemical drawings,
-     * images and sequences.
-     * Material name, description and library type are stored
-     * directly with the material, although they appear as field values
-     * in some REST endpoints.
-     * Finally store the material and all dependent entities and files.
-     *
-     * @param materials a list of materials
-     *                  what fields contains materials?
-     *                  Material{id='asset:62163210ab0ad27bf7942aea',
-     *                  name='C000001',
-     *                  description='',
-     *                  libraryId='6215104dab0ad27bf7942a45',
-     *                  createdAt=Wed Feb 23 13:09:36 CET 2022,
-     *                  createdBy='UserReference{id='102'}',
-     *                  owner='UserReference{id='102'}',
-     *                  editedAt=Thu Sep 12 10:49:52 CEST 2024,
-     *                  editedBy='UserReference{id='137'}',
-     *                  digest=53267672}
+     * Fetch a single Material (asset or batch) via REST and store it
+     * in the database.
+     * @param entityDTO the Signals entity, which should be processed
+     * @param
      */
-    private void processMaterials(List<Material> materials) {
-        //collects all library ids
-        Set<String> libraryIds = materials.stream().map(Material::getLibraryId).collect(Collectors.toSet());
-
-        //load all fields for library by library id, where field map has a key field title and field object
-        Map<String, Map<String, Field>> fieldsByLibrary = mapFieldsByLibraryId(libraryIds);
-
-        for (Material mat : materials) {
-            //field from certain library (contains title, id and type) ; mat contains asset eid and library id as well as name of asset
-            Map<String, Field> libraryFields = fieldsByLibrary.get(mat.getLibraryId());
-
-            try {
-                processMaterial(libraryFields, mat);
-                materialDbService.save(mat);
-            } catch (IOException e) {
-                logger.warn("processMaterials caught IOException for material {}", mat.getId());
-            }
+    private void fetchMaterial(SignalsIEntityDTO entityDTO, Map<String, Map<String, Field>> allFields) {
+        try {
+            Material mat = materialRestService.doGetMaterial(entityDTO.getId());
+            Map<String, Field> fieldsByLibraryId = allFields.get(mat.getLibraryId());
+            processMaterial(fieldsByLibraryId, mat);
+            materialDbService.save(mat);
+        } catch (IOException e) {
+            logger.warn("fetchMaterial caught IOException for material {}", entityDTO.getId());
         }
     }
+
+
 
     /**
      * @param fieldsByLibraryId a map of field definitions keyed by their library ID
@@ -270,7 +236,7 @@ public class MaterialsManager {
                 case FieldType.CHEMICAL_DRAWING:
                     obtainDrawing(mat, definition, value);
                     break;
-                case FieldType.SEQUENCE:
+                case FieldType.SEQUENCE_FILE:
                     obtainSequence(mat, definition, value);
             }
         }

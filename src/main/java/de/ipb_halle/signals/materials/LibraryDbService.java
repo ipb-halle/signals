@@ -64,8 +64,12 @@ public class LibraryDbService {
         Root<LibraryEntity> root = criteriaQuery.from(LibraryEntity.class);
         criteriaQuery.select(root);
 
+        /*
+         * query criteria may be necessary in future
+         *
         List<Predicate> predicates = new ArrayList<>();
         criteriaQuery.where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
+         */
 
         List<Library> results = new ArrayList<>();
         for (LibraryEntity entity : em.createQuery(criteriaQuery).getResultList()) {

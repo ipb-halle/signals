@@ -33,6 +33,7 @@ public class FieldType extends DynEnum <FieldType> {
     public final static String ATTACHED_FILE = "ATTACHED_FILE";
     public final static String CHEMICAL_DRAWING = "CHEMICAL_DRAWING";
     public final static String SEQUENCE = "SEQUENCE";
+    public final static String SEQUENCE_FILE = "SEQUENCE_FILE";
     public final static String TEXT = "TEXT";
 
     /**
