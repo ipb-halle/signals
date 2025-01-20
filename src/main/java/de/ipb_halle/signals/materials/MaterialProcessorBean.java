@@ -141,30 +141,54 @@ public class MaterialProcessorBean {
                 = materialRestService.doGetMaterialProperties(material.getId(), fieldLibrariesById);
 
         for (FieldValue fieldValue : fieldValues) {
-            Field fieldDefinition = fieldLibrariesById.get(fieldValue.getFieldId());
-            if (fieldDefinition == null) {
+            Field field = fieldLibrariesById.get(fieldValue.getFieldId());
+            if (field == null) {
                 //if ad-hoc resp. new field
                 logger.info("MPB:-> Definition of field is null => saving new field");
-                fieldDefinition = fieldValue.getAdHocField();
-                fieldDbService.save(fieldDefinition);
-                fieldLibrariesById.put(fieldDefinition.getId(), fieldDefinition);
+                field = fieldValue.getAdHocField();
+                fieldDbService.save(field);
+                fieldLibrariesById.put(field.getId(), field);
             }
             fieldValue.setEntityId(material.getId());
-
-            switch (fieldDefinition.getFieldType().getValue()) {
-                case FieldType.ATTACHED_FILE:
-                    obtainAttachment(material, fieldDefinition, fieldValue);
-                    break;
-                case FieldType.CHEMICAL_DRAWING:
-                    obtainDrawing(material, fieldDefinition, fieldValue);
-                    break;
-                case FieldType.SEQUENCE_FILE:
-                    obtainSequence(material, fieldDefinition, fieldValue);
+            if (field.getFieldType().getValue().equals(FieldType.ATTACHED_FILE)
+                    || field.getFieldType().getValue().equals(FieldType.CHEMICAL_DRAWING)
+                    || field.getFieldType().getValue().equals(FieldType.SEQUENCE_FILE)) {
+                processAttachments(material, field, fieldValue);
             }
-
             material.addFieldValue(fieldValue);
         }
     }
+
+    /**
+     * Process all attachments of a single material. Avoid downloading
+     * and storing of unchanged attachments
+     *
+     * @param material
+     * @param field
+     * @param fieldValue
+     */
+    private void processAttachments(Material material, Field field, FieldValue fieldValue) throws IOException {
+        Attachment attachment = getAttachment(material, field);
+        AttachmentRevision latestRevision = attachment.getLatestRevision();
+        AttachmentRevision newRevision = new AttachmentRevision();
+        materialRestService.parseAttachmentRevisionInfo(newRevision, fieldValue);
+
+        if ((latestRevision == null)
+                || !latestRevision.getFileId().equals(newRevision.getFileId())) {
+            logger.info("Found new attachment for material Id={}", material.getId());
+            switch (field.getFieldType().getValue()) {
+                case FieldType.ATTACHED_FILE:
+                    obtainAttachment(material, field, fieldValue);
+                    break;
+                case FieldType.CHEMICAL_DRAWING:
+                    obtainDrawing(material, field, fieldValue);
+                    break;
+                case FieldType.SEQUENCE_FILE:
+                    obtainSequence(material, field, fieldValue);
+            }
+        }
+    }
+
 
     private void obtainAttachment(Material material, Field field, FieldValue fieldValue) throws IOException {
         String mimeType = materialRestService.parseAttachmentMimeType(fieldValue);
@@ -203,33 +227,27 @@ public class MaterialProcessorBean {
                 material.getId(), field.getId());
 
         Attachment attachment = getAttachment(material, field);
-        AttachmentRevision latestRevision = attachment.getLatestRevision();
-
         AttachmentRevision newRevision = new AttachmentRevision();
         materialRestService.parseAttachmentRevisionInfo(newRevision, fieldValue);
         attachment.addRevision(newRevision);
 
         //Saves only if it is a new fileId
-        if (latestRevision == null
-                || !latestRevision.getFileId().equals(newRevision.getFileId())) {
+        for (RestReply reply : files) {
+            AttachmentFile file = new AttachmentFile();
+            file.setDigest(reply.getDigest());
+            file.setSize(reply.getFileSize());
+            file.setMimeType(reply.getMimeType());
+            file.setTempPath(reply.getPath());
+            attachment.addFile(file);
+        }
+        logger.info("MPB:-> Saving attachment: {}", attachment);
 
-            for (RestReply reply : files) {
-                AttachmentFile file = new AttachmentFile();
-                file.setDigest(reply.getDigest());
-                file.setSize(reply.getFileSize());
-                file.setMimeType(reply.getMimeType());
-                file.setTempPath(reply.getPath());
-                attachment.addFile(file);
-            }
-            logger.info("MPB:-> Saving attachment: {}", attachment);
+        attachmentDbService.save(attachment);
 
-            attachmentDbService.save(attachment);
-
-            logger.info("MPB:-> Persisting files for revision: {}",
-                    attachment.getLatestRevision().getId());
-            for (AttachmentFile file : attachment.getFiles(attachment.getLatestRevision().getId())) {
-                storageService.storeFile(file);
-            }
+        logger.info("MPB:-> Persisting files for revision: {}",
+                attachment.getLatestRevision().getId());
+        for (AttachmentFile file : attachment.getFiles(attachment.getLatestRevision().getId())) {
+            storageService.storeFile(file);
         }
 
         logger.info("MPB:-> Attachment stored successfully, material: {}, field: {}",
@@ -259,12 +277,5 @@ public class MaterialProcessorBean {
                         "MPB:-> getAttachment() found more than 1 attachment for matId = "
                                 + material.getId() + ", fieldId = " + field.getId());
         }
-    }
-
-
-    public static void main(String[] args) {
-        logger.info("This is an INFO log.");
-        logger.warn("This is a WARN log.");
-        logger.error("This is an ERROR log.");
     }
 }

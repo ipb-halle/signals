@@ -9,7 +9,7 @@
 
         <!-- General Logs -->
         <File name="IPBFile" fileName="logs/snb.log">
-            <PatternLayout pattern="[%-5level] %m%n"/>
+            <PatternLayout pattern="[%-5level] %c{2} %m%n"/>
         </File>
 
     </Appenders>

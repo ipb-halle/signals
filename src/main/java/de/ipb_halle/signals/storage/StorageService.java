@@ -71,8 +71,8 @@ public class StorageService {
             Files.createDirectories(destination.getParent());
             Files.move(file.getTempPath(), destination, StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException e) {
-            this.logger.warn("storeFile() caught IOException on move {} -> {}",
-                    file.getTempPath().toFile(), destination.toString());
+            this.logger.warn("storeFile() caught IOException on move {} -> {} ({})",
+                    file.getTempPath().toFile(), destination.toString(), e.getMessage());
             throw(e);
         }
     }
