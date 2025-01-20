@@ -19,14 +19,13 @@ package de.ipb_halle.signals.inventory;
 
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
-/** 
- * Manager for containers, container types, locations 
+/**
+ * Manager for containers, container types, locations
  * and location types.
  */
 
@@ -51,6 +50,13 @@ public class InventoryManager {
     @Inject
     private LocationTypeManager locationTypeManager;
 
+    @Inject
+    private ContainerManager containerManager;
+
+    @Inject
+    private ContainerTypeManager containerTypeManager;
+
+
     private Logger logger = LoggerFactory.getLogger(ContainerManager.class);
 
     public void manageInventory(Date[] dateRange) {
@@ -61,11 +67,11 @@ public class InventoryManager {
     }
 
     public void fetchContainers(Date[] dateRange) {
-
+        containerManager.manageContainers(dateRange);
     }
 
     public void fetchContainerTypes() {
-
+        containerTypeManager.save(containerTypeManager.getSnbContainerTypes());
     }
 
     public void fetchLocations(Date[] dateRange) {

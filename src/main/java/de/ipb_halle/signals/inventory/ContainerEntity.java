@@ -17,20 +17,36 @@
  */
 package de.ipb_halle.signals.inventory;
 
-import java.util.Date;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-/** 
+import java.util.Date;
+
+/**
  * Container entity
  */
 
 @Entity
-@Table(name="containers")
+@Table(name = "containers")
 public class ContainerEntity {
+    public final static String ATTR_AMOUNT = "amount";
+    public final static String ATTR_BARCODE = "barcode";
+    public final static String ATTR_COORDINATE_X = "coordinateX";
+    public final static String ATTR_COORDINATE_Y = "coordinateY";
+    public final static String ATTR_CONTAINER_TYPE_ID = "typeId";
+    public final static String ATTR_CONTAINER_TYPE_NAME = "typeName";
+    public final static String ATTR_CONTENTS = "contents";
+    public final static String ATTR_CONTENT_ID = "entityId";
+    public final static String ATTR_CONTENT_TYPE = "entityType";
+    public final static String ATTR_CREATED_AT = "createdAt";
+    public final static String ATTR_CREATED_BY = "relationships.createdBy.data.id";
+    public final static String ATTR_LOCATION_ID = "location.id";
+    public final static String ATTR_UNIT = "unit";
+    public final static String ATTR_UPDATED_AT = "updatedAt";
+    public final static String ATTR_UPDATED_BY = "relationships.updatedBy.data.id";
+    public final static String ENTITY_TYPE_CONTAINER = "container";
 
     @Id
     private String id;
@@ -41,25 +57,25 @@ public class ContainerEntity {
     @Column
     private String barcode;
 
-    @Column(name="container_type_id")
+    @Column(name = "container_type_id")
     private String containerTypeId;
 
-    @Column(name="coordinate_x")
+    @Column(name = "coordinate_x")
     private Integer coordinateX;
 
-    @Column(name="coordinate_y")
+    @Column(name = "coordinate_y")
     private Integer coordinateY;
 
-    @Column(name="created_at")
+    @Column(name = "created_at")
     private Date createdAt;
 
-    @Column(name="created_by")
+    @Column(name = "created_by")
     private String createdBy;
 
     @Column
     private String digest;
 
-    @Column(name="location_id")
+    @Column(name = "location_id")
     private String locationId;
 
     @Column
@@ -68,11 +84,14 @@ public class ContainerEntity {
     @Column
     private String unit;
 
-    @Column(name="updated_at")
+    @Column(name = "updated_at")
     private Date updatedAt;
 
-    @Column(name="updated_by")
+    @Column(name = "updated_by")
     private String updatedBy;
+
+    @Column(name = "type_name")
+    private String containerTypeName;
 
 
     public Double getAmount() {
@@ -129,6 +148,10 @@ public class ContainerEntity {
 
     public String getUpdatedBy() {
         return updatedBy;
+    }
+
+    public String getContainerTypeName() {
+        return containerTypeName;
     }
 
     public ContainerEntity setAmount(Double a) {
@@ -199,5 +222,31 @@ public class ContainerEntity {
     public ContainerEntity setUpdatedBy(String u) {
         updatedBy = u;
         return this;
+    }
+
+    public ContainerEntity setContainerTypeName(String name) {
+        this.containerTypeName = name;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return "ContainerEntity{" +
+                "id='" + id + '\'' +
+                ", amount=" + amount +
+                ", barcode='" + barcode + '\'' +
+                ", containerTypeId='" + containerTypeId + '\'' +
+                ", coordinateX=" + coordinateX +
+                ", coordinateY=" + coordinateY +
+                ", createdAt=" + createdAt +
+                ", createdBy='" + createdBy + '\'' +
+                ", digest='" + digest + '\'' +
+                ", locationId='" + locationId + '\'' +
+                ", name='" + name + '\'' +
+                ", unit='" + unit + '\'' +
+                ", updatedAt=" + updatedAt +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", containerTypeName='" + containerTypeName + '\'' +
+                '}';
     }
 }

@@ -20,7 +20,6 @@ package de.ipb_halle.signals.materials;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.field.FieldDbService;
-import de.ipb_halle.signals.field.FieldOption;
 import de.ipb_halle.signals.field.FieldValue;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
@@ -32,12 +31,14 @@ import jakarta.persistence.criteria.Root;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 @Stateless
 public class MaterialDbService {
 
-    @PersistenceContext(unitName="signalsDB")
+    @PersistenceContext(unitName = "signalsDB")
     private EntityManager em;
 
     @Inject

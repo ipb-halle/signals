@@ -17,10 +17,7 @@
  */
 package de.ipb_halle.signals.materials;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import de.ipb_halle.signals.attachment.Attachment;
 import de.ipb_halle.signals.attachment.AttachmentRevision;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
@@ -37,7 +34,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * REST service for materials
@@ -73,10 +73,14 @@ public class MaterialRestService implements RestReplyParser<Material> {
         /**
          * link to materialJson -> materials/{eid}/data
          */
-
-        JsonObject materialJson = json.getAsJsonObject().get(RestHelper.ATTR_DATA).getAsJsonObject();
-        JsonObject attributes = materialJson.get(RestHelper.ATTR_ATTRIBUTES).getAsJsonObject();
-
+        JsonObject attributes = null;
+        JsonObject materialJson = null;
+        try {
+            materialJson = json.getAsJsonObject().get(RestHelper.ATTR_DATA).getAsJsonObject();
+            attributes = materialJson.get(RestHelper.ATTR_ATTRIBUTES).getAsJsonObject();
+        } catch (JsonSyntaxException | IllegalStateException e) {
+            logger.error("MRS:-> Invalid JSON structure: {}", e.getLocalizedMessage());
+        }
         material.setId(RestHelper.parseString(attributes, RestHelper.ATTR_ID));
         material.setName(RestHelper.parseString(attributes, RestHelper.ATTR_NAME));
         material.setDescription(RestHelper.parseString(attributes, RestHelper.ATTR_DESCRIPTION));
@@ -100,8 +104,9 @@ public class MaterialRestService implements RestReplyParser<Material> {
 
     /**
      * Parse the material id for a given batch
+     *
      * @param attributes JSON data provided by the REST call
-     * @param material the Material batch object
+     * @param material   the Material batch object
      */
     private void parseMaterialId(JsonObject attributes, Material material) {
         material.setMaterial(new MaterialReference()
@@ -117,14 +122,26 @@ public class MaterialRestService implements RestReplyParser<Material> {
      */
     private List<FieldValue> parseFields(JsonElement json, Map<String, Field> fields, String definingId) {
         List<FieldValue> values = new ArrayList<>();
-        JsonObject jsonObj = json.getAsJsonObject();
-        if (jsonObj.has(RestHelper.ATTR_DATA)) {
-            JsonArray data = jsonObj.get(RestHelper.ATTR_DATA).getAsJsonArray();
-            for (JsonElement fieldJsonElement : data) {
-                //parsing of filed Value from fieldJsonElement
+        if (json.isJsonObject()) {
+            JsonObject jsonObj = json.getAsJsonObject();
+            if (jsonObj.has(RestHelper.ATTR_DATA)) {
+                JsonArray data = jsonObj.get(RestHelper.ATTR_DATA).getAsJsonArray();
+                for (JsonElement fieldJsonElement : data) {
+                    //parsing of filed Value from fieldJsonElement
+                    values.add(parseSingleField(fieldJsonElement, fields));
+                }
+            }
+        } else if (json.isJsonArray()) {
+            logger.warn("MRS:-> Unexpected JSON structure: Array received instead of Object. Parsing Json array.");
+            JsonArray array = json.getAsJsonArray();
+            for (JsonElement fieldJsonElement : array) {
                 values.add(parseSingleField(fieldJsonElement, fields));
             }
+
+        } else {
+            logger.error("MRS:-> Invalid JSON structure: {}", json.toString());
         }
+
         return values;
     }
 
@@ -150,7 +167,7 @@ public class MaterialRestService implements RestReplyParser<Material> {
 
         //ToDO the method is almost not in use and only for emergency case, if a new filed will be discovered
         if (field == null) {
-            logger.info("FIELD IS NULL !!!!! \n");
+            logger.info("MRS:-> FIELD IS NULL !!!!! \n");
             //receiving a file information from material attachment->
             fieldValue.setAdHocField(parseFieldDefinition(metaFieldJsonObject));
         }
@@ -215,11 +232,11 @@ public class MaterialRestService implements RestReplyParser<Material> {
             return JsonParser.parseString(restClient.getResponse().getString());
 
         } catch (UnexpectedResponseCodeException ue) {
-            logger.warn("Unexpected code", ue);
+            logger.warn("MRS:-> Unexpected code {}", ue.getMessage(),ue);
         } catch (URISyntaxException me) {
-            logger.warn("Malformed URL", me);
+            logger.warn("MRS:-> Malformed URL {}", me.getMessage(), me);
         } catch (IOException ioe) {
-            logger.warn("IOException", ioe);
+            logger.warn("MRS:-> IOException {}", ioe.getMessage(), ioe);
         }
         return null;
     }
@@ -242,11 +259,11 @@ public class MaterialRestService implements RestReplyParser<Material> {
             return restClient.getResponse();
         } catch (UnexpectedResponseCodeException e) {
             // attachment (drawing, image, sequence) may not be available
-            logger.debug("Unexpected response code {}", restClient.getResponseCode(), e);
+            logger.debug("MRS:-> Unexpected response code {}", restClient.getResponseCode(), e);
         } catch (IOException e) {
-            logger.warn("caught IOException: ", e);
+            logger.warn("MRS:-> caught IOException: {}", e.getMessage(), e);
         } catch (URISyntaxException e) {
-            logger.warn("URISyntaxException: ", e);
+            logger.warn("MRS:-> URISyntaxException: {}", e.getMessage(), e);
         }
         return null;
     }

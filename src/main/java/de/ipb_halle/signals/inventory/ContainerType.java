@@ -20,18 +20,20 @@ package de.ipb_halle.signals.inventory;
 import de.ipb_halle.signals.attachment.Attachment;
 import de.ipb_halle.signals.attachment.AttachmentEntity;
 import de.ipb_halle.signals.field.Field;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 
-/** 
+/**
  * Container Type DTO
  */
 
 public class ContainerType {
-
+    private final static String CONTAINER_TYPE_ENTITY_PREFIX = "container:";
+    private final static String CONTAINER_TYPE_ENTITY_SUFFIX = ":ivt";
     public final static String ATTR_ATTACHMENTS = "attachments";
     public final static String ATTR_CREATED_AT = "createdAt";
     public final static String ATTR_IN_USE = "inUse";
@@ -53,7 +55,7 @@ public class ContainerType {
     private boolean inUse;
 
     private boolean movable;
-    
+
     private String name;
 
     private Date updatedAt;
@@ -64,11 +66,11 @@ public class ContainerType {
     public ContainerType() {
         createdAt = new Date();
         updatedAt = new Date();
-        attachments = new HashSet<> ();
-        fields = new HashSet<> ();
+        attachments = new HashSet<>();
+        fields = new HashSet<>();
     }
 
-    public  ContainerType(ContainerTypeEntity cte, List<Field> fd) {
+    public ContainerType(ContainerTypeEntity cte, List<Field> fd) {
         id = cte.getId();
         createdAt = cte.getCreatedAt();
         description = cte.getDescription();
@@ -77,23 +79,30 @@ public class ContainerType {
         name = cte.getName();
         updatedAt = cte.getUpdatedAt();
 
-        attachments = new HashSet<> ();
+        attachments = new HashSet<>();
         // attachments.addAll(a);
-        fields = new HashSet<> ();
+        fields = new HashSet<>();
         fields.addAll(fd);
+    }
+
+    public String getIdWithPrefixSuffix() {
+        this.setId(CONTAINER_TYPE_ENTITY_PREFIX + this.getId() + CONTAINER_TYPE_ENTITY_SUFFIX);
+        return this.getId();
     }
 
     public ContainerTypeEntity createEntity() {
         ContainerTypeEntity cte = new ContainerTypeEntity()
-            .setId(id)
-            .setCreatedAt(createdAt)
-            .setDescription(description)
-            .setInUse(inUse)
-            .setMovable(movable)
-            .setName(name)
-            .setUpdatedAt(updatedAt);
+                .setId(id)
+                .setCreatedAt(createdAt)
+                .setDescription(description)
+                .setInUse(inUse)
+                .setMovable(movable)
+                .setName(name)
+                .setUpdatedAt(updatedAt);
+        System.out.println(cte.getId());
         return cte;
     }
+
 
     public String dump() {
         return String.format("ContainerType(%s): %s\n", id, name);

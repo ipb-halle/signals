@@ -28,7 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 
@@ -87,11 +88,11 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsIEntityD
     }
 
     public static void parseAncestors(JsonObject json, IEntityRelationships entity) {
-        throw new RuntimeException("parseAncestors NOT IMPLEMENTED");
+        throw new RuntimeException("SEM:-> parseAncestors NOT IMPLEMENTED");
         // entity.addAllAncestors(...);
     }
     private static void parseChildren(JsonObject relationships, IEntityRelationships entity) {
-        throw new RuntimeException("parseChildren NOT IMPLEMENTED");
+        throw new RuntimeException("SEM:-> parseChildren NOT IMPLEMENTED");
         // entity.addAllChildren(...);
     }
 

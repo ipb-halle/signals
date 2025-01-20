@@ -17,10 +17,14 @@
  */
 package de.ipb_halle.signals.inventory;
 
+import de.ipb_halle.signals.field.Field;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
+import java.util.Objects;
+import java.util.Set;
 
 /** 
  * Single signals entity (entities API endpoint) 
@@ -41,6 +45,8 @@ public class LocationType {
     @Column
     private String description;
 
+    private transient Set<Field> fields;
+
     public String dump() {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("LocationType(%s): %s\n", id, name));
@@ -59,6 +65,10 @@ public class LocationType {
         return name;
     }
 
+    public Set<Field> getFields() {
+        return fields;
+    }
+
     public void setId(String i) {
         id = i;
     }
@@ -69,5 +79,31 @@ public class LocationType {
 
     public void setName(String n) {
         name = n;
+    }
+
+    public void addFields(Set<Field> fd) {
+        fields = fd;
+    }
+
+    @Override
+    public String toString() {
+        return "LocationType{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        LocationType that = (LocationType) object;
+        return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(description, that.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description);
     }
 }

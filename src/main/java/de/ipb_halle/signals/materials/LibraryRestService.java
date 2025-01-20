@@ -95,11 +95,11 @@ public class LibraryRestService implements RestReplyParser<Library> {
             return jsonResult.getAsJsonObject().getAsJsonArray(RestHelper.ATTR_DATA).iterator();
 
         } catch(UnexpectedResponseCodeException ue) {
-            logger.warn("Unexpected code");
+            logger.warn("LibraryRestService:-> Unexpected code", ue);
         } catch(URISyntaxException me) {
-            logger.warn("Malformed URL");
+            logger.warn("LibraryRestService:-> Malformed URL", me);
         } catch(IOException ioe) {
-            logger.warn("IOException", (Throwable) ioe);
+            logger.warn("LibraryRestService:-> IOException", ioe);
         }
         return null; 
     }

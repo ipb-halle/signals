@@ -20,15 +20,20 @@ package de.ipb_halle.signals.inventory;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
-import de.ipb_halle.signals.rest.Method;
-import de.ipb_halle.signals.rest.RestClient;
-import de.ipb_halle.signals.rest.RestHelper;
-import de.ipb_halle.signals.rest.RestResultIterator;
-import de.ipb_halle.signals.rest.RestReplyParser;
-
+import de.ipb_halle.signals.dynEnum.DynEnumManager;
+import de.ipb_halle.signals.field.Field;
+import de.ipb_halle.signals.field.FieldOption;
+import de.ipb_halle.signals.field.FieldType;
+import de.ipb_halle.signals.rest.*;
 import jakarta.ejb.Local;
 import jakarta.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 
 /**
@@ -39,9 +44,14 @@ import jakarta.inject.Inject;
 public class LocationTypeRestService implements RestReplyParser<LocationType> {
 
     public final String INVENTORY_TYPES_ENDPOINT = "/inventory/types";
+    private Logger logger = LoggerFactory.getLogger(LocationTypeRestService.class);
+
 
     @Inject
     private RestClient restClient;
+
+    @Inject
+    private DynEnumManager dynEnumManager;
 
 
     public LocationType parseReply(JsonElement j) {
@@ -57,7 +67,33 @@ public class LocationTypeRestService implements RestReplyParser<LocationType> {
     }
 
     private void parseFields(LocationType locationType, JsonArray fields) {
-        // ToDO: parse the field definitions
+        // ToDO: parse the field -> implementation must be controlled
+        Iterator<JsonElement> iterator = fields.iterator();
+        List<Field> fieldList = new ArrayList<>();
+        while (iterator.hasNext()) {
+            Field field = null;
+
+            try {
+                JsonElement jsonElement = iterator.next();
+                field = new Field();
+                field.setId(jsonElement.getAsJsonObject().get(RestHelper.ATTR_ID).getAsString());
+                field.setTitle(jsonElement.getAsJsonObject().getAsJsonObject(Field.ATTR_DEFINITION).get(Field.ATTR_TITLE).getAsString());
+                String fieldType = jsonElement.getAsJsonObject().getAsJsonObject(Field.ATTR_DEFINITION).get(Field.ATTR_FIELD_TYPE).getAsString();
+                field.setFieldType((FieldType) dynEnumManager.valueOf(FieldType.valueOf(fieldType)));
+                field.setDefiningEntityId(locationType.getId());
+                if (jsonElement.getAsJsonObject().getAsJsonObject(Field.ATTR_DEFINITION).get(Field.ATTR_OPTIONS) != null) {
+                    JsonArray options = jsonElement.getAsJsonObject().getAsJsonObject(Field.ATTR_DEFINITION).get(Field.ATTR_OPTIONS).getAsJsonArray();
+                    for (JsonElement option : options) {
+                        String optionString = option.getAsJsonPrimitive().getAsString();
+                        field.addOption(new FieldOption(field.getId(), optionString));
+                    }
+                    fieldList.add(field);
+                }
+            } catch (Exception e) {
+                logger.error("LocationTypeRestService:-> Method parseFields() threw an exception for ID= {} ", field.getId(), e);
+            }
+        }
+        locationType.addFields(new HashSet<>(fieldList));
     }
 
     public RestResultIterator<LocationType> doGetLocationTypes() {

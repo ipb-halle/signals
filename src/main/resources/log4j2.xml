@@ -1,39 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="info">
 
-  <Appenders>
+    <Appenders>
+        <!-- Console Appender -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="[%-5level] %m%n"/>
+        </Console>
 
-    <Console name="Console" target="SYSTEM_OUT">
-      <PatternLayout pattern="[%-5level] %m%n"/>
-    </Console>
+        <!-- General Logs -->
+        <File name="IPBFile" fileName="logs/snb.log">
+            <PatternLayout pattern="[%-5level] %m%n"/>
+        </File>
 
-    <File name="IPB File" fileName="logs/snb.log">
-        <PatternLayout pattern="[%-5level] %m%n"/>
-    </File>
+    </Appenders>
 
-  </Appenders>
+    <Loggers>
+        <!-- Application-specific Logger -->
+        <Logger name="de.ipb_halle" level="DEBUG" additivity="true">
+            <AppenderRef ref="IPBFile"/>
+        </Logger>
 
-  <Loggers>
+        <!-- Hibernate Logging -->
+        <Logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <Logger name="org.hibernate" level="warn" additivity="true">
+            <AppenderRef ref="IPBFile"/>
+        </Logger>
 
-    <Logger name="de.ipb_halle" level="info" additivity="false">
-      <AppenderRef ref="IPB File"/>
-    </Logger>
+        <!-- OpenEJB Logging -->
+        <Logger name="org.apache.openejb" level="DEBUG" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="IPBFile"/>
+        </Logger>
 
-    <!-- set level to 'debug' to log SQL statements -->
-    <Logger name="org.hibernate.SQL" level="warn" additivity="false">
-      <AppenderRef ref="Console" level="warn"/>
-    </Logger>
+        <!-- Transaction Logging -->
+        <Logger name="jakarta.transaction" level="DEBUG" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="IPBFile"/>
+        </Logger>
 
-    <!-- set level to 'debug' to log bind parameters -->
-    <Logger name="org.hibernate.type" level="warn" additivity="false">
-      <AppenderRef ref="Console" level="warn"/>
-    </Logger>
-
-    <Root level="error">
-      <AppenderRef ref="Console"/>
-    </Root>
-
-  </Loggers>
+        <!-- Root Logger -->
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="IPBFile"/>
+        </Root>
+    </Loggers>
 
 </Configuration>
-

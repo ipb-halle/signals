@@ -334,6 +334,7 @@ CREATE TABLE containers (
     location_id VARCHAR,
     material_id VARCHAR /* REFERENCES materials(id) */,
     name VARCHAR,
+    type_name VARCHAR,
     updated_at TIMESTAMP,
     updated_by VARCHAR /* REFERENCES users(id) */,
     unit VARCHAR

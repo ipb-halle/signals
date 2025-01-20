@@ -19,9 +19,7 @@ package de.ipb_halle.signals.materials;
 
 import de.ipb_halle.signals.attachment.Attachment;
 import de.ipb_halle.signals.entity.EntityType;
-import de.ipb_halle.signals.entity.IEntityRelationships;
 import de.ipb_halle.signals.entity.IObjectMetaData;
-import de.ipb_halle.signals.entity.ISignalsEntity;
 import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.users.IUser;
 import de.ipb_halle.signals.users.UserReference;

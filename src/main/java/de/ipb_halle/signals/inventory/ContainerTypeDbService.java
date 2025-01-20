@@ -17,11 +17,9 @@
  */
 package de.ipb_halle.signals.inventory;
 
-import de.ipb_halle.signals.attachment.Attachment;
 import de.ipb_halle.signals.attachment.AttachmentDbService;
-import de.ipb_halle.signals.attachment.AttachmentEntity;
-import de.ipb_halle.signals.field.FieldDbService;
 import de.ipb_halle.signals.field.Field;
+import de.ipb_halle.signals.field.FieldDbService;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -31,7 +29,9 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -42,6 +42,8 @@ import java.util.List;
 public class ContainerTypeDbService {
 
     public final static String CONTAINER_TYPE_ID = "container_type_id";
+    private final static String CONTAINER_TYPE_ENTITY_PREFIX = "container:";
+    private final static String CONTAINER_TYPE_ENTITY_SUFFIX = ":ivt";
 
     @Inject
     private AttachmentDbService attachmentService;
@@ -52,24 +54,37 @@ public class ContainerTypeDbService {
     @PersistenceContext(unitName = "signalsDB")
     private EntityManager em;
 
-    /**
-     * @param id the ContainerType Id
-     * @return a list of Attatchment for that container type
-     *
-    private List<AttachmentEntity> loadAttachments(String id) {
-    CriteriaBuilder builder = em.getCriteriaBuilder();
-    CriteriaQuery<ContainerTypeAttachment> criteriaQuery = builder.createQuery(ContainerTypeAttachment.class);
-    Root<ContainerTypeAttachment> root = criteriaQuery.from(ContainerTypeAttachment.class);
-    criteriaQuery.select(root);
-    criteriaQuery.where(builder.equal(root.get(CONTAINER_TYPE_ID), id));
 
-    List<AttachmentEntity> result = new ArrayList<>();
-    for (ContainerTypeAttachment cta : em.createQuery(criteriaQuery).getResultList()) {
-    result.add(attachmentService.loadById(cta.getAttachmentId()));
+    public Set<String> getContainerTypeIds() {
+        Set<String> entityIds = new HashSet<>();
+        try {
+            CriteriaBuilder builder = em.getCriteriaBuilder();
+            CriteriaQuery<ContainerTypeEntity> query = builder.createQuery(ContainerTypeEntity.class);
+            Root<ContainerTypeEntity> root = query.from(ContainerTypeEntity.class);
+            query.select(root);
+
+            List<ContainerTypeEntity> resultList = em.createQuery(query).getResultList();
+            System.out.println("Query result: " + resultList);
+
+            if (resultList == null || resultList.isEmpty()) {
+                System.err.println("ContainerTypeDbService:-> No results found for ContainerTypeEntity.");
+                return entityIds;
+            }
+
+            for (ContainerTypeEntity cte : resultList) {
+                if (cte.getId() != null) {
+                    entityIds.add(CONTAINER_TYPE_ENTITY_PREFIX + cte.getId() + CONTAINER_TYPE_ENTITY_SUFFIX);
+                } else {
+                    System.err.println("ContainerTypeDbService:-> Null ID found for a ContainerTypeEntity.");
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("ContainerTypeDbService:-> Error while fetching container type IDs: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return entityIds;
     }
-    return result;
-    }
-     */
+
 
     /**
      * @param id the ContainerType Id

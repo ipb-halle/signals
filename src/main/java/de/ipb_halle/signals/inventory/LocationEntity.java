@@ -17,11 +17,14 @@
  */
 package de.ipb_halle.signals.inventory;
 
-import java.util.Date;
+import de.ipb_halle.signals.field.FieldValue;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
+import java.util.Date;
+import java.util.Set;
 
 /** 
  * Location entity (/inventory/locations/ API endpoint) 
@@ -93,6 +96,7 @@ public class LocationEntity implements ILocation {
 
     private transient LocationType type;
     private transient ILocation ancestor;
+    private transient Set<FieldValue> fieldValues;
 
     /**
      * default constructor
@@ -161,6 +165,10 @@ public class LocationEntity implements ILocation {
 
     public String getUpdatedBy() {
         return updatedBy;
+    }
+
+    public Set<FieldValue> getFieldValues() {
+        return fieldValues;
     }
 
     public boolean isGrid() {
@@ -235,6 +243,12 @@ public class LocationEntity implements ILocation {
     public void setUpdatedBy(String u) {
         updatedBy = u;
     }
+
+    public void setFieldValues(Set<FieldValue> vs) {
+        fieldValues = vs;
+    }
+
+
 
     @Override
     public String toString() {

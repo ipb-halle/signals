@@ -20,21 +20,16 @@ package de.ipb_halle.signals.inventory;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import de.ipb_halle.signals.attachment.AttachmentRestService;
+import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldParser;
-import de.ipb_halle.signals.rest.Method;
-import de.ipb_halle.signals.rest.RestClient;
-import de.ipb_halle.signals.rest.RestHelper;
-import de.ipb_halle.signals.rest.RestResultIterator;
-import de.ipb_halle.signals.rest.RestReplyParser;
+import de.ipb_halle.signals.rest.*;
+import jakarta.ejb.Local;
+import jakarta.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import jakarta.ejb.Local;
-import jakarta.inject.Inject;
 
 
 /**
@@ -45,6 +40,9 @@ import jakarta.inject.Inject;
 public class ContainerTypeRestService implements RestReplyParser<ContainerType> {
 
     public final String CONTAINER_TYPE_ENDPOINT = "/inventory/types";
+    private final static String CONTAINER_TYPE_ENTITY_PREFIX = "container:";
+    private final static String CONTAINER_TYPE_ENTITY_SUFFIX = ":ivt";
+
 
     @Inject
     private RestClient restClient;
@@ -86,7 +84,7 @@ public class ContainerTypeRestService implements RestReplyParser<ContainerType> 
         return containerTypes;
     }
 
-    private void parseAttachments(JsonArray j, ContainerType ct){
+    private void parseAttachments(JsonArray j, ContainerType ct) {
         Iterator<JsonElement> iter = j.iterator();
         AttachmentRestService svc = new AttachmentRestService();
         while (iter.hasNext()) {
@@ -97,7 +95,9 @@ public class ContainerTypeRestService implements RestReplyParser<ContainerType> 
     private void parseFieldDefinitions(JsonArray j, ContainerType ct) {
         Iterator<JsonElement> iter = j.iterator();
         while (iter.hasNext()) {
-            ct.addField(fieldParser.parseReply(iter.next()));
+            Field field = fieldParser.parseReply(iter.next());
+            field.setDefiningEntityId(CONTAINER_TYPE_ENTITY_PREFIX + ct.getId() + CONTAINER_TYPE_ENTITY_SUFFIX);
+            ct.addField(field);
         }
     }
 }

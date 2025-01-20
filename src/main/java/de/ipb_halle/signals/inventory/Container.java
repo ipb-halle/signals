@@ -17,38 +17,22 @@
  */
 package de.ipb_halle.signals.inventory;
 
-import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.entity.Unit;
+import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.materials.IMaterial;
+import de.ipb_halle.signals.users.IUser;
 import de.ipb_halle.signals.users.UserReference;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import de.ipb_halle.signals.users.IUser;
 
-/** 
- * Single signals entity (entities API endpoint) 
+/**
+ * Single signals entity (entities API endpoint)
  */
 
 public class Container {
-
-    public final static String ATTR_AMOUNT = "amount";
-    public final static String ATTR_BARCODE = "barcode";
-    public final static String ATTR_COORDINATE_X = "coordinateX";
-    public final static String ATTR_COORDINATE_Y = "coordinateY";
-    public final static String ATTR_CONTAINER_TYPE_ID = "typeId";
-    public final static String ATTR_CONTAINER_TYPE_NAME = "typeName";
-    public final static String ATTR_CONTENTS = "contents";
-    public final static String ATTR_CONTENT_ID = "entityId";
-    public final static String ATTR_CONTENT_TYPE = "entityType";
-    public final static String ATTR_CREATED_AT = "createdAt";
-    public final static String ATTR_CREATED_BY = "relationships.createdBy.data.id";
-    public final static String ATTR_LOCATION_ID = "location.id";
-    public final static String ATTR_UNIT = "unit";
-    public final static String ATTR_UPDATED_AT = "updatedAt";
-    public final static String ATTR_UPDATED_BY = "relationships.updatedBy.data.id";
 
     private String id;
     private Double amount;
@@ -82,8 +66,8 @@ public class Container {
      * default constructor
      */
     public Container() {
-        fieldValues = new HashSet<> ();
-        materials = new HashSet<> ();
+        fieldValues = new HashSet<>();
+        materials = new HashSet<>();
     }
 
     // entity constructor
@@ -101,25 +85,26 @@ public class Container {
         updatedAt = ce.getUpdatedAt();
         updatedBy = new UserReference(ce.getUpdatedBy());
 
-        fieldValues = new HashSet<> ();
-        materials = new HashSet<> ();
+        fieldValues = new HashSet<>();
+        materials = new HashSet<>();
     }
 
     public ContainerEntity createEntity() {
         return new ContainerEntity()
-            .setId(id)
-            .setAmount(amount)
-            .setBarcode(barcode)
-            .setCoordinateX(coordinateX)
-            .setCoordinateY(coordinateY)
-            .setCreatedAt(createdAt)
-            .setCreatedBy(createdBy.getId())
-            .setDigest(digest) 
-            .setLocationId(location.getId())
-            .setName(name)
-            .setUnit(unit.getUnit())
-            .setUpdatedAt(updatedAt)
-            .setUpdatedBy(updatedBy.getId());
+                .setId(id)
+                .setAmount(amount)
+                .setBarcode(barcode)
+                .setCoordinateX(coordinateX)
+                .setCoordinateY(coordinateY)
+                .setCreatedAt(createdAt)
+                .setCreatedBy(createdBy.getId())
+                .setDigest(digest)
+                .setLocationId(location.getId())
+                .setName(name)
+                .setUnit(unit.getUnit())
+                .setUpdatedAt(updatedAt)
+                .setUpdatedBy(updatedBy.getId())
+                .setContainerTypeName(containerTypeName);
     }
 
     public void addFieldValue(FieldValue v) {

@@ -17,6 +17,9 @@
  */
 package de.ipb_halle.signals.entity;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,7 +28,7 @@ import java.util.Map;
 
 /**
  * Unit of measurement.
- * 
+ *
  * @author fbroda
  */
 public class Unit implements Serializable {
@@ -45,6 +48,9 @@ public class Unit implements Serializable {
 
     private static Map<Quality, List<Unit>> unitsByQuality;
     private static Map<String, Unit> unitsByUnit;
+
+    private static final Logger logger = LoggerFactory.getLogger(Unit.class);
+
 
     /**
      * static constructor base units are added first!
@@ -187,7 +193,12 @@ public class Unit implements Serializable {
     public static Unit getUnit(String unit) {
         Unit u = unitsByUnit.get(unit);
         if (u == null) {
-            throw new IllegalArgumentException("getUnit() attempt to fetch unknown unit");
+            if (unit.equalsIgnoreCase("mul") || unit.equalsIgnoreCase("µL")) {
+                logger.debug("unit is {}, set to µl\n", unit);
+                u = unitsByUnit.get("µl");
+            } else {
+                logger.error("Unit:-> getUnit() attempt to fetch unknown unit {}", unit);
+            }
         }
         return u;
     }
@@ -241,7 +252,7 @@ public class Unit implements Serializable {
      *                   temperature)
      * @param propUnit   the unit (e.g. g / cm^3 for density)
      * @return the factor of proportionality for conversion (e.g. approx. 0.127 for
-     *         conversion from grams in this example)
+     * conversion from grams in this example)
      */
     @Deprecated
     public double transform(Unit target, double propFactor, Unit propUnit) {

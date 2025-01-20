@@ -17,12 +17,13 @@
  */
 package de.ipb_halle.signals.inventory;
 
-import java.util.List;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 
-/** 
- * Manager for container types (inventory/types API endpoint) 
+import java.util.List;
+
+/**
+ * Manager for container types (inventory/types API endpoint)
  */
 
 @Stateless
@@ -39,12 +40,15 @@ public class ContainerTypeManager {
     }
 
     public List<ContainerType> getSnbContainerTypes() {
-        return restService.doGetContainerTypes();
+        List<ContainerType>  containerTypes = restService.doGetContainerTypes();
+        return containerTypes;
     }
 
     public void save(List<ContainerType> ctypes) {
         for (ContainerType ct : ctypes) {
             dbService.save(ct);
+            System.out.println(ct);
         }
     }
+
 }

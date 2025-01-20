@@ -20,6 +20,7 @@ package de.ipb_halle.signals.materials;
 import jakarta.persistence.*;
 
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Table(name = "materials")
@@ -169,5 +170,18 @@ public class MaterialEntity {
                 ", materialId='" + materialId + '\'' +
                 ", entityType=" + entityType +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        MaterialEntity that = (MaterialEntity) object;
+        return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(libraryId, that.libraryId) && Objects.equals(createdAt, that.createdAt) && Objects.equals(createdBy, that.createdBy) && Objects.equals(owner, that.owner) && Objects.equals(editedAt, that.editedAt) && Objects.equals(editedBy, that.editedBy) && Objects.equals(digest, that.digest) && Objects.equals(entityType, that.entityType) && Objects.equals(materialId, that.materialId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, libraryId, createdAt, createdBy, owner, editedAt, editedBy, digest, entityType, materialId);
     }
 }

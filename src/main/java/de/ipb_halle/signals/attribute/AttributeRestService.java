@@ -112,11 +112,11 @@ public class AttributeRestService implements RestReplyParser<Attribute> {
             return jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA);
 
         } catch(UnexpectedResponseCodeException ue) {
-            logger.warn("Unexpected response code when fetching attribute with ID: {}", id, ue);
+            logger.warn("ARS:-> Unexpected response code when fetching attribute with ID: {}", id, ue);
         } catch(URISyntaxException me) {
-            logger.warn("Malformed URL for ID: {}", id, me);
+            logger.warn("ARS:-> Malformed URL for ID: {}", id, me);
         } catch (IOException ioe) {
-            logger.warn("IOException occurred while fetching attribute with ID: {}", id, ioe);
+            logger.warn("ARS:-> IOException occurred while fetching attribute with ID: {}", id, ioe);
         }
         return null;
     }
@@ -132,11 +132,11 @@ public class AttributeRestService implements RestReplyParser<Attribute> {
             return jsonResult.getAsJsonObject().getAsJsonArray(RestHelper.ATTR_DATA);
 
         } catch(UnexpectedResponseCodeException ue) {
-            logger.warn("Unexpected response code", ue);
+            logger.warn("ARS:-> Unexpected response code {}", ue.getMessage(),ue);
         } catch(URISyntaxException me) {
-            logger.warn("Malformed URL", me);
+            logger.warn("ARS:-> Malformed URL {}", me.getMessage(), me);
         } catch (IOException ioe) {
-            logger.warn("IOException occurred while fetching attributes list", ioe);
+            logger.warn("ARS:-> IOException occurred while fetching attributes list {}", ioe.getMessage(), ioe);
         }
         return null;
     }

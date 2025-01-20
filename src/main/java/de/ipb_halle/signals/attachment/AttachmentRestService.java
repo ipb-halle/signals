@@ -79,7 +79,7 @@ public class AttachmentRestService implements RestReplyParser<Attachment> {
                     // extraction fields like "type" and "id"
                     String childId = childObject.has(RestHelper.ATTR_ID) ? childObject.get(RestHelper.ATTR_ID).getAsString() : null;
                     String childType = Objects.requireNonNull(childId).substring(0, childId.indexOf(":"));
-                    logger.info("Attachment type -  Type: {}\n", childType);
+                    logger.info("ARS:-> Attachment type -  Type: {}\n", childType);
 
                     JsonElement attachmentDescriptionJson = fetch(childId);
 
@@ -103,11 +103,11 @@ public class AttachmentRestService implements RestReplyParser<Attachment> {
 
 
                 } else {
-                    logger.warn("Child element is not a JsonObject: {}\n", attachmentChildElement);
+                    logger.warn("ARS:-> Child element is not a JsonObject: {}\n", attachmentChildElement);
                 }
             }
         } else {
-            logger.warn("'children' is not a valid JSON object or does not contain 'data'.\n");
+            logger.warn("ARS:-> 'children' is not a valid JSON object or does not contain 'data'.\n");
         }
         return attachment;
     }
@@ -123,11 +123,11 @@ public class AttachmentRestService implements RestReplyParser<Attachment> {
             resultJsonElement = JsonParser.parseString(response);
             return resultJsonElement;
         } catch (UnexpectedResponseCodeException ue) {
-            logger.warn("Unexpected code:\n" + ue);
+            logger.warn("ARS:-> Unexpected code: {}\n", ue.getMessage(), ue);
         } catch (URISyntaxException me) {
-            logger.warn("Malformed URL:\n" + me);
+            logger.warn("ARS:-> Malformed URL: {}\n", me.getMessage(), me);
         } catch (IOException ioe) {
-            logger.warn("IOException", ioe);
+            logger.warn("ARS:-> IOException {}", ioe.getMessage(), ioe);
         }
         return null;
     }

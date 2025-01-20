@@ -41,9 +41,8 @@ public class ContainerDbService {
         return new Container(entity);
     }
 
-    public void save(Container ct) {
-        ContainerEntity entity = ct.createEntity();
-        this.em.merge(entity);
+    public void save(ContainerEntity ct) {
+        this.em.merge(ct);
     }
 
 }

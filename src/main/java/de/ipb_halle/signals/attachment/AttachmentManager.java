@@ -67,11 +67,11 @@ public class AttachmentManager {
         List<AttachmentEntity> attachments = new ArrayList<>();
 
         for (SignalsIEntityDTO entityDTO : signalsEntityDTOS) {
-            logger.info("Processing {} in order to extract the attachments {}\n", entityDTO.getType(), entityDTO.getId());
+            logger.info("AM:-> Processing {} in order to extract the attachments {}\n", entityDTO.getType(), entityDTO.getId());
             if (attachmentRestService.checkIfEntityHasChildren(entityDTO)) {
                 attachments.add(attachmentRestService.doGetAttachment(entityDTO.getId()).createEntity());
             } else {
-                logger.info("{} {} doesn't have children", entityDTO.getType(), entityDTO.getId());
+                logger.info("AM:-> {} {} doesn't have children", entityDTO.getType(), entityDTO.getId());
             }
         }
         //Logger

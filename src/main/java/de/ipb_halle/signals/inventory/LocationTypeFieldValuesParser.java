@@ -1,27 +1,28 @@
 /*
- * IPB Signals client
- * Copyright 2022 Leibniz-Institut f. Pflanzenbiochemie
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  * IPB Signals client
+ *  * Copyright 2024 Leibniz-Institut f. Pflanzenbiochemie
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
+ *  *
  *
  */
-package de.ipb_halle.signals.field;
+package de.ipb_halle.signals.inventory;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import de.ipb_halle.signals.LogConfig;
-import de.ipb_halle.signals.materials.MaterialRestService;
+import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestReplyParser;
 import org.slf4j.Logger;
@@ -34,10 +35,9 @@ import java.util.List;
 /**
  * service for field values (not a real REST service)
  */
-@Deprecated
-public class FieldValuesParser implements RestReplyParser<List<FieldValue>> {
+public class LocationTypeFieldValuesParser implements RestReplyParser<List<FieldValue>> {
 
-    private Logger logger = LoggerFactory.getLogger(FieldValuesParser.class);
+    private Logger logger = LoggerFactory.getLogger(LocationTypeFieldValuesParser.class);
 
 
     /**
@@ -54,11 +54,22 @@ public class FieldValuesParser implements RestReplyParser<List<FieldValue>> {
         List<FieldValue> fieldValueList = new ArrayList<>();
         Iterator<JsonElement> iter = json.iterator();
         while (iter.hasNext()) {
-            JsonObject jsonObj = iter.next().getAsJsonObject();
+            JsonElement jsonElement = iter.next().getAsJsonObject();
             FieldValue fieldValue = new FieldValue()
                     .setLinkType(FieldValue.LinkType.FIELD_ID)
-                    .setFieldId(RestHelper.parseString(jsonObj, RestHelper.ATTR_ID))
-                    .setValue(jsonObj.get(FieldValue.ATTR_CONTENT).toString());
+                    .setFieldId(RestHelper.parseString(jsonElement.getAsJsonObject(), RestHelper.ATTR_ID));
+            if (jsonElement.getAsJsonObject().getAsJsonObject("value") != null ) {
+                logger.debug("LocationTypeFieldValueParser:-> there is a value!");
+                fieldValue.setValue(jsonElement.getAsJsonObject().getAsJsonObject("value").toString());
+            }
+            if (jsonElement.getAsJsonObject().getAsJsonObject(FieldValue.ATTR_CONTENT) != null) {
+                logger.debug("LocationTypeFieldValueParser:-> there is a content!");
+                fieldValue.setValue(jsonElement.getAsJsonObject().getAsJsonObject(FieldValue.ATTR_CONTENT).toString());
+            }else {
+                logger.debug("LocationTypeFieldValueParser:-> there is nothing\"\"");
+                fieldValue.setValue("");
+            }
+
             fieldValueList.add(fieldValue);
         }
         return fieldValueList;

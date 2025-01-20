@@ -21,52 +21,32 @@
 package de.ipb_halle.signals.materials;
 
 import de.ipb_halle.signals.RuntimeConfig;
-import de.ipb_halle.signals.attachment.Attachment;
-import de.ipb_halle.signals.attachment.AttachmentDbService;
-import de.ipb_halle.signals.attachment.AttachmentFile;
-import de.ipb_halle.signals.attachment.AttachmentRevision;
 import de.ipb_halle.signals.entity.EntityType;
-import de.ipb_halle.signals.entity.SignalsIEntityDTO;
 import de.ipb_halle.signals.entity.SignalsEntityDbService;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
+import de.ipb_halle.signals.entity.SignalsIEntityDTO;
 import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldDbService;
-import de.ipb_halle.signals.field.FieldType;
-import de.ipb_halle.signals.field.FieldValue;
-import de.ipb_halle.signals.rest.RestReply;
-import de.ipb_halle.signals.storage.StorageService;
 import jakarta.ejb.Stateless;
+import jakarta.ejb.TransactionAttribute;
+import jakarta.ejb.TransactionAttributeType;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 
 /**
- * Manager for signals materials libraries (materials/libraries API endpoint)
+ * Manager for signals materials libraries (materials/libraries API endpoint).
+ * <p>
+ * Orchestrates the loading of "materials" (e.g., assets, batches) from the Signals database,
+ * invokes the {@link MaterialProcessorBean} for processing each material, and handles library
+ * data retrieval (both local and remote).
  */
-
 @Stateless
 public class MaterialsManager {
-
-    @Inject
-    private AttachmentDbService attachmentDbService;
-
-    @Inject
-    private LibraryDbService libraryDbService;
-
-    @Inject
-    private LibraryRestService libraryRestService;
-
-    @Inject
-    private MaterialDbService materialDbService;
-
-    @Inject
-    private MaterialRestService materialRestService;
 
     @Inject
     private SignalsEntityDbService signalsEntityDbService;
@@ -75,266 +55,147 @@ public class MaterialsManager {
     private FieldDbService fieldDbService;
 
     @Inject
-    private StorageService storageService;
+    private LibraryDbService libraryDbService;
+
+    @Inject
+    private LibraryRestService libraryRestService;
+
+    @Inject
+    private MaterialProcessorBean materialProcessorBean;
 
     private Logger logger = LoggerFactory.getLogger(MaterialsManager.class);
 
-    public void manageLibraries(RuntimeConfig config) {
-        fetchLibraries(config);
-    }
-
-
-    //=============RECEIVE MATERIALS AND FIELDS=============================================================
+    /**
+     * Fetches materials from the Signals database within a specified date range
+     * and processes them sequentially, mapping all fields from relevant libraries.
+     * <p>
+     * This method:
+     * <ul>
+     *     <li>Builds query parameters for date-based retrieval.</li>
+     *     <li>Retrieves and maps fields from all known libraries.</li>
+     *     <li>Loads the materials from the local database via {@link SignalsEntityDbService}.</li>
+     *     <li>Processes each material in sequence using
+     *     {@link #processMaterialsSequentially(List, Map)}.</li>
+     * </ul>
+     *
+     * @param runtimeConfig a configuration object containing runtime properties
+     * @param dateRange an array with one or two date elements:
+     *                  <ul>
+     *                      <li><b>[0]</b> start date (required)</li>
+     *                      <li><b>[1]</b> optional end date</li>
+     *                  </ul>
+     */
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void manageMaterials(RuntimeConfig runtimeConfig, Date[] dateRange) {
-        Map<String, Object> cmap = new HashMap<>();
-        /**
-         * criteria Map contains entityType, start and end date e.g.:
-         * CMAP key: "includeTypes" and value: "[asset.EntityType]"
-         * CMAP key: "start" and value: "2024-01-01T00:00:00.000+0100"
-         * CMAP key: "end" and value: "2024-12-09T09:05:12.479+0100"
-         */
+        logger.info("MM:-> START MANAGE MATERIALS");
 
+        //Query parameters for load
+        Map<String, Object> cmap = new HashMap<>();
         cmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
         if (dateRange.length > 1) {
             cmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
         }
-
-        // ToDo: order of entities (assets, then batches) matters!
         cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES,
                 new EntityType[]{EntityType.valueOf(Material.ENTITY_TYPE_ASSET),
                         EntityType.valueOf(Material.ENTITY_TYPE_BATCH)});
 
+        // Fetch all fields of all libraries
         Map<String, Map<String, Field>> allFields = mapFieldsByLibraryId();
 
-        //List of all asset entities
+        // Load all materials from the database
         List<SignalsIEntityDTO> entityDTOs = signalsEntityDbService.load(cmap);
-        int i = 1;
-        for (SignalsIEntityDTO dto : entityDTOs) {
-            if ((i % 1000) == 0) {
-                this.logger.info("Processed material #{}", i);
-            }
-            fetchMaterial(dto, allFields);
-        }
+
+        //Parallel processing
+        processMaterialsSequentially(entityDTOs, allFields);
     }
 
+
     /**
-     * This method creates mapping of fields by libraryId
-     * @return all fields mapped by libraryId (outer map) and fieldId (inner map)
+     * Builds a mapping of library IDs to the fields belonging to each library.
+     * <p>
+     * The resulting structure is:
+     * <code>Map&lt;libraryId, Map&lt;fieldId, Field&gt;&gt;</code>.
+     *
+     * @return a nested map from library ID -> field ID -> {@link Field}
      */
     private Map<String, Map<String, Field>> mapFieldsByLibraryId() {
-        /**
-         * Information about field:
-         * Field{id='6329671b759ae07953c8117a',
-         * attributeListEid='null',
-         * calculated=null,
-         * defaultUnit='null',
-         * definedBy='SYSTEM_DEFAULT',
-         * definingEntityId='assetType:6329671b759ae07953c8117b',
-         * hidden=true, key='null', multiSelect=null, readOnly=null, required=false,
-         * title='Chemical Compounds Image', userDefined=null, fieldType=ATTACHED_FILE.FieldType(28) ,
-         * measures=[], options=[], designation=asset.FieldDesignation}
-         */
-        List<Library> libraries = libraryDbService.load(new HashMap<String, Object>());
+        // 1) Loads all libraries
+        List<Library> libraries = libraryDbService.load(new HashMap<>());
         Set<String> libraryIds = libraries.stream().map(Library::getId).collect(Collectors.toSet());
+
+        // 2) Load all fields for the retrieved libraries
         List<Field> allFields = receiveAllFieldsOfAllLibraries(libraryIds);
 
-        //creating a map with library id as a key and field title/ field Object hashMap as a value
-        Map<String, Map<String, Field>> resultMap = new HashMap<>();
+        // 3) Build the nested map
+        Map<String, Map<String, Field>> fieldMap = new HashMap<>();
         for (Field field : allFields) {
             //removing prefix assetType-> definingEntityId='assetType:6329671b759ae07953c8117b',
             String libraryId = field.getDefiningEntityId().split(":")[1];
-            //putting String libraryID as a key and field result hashMap with field title and field object as a value
-            resultMap.putIfAbsent(libraryId, new HashMap<>());
-            //putting field Object as a value in value hashMap
-            resultMap.get(libraryId).put(field.getId(), field);
+            fieldMap.putIfAbsent(libraryId, new HashMap<>());
+            fieldMap.get(libraryId).put(field.getId(), field);
         }
-        return resultMap;
+        return fieldMap;
     }
 
     /**
-     * This method obtains a List of all Fields for a given set of libraries
-     *
-     * @param libraryIds a set of library Ids -> assetType:1234567890abcdef
-     * @return list of Fields
-     * how field looks like:
-     * Field{  id='66e2c5c9c4f5b568f97b8e84',
-     * attributeListEid='attribute:27',
-     * calculated=false,
-     * defaultUnit='null',
-     * definedBy='USER_ADDED',
-     * hidden=false,
-     * key='null',
-     * multiSelect=null,
-     * readOnly=null,
-     * required=true,
-     * title='Materials Access',
-     * userDefined=null,
-     * fieldType=ATTRIBUTE.FieldType(25) ,
-     * measures=[], options=[], designation=asset.FieldDesignation}
+     * Loads all fields for each specified library ID from the database.
      * <p>
-     * example fo criteria map:
-     * key "definingEntityId" and value [assetType:6215104dab0ad27bf7942a53, assetType:6329671b759ae07953c8117b, assetType:6215104dab0ad27bf7942a45]
+     * Since libraries in the database store their fields under a <code>definingEntityId</code>
+     * in the form <code>libraryType:libraryId</code>, this method first maps library IDs to
+     * the expected search format, then invokes the {@link FieldDbService}.
+     *
+     * @param libraryIds a collection of library IDs to load fields for
+     * @return a list of all fields matching the library IDs
      */
     private List<Field> receiveAllFieldsOfAllLibraries(Collection<String> libraryIds) {
         Map<String, Object> cmap = new HashMap<>();
-        // receive all fields from all libraries in one shot -> very efficient
-        cmap.put(Field.DEFINING_ENTITY_ID, libraryIds.stream().map(id -> Library.LIBRARY_TYPE + ":" + id).collect(Collectors.toList()));
+        cmap.put(Field.DEFINING_ENTITY_ID, libraryIds.stream()
+                .map(id -> Library.LIBRARY_TYPE + ":" + id)
+                .collect(Collectors.toList()));
         return fieldDbService.load(cmap);
     }
 
-
     /**
-     * Fetch a single Material (asset or batch) via REST and store it
-     * in the database.
-     * @param entityDTO the Signals entity, which should be processed
-     * @param
-     */
-    private void fetchMaterial(SignalsIEntityDTO entityDTO, Map<String, Map<String, Field>> allFields) {
-        try {
-            Material mat = materialRestService.doGetMaterial(entityDTO.getId());
-            Map<String, Field> fieldsByLibraryId = allFields.get(mat.getLibraryId());
-            processMaterial(fieldsByLibraryId, mat);
-            materialDbService.save(mat);
-        } catch (IOException e) {
-            logger.warn("fetchMaterial caught IOException for material {}", entityDTO.getId());
-        }
-    }
-
-
-
-    /**
-     * @param fieldsByLibraryId a map of field definitions keyed by their library ID
-     * @param mat               the material to which the field values are associated
-     * @throws IOException if an error occurs during the process, such as when retrieving attachments
-     */
-    private void processMaterial(Map<String, Field> fieldsByLibraryId, Material mat) throws IOException {
-
-        /*
-            example of fieldValue in fieldValues:
-                entityId='null', fieldId='6215104dab0ad27bf7942a48', fieldTitle='Molecular Formula',
-                value='"C<sub>10</sub>H<sub>20</sub>O<sub>2</sub>"', linkType=UNSPECIFIED', adHocField=null
-        */
-        List<FieldValue> fieldValues = materialRestService.doGetMaterialProperties(mat.getId(), fieldsByLibraryId);
-
-        for (FieldValue value : fieldValues) {
-            Field definition = fieldsByLibraryId.get(value.getFieldId());
-
-            //ToDO NEVER OCCURS
-            if (definition == null) {
-                logger.info("Definition is null");
-                definition = value.getAdHocField();
-                fieldDbService.save(definition);
-                fieldsByLibraryId.put(definition.getId(), definition);
-            }
-
-            value.setEntityId(mat.getId());
-            mat.addFieldValue(value);
-            switch (definition.getFieldType().getValue()) {
-                case FieldType.ATTACHED_FILE:
-                    obtainAttachment(mat, definition, value);
-                    break;
-                case FieldType.CHEMICAL_DRAWING:
-                    obtainDrawing(mat, definition, value);
-                    break;
-                case FieldType.SEQUENCE_FILE:
-                    obtainSequence(mat, definition, value);
-            }
-        }
-    }
-
-
-    private void obtainAttachment(Material mat, Field field, FieldValue value) throws IOException {
-        String mimeType = materialRestService.parseAttachmentMimeType(value);
-        RestReply tempPath = materialRestService.doGetMaterialAttachment(mat, field, mimeType);
-        if (tempPath != null) {
-            List<RestReply> replies = new ArrayList<>();
-            replies.add(tempPath);
-            logger.info("obtainAttachment");
-            storeAttachment(mat, field, replies, value);
-        }
-    }
-
-    private void obtainDrawing(Material mat, Field drawing, FieldValue value) throws IOException {
-        List<RestReply> drawings = materialRestService.doGetMaterialDrawing(mat);
-        logger.info("obtainDrawing");
-        storeAttachment(mat, drawing, drawings, value);
-    }
-
-    private void obtainSequence(Material mat, Field sequence, FieldValue value) throws IOException {
-        List<RestReply> sequences = materialRestService.doGetMaterialSequence(mat);
-        logger.info("obtainSequence");
-        storeAttachment(mat, sequence, sequences, value);
-    }
-
-
-    //=============STORE ATTACHMENTS=============================================================
-
-    /**
-     * Moves a collection of temporary attachment files into
-     * permanent storage and create the appropriate database records.
-     * Checks, whether the files actually are new revisions. If
-     * files didn't change (as per their fileId), no new
-     * AttachmentRevision is created.
+     * Processes the given list of material DTOs in a sequential manner, delegating
+     * each to {@link MaterialProcessorBean#processSingleMaterial(SignalsIEntityDTO, Map)}.
+     * <p>
+     * Logs progress for every 500 materials processed.
      *
-     * @param mat
-     * @param field
-     * @param files
+     * @param materials a list of {@link SignalsIEntityDTO} representing materials
+     * @param allFields a nested map of library ID -> field ID -> {@link Field}, used
+     *                  for contextualizing field data in each material
      */
-    @Transactional(rollbackOn = IOException.class)
-    private void storeAttachment(Material mat, Field field, Collection<RestReply> files, FieldValue value) throws IOException {
-
-        Attachment attachment = getAttachment(mat, field, value);
-        AttachmentRevision latestRevision = attachment.getLatestRevision();
-        AttachmentRevision newRevision = new AttachmentRevision();
-        addRevisionData(newRevision, value);
-        attachment.addRevision(newRevision);
-
-        if ((latestRevision == null) || (!latestRevision.getFileId().equals(newRevision.getFileId()))) {
-            for (RestReply reply : files) {
-                AttachmentFile file = new AttachmentFile();
-                file.setDigest(reply.getDigest());
-                file.setSize(reply.getFileSize());
-                file.setMimeType(reply.getMimeType());
-                file.setTempPath(reply.getPath());
-                attachment.addFile(file);
-            }
-            attachmentDbService.save(attachment);
-
-            for (AttachmentFile file : attachment.getFiles(attachment.getLatestRevision().getId())) {
-                storageService.storeFile(file);
+    private void processMaterialsSequentially(List<SignalsIEntityDTO> materials,
+                                              Map<String, Map<String, Field>> allFields) {
+        int count = 0;
+        for (SignalsIEntityDTO dto : materials) {
+            materialProcessorBean.processSingleMaterial(dto, allFields);
+            count++;
+            if (count % 500 == 0) {
+                System.out.printf("%d materials are proceeded.\n", count);
             }
         }
-    }
-
-    private Attachment getAttachment(Material mat, Field field, FieldValue value) {
-        Map<String, Object> cmap = new HashMap<>();
-        cmap.put(Attachment.ANCESTOR_ID, mat.getId());
-        cmap.put(Attachment.FIELD_ID, field.getId());
-        cmap.put(Attachment.LATEST_ONLY, Boolean.TRUE);
-        List<Attachment> attachments = attachmentDbService.load(cmap);
-        switch (attachments.size()) {
-            case 0:
-                Attachment attachment = new Attachment();
-                attachment.setAncestorId(mat.getId());
-                attachment.setFieldId(field.getId());
-                return attachment;
-            case 1:
-                return attachments.get(0);
-            default:
-                throw new RuntimeException("getLatestAttachmentRevision() returned more than 1 attachment");
-        }
-    }
-
-    private void addRevisionData(AttachmentRevision rev, FieldValue value) {
-        materialRestService.parseAttachmentRevisionInfo(rev, value);
     }
 
     /**
-     * Obtains libraries from Signals via REST call and stores them in the
-     * database. If the RuntimeConfig flag updateDb is false, the list of
-     * libraries is obtained but not stored in the database ('dry run').
+     * Main entry point for managing libraries: it calls {@link #fetchLibraries(RuntimeConfig)}
+     * to retrieve the library list and optionally updates the local database.
      *
-     * @param config
+     * @param config runtime configuration determining whether the fetched libraries
+     *               are persisted to the database
+     */
+    public void manageLibraries(RuntimeConfig config) {
+        fetchLibraries(config);
+    }
+
+    /**
+     * Fetches a list of libraries from the Signals system via REST and, if
+     * {@code config.updateDb} is {@code true}, saves them to the local database.
+     * If {@code config.updateDb} is {@code false}, the method performs a dry run
+     * (libraries are fetched but not persisted).
+     *
+     * @param config a {@link RuntimeConfig} object indicating whether the fetched
+     *               libraries should be stored in the database
      */
     private void fetchLibraries(RuntimeConfig config) {
         List<Library> libraries = libraryRestService.doGetLibraries();
@@ -344,6 +205,8 @@ public class MaterialsManager {
             }
         }
     }
+
+
 }
 
 

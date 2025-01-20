@@ -17,41 +17,43 @@
  */
 package de.ipb_halle.signals.inventory;
 
-import java.util.Date;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-/** 
+import java.util.Date;
+
+/**
  * Container type entity
  */
 
 @Entity
-@Table(name="container_types")
+@Table(name = "container_types")
 public class ContainerTypeEntity {
-
+    private final static String CONTAINER_TYPE_ENTITY_PREFIX = "container:";
+    private final static String CONTAINER_TYPE_ENTITY_SUFFIX = ":ivt";
 
     @Id
+    @Column(name = "id")
     private String id;
 
-    @Column(name="created_at")
+    @Column(name = "created_at")
     private Date createdAt;
 
-    @Column
+    @Column(name = "description")
     private String description;
 
-    @Column(name="in_use")
+    @Column(name = "in_use")
     private boolean inUse;
 
-    @Column
+    @Column(name = "movable")
     private boolean movable;
-    
-    @Column
+
+    @Column(name = "name")
     private String name;
 
-    @Column(name="updated_at")
+    @Column(name = "updated_at")
     private Date updatedAt;
 
     /**
@@ -60,6 +62,10 @@ public class ContainerTypeEntity {
     public ContainerTypeEntity() {
         createdAt = new Date();
         updatedAt = new Date();
+    }
+
+    public ContainerTypeEntity addPrefixSuffix() {
+        return this.setId(CONTAINER_TYPE_ENTITY_PREFIX + this.getId() + CONTAINER_TYPE_ENTITY_SUFFIX);
     }
 
     public String getId() {
