@@ -77,7 +77,7 @@ public class LibraryDbService {
     }
 
     public Library loadById(String id) {
-        logger.debug("Load library: id={}", id);
+        logger.trace("Load library: id={}", id);
         LibraryEntity entity = em.find(LibraryEntity.class, id);
         Library lib = new Library(entity);
         lib.addAllAssetFields(loadFieldDefinitions(entity.getId(), 
@@ -95,7 +95,7 @@ public class LibraryDbService {
     }
 
     public void save(Library lib) {
-        logger.debug("Store library: id={}", lib.getId());
+        logger.trace("Store library: id={}", lib.getId());
         LibraryEntity le = lib.createEntity();
         em.merge(le);
         saveFields(lib.getAssetFields(), le.getId());
@@ -109,7 +109,7 @@ public class LibraryDbService {
                 .setLibraryId(libraryId)
                 .setFieldId(f.getId());
             em.merge(libFD);
-            logger.debug("LibraryDbService:-> Stored library field: lib={}/{} field={}", libraryId, f.getDesignation().getValue(), f.getId());
+            logger.trace("LibraryDbService:-> Stored library field: lib={}/{} field={}", libraryId, f.getDesignation().getValue(), f.getId());
         }
     }
 }

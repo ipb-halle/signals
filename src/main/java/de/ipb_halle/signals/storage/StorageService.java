@@ -21,6 +21,7 @@ package de.ipb_halle.signals.storage;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.attachment.Attachment;
 import de.ipb_halle.signals.attachment.AttachmentFile;
+import de.ipb_halle.signals.rest.RestReply;
 import jakarta.annotation.Resource;
 import jakarta.ejb.Stateless;
 import org.slf4j.Logger;
@@ -64,6 +65,10 @@ public class StorageService {
     }
 
     private Logger logger = LoggerFactory.getLogger(StorageService.class);
+
+    public void removeFromStaging(RestReply file) throws IOException {
+        Files.delete(file.getPath());
+    }
 
     public void storeFile(AttachmentFile file) throws IOException {
         Path destination = computeDestination(file);

@@ -27,6 +27,7 @@ public class Field {
 
     /* keys for query criteria */
     public final static String FIELD_TITLE = "title";
+    public final static String FIELD_TYPE = "fieldType";
     public final static String ENTITY_ID = "entityId";
     public final static String DEFINING_ENTITY_ID = "definingEntityId";
     public final static String FIELD_ID = "fieldId";

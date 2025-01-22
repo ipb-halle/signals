@@ -87,7 +87,7 @@ public class MaterialsManager {
      */
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void manageMaterials(RuntimeConfig runtimeConfig, Date[] dateRange) {
-        logger.info("MM:-> START MANAGE MATERIALS");
+        logger.debug("MM:-> START MANAGE MATERIALS");
 
         //Query parameters for load
         Map<String, Object> cmap = new HashMap<>();

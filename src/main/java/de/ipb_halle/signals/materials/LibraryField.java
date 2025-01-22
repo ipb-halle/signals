@@ -20,7 +20,6 @@ package de.ipb_halle.signals.materials;
 import de.ipb_halle.signals.util.EmbeddedKeyValue;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import java.util.Objects;

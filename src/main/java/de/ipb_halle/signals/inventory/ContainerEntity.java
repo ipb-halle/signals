@@ -46,6 +46,9 @@ public class ContainerEntity {
     public final static String ATTR_UNIT = "unit";
     public final static String ATTR_UPDATED_AT = "updatedAt";
     public final static String ATTR_UPDATED_BY = "relationships.updatedBy.data.id";
+    public final static String CONTENT_TYPE_ASSET = "asset";
+    public final static String CONTENT_TYPE_BATCH = "batch";
+    public final static String CONTENT_TYPE_SAMPLE = "sample";
     public final static String ENTITY_TYPE_CONTAINER = "container";
 
     @Id

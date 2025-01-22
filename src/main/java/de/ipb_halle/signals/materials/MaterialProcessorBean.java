@@ -21,10 +21,7 @@
 package de.ipb_halle.signals.materials;
 
 
-import de.ipb_halle.signals.attachment.Attachment;
-import de.ipb_halle.signals.attachment.AttachmentDbService;
-import de.ipb_halle.signals.attachment.AttachmentFile;
-import de.ipb_halle.signals.attachment.AttachmentRevision;
+import de.ipb_halle.signals.attachment.*;
 import de.ipb_halle.signals.entity.SignalsIEntityDTO;
 import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldDbService;
@@ -44,10 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.LocalTime;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Stateless
 @LocalBean
@@ -84,13 +78,13 @@ public class MaterialProcessorBean {
     public void processSingleMaterial(SignalsIEntityDTO signalsIEntityDTO,
                                       Map<String, Map<String, Field>> allFields) {
         try {
-            logger.info("MPB:-> Start processing material: {} at {}",
+            logger.trace("MPB:-> Start processing material: {} at {}",
                     signalsIEntityDTO.getId(), LocalTime.now());
 
             //The main processing of material takes places in this method
             doProcessMaterial(signalsIEntityDTO, allFields);
 
-            logger.info("MPB:-> Finished processing material: {}\n", signalsIEntityDTO.getId());
+            logger.trace("MPB:-> Finished processing material: {}\n", signalsIEntityDTO.getId());
         } catch (Exception e) {
             //Transaction will be automatically rolled back if exception occurs
             logger.error("MPB:-> Error in ProcessSingleMaterial, material {}: {}",
@@ -110,7 +104,7 @@ public class MaterialProcessorBean {
         long startFetchTime = System.currentTimeMillis();
         Material material = materialRestService.doGetMaterial(signalsIEntityDTO.getId());
         long endFetchTime = System.currentTimeMillis();
-        logger.info("MPB:-> Fetched material {} in {} ms",
+        logger.trace("MPB:-> Fetched material {} in {} ms",
                 signalsIEntityDTO.getId(), (endFetchTime - startFetchTime));
 
         //2) Process fields
@@ -124,14 +118,14 @@ public class MaterialProcessorBean {
         long startFieldProcessTime = System.currentTimeMillis();
         processMaterialFields(fieldsByLibraryId, material);
         long endFieldProcessTime = System.currentTimeMillis();
-        logger.info("MPB:-> Processed fields for material {} in {} ms",
+        logger.trace("MPB:-> Processed fields for material {} in {} ms",
                 signalsIEntityDTO.getId(), (endFieldProcessTime - startFieldProcessTime));
 
         //3) Save materials in database
         long startSaveTime = System.currentTimeMillis();
         materialDbService.save(material);
         long endSaveTime = System.currentTimeMillis();
-        logger.info("MPB:-> Saved material {} in DB in {} ms",
+        logger.trace("MPB:-> Saved material {} in DB in {} ms",
                 signalsIEntityDTO.getId(), (endSaveTime - startSaveTime));
     }
 
@@ -144,7 +138,7 @@ public class MaterialProcessorBean {
             Field field = fieldLibrariesById.get(fieldValue.getFieldId());
             if (field == null) {
                 //if ad-hoc resp. new field
-                logger.info("MPB:-> Definition of field is null => saving new field");
+                logger.trace("MPB:-> Definition of field is null => saving new field");
                 field = fieldValue.getAdHocField();
                 fieldDbService.save(field);
                 fieldLibrariesById.put(field.getId(), field);
@@ -176,46 +170,52 @@ public class MaterialProcessorBean {
         if ((latestRevision == null)
                 || !latestRevision.getFileId().equals(newRevision.getFileId())) {
             logger.info("Found new attachment for material Id={}", material.getId());
+            List<RestReply> replies = new ArrayList<>();
             switch (field.getFieldType().getValue()) {
                 case FieldType.ATTACHED_FILE:
-                    obtainAttachment(material, field, fieldValue);
+                    replies = obtainAttachment(material, field, fieldValue);
                     break;
                 case FieldType.CHEMICAL_DRAWING:
-                    obtainDrawing(material, field, fieldValue);
+                    replies = obtainDrawing(material);
                     break;
                 case FieldType.SEQUENCE_FILE:
-                    obtainSequence(material, field, fieldValue);
+                    replies = obtainSequence(material);
+            }
+
+            attachment.addRevision(newRevision);
+            if (! replies.isEmpty()) {
+                storeAttachment(attachment, replies);
             }
         }
     }
 
-
-    private void obtainAttachment(Material material, Field field, FieldValue fieldValue) throws IOException {
+    private List<RestReply> obtainAttachment(Material material, Field field, FieldValue fieldValue) throws IOException {
         String mimeType = materialRestService.parseAttachmentMimeType(fieldValue);
         RestReply tempPath = materialRestService.doGetMaterialAttachment(material, field, mimeType);
-        if (tempPath != null) {
-            storeAttachment(material, field, List.of(tempPath), fieldValue);
-        }
+        return tempPath != null ? List.of(tempPath) : new ArrayList<RestReply>();
     }
 
-    private void obtainDrawing(Material material, Field drawing, FieldValue fieldValue) throws IOException {
-        List<RestReply> drawings = materialRestService.doGetMaterialDrawing(material);
-        if (drawings != null && !drawings.isEmpty()) {
-            storeAttachment(material, drawing, drawings, fieldValue);
-        }
+    private List<RestReply> obtainDrawing(Material material) throws IOException {
+        return materialRestService.doGetMaterialDrawing(material);
     }
 
-    private void obtainSequence(Material material, Field sequence, FieldValue fieldValue) throws IOException {
-        List<RestReply> sequences = materialRestService.doGetMaterialSequence(material);
-        if (sequences != null && !sequences.isEmpty()) {
-            storeAttachment(material, sequence, sequences, fieldValue);
-        }
+    private List<RestReply> obtainSequence(Material material) throws IOException {
+        return materialRestService.doGetMaterialSequence(material);
     }
 
+
+    /**
+     * persist the downloaded attachments in the database and move
+     * them from their staging location into permanent storage. Make
+     * sure, not to store and move if the transaction has been aborted.
+     * @param attachment the attachment with a new revision already added
+     * @param files
+     * @throws IOException
+     */
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    private void storeAttachment(Material material, Field field,
-                                 Collection<RestReply> files,
-                                 FieldValue fieldValue) throws IOException {
+    private void storeAttachment(Attachment attachment,
+                                 Collection<RestReply> files
+                                 ) throws IOException {
 
         if (transactionSynchronizationRegistry.getTransactionStatus()
                 == jakarta.transaction.Status.STATUS_MARKED_ROLLBACK) {
@@ -223,15 +223,6 @@ public class MaterialProcessorBean {
             return;
         }
 
-        logger.info("MPB:-> Storing attachment for material: {}, field: {} ",
-                material.getId(), field.getId());
-
-        Attachment attachment = getAttachment(material, field);
-        AttachmentRevision newRevision = new AttachmentRevision();
-        materialRestService.parseAttachmentRevisionInfo(newRevision, fieldValue);
-        attachment.addRevision(newRevision);
-
-        //Saves only if it is a new fileId
         for (RestReply reply : files) {
             AttachmentFile file = new AttachmentFile();
             file.setDigest(reply.getDigest());
@@ -240,18 +231,15 @@ public class MaterialProcessorBean {
             file.setTempPath(reply.getPath());
             attachment.addFile(file);
         }
-        logger.info("MPB:-> Saving attachment: {}", attachment);
+        logger.trace("MPB:-> Saving attachment: {}", attachment);
 
         attachmentDbService.save(attachment);
 
-        logger.info("MPB:-> Persisting files for revision: {}",
+        logger.trace("MPB:-> Persisting files for revision: {}",
                 attachment.getLatestRevision().getId());
         for (AttachmentFile file : attachment.getFiles(attachment.getLatestRevision().getId())) {
             storageService.storeFile(file);
         }
-
-        logger.info("MPB:-> Attachment stored successfully, material: {}, field: {}",
-                material.getId(), field.getId());
     }
 
     /**
@@ -273,9 +261,8 @@ public class MaterialProcessorBean {
             case 1:
                 return attachments.get(0);
             default:
-                throw new RuntimeException(
-                        "MPB:-> getAttachment() found more than 1 attachment for matId = "
-                                + material.getId() + ", fieldId = " + field.getId());
+                logger.error("MPB:-> getAttachment() found more than 1 attachment for matId = {}, fieldId = {}", material.getId(), field.getId());
+                return null;
         }
     }
 }

@@ -59,14 +59,14 @@ public class LocationTypeFieldValuesParser implements RestReplyParser<List<Field
                     .setLinkType(FieldValue.LinkType.FIELD_ID)
                     .setFieldId(RestHelper.parseString(jsonElement.getAsJsonObject(), RestHelper.ATTR_ID));
             if (jsonElement.getAsJsonObject().getAsJsonObject("value") != null ) {
-                logger.debug("LocationTypeFieldValueParser:-> there is a value!");
+                logger.trace("LTFVP:-> there is a value!");
                 fieldValue.setValue(jsonElement.getAsJsonObject().getAsJsonObject("value").toString());
             }
             if (jsonElement.getAsJsonObject().getAsJsonObject(FieldValue.ATTR_CONTENT) != null) {
-                logger.debug("LocationTypeFieldValueParser:-> there is a content!");
+                logger.trace("LTFVP:-> there is a content!");
                 fieldValue.setValue(jsonElement.getAsJsonObject().getAsJsonObject(FieldValue.ATTR_CONTENT).toString());
             }else {
-                logger.debug("LocationTypeFieldValueParser:-> there is nothing\"\"");
+                logger.trace("LTFVP:-> there is nothing\"\"");
                 fieldValue.setValue("");
             }
 

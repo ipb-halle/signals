@@ -20,6 +20,7 @@ package de.ipb_halle.signals.inventory;
 import de.ipb_halle.signals.attachment.AttachmentDbService;
 import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldDbService;
+import de.ipb_halle.signals.materials.MaterialProcessorBean;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -27,6 +28,9 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -42,8 +46,7 @@ import java.util.Set;
 public class ContainerTypeDbService {
 
     public final static String CONTAINER_TYPE_ID = "container_type_id";
-    private final static String CONTAINER_TYPE_ENTITY_PREFIX = "container:";
-    private final static String CONTAINER_TYPE_ENTITY_SUFFIX = ":ivt";
+    private final static Logger logger = LoggerFactory.getLogger(MaterialProcessorBean.class);
 
     @Inject
     private AttachmentDbService attachmentService;
@@ -73,14 +76,13 @@ public class ContainerTypeDbService {
 
             for (ContainerTypeEntity cte : resultList) {
                 if (cte.getId() != null) {
-                    entityIds.add(CONTAINER_TYPE_ENTITY_PREFIX + cte.getId() + CONTAINER_TYPE_ENTITY_SUFFIX);
+                    entityIds.add(Container.CONTAINER_TYPE_ENTITY_PREFIX + cte.getId() + Container.CONTAINER_TYPE_ENTITY_SUFFIX);
                 } else {
-                    System.err.println("ContainerTypeDbService:-> Null ID found for a ContainerTypeEntity.");
+                    logger.error("ContainerTypeDbService:-> Null ID found for a ContainerTypeEntity {}.", cte.getId());
                 }
             }
         } catch (Exception e) {
-            System.err.println("ContainerTypeDbService:-> Error while fetching container type IDs: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("ContainerTypeDbService:-> Error while fetching container type IDs: {}",  e.getMessage(), e);
         }
         return entityIds;
     }

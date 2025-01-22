@@ -21,8 +21,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import de.ipb_halle.signals.attachment.Attachment;
+import de.ipb_halle.signals.attachment.AttachmentRestService;
+import de.ipb_halle.signals.attachment.AttachmentRevision;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.Unit;
+import de.ipb_halle.signals.field.Field;
+import de.ipb_halle.signals.field.FieldValue;
+import de.ipb_halle.signals.materials.Material;
 import de.ipb_halle.signals.materials.MaterialReference;
 import de.ipb_halle.signals.rest.*;
 import de.ipb_halle.signals.users.UserReference;
@@ -43,12 +49,15 @@ import java.util.Iterator;
 public class ContainerRestService implements RestReplyParser<Container> {
 
     public final String CONTAINER_ENDPOINT = "/inventory/containers/%s";
-
+    public final String CONTAINER_ATTACHMENT_ENDPOINT = "/inventory/containers/%s/fields/%s/attachment";
     @Inject
     private RestClient restClient;
 
     @Inject
     private DynEnumManager dynEnumManager;
+
+    @Inject
+    private AttachmentRestService attachmentRestService;
 
     private Logger logger = LoggerFactory.getLogger(ContainerRestService.class);
 
@@ -78,11 +87,11 @@ public class ContainerRestService implements RestReplyParser<Container> {
 
        // parseFieldValues(attributes.getAsJsonArray(RestHelper.ATTR_FIELDS), ct);
         parseFieldValues(jsonArray, ct);
-        parseMaterials(attributes.getAsJsonArray(ContainerEntity.ATTR_CONTENTS), ct);
+        parseContainerContents(attributes.getAsJsonArray(ContainerEntity.ATTR_CONTENTS), ct);
 
         parseChangeRecords(j, ct);
 
-        logger.info("ContainerRestService:-> Parsed container with ID={}", ct.getId());
+        logger.trace("ContainerRestService:-> Parsed container with ID={}", ct.getId());
         return ct;
     }
 
@@ -132,16 +141,55 @@ public class ContainerRestService implements RestReplyParser<Container> {
         ct.addFieldValues(svc.parseReply(jArray));
     }
 
-    private void parseMaterials(JsonArray jArray, Container ct) {
+    /**
+     * Containers may contain Materials or Samples, depending on entityType
+     * (or the prefix of the entityId).
+     * @param jArray
+     * @param ct
+     */
+    private void parseContainerContents(JsonArray jArray, Container ct) {
         Iterator<JsonElement> iter = jArray.iterator();
         while (iter.hasNext()) {
-            ct.addMaterial(
-                    new MaterialReference()
-                            .setId(
-                                    RestHelper.parseString(
-                                            RestHelper.getPrimitiveFromPath(
-                                                    iter.next(),
-                                                    ContainerEntity.ATTR_CONTENT_ID))));
+            JsonElement json = iter.next();
+            String type = RestHelper.parseString(RestHelper.getPrimitiveFromPath(json, ContainerEntity.ATTR_CONTENT_TYPE));
+            String id = RestHelper.parseString(RestHelper.getPrimitiveFromPath(json, ContainerEntity.ATTR_CONTENT_ID));
+            switch(type) {
+                case ContainerEntity.CONTENT_TYPE_ASSET:
+                    ct.addMaterial(new MaterialReference().setId(id));
+                    break;
+                case ContainerEntity.CONTENT_TYPE_BATCH:
+                    ct.addMaterial(new MaterialReference().setId(id));
+                    break;
+                case ContainerEntity.CONTENT_TYPE_SAMPLE:
+                    logger.warn("Unable to assign Sample to Container");
+                    break;
+                default:
+                    throw new RuntimeException("Unknown content type for container: " + ct.getId());
+            }
         }
+    }
+
+    /**
+     * Obtain a container attachment as an octet stream.
+     *
+     * @param container
+     * @param field
+     * @return path of the downloaded attachment in the staging area
+     */
+    public RestReply doGetContainerAttachment(Container container, Field field, String mimeType) {
+        String endpoint = String.format(CONTAINER_ATTACHMENT_ENDPOINT, container.getId(), field.getId());
+        return attachmentRestService.fetchAttachment(endpoint, mimeType);
+    }
+    
+    public String parseAttachmentMimeType(FieldValue fieldValue) {
+        JsonElement json = JsonParser.parseString(fieldValue.getValue());
+        return RestHelper.getPrimitiveFromPath(json, Container.ATTR_ATTACHMENT_MIMETYPE).getAsString();
+    }
+
+    public void parseAttachmentRevisionInfo(AttachmentRevision newRevision, FieldValue fieldValue) {
+        JsonElement json = JsonParser.parseString(fieldValue.getValue());
+        newRevision.setOriginalName(RestHelper.getPrimitiveFromPath(json, Container.ATTR_ATTACHMENT_FILENAME).getAsString());
+        newRevision.setMimeType(RestHelper.getPrimitiveFromPath(json, Container.ATTR_ATTACHMENT_MIMETYPE).getAsString());
+        newRevision.setSize(RestHelper.getPrimitiveFromPath(json, Container.ATTR_ATTACHMENT_FILESIZE).getAsLong());
     }
 }

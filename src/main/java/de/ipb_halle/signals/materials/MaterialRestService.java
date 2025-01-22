@@ -19,6 +19,7 @@ package de.ipb_halle.signals.materials;
 
 import com.google.gson.*;
 import de.ipb_halle.signals.attachment.Attachment;
+import de.ipb_halle.signals.attachment.AttachmentRestService;
 import de.ipb_halle.signals.attachment.AttachmentRevision;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.EntityType;
@@ -62,6 +63,9 @@ public class MaterialRestService implements RestReplyParser<Material> {
 
     @Inject
     private RestClient restClient;
+
+    @Inject
+    private AttachmentRestService attachmentRestService;
 
     @Inject
     private DynEnumManager dynEnumManager;
@@ -167,7 +171,7 @@ public class MaterialRestService implements RestReplyParser<Material> {
 
         //ToDO the method is almost not in use and only for emergency case, if a new filed will be discovered
         if (field == null) {
-            logger.info("MRS:-> FIELD IS NULL !!!!! \n");
+            logger.trace("MRS:-> FIELD IS NULL !!!!! \n");
             //receiving a file information from material attachment->
             fieldValue.setAdHocField(parseFieldDefinition(metaFieldJsonObject));
         }
@@ -242,33 +246,6 @@ public class MaterialRestService implements RestReplyParser<Material> {
     }
 
     /**
-     * Actually do a REST call to obtain a single attachment
-     *
-     * @param endpoint    the specific endpoint with id
-     * @param contentType MIME type of the attachment
-     * @return path of the received attachment in the staging area
-     */
-    private RestReply fetchAttachment(String endpoint, String contentType) {
-        try {
-            restClient.reset()
-                    .setMethod(Method.GET)
-                    .setContentType(contentType)
-                    .setResponseType(RestClient.RestType.STREAM)
-                    .setEndpoint(endpoint)
-                    .execute();
-            return restClient.getResponse();
-        } catch (UnexpectedResponseCodeException e) {
-            // attachment (drawing, image, sequence) may not be available
-            logger.debug("MRS:-> Unexpected response code {}", restClient.getResponseCode(), e);
-        } catch (IOException e) {
-            logger.warn("MRS:-> caught IOException: {}", e.getMessage(), e);
-        } catch (URISyntaxException e) {
-            logger.warn("MRS:-> URISyntaxException: {}", e.getMessage(), e);
-        }
-        return null;
-    }
-
-    /**
      * Obtain a material attachment as an octet stream. Chemical drawings,
      * images and sequences require special handling.
      *
@@ -278,7 +255,7 @@ public class MaterialRestService implements RestReplyParser<Material> {
      */
     public RestReply doGetMaterialAttachment(Material material, Field field, String mimeType) {
         String endpoint = String.format(MATERIAL_ATTACHMENT_ENDPOINT, material.getId(), field.getId());
-        return fetchAttachment(endpoint, mimeType);
+        return attachmentRestService.fetchAttachment(endpoint, mimeType);
     }
 
     public List<RestReply> doGetMaterialDrawing(Material material) {
@@ -286,7 +263,7 @@ public class MaterialRestService implements RestReplyParser<Material> {
         for (String type : new String[]{RestClient.CHEMICAL_CDXML,
                 RestClient.CHEMICAL_MOL3000,
                 RestClient.CHEMICAL_SVG}) {
-            RestReply attachment = fetchAttachment(String.format(MATERIAL_DRAWING_ENDPOINT, material.getId()),
+            RestReply attachment = attachmentRestService.fetchAttachment(String.format(MATERIAL_DRAWING_ENDPOINT, material.getId()),
                     type);
             if (attachment != null) {
                 result.add(attachment);
@@ -300,7 +277,7 @@ public class MaterialRestService implements RestReplyParser<Material> {
     public List<RestReply> doGetMaterialSequence(Material material) {
         List<RestReply> sequences = new ArrayList<>();
         for (String type : new String[]{RestClient.SEQUENCE_GENBANK, RestClient.SEQUENCE_FASTA}) {
-            RestReply attachment = fetchAttachment(String.format(MATERIAL_SEQUENCE_ENDPOINT, material.getId()),
+            RestReply attachment = attachmentRestService.fetchAttachment(String.format(MATERIAL_SEQUENCE_ENDPOINT, material.getId()),
                     type);
             if (attachment != null) {
                 sequences.add(attachment);

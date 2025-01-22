@@ -59,7 +59,7 @@ CREATE TABLE signalsentities (
  * the signalsentities table, when the child_id is discovered.
  */
 CREATE TABLE signalsentities_children (
-    signals_entity_id VARCHAR NOT NULL REFERENCES signalsentities(id),
+    signals_entity_id VARCHAR NOT NULL REFERENCES signalsentities(id) ON UPDATE CASCADE ON DELETE CASCADE,
     child_id VARCHAR NOT NULL,
     PRIMARY KEY (signals_entity_id, child_id)
 );
@@ -71,7 +71,7 @@ CREATE TABLE signalsentities_children (
  */
 
 CREATE TABLE signalsentities_ancestors (
-    signals_entity_id VARCHAR NOT NULL REFERENCES signalsentities(id),
+    signals_entity_id VARCHAR NOT NULL REFERENCES signalsentities(id) ON UPDATE CASCADE ON DELETE CASCADE,
     ancestor_id VARCHAR NOT NULL,
     PRIMARY KEY (signals_entity_id, ancestor_id)
 );
@@ -79,25 +79,25 @@ CREATE TABLE signalsentities_ancestors (
 CREATE TABLE signalsentities_flags (
     signals_entity_id VARCHAR,
     flag_value VARCHAR,
-    FOREIGN KEY (signals_entity_id) REFERENCES signalsentities(id)
+    FOREIGN KEY (signals_entity_id) REFERENCES signalsentities(id ON UPDATE CASCADE ON DELETE CASCADE)
 );
 
 CREATE TABLE attribute_definitions (
     id VARCHAR NOT NULL PRIMARY KEY,
-    attr_type INTEGER NOT NULL REFERENCES dyn_enums(id),
+    attr_type INTEGER NOT NULL REFERENCES dyn_enums(id) ON UPDATE CASCADE ON DELETE CASCADE,
     name VARCHAR,
     description VARCHAR,
     format VARCHAR
 );
 
 CREATE TABLE attribute_values (
-    id  VARCHAR NOT NULL REFERENCES attribute_definitions(id),
+    id  VARCHAR NOT NULL REFERENCES attribute_definitions(id) ON UPDATE CASCADE ON DELETE CASCADE,
     value VARCHAR,
     PRIMARY KEY (id, value)
 );
 
 CREATE TABLE synonyms (
-    id VARCHAR NOT NULL REFERENCES signalsentities(id),
+    id VARCHAR NOT NULL REFERENCES signalsentities(id) ON UPDATE CASCADE ON DELETE CASCADE,
     value VARCHAR NOT NULL,
     PRIMARY KEY (id, value)
 );
@@ -177,14 +177,14 @@ CREATE TABLE groups (
 );
 
 CREATE TABLE user_roles (
-    user_id VARCHAR NOT NULL REFERENCES users(id),
-    role_id VARCHAR NOT NULL REFERENCES roles(id),
+    user_id VARCHAR NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    role_id VARCHAR NOT NULL REFERENCES roles(id) ON UPDATE CASCADE ON DELETE CASCADE,
     PRIMARY KEY (user_id, role_id)
 );
 
 CREATE TABLE group_memberships (
-    user_id VARCHAR NOT NULL REFERENCES users(id),
-    group_id VARCHAR NOT NULL  REFERENCES groups(id),
+    user_id VARCHAR NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    group_id VARCHAR NOT NULL  REFERENCES groups(id) ON UPDATE CASCADE ON DELETE CASCADE,
     PRIMARY KEY (user_id, group_id)
 );
 
@@ -196,8 +196,8 @@ CREATE TABLE field_definitions (
     defined_by VARCHAR,
     defining_entity_id VARCHAR /* NOT NULL signalsentities(id) */,
     description VARCHAR,
-    designation INTEGER NOT NULL REFERENCES dyn_enums(id),
-    field_type INTEGER NOT NULL REFERENCES dyn_enums(id),
+    designation INTEGER NOT NULL REFERENCES dyn_enums(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    field_type INTEGER NOT NULL REFERENCES dyn_enums(id) ON UPDATE CASCADE ON DELETE CASCADE,
     hidden VARCHAR,
     key VARCHAR,
     multiselect BOOLEAN,
@@ -208,29 +208,29 @@ CREATE TABLE field_definitions (
 );
 
 CREATE TABLE field_measures (
-    field_id VARCHAR NOT NULL REFERENCES field_definitions(id),
+    field_id VARCHAR NOT NULL REFERENCES field_definitions(id) ON UPDATE CASCADE ON DELETE CASCADE,
     measure INTEGER NOT NULL,
     PRIMARY KEY (field_id, measure)
 );
 
 CREATE TABLE field_options (
-    id VARCHAR NOT NULL REFERENCES field_definitions(id),
+    id VARCHAR NOT NULL REFERENCES field_definitions(id) ON UPDATE CASCADE ON DELETE CASCADE,
     value VARCHAR NOT NULL,
     PRIMARY KEY (id, value)
 );
 
 CREATE TABLE field_values (
-    entity_id VARCHAR NOT NULL REFERENCES signalsentities(id),
-    field_id VARCHAR NOT NULL REFERENCES field_definitions(id),
+    entity_id VARCHAR NOT NULL REFERENCES signalsentities(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    field_id VARCHAR NOT NULL REFERENCES field_definitions(id) ON UPDATE CASCADE ON DELETE CASCADE,
     value VARCHAR,
     PRIMARY KEY (entity_id, field_id)
 );
 
 CREATE TABLE attachments (
     id SERIAL NOT NULL PRIMARY KEY,
-    entity_id VARCHAR REFERENCES signalsentities(id),
-    field_id VARCHAR REFERENCES field_definitions(id),
-    ancestor_id VARCHAR NOT NULL REFERENCES signalsentities(id)
+    entity_id VARCHAR REFERENCES signalsentities(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    field_id VARCHAR REFERENCES field_definitions(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    ancestor_id VARCHAR NOT NULL REFERENCES signalsentities(id ON UPDATE CASCADE ON DELETE CASCADE)
 );
 
 CREATE TABLE attachment_revisions (
@@ -244,7 +244,7 @@ CREATE TABLE attachment_revisions (
 
 CREATE TABLE attachment_files (
     id SERIAL NOT NULL PRIMARY KEY,
-    revision_id INTEGER NOT NULL REFERENCES attachment_revisions(id),
+    revision_id INTEGER NOT NULL REFERENCES attachment_revisions(id) ON UPDATE CASCADE ON DELETE CASCADE,
     mime_type VARCHAR,
     size BIGINT,
     digest VARCHAR
@@ -261,8 +261,8 @@ CREATE TABLE container_types (
 );
 
 CREATE TABLE container_type_fields (
-    id VARCHAR NOT NULL REFERENCES container_types (id),
-    value VARCHAR NOT NULL REFERENCES field_definitions (id),
+    id VARCHAR NOT NULL REFERENCES container_types (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    value VARCHAR NOT NULL REFERENCES field_definitions (id) ON UPDATE CASCADE ON DELETE CASCADE,
     PRIMARY KEY (id, value)
 );
 
@@ -288,8 +288,8 @@ CREATE TABLE libraries (
 );
 
 CREATE TABLE library_fields (
-    id VARCHAR NOT NULL REFERENCES libraries (id),
-    value VARCHAR NOT NULL REFERENCES field_definitions (id),
+    id VARCHAR NOT NULL REFERENCES libraries (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    value VARCHAR NOT NULL REFERENCES field_definitions (id) ON UPDATE CASCADE ON DELETE CASCADE,
     PRIMARY KEY (id, value)
 );
 
@@ -301,11 +301,11 @@ CREATE TABLE materials (
     digest VARCHAR,
     edited_at TIMESTAMP,
     edited_by VARCHAR /* NOT NULL REFERENCES users(id) */,
-    library_id VARCHAR REFERENCES libraries(id),
+    library_id VARCHAR REFERENCES libraries(id) ON UPDATE CASCADE ON DELETE CASCADE,
     name VARCHAR,
     owner VARCHAR /* NOT NULL REFERENCES users(id) */
-    entity_type INTEGER NOT NULL REFERENCES dyn_enums(id),
-    material_id VARCHAR REFERENCES materials(id)
+    entity_type INTEGER NOT NULL REFERENCES dyn_enums(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    material_id VARCHAR REFERENCES materials(id ON UPDATE CASCADE ON DELETE CASCADE)
 );
 
 CREATE TABLE material_batches (
@@ -316,7 +316,7 @@ CREATE TABLE material_batches (
     digest VARCHAR,
     edited_at TIMESTAMP,
     edited_by VARCHAR /* NOT NULL REFERENCES users(id) */,
-    material_id VARCHAR REFERENCES materials(id),
+    material_id VARCHAR REFERENCES materials(id) ON UPDATE CASCADE ON DELETE CASCADE,
     name VARCHAR,
     owner VARCHAR /* NOT NULL REFERENCES users(id) */
 );

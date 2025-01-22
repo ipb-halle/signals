@@ -141,4 +141,36 @@ public class AttachmentRestService implements RestReplyParser<Attachment> {
         JsonObject relationship = RestHelper.getFromPath(Objects.requireNonNull(resultJsonElement).getAsJsonObject(), ATTACHMENT_RELATIONSHIPS).getAsJsonObject();
         return relationship.has(RestHelper.ATTR_CHILDREN);
     }
+
+    /**
+     * Actually do a REST call to obtain a single attachment
+     *
+     * @param endpoint    the specific endpoint with id
+     * @param contentType MIME type of the attachment
+     * @return path of the received attachment in the staging area
+     */
+    public RestReply fetchAttachment(String endpoint, String contentType) {
+        try {
+            restClient.reset()
+                    .setMethod(Method.GET)
+                    .setContentType(contentType)
+                    .setResponseType(RestClient.RestType.STREAM)
+                    .setEndpoint(endpoint)
+                    .execute();
+            return restClient.getResponse();
+        } catch (UnexpectedResponseCodeException e) {
+            // attachment (drawing, image, sequence) may not be available
+            logger.debug("MRS:-> Unexpected response code {}", restClient.getResponseCode(), e);
+        } catch (IOException e) {
+            logger.warn("MRS:-> caught IOException: {}", e.getMessage(), e);
+        } catch (URISyntaxException e) {
+            logger.warn("MRS:-> URISyntaxException: {}", e.getMessage(), e);
+        }
+        return null;
+    }
+
+
+
+
+
 }

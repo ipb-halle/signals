@@ -11,6 +11,11 @@ public class FieldDesignation extends DynEnum<FieldDesignation> {
     public final static String DEFAULT = "default";
     public final static String ASSET = "asset";
     public final static String BATCH = "batch";
+    public final static String CONTAINER = "container";
+    public final static String LOCATION = "location";
+    public final static String SAMPLE = "sample";
+    public final static String EXPERIMENT = "experiment";
+    public final static String NOTEBOOK = "notebook";
 
     public FieldDesignation() {
     }

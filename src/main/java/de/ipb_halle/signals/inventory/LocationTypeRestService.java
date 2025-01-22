@@ -22,6 +22,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.field.Field;
+import de.ipb_halle.signals.field.FieldDesignation;
 import de.ipb_halle.signals.field.FieldOption;
 import de.ipb_halle.signals.field.FieldType;
 import de.ipb_halle.signals.rest.*;
@@ -66,8 +67,21 @@ public class LocationTypeRestService implements RestReplyParser<LocationType> {
         return lt;
     }
 
+    /*
+     * ToDo: xxxxx Copied from ContainerTypeRestService; may replace parseFields
+     *
+    private void parseFieldDefinitions(JsonArray j, LocationType lt) {
+        Iterator<JsonElement> iter = j.iterator();
+        while (iter.hasNext()) {
+            Field field = fieldParser.parseReply(iter.next());
+            field.setDesignation((FieldDesignation) dynEnumManager.valueOf(FieldDesignation.valueOf(FieldDesignation.LOCATION)));
+            field.setDefiningEntityId(LOCATION_TYPE_ENTITY_PREFIX + lt.getId() + LOCATION_TYPE_ENTITY_SUFFIX);
+            lt.addField(field);
+        }
+    }
+    */
+
     private void parseFields(LocationType locationType, JsonArray fields) {
-        // ToDO: parse the field -> implementation must be controlled
         Iterator<JsonElement> iterator = fields.iterator();
         List<Field> fieldList = new ArrayList<>();
         while (iterator.hasNext()) {
@@ -76,6 +90,7 @@ public class LocationTypeRestService implements RestReplyParser<LocationType> {
             try {
                 JsonElement jsonElement = iterator.next();
                 field = new Field();
+                field.setDesignation((FieldDesignation) dynEnumManager.valueOf(FieldDesignation.valueOf(FieldDesignation.LOCATION)));
                 field.setId(jsonElement.getAsJsonObject().get(RestHelper.ATTR_ID).getAsString());
                 field.setTitle(jsonElement.getAsJsonObject().getAsJsonObject(Field.ATTR_DEFINITION).get(Field.ATTR_TITLE).getAsString());
                 String fieldType = jsonElement.getAsJsonObject().getAsJsonObject(Field.ATTR_DEFINITION).get(Field.ATTR_FIELD_TYPE).getAsString();

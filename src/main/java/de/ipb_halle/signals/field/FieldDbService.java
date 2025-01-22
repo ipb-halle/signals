@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals.field;
 
+import de.ipb_halle.signals.dynEnum.DynEnum;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.util.EmbeddedKeyValue;
 import jakarta.ejb.Stateless;
@@ -85,7 +86,12 @@ public class FieldDbService {
             predicates.add(criteriaBuilder.equal(root.get("id"), cmap.get(Field.FIELD_ID)));
         }
         if (cmap.containsKey(Field.FIELD_DESIGNATION)) {
-            predicates.add(criteriaBuilder.equal(root.get(Field.FIELD_DESIGNATION), cmap.get(Field.FIELD_DESIGNATION)));
+            predicates.add(criteriaBuilder.equal(root.get(Field.FIELD_DESIGNATION),
+                    dynEnumManager.valueOf((DynEnum) cmap.get(Field.FIELD_DESIGNATION)).getId()));
+        }
+        if (cmap.containsKey(Field.FIELD_TYPE)) {
+            predicates.add(criteriaBuilder.equal(root.get(Field.FIELD_TYPE),
+                    dynEnumManager.valueOf((DynEnum) cmap.get(Field.FIELD_TYPE)).getId()));
         }
         if (cmap.containsKey(Field.DEFINING_ENTITY_ID)) {
             List<String> definingEntityIds = (List<String>) cmap.get(Field.DEFINING_ENTITY_ID);

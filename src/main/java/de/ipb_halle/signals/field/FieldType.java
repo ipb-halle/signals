@@ -31,6 +31,7 @@ import jakarta.persistence.Entity;
 public class FieldType extends DynEnum <FieldType> {
 
     public final static String ATTACHED_FILE = "ATTACHED_FILE";
+    public final static String ATTACHMENT_FILE = "attachmentFile";      // used by Inventory
     public final static String CHEMICAL_DRAWING = "CHEMICAL_DRAWING";
     public final static String SEQUENCE = "SEQUENCE";
     public final static String SEQUENCE_FILE = "SEQUENCE_FILE";

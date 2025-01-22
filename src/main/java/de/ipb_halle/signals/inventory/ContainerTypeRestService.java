@@ -21,7 +21,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.ipb_halle.signals.attachment.AttachmentRestService;
+import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.field.Field;
+import de.ipb_halle.signals.field.FieldDesignation;
 import de.ipb_halle.signals.field.FieldParser;
 import de.ipb_halle.signals.rest.*;
 import jakarta.ejb.Local;
@@ -49,6 +51,9 @@ public class ContainerTypeRestService implements RestReplyParser<ContainerType> 
 
     @Inject
     private FieldParser fieldParser;
+
+    @Inject
+    private DynEnumManager dynEnumManager;
 
     public ContainerType parseReply(JsonElement j) {
         ContainerType ct = new ContainerType();
@@ -96,6 +101,7 @@ public class ContainerTypeRestService implements RestReplyParser<ContainerType> 
         Iterator<JsonElement> iter = j.iterator();
         while (iter.hasNext()) {
             Field field = fieldParser.parseReply(iter.next());
+            field.setDesignation((FieldDesignation) dynEnumManager.valueOf(FieldDesignation.valueOf(FieldDesignation.CONTAINER)));
             field.setDefiningEntityId(CONTAINER_TYPE_ENTITY_PREFIX + ct.getId() + CONTAINER_TYPE_ENTITY_SUFFIX);
             ct.addField(field);
         }

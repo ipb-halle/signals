@@ -20,6 +20,7 @@ package de.ipb_halle.signals.inventory;
 import de.ipb_halle.signals.entity.Unit;
 import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.materials.IMaterial;
+import de.ipb_halle.signals.sample.Sample;
 import de.ipb_halle.signals.users.IUser;
 import de.ipb_halle.signals.users.UserReference;
 
@@ -33,6 +34,12 @@ import java.util.Set;
  */
 
 public class Container {
+
+    public final static String ATTR_ATTACHMENT_FILENAME = "attachment.filename";
+    public final static String ATTR_ATTACHMENT_FILESIZE = "attachment.size";
+    public final static String ATTR_ATTACHMENT_MIMETYPE = "attachment.mimeType";
+    public final static String CONTAINER_TYPE_ENTITY_PREFIX = "container:";
+    public final static String CONTAINER_TYPE_ENTITY_SUFFIX = ":ivt";
 
     private String id;
     private Double amount;
@@ -48,6 +55,7 @@ public class Container {
     private Set<FieldValue> fieldValues;
     private ILocation location;
     private Set<IMaterial> materials;
+    private Set<Sample> samples;
     private String name;
     private Date updatedAt;
     private IUser updatedBy;
@@ -68,6 +76,7 @@ public class Container {
     public Container() {
         fieldValues = new HashSet<>();
         materials = new HashSet<>();
+        samples = new HashSet<>();
     }
 
     // entity constructor
@@ -87,6 +96,7 @@ public class Container {
 
         fieldValues = new HashSet<>();
         materials = new HashSet<>();
+        samples = new HashSet<>();
     }
 
     public ContainerEntity createEntity() {
