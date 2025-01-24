@@ -67,7 +67,7 @@ public class DynEnumManagerTest {
     @Test
     public void dynEnumManagerTest() {
 
-        final DynEnum first = EntityType.valueOf("experiment");
+        final DynEnum first = EntityType.valueOf("invalidValueForTesting");
         assertThrows(RuntimeException.class, () -> dynEnumMgr.valueOf(first));
 
         dynEnumMgr.allowEnumDiscovery();

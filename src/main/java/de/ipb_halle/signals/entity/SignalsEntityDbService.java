@@ -90,7 +90,7 @@ public class SignalsEntityDbService {
         CriteriaQuery<SignalsEntityChild> criteriaQuery = builder.createQuery(SignalsEntityChild.class);
         Root<SignalsEntityChild> root = criteriaQuery.from(SignalsEntityChild.class);
         criteriaQuery.select(root);
-        criteriaQuery.where(builder.equal(root.get("id"), id));
+        criteriaQuery.where(builder.equal(root.get("id").get("id"), id));
         for (SignalsEntityChild child : em.createQuery(criteriaQuery).getResultList()) {
             results.add(loadById(child.getChildId()));
         }
