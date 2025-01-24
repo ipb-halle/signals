@@ -21,7 +21,7 @@ import de.ipb_halle.signals.DateRangeParser;
 import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.Signals;
 import de.ipb_halle.signals.SignalsConfig;
-import de.ipb_halle.signals.attachment.AttachmentManager;
+import de.ipb_halle.signals.element.ElementManager;
 import de.ipb_halle.signals.attribute.AttributeManager;
 import de.ipb_halle.signals.inventory.LocationEntity;
 import org.apache.commons.cli.*;
@@ -35,7 +35,7 @@ public class SignalsEntityConfig {
 
     private Logger logger;
     private AttributeManager attributeManager;
-    private AttachmentManager attachmentManager;
+    private ElementManager elementManager;
     private SignalsEntityManager signalsEntityManager;
     private SignalsConfig signalsConfig;
     private RuntimeConfig runtimeConfig;

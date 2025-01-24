@@ -20,13 +20,16 @@ package de.ipb_halle.signals.inventory;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.RuntimeConfig;
+import de.ipb_halle.signals.attachment.*;
 import de.ipb_halle.signals.dynEnum.DynEnum;
 import de.ipb_halle.signals.dynEnum.DynEnumDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.SignalsEntity;
 import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.entity.SignalsEntityDbService;
+import de.ipb_halle.signals.field.FieldDbService;
 import de.ipb_halle.signals.rest.MockRestClient;
+import de.ipb_halle.signals.storage.StorageService;
 import de.ipb_halle.signals.users.LdapClient;
 import de.ipb_halle.signals.users.MockLdapAdapter;
 import de.ipb_halle.signals.users.MockLdapAdapterFactory;
@@ -89,6 +92,8 @@ public class ContainerManagerTest {
     @Module
     @Classes(cdi = true, value = { LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class,
             MockRestClient.class, SignalsConfig.class,
+            Attachment.class, AttachmentRestService.class, AttachmentDbService.class,
+            FieldDbService.class, ContainerTypeDbService.class, StorageService.class,
             SignalsEntity.class, SignalsEntityDTO.class, SignalsEntityDbService.class,
             DynEnum.class, DynEnumManager.class, DynEnumDbService.class,
             LocationDbService.class, LocationManager.class, LocationRestService.class,
@@ -103,8 +108,10 @@ public class ContainerManagerTest {
 
     @Module
     public PersistenceUnit persistence() {
-        return TestBase.persistence(new String[]{ ContainerType.class.getName(),
-        DynEnum.class.getName(), LocationType.class.getName(), LocationEntity.class.getName(),
+        return TestBase.persistence(new String[]{AttachmentRevision.class.getName(),
+                AttachmentFile.class.getName(), AttachmentEntity.class.getName(),
+                ContainerType.class.getName(), DynEnum.class.getName(),
+                LocationType.class.getName(), LocationEntity.class.getName(),
                 SignalsEntity.class.getName()});
     }
 

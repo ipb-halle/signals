@@ -16,7 +16,7 @@
 
     <Loggers>
         <!-- Application-specific Logger -->
-        <Logger name="de.ipb_halle" level="DEBUG" additivity="true">
+        <Logger name="de.ipb_halle" level="TRACE" additivity="true">
             <AppenderRef ref="IPBFile"/>
         </Logger>
 

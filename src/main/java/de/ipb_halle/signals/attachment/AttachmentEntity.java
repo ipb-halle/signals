@@ -17,9 +17,6 @@
  */
 package de.ipb_halle.signals.attachment;
 
-import java.sql.Struct;
-import java.util.Date;
-
 import jakarta.persistence.*;
 
 /**
@@ -34,8 +31,8 @@ public class AttachmentEntity {
     @Id
     private Integer id;
 
-    @Column(name = "entity_id")
-    private String entityId;
+    @Column(name = "element_id")
+    private String elementId;
 
     @Column(name = "field_id")
     private String fieldId;
@@ -44,7 +41,7 @@ public class AttachmentEntity {
     private String ancestorId;
 
     public String dump() {
-        return String.format("Attachment(%d): %s\n", id, entityId);
+        return String.format("Attachment(%d): %s\n", id, elementId);
     }
 
 
@@ -66,12 +63,12 @@ public class AttachmentEntity {
         return this;
     }
 
-    public String getEntityId() {
-        return entityId;
+    public String getElementId() {
+        return elementId;
     }
 
-    public AttachmentEntity setEntityId(String entityId) {
-        this.entityId = entityId;
+    public AttachmentEntity setElementId(String elementId) {
+        this.elementId = elementId;
         return this;
     }
 

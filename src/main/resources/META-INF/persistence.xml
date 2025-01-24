@@ -10,11 +10,14 @@
         <non-jta-data-source>signalsDSNonJTA</non-jta-data-source>
 
         <class>de.ipb_halle.signals.attachment.Attachment</class>
+        <class>de.ipb_halle.signals.attachment.AttachmentRevision</class>
+        <class>de.ipb_halle.signals.attachment.AttachmentFile</class>
         <class>de.ipb_halle.signals.attribute.AttributeDefinition</class>
         <class>de.ipb_halle.signals.attribute.AttributeValue</class>
         <class>de.ipb_halle.signals.config.LocalConfig</class>
         <class>de.ipb_halle.signals.entity.EntityType</class>
         <class>de.ipb_halle.signals.entity.SignalsEntity</class>
+        <class>de.ipb_halle.signals.entity.SignalsEntityChild</class>
         <class>de.ipb_halle.signals.field.FieldDefinition</class>
         <class>de.ipb_halle.signals.field.FieldMeasure</class>
         <class>de.ipb_halle.signals.field.FieldOption</class>

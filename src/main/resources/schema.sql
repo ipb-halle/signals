@@ -11,7 +11,7 @@ INSERT INTO dyn_enums (type, value) VALUES
     ('EntityType', 'request'),
     ('EntityType', 'asset'),
     ('EntityType', 'location'),
-    ('EntityType', 'container')
+    ('EntityType', 'container'),
     ('EntityType', 'sample'),
     ('EntityType', 'text'),
     ('EntityType', 'task'),
@@ -62,18 +62,6 @@ CREATE TABLE signalsentities_children (
     signals_entity_id VARCHAR NOT NULL REFERENCES signalsentities(id) ON UPDATE CASCADE ON DELETE CASCADE,
     child_id VARCHAR NOT NULL,
     PRIMARY KEY (signals_entity_id, child_id)
-);
-
-/*
- * Ancestors of entities: We cannot use a foreign key for
- * ancestor_id because the ancestor may not yet be entered into
- * the signalsentities table, when the ancestor_id is discovered.
- */
-
-CREATE TABLE signalsentities_flags (
-    signals_entity_id VARCHAR,
-    flag_value VARCHAR,
-    FOREIGN KEY (signals_entity_id) REFERENCES signalsentities(id ON UPDATE CASCADE ON DELETE CASCADE)
 );
 
 CREATE TABLE attribute_definitions (
@@ -222,9 +210,9 @@ CREATE TABLE field_values (
 
 CREATE TABLE attachments (
     id SERIAL NOT NULL PRIMARY KEY,
-    entity_id VARCHAR REFERENCES signalsentities(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    element_id VARCHAR REFERENCES signalsentities(id) ON UPDATE CASCADE ON DELETE CASCADE,
     field_id VARCHAR REFERENCES field_definitions(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    ancestor_id VARCHAR NOT NULL REFERENCES signalsentities(id ON UPDATE CASCADE ON DELETE CASCADE)
+    ancestor_id VARCHAR NOT NULL REFERENCES signalsentities(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE attachment_revisions (
@@ -297,9 +285,9 @@ CREATE TABLE materials (
     edited_by VARCHAR /* NOT NULL REFERENCES users(id) */,
     library_id VARCHAR REFERENCES libraries(id) ON UPDATE CASCADE ON DELETE CASCADE,
     name VARCHAR,
-    owner VARCHAR /* NOT NULL REFERENCES users(id) */
+    owner VARCHAR /* NOT NULL REFERENCES users(id) */,
     entity_type INTEGER NOT NULL REFERENCES dyn_enums(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    material_id VARCHAR REFERENCES materials(id ON UPDATE CASCADE ON DELETE CASCADE)
+    material_id VARCHAR REFERENCES materials(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE material_batches (

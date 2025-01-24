@@ -109,10 +109,10 @@ public class SignalsEntityManager {
         while (iter.hasNext()) {
             SignalsEntityDTO dto = iter.next();
 
-            if (dto.getId().split(":")[0].equalsIgnoreCase("container")
-                    || dto.getId().split(":")[0].equalsIgnoreCase("location")) {
-                dto.setId(dto.getId().split(":")[1]);
-            }
+//            if (dto.getId().split(":")[0].equalsIgnoreCase("container")
+//                    || dto.getId().split(":")[0].equalsIgnoreCase("location")) {
+//                dto.setId(dto.getId().split(":")[1]);
+//            }
             // switch bean context to obtain a transaction boundary
             signalsEntitiesProcessorBean.processEntity(config, dto);
         }

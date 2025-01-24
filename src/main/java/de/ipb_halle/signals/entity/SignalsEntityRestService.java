@@ -114,21 +114,11 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
      * fields are: eid, name, description, createdAt, editedAt, type, state, digest, fields
      */
     public RestResultIterator<SignalsEntityDTO> doGetChildren(SignalsEntityDTO parentEntity) {
-        try {
-            restClient.reset()
-                    .setMethod(Method.GET)
-                    .setEndpoint(String.format(SIGNALS_ENTITY_CHILDREN_ENDPOINT, parentEntity.getId()))
-                    .execute();
-            return new RestResultIterator<SignalsEntityDTO>(restClient,
-                    new SignalsChildParser(dynEnumManager), true);
-        } catch (UnexpectedResponseCodeException ue) {
-            logger.warn("Unexpected code {}", ue.getMessage(), ue);
-        } catch (URISyntaxException me) {
-            logger.warn("Malformed URL {}", me.getMessage(), me);
-        } catch (IOException ioe) {
-            logger.warn("IOException {}", ioe.getMessage(), ioe);
-        }
-        return null;
+        restClient.reset()
+                .setMethod(Method.GET)
+                .setEndpoint(String.format(SIGNALS_ENTITY_CHILDREN_ENDPOINT, parentEntity.getStrippedId()));
+        return new RestResultIterator<SignalsEntityDTO>(restClient,
+                new SignalsChildParser(dynEnumManager), true);
     }
 
     private void configureEntityTypes(Map<String, Object> cmap) {

@@ -43,6 +43,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(ApplicationComposer.class)
 public class SignalsEntityManagerTest {
 
+    private final String TEST_MOCK_RESOURCE = "SignalsEntityManagerTestMockResources.json";
     private final String TEST_RESOURCE_1 = "SignalsEntityManagerTest001.json";
     private final String TEST_KEY_1 = 
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities?includeTypes=location&page%5Blimit%5D=20&page%5Boffset%5D=0";
@@ -64,8 +65,9 @@ public class SignalsEntityManagerTest {
 
     @Module
     @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
-        SignalsEntity.class, SignalsEntityDbService.class, SignalsEntityManager.class,
-        SignalsEntityRestService.class, DynEnum.class, DynEnumManager.class, DynEnumDbService.class,
+            SignalsEntity.class, SignalsEntityDbService.class, SignalsEntityManager.class,
+            SEProcessorBean.class,
+            SignalsEntityRestService.class, DynEnum.class, DynEnumManager.class, DynEnumDbService.class,
             SignalsEntityDTO.class, EntityType.class})
     public EjbJar app() {
         return new EjbJar();
@@ -84,12 +86,13 @@ public class SignalsEntityManagerTest {
 
     @Before
     public void testSetup() {
-        TestBase.prepareRestClients(mockRestClient,
-            TEST_KEY_1,
-            getClass().getResourceAsStream(TEST_RESOURCE_1));
-        TestBase.prepareRestClients(mockRestClient,
-            TEST_KEY_2,
-            getClass().getResourceAsStream(TEST_RESOURCE_2));
+//        TestBase.prepareRestClients(mockRestClient,
+//            TEST_KEY_1,
+//            getClass().getResourceAsStream(TEST_RESOURCE_1));
+//        TestBase.prepareRestClients(mockRestClient,
+//            TEST_KEY_2,
+//            getClass().getResourceAsStream(TEST_RESOURCE_2));
+        TestBase.prepareRestClients(mockRestClient, this.getClass(), TEST_MOCK_RESOURCE);
     }
 
 

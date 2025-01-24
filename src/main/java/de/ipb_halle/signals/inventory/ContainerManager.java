@@ -123,7 +123,7 @@ public class ContainerManager {
         // 5) Processes container sequentially
         for (SignalsEntityDTO dto : containers) {
             // filter out type definitions, if signals DB put them together
-            if (!containerTypeIds.contains(dto.getId())) {
+            if (!containerTypeIds.contains(dto.getStrippedId())) {
                 processContainer(dto.getId(), attachmentFields);
             }
         }

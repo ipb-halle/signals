@@ -87,7 +87,7 @@ public class FieldDbService {
         }
         if (cmap.containsKey(Field.FIELD_DESIGNATION)) {
             predicates.add(criteriaBuilder.equal(root.get(Field.FIELD_DESIGNATION),
-                    dynEnumManager.valueOf((DynEnum) cmap.get(Field.FIELD_DESIGNATION)).getId()));
+                    ((DynEnum) cmap.get(Field.FIELD_DESIGNATION)).getId()));
         }
         if (cmap.containsKey(Field.FIELD_TYPE)) {
             predicates.add(criteriaBuilder.equal(root.get(Field.FIELD_TYPE),

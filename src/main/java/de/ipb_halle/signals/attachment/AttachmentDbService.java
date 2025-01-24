@@ -60,8 +60,8 @@ public class AttachmentDbService {
         if (cmap.containsKey(Attachment.ATTACHMENT_ID)) {
             predicates.add(criteriaBuilder.equal(root.get(Attachment.ATTACHMENT_ID), cmap.get(Attachment.ATTACHMENT_ID)));
         }
-        if (cmap.containsKey(Attachment.ENTITY_ID)) {
-            predicates.add(criteriaBuilder.equal(root.get(Attachment.ENTITY_ID), cmap.get(Attachment.ENTITY_ID)));
+        if (cmap.containsKey(Attachment.ELEMENT_ID)) {
+            predicates.add(criteriaBuilder.equal(root.get(Attachment.ELEMENT_ID), cmap.get(Attachment.ELEMENT_ID)));
         }
         if (cmap.containsKey(Attachment.FIELD_ID)) {
             predicates.add(criteriaBuilder.equal(root.get(Attachment.FIELD_ID), cmap.get(Attachment.FIELD_ID)));

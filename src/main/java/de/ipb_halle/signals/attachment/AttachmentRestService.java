@@ -24,6 +24,7 @@ import com.google.gson.JsonParser;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.rest.*;
+import jakarta.ejb.Local;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,85 +38,13 @@ import java.util.Objects;
  * service for attachments (not yet a real REST service)
  */
 
-//@Local
-public class AttachmentRestService implements RestReplyParser<Attachment> {
+@Local
+public class AttachmentRestService {
 
-    public final static String ATTACHMENT_ENDPOINT = "/entities/%s";
-    public final static String ATTACHMENT_ANCESTORS = "data.relationships.ancestors.data";
-    public final static String ATTACHMENT_ATTRIBUTES = "data.attributes";
-    public final static String ATTACHMENT_RELATIONSHIPS = "data.relationships";
-    public final static String ATTACHMENT_CHILDREN = "data.relationships.children.data";
     private Logger logger = LoggerFactory.getLogger(AttachmentRestService.class);
 
     @Inject
     private RestClient restClient;
-
-    @Override
-    public Attachment parseReply(JsonElement resultObject) {
-        Attachment attachment = new Attachment();
-
-        //check if resultObject is an Object and 'data' exists
-        if (resultObject.isJsonObject() && resultObject.getAsJsonObject().has(RestHelper.ATTR_DATA)) {
-            JsonArray attachmentsChildrenDataArray = RestHelper.getFromPath(resultObject.getAsJsonObject(), ATTACHMENT_CHILDREN).getAsJsonArray();
-
-            // iteration through "data"-array elements
-            for (JsonElement attachmentChildElement : attachmentsChildrenDataArray) {
-                if (attachmentChildElement.isJsonObject()) {
-                    JsonObject childObject = attachmentChildElement.getAsJsonObject();
-
-                    // extraction fields like "type" and "id"
-                    String childId = childObject.has(RestHelper.ATTR_ID) ? childObject.get(RestHelper.ATTR_ID).getAsString() : null;
-                    String childType = Objects.requireNonNull(childId).substring(0, childId.indexOf(":"));
-                    logger.info("ARS:-> Attachment type -  Type: {}\n", childType);
-
-                    JsonElement attachmentDescriptionJson = fetch(childId);
-                    JsonObject attachmentObject = Objects.requireNonNull(attachmentDescriptionJson).getAsJsonObject();
-                    JsonObject attachmentAttributes = RestHelper.getFromPath(attachmentObject, ATTACHMENT_ATTRIBUTES).getAsJsonObject();
-                    JsonArray attachmentAncestors = RestHelper.getFromPath(attachmentObject, ATTACHMENT_ANCESTORS).getAsJsonArray();
-
-                    for (JsonElement ancestor : attachmentAncestors) {
-                        JsonObject ancestorObject = ancestor.getAsJsonObject();
-                        attachment.setAncestorId(ancestorObject.has(RestHelper.ATTR_ID) ? ancestorObject.get(RestHelper.ATTR_ID).getAsString() : null);
-                    }
-                } else {
-                    logger.warn("ARS:-> Child element is not a JsonObject: {}\n", attachmentChildElement);
-                }
-            }
-        } else {
-            logger.warn("ARS:-> 'children' is not a valid JSON object or does not contain 'data'.\n");
-        }
-        return attachment;
-    }
-
-    private JsonElement fetch(String id) {
-        JsonElement resultJsonElement;
-        try {
-            restClient.setMethod(Method.GET)
-                    .setEndpoint(String.format(ATTACHMENT_ENDPOINT, id))
-                    .execute();
-
-            String response = restClient.getResponse().getString();
-            resultJsonElement = JsonParser.parseString(response);
-            return resultJsonElement;
-        } catch (UnexpectedResponseCodeException ue) {
-            logger.warn("ARS:-> Unexpected code: {}\n", ue.getMessage(), ue);
-        } catch (URISyntaxException me) {
-            logger.warn("ARS:-> Malformed URL: {}\n", me.getMessage(), me);
-        } catch (IOException ioe) {
-            logger.warn("ARS:-> IOException {}", ioe.getMessage(), ioe);
-        }
-        return null;
-    }
-
-    public Attachment doGetAttachment(String id) {
-        return parseReply(Objects.requireNonNull(fetch(id)));
-    }
-
-    public boolean checkIfEntityHasChildren(SignalsEntityDTO experiment) {
-        JsonElement resultJsonElement = fetch(experiment.getId());
-        JsonObject relationship = RestHelper.getFromPath(Objects.requireNonNull(resultJsonElement).getAsJsonObject(), ATTACHMENT_RELATIONSHIPS).getAsJsonObject();
-        return relationship.has(RestHelper.ATTR_CHILDREN);
-    }
 
     /**
      * Actually do a REST call to obtain a single attachment
@@ -143,9 +72,4 @@ public class AttachmentRestService implements RestReplyParser<Attachment> {
         }
         return null;
     }
-
-
-
-
-
 }

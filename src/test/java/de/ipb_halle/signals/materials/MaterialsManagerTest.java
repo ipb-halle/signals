@@ -20,10 +20,7 @@ package de.ipb_halle.signals.materials;
 import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
-import de.ipb_halle.signals.attachment.AttachmentDbService;
-import de.ipb_halle.signals.attachment.AttachmentEntity;
-import de.ipb_halle.signals.attachment.AttachmentFile;
-import de.ipb_halle.signals.attachment.AttachmentRevision;
+import de.ipb_halle.signals.attachment.*;
 import de.ipb_halle.signals.config.LocalConfig;
 import de.ipb_halle.signals.config.LocalConfigDbService;
 import de.ipb_halle.signals.dynEnum.DynEnum;
@@ -77,16 +74,16 @@ public class MaterialsManagerTest {
     private MaterialsManager manager;
 
     @Module
-    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
-        LocalConfig.class, LocalConfigDbService.class,
-        FieldDefinition.class, FieldDbService.class, FieldParser.class,
-        FieldValueEntity.class, SignalsEntityRestService.class, SignalsEntityDbService.class,
-        DynEnum.class, DynEnumDbService.class, DynEnumManager.class,
-        Library.class, LibraryEntity.class, AttachmentDbService.class, AttachmentEntity.class,
+    @Classes(cdi = true, value = {MockRestClient.class, SignalsConfig.class,
+            LocalConfig.class, LocalConfigDbService.class, AttachmentRestService.class,
+            AttachmentDbService.class, StorageService.class, AttachmentEntity.class,
             AttachmentRevision.class, AttachmentFile.class,
-        LibraryField.class, EmbeddedKeyValue.class, StorageService.class,
-        Material.class, MaterialEntity.class, MaterialDbService.class, MaterialRestService.class,
-        LibraryDbService.class, MaterialsManager.class, LibraryRestService.class })
+            FieldDefinition.class, FieldDbService.class, FieldParser.class,
+            FieldValueEntity.class, SignalsEntityRestService.class, SignalsEntityDbService.class,
+            DynEnum.class, DynEnumDbService.class, DynEnumManager.class, MaterialProcessorBean.class,
+            Library.class, LibraryEntity.class, LibraryField.class, EmbeddedKeyValue.class, StorageService.class,
+            Material.class, MaterialEntity.class, MaterialDbService.class, MaterialRestService.class,
+            LibraryDbService.class, MaterialsManager.class, LibraryRestService.class})
     public EjbJar app() {
         return new EjbJar();
     }

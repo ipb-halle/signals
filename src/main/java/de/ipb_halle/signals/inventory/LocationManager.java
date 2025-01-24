@@ -77,7 +77,7 @@ public class LocationManager {
              * LocationTypes (e.g. building, room, shelf, ...) are represented as
              * Locations in the signalsentities table (db)! We need to exclude them.
              */
-            if (!locationTypeIds.contains(entityDTO.getId())) {
+            if (!locationTypeIds.contains(entityDTO.getStrippedId())) {
                 fetchSingleLocation(entityDTO);
             }
         }
@@ -91,7 +91,7 @@ public class LocationManager {
      * @return the location entity
      */
     public LocationEntity fetchSingleLocation(SignalsEntityDTO entityDTO) {
-        LocationEntity location = restService.doGetLocation(entityDTO.getId());
+        LocationEntity location = restService.doGetLocation(entityDTO.getStrippedId());
         dbService.save(location);
         return location;
     }

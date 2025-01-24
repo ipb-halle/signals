@@ -17,6 +17,10 @@
  */
 package de.ipb_halle.signals;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import de.ipb_halle.signals.rest.MockRestClient;
 
 import java.io.BufferedReader;
@@ -24,6 +28,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Properties;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
 
@@ -74,6 +79,24 @@ public class TestBase {
      */
     public static void prepareRestClients(MockRestClient client, String urlKey, InputStream stream) {
         client.addResponse(urlKey, readStream(stream));
+    }
+
+    /**
+     * add test data to the resultMap of the MockRestClient, use a JSON
+     * array of key / resource mappings as input
+     * @param client the MockRestClient
+     * @param clazz the context in which the resource request is to be processed
+     * @param config resource name of the MockRestClientConfig
+     */
+    public static void prepareRestClients(MockRestClient client, Class clazz, String config) {
+        InputStreamReader reader = new InputStreamReader(clazz.getResourceAsStream(config));
+        JsonElement json = JsonParser.parseReader(reader);
+        Iterator<JsonElement> iter = json.getAsJsonArray().iterator();
+        while(iter.hasNext()) {
+            JsonObject obj = iter.next().getAsJsonObject();
+            client.addResponse(obj.get("key").getAsString(),
+                    readStream(clazz.getResourceAsStream(obj.get("resource").getAsString())));
+        }
     }
 
     /**

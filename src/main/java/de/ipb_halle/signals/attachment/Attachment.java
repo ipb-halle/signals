@@ -34,7 +34,7 @@ public class Attachment implements IAttachment {
 
     public final static String ANCESTOR_ID = "ancestorId";
     public final static String ATTACHMENT_ID = "id";
-    public final static String ENTITY_ID = "entityId";
+    public final static String ELEMENT_ID = "elementId";
     public final static String FIELD_ID = "fieldId";
 
     public final static String LATEST_ONLY = "latestRevision";
@@ -42,7 +42,7 @@ public class Attachment implements IAttachment {
 
 
     private Integer id;
-    private String entityId;
+    private String elementId;
     private String fieldId;
     private String ancestorId;
 
@@ -56,7 +56,7 @@ public class Attachment implements IAttachment {
 
     public Attachment(AttachmentEntity e) {
         this.id = e.getId();
-        this.entityId = e.getEntityId();
+        this.elementId = e.getElementId();
         this.fieldId = e.getFieldId();
         this.ancestorId = e.getAncestorId();
         revisions = new ArrayList<>();
@@ -66,7 +66,7 @@ public class Attachment implements IAttachment {
     public AttachmentEntity createEntity() {
         AttachmentEntity attachmentEntity = new AttachmentEntity();
         attachmentEntity.setId(id);
-        attachmentEntity.setEntityId(entityId);
+        attachmentEntity.setElementId(elementId);
         attachmentEntity.setFieldId(fieldId);
         attachmentEntity.setAncestorId(ancestorId);
         return attachmentEntity;
@@ -130,12 +130,12 @@ public class Attachment implements IAttachment {
         return this;
     }
 
-    public String getEntityId() {
-        return entityId;
+    public String getElementId() {
+        return elementId;
     }
 
-    public void setEntityId(String entityId) {
-        this.entityId = entityId;
+    public void setElementId(String elementId) {
+        this.elementId = elementId;
     }
 
     public String getFieldId() {

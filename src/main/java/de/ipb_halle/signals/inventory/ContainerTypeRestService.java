@@ -63,10 +63,9 @@ public class ContainerTypeRestService implements RestReplyParser<ContainerType> 
         ct.setDescription(attributes.getAsJsonPrimitive(RestHelper.ATTR_DESCRIPTION).getAsString());
         ct.setName(attributes.getAsJsonPrimitive(ContainerType.ATTR_NAME).getAsString());
         /*
-        if (attributes.has(ContainerType.ATTR_ATTACHMENTS)) {
-            parseAttachments(attributes.getAsJsonArray(ContainerType.ATTR_ATTACHMENTS), ct);
-        }
-        */
+         * We ignore the ContainerType.ATTR_ATTACHMENTS attribute,
+         * which may contain e.g. a ContainerType icon (e.g. "DefaultImage_Container_Bottle.png")
+         */
         if (attributes.has(RestHelper.ATTR_FIELDS)) {
             parseFieldDefinitions(attributes.getAsJsonArray(RestHelper.ATTR_FIELDS), ct);
         }
@@ -87,14 +86,6 @@ public class ContainerTypeRestService implements RestReplyParser<ContainerType> 
             containerTypes.add(iter.next());
         }
         return containerTypes;
-    }
-
-    private void parseAttachments(JsonArray j, ContainerType ct) {
-        Iterator<JsonElement> iter = j.iterator();
-        AttachmentRestService svc = new AttachmentRestService();
-        while (iter.hasNext()) {
-            ct.addAttachment(svc.parseReply(iter.next()).createEntity());
-        }
     }
 
     private void parseFieldDefinitions(JsonArray j, ContainerType ct) {

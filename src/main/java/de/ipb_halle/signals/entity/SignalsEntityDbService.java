@@ -25,6 +25,8 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -39,6 +41,8 @@ public class SignalsEntityDbService {
 
     @Inject
     private DynEnumManager dynEnumManager;
+
+    private static final Logger logger = LoggerFactory.getLogger(SignalsEntityDbService.class);
 
     public List<SignalsEntityDTO> load(Map<String, Object> cmap) {
         List<SignalsEntityDTO> results = new ArrayList<>();
@@ -73,7 +77,9 @@ public class SignalsEntityDbService {
         if (entity != null) {
             SignalsEntityDTO dto = new SignalsEntityDTO(entity, dynEnumManager);
             dto.addChildren(loadChildren(id));
+            return dto;
         }
+        logger.trace("loadById({}) returned null", id);
         return null;
     }
 
@@ -95,6 +101,7 @@ public class SignalsEntityDbService {
     public void save(SignalsEntityDTO dto) {
         SignalsEntity entity = dto.createEntity();
         this.em.merge(entity);
+        logger.trace("save({})", dto.getId());
         saveChildren(dto);
     }
 

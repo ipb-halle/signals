@@ -17,8 +17,8 @@
  */
 package de.ipb_halle.signals;
 
-import de.ipb_halle.signals.attachment.AttachmentConfig;
-import de.ipb_halle.signals.attachment.AttachmentManager;
+import de.ipb_halle.signals.element.ElementConfig;
+import de.ipb_halle.signals.element.ElementManager;
 import de.ipb_halle.signals.attribute.AttributeManager;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.SignalsEntityConfig;
@@ -92,12 +92,12 @@ public class Signals {
     private SignalsEntityManager signalsEntityManager;
 
     @Inject
-    private AttachmentManager attachmentManager;
+    private ElementManager elementManager;
 
     private AccessConfig accessConfig;
     private InventoryConfig inventoryConfig;
     private MaterialsConfig materialsConfig;
-    private AttachmentConfig attachmentConfig;
+    private ElementConfig elementConfig;
     private RuntimeConfig runtimeConfig;
     private SignalsEntityConfig signalsEntityConfig;
     private boolean noMail;
@@ -139,7 +139,7 @@ public class Signals {
                 runtimeConfig, materialsManager);
         signalsEntityConfig = new SignalsEntityConfig(signalsConfig,
                 runtimeConfig, attributeManager, signalsEntityManager);
-        attachmentConfig = new AttachmentConfig(signalsConfig, runtimeConfig, attachmentManager);
+        elementConfig = new ElementConfig(signalsConfig, runtimeConfig, elementManager);
     }
 
     public void dumpEntities(Date[] dateRange) {
@@ -189,8 +189,8 @@ public class Signals {
         materialsConfig.manageMaterials(dateRange);
     }
 
-    public void manageAttachments(Date[] dateRange) {
-        attachmentConfig.manageAttachments(dateRange);
+    public void manageElements(Date[] dateRange) {
+        elementConfig.manageElements(dateRange);
     }
 
     public static Signals getInstance(String fname) {
@@ -260,7 +260,7 @@ public class Signals {
             SignalsEntityConfig.processCommandLine(cmdline, options, signals);
             MaterialsConfig.processCommandLine(cmdline, options, signals);
             InventoryConfig.processCommandLine(cmdline, options, signals);
-            AttachmentConfig.processCommandLine(cmdline,options,signals);
+            ElementConfig.processCommandLine(cmdline,options,signals);
 
         } catch (MissingArgumentException mae) {
             printHelp("ERROR: " + mae.getMessage(), options);
@@ -282,7 +282,7 @@ public class Signals {
         AccessConfig.registerOptions(options);
         SignalsEntityConfig.registerOptions(options);
         MaterialsConfig.registerOptions(options);
-        AttachmentConfig.registerOptions(options);
+        ElementConfig.registerOptions(options);
         InventoryConfig.registerOptions(options);
         processCommandLine(argv, options);
     }

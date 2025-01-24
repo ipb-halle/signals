@@ -90,7 +90,7 @@ public class LibraryDbService {
     public List<Field> loadFieldDefinitions(String id, FieldDesignation designation) {
         Map<String, Object> cmap = new HashMap<> ();
         cmap.put(Field.FIELD_ID, id);
-        cmap.put(Field.FIELD_DESIGNATION, dynEnumManager.valueOf(designation).getId());
+        cmap.put(Field.FIELD_DESIGNATION, dynEnumManager.valueOf(designation));
         return fieldDbService.load(cmap);
     }
 

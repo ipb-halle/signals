@@ -48,7 +48,6 @@ public class SignalsEntityDTO implements IEntityRelationships, ISignalsEntity {
     private Long digest;
     private Date timeStamp;
     private Set<ISignalsEntity> children;
-    //private List<String> flags;
 
     /**
      * default constructor
@@ -122,6 +121,14 @@ public class SignalsEntityDTO implements IEntityRelationships, ISignalsEntity {
 
     public String getId() {
         return id;
+    }
+
+    /**
+     * @return splits the id into prefix, id (and suffix) and return the id part
+     */
+    public String getStrippedId() {
+        String[] parts = id.split(":");
+        return parts.length > 1 ? parts[1] : parts[0];
     }
 
     public EntityType getType() {
@@ -247,15 +254,6 @@ public class SignalsEntityDTO implements IEntityRelationships, ISignalsEntity {
     public int hashCode() {
         return Objects.hashCode(id);
     }
-/*
-    public List<String> getFlags() {
-        return flags;
-    }
-
-    public void setFlags(List<String> flags) {
-        this.flags = flags;
-    }
-*/
 }
 
 
