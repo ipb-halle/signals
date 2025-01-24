@@ -15,69 +15,57 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.field;
-
-import java.io.Serializable;
-import java.util.Objects;
+package de.ipb_halle.signals.entity;
 
 import de.ipb_halle.signals.util.EmbeddedKeyValue;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+
 
 /** 
- * Field values (field definition, entity id, value)
+ * Quality (measure) - field assignments
  */
 
 @Entity
-@Table(name="field_values")
-public class FieldValueEntity implements Serializable {
+@Table(name="signalsentities_children")
+public class SignalsEntityChild implements Serializable {
 
     private final static long serialVersionUID = 1L;
 
-    public final static String ATTR_USER_VALUE = "content.user";
-    public final static String ATTR_IS_RAW_VALUE = "content.isRawValue";
-
     @AttributeOverrides({
-            @AttributeOverride(name = "id", column = @Column(name = "entity_id")),
-            @AttributeOverride(name = "value", column = @Column(name = "field_id"))
+            @AttributeOverride(name = "id", column = @Column(name = "signals_entity_id")),
+            @AttributeOverride(name = "value", column = @Column(name = "child_id"))
     })
     @EmbeddedId
     private EmbeddedKeyValue id;
 
-    @Column
-    private String value;
-
     /**
      * default constructor
      */
-    public FieldValueEntity() {
+    public SignalsEntityChild() {
         id = new EmbeddedKeyValue();
     }
 
-    public String getEntityId() {
+    public SignalsEntityChild(String entity, String child) {
+        id = new EmbeddedKeyValue(entity, child);
+    }
+
+    public String getSignalsEntityId() {
         return id.getId();
     }
 
-    public String getFieldDefinitionId() {
+    public String getChildId() {
         return id.getValue();
     }
 
-    public String getValue() {
-        return value;
-    }
-
-    public FieldValueEntity setEntityId(String e) {
+    public SignalsEntityChild setSignalsEntityId(String e) {
         id.setId(e);
         return this;
     }
 
-    public FieldValueEntity setFieldDefinitionId(String i) {
+    public SignalsEntityChild setChildId(String i) {
         id.setValue(i);
-        return this;
-    }
-
-    public FieldValueEntity setValue(String v) {
-        value = v;
         return this;
     }
 }

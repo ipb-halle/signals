@@ -85,7 +85,7 @@ public class ContainerRestService implements RestReplyParser<Container> {
 
         }
 
-       // parseFieldValues(attributes.getAsJsonArray(RestHelper.ATTR_FIELDS), ct);
+        // parseFieldValues(attributes.getAsJsonArray(RestHelper.ATTR_FIELDS), ct);
         parseFieldValues(jsonArray, ct);
         parseContainerContents(attributes.getAsJsonArray(ContainerEntity.ATTR_CONTENTS), ct);
 
@@ -144,6 +144,7 @@ public class ContainerRestService implements RestReplyParser<Container> {
     /**
      * Containers may contain Materials or Samples, depending on entityType
      * (or the prefix of the entityId).
+     *
      * @param jArray
      * @param ct
      */
@@ -153,7 +154,7 @@ public class ContainerRestService implements RestReplyParser<Container> {
             JsonElement json = iter.next();
             String type = RestHelper.parseString(RestHelper.getPrimitiveFromPath(json, ContainerEntity.ATTR_CONTENT_TYPE));
             String id = RestHelper.parseString(RestHelper.getPrimitiveFromPath(json, ContainerEntity.ATTR_CONTENT_ID));
-            switch(type) {
+            switch (type) {
                 case ContainerEntity.CONTENT_TYPE_ASSET:
                     ct.addMaterial(new MaterialReference().setId(id));
                     break;
@@ -161,7 +162,7 @@ public class ContainerRestService implements RestReplyParser<Container> {
                     ct.addMaterial(new MaterialReference().setId(id));
                     break;
                 case ContainerEntity.CONTENT_TYPE_SAMPLE:
-                    logger.warn("Unable to assign Sample to Container");
+                    logger.warn("Unable to assign Sample to Container with Id={}", id);
                     break;
                 default:
                     throw new RuntimeException("Unknown content type for container: " + ct.getId());
@@ -180,7 +181,7 @@ public class ContainerRestService implements RestReplyParser<Container> {
         String endpoint = String.format(CONTAINER_ATTACHMENT_ENDPOINT, container.getId(), field.getId());
         return attachmentRestService.fetchAttachment(endpoint, mimeType);
     }
-    
+
     public String parseAttachmentMimeType(FieldValue fieldValue) {
         JsonElement json = JsonParser.parseString(fieldValue.getValue());
         return RestHelper.getPrimitiveFromPath(json, Container.ATTR_ATTACHMENT_MIMETYPE).getAsString();

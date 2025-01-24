@@ -43,30 +43,30 @@ public class AttachmentManager {
 
 
     public void manageAttachments(RuntimeConfig runtimeConfig, EntityType[] includedTypes, Date[] dateRange) {
-        Map<String, Object> hmap = new HashMap<>();
+        Map<String, Object> cmap = new HashMap<>();
 
-        hmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
+        cmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
         if (dateRange.length > 1) {
-            hmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
+            cmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
         }
-        hmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, includedTypes);
+        cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, includedTypes);
 
         /**
          * result:
-         * ATTACHMENT manager key: 'includeTypes' and value: '[experiment.EntityType]' of hmap
-         * ATTACHMENT manager key: 'start' and value: '2023-01-01T00:00:00.000+0100' of hmap
-         * ATTACHMENT manager key: 'end' and value: '2024-12-09T14:24:54.345+0100' of hmap
+         * ATTACHMENT manager key: 'includeTypes' and value: '[experiment.EntityType]' of cmap
+         * ATTACHMENT manager key: 'start' and value: '2023-01-01T00:00:00.000+0100' of cmap
+         * ATTACHMENT manager key: 'end' and value: '2024-12-09T14:24:54.345+0100' of cmap
          */
-        //hmap.forEach((mapkey, mapvalue) -> logger.info("THIS IS ATTACHMENT manager key: '{}' and value: '{}' of hmap", mapkey, mapvalue));
+        //cmap.forEach((mapkey, mapvalue) -> logger.info("THIS IS ATTACHMENT manager key: '{}' and value: '{}' of cmap", mapkey, mapvalue));
 
-        List<SignalsIEntityDTO> signalsEntityDTOS = signalsEntityDbService.load(hmap);
+        List<SignalsEntityDTO> signalsEntityDTOS = signalsEntityDbService.load(cmap);
 
         //signalsEntityDTOList.forEach((entity) -> logger.info("This is an element of list of entitiesDTO: '{}'\n", entity.dump()));
 
         //loading of attachment lists to add fields
         List<AttachmentEntity> attachments = new ArrayList<>();
 
-        for (SignalsIEntityDTO entityDTO : signalsEntityDTOS) {
+        for (SignalsEntityDTO entityDTO : signalsEntityDTOS) {
             logger.info("AM:-> Processing {} in order to extract the attachments {}\n", entityDTO.getType(), entityDTO.getId());
             if (attachmentRestService.checkIfEntityHasChildren(entityDTO)) {
                 attachments.add(attachmentRestService.doGetAttachment(entityDTO.getId()).createEntity());

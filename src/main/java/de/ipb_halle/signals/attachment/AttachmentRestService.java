@@ -22,7 +22,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
-import de.ipb_halle.signals.entity.SignalsIEntityDTO;
+import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.rest.*;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
@@ -50,20 +50,7 @@ public class AttachmentRestService implements RestReplyParser<Attachment> {
     @Inject
     private RestClient restClient;
 
-    @Inject
-    private DynEnumManager dynEnumManager;
-
-    /**
-     * converts a field type from JSON to the respective
-     * database backed field type class instance.
-     *
-     * @throws RuntimeException if field type is not yet registered and
-     *                          auto discovery is not allowed (default).
-     */
-    private AttachmentType lookupFieldType(String typeString) {
-        return (AttachmentType) dynEnumManager.valueOf(AttachmentType.valueOf(typeString));
-    }
-
+    @Override
     public Attachment parseReply(JsonElement resultObject) {
         Attachment attachment = new Attachment();
 
@@ -82,7 +69,6 @@ public class AttachmentRestService implements RestReplyParser<Attachment> {
                     logger.info("ARS:-> Attachment type -  Type: {}\n", childType);
 
                     JsonElement attachmentDescriptionJson = fetch(childId);
-
                     JsonObject attachmentObject = Objects.requireNonNull(attachmentDescriptionJson).getAsJsonObject();
                     JsonObject attachmentAttributes = RestHelper.getFromPath(attachmentObject, ATTACHMENT_ATTRIBUTES).getAsJsonObject();
                     JsonArray attachmentAncestors = RestHelper.getFromPath(attachmentObject, ATTACHMENT_ANCESTORS).getAsJsonArray();
@@ -91,17 +77,6 @@ public class AttachmentRestService implements RestReplyParser<Attachment> {
                         JsonObject ancestorObject = ancestor.getAsJsonObject();
                         attachment.setAncestorId(ancestorObject.has(RestHelper.ATTR_ID) ? ancestorObject.get(RestHelper.ATTR_ID).getAsString() : null);
                     }
-
-//                    attachment.setId(childId);
-//                    attachment.setName(attachmentAttributes.has(RestHelper.ATTR_NAME) ? attachmentAttributes.get(RestHelper.ATTR_NAME).getAsString() : null);
-//                    attachment.setType(lookupFieldType(childType));
-//                    attachment.setCreatedAt(attachmentAttributes.has(Group.ATTR_CREATED_AT) ? RestHelper.parseDate(attachmentAttributes, Group.ATTR_CREATED_AT, new Date(0)) : null);
-//                    attachment.setEditedAt(attachmentAttributes.has(Group.ATTR_EDITED_AT) ? RestHelper.parseDate(attachmentAttributes, Group.ATTR_EDITED_AT, new Date(0)) : null);
-//                    attachment.setDigest(attachmentAttributes.has(Group.ATTR_DIGEST) ? attachmentAttributes.get(Group.ATTR_DIGEST).getAsString() : null);
-
-                    // logger.info("THIS IS AN ATTACHMENT: {}\n", attachment.toString());
-
-
                 } else {
                     logger.warn("ARS:-> Child element is not a JsonObject: {}\n", attachmentChildElement);
                 }
@@ -136,7 +111,7 @@ public class AttachmentRestService implements RestReplyParser<Attachment> {
         return parseReply(Objects.requireNonNull(fetch(id)));
     }
 
-    public boolean checkIfEntityHasChildren(SignalsIEntityDTO experiment) {
+    public boolean checkIfEntityHasChildren(SignalsEntityDTO experiment) {
         JsonElement resultJsonElement = fetch(experiment.getId());
         JsonObject relationship = RestHelper.getFromPath(Objects.requireNonNull(resultJsonElement).getAsJsonObject(), ATTACHMENT_RELATIONSHIPS).getAsJsonObject();
         return relationship.has(RestHelper.ATTR_CHILDREN);

@@ -17,8 +17,10 @@
  */
 package de.ipb_halle.signals.entity;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.rest.*;
 import de.ipb_halle.signals.users.UserReference;
@@ -27,9 +29,10 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 
@@ -37,11 +40,12 @@ import java.util.concurrent.atomic.AtomicReference;
  * Manager for signals entities (entities API endpoint)
  */
 @Local
-public class SignalsEntityRestService implements RestReplyParser<SignalsIEntityDTO> {
+public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDTO> {
 
     private Logger logger = LoggerFactory.getLogger(SignalsEntityRestService.class);
 
     public final static String SIGNALS_ENTITY_ENDPOINT = "/entities";
+    public final static String SIGNALS_ENTITY_CHILDREN_ENDPOINT = "/entities/%s/children";
     public final static String PARAMETER_INCLUDE_TYPES = "includeTypes";
     public final static String PARAMETER_START = "start";
     public final static String PARAMETER_END = "end";
@@ -52,51 +56,41 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsIEntityD
     @Inject
     private DynEnumManager dynEnumManager;
 
-    public SignalsIEntityDTO parseReply(JsonElement json) {
-        SignalsIEntityDTO dto = new SignalsIEntityDTO();
+    public SignalsEntityDTO parseReply(JsonElement json) {
+        SignalsEntityDTO dto = new SignalsEntityDTO();
         JsonObject jsonObj = json.getAsJsonObject();
-        JsonObject attributes = jsonObj.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
-        JsonObject relationships = jsonObj.getAsJsonObject(RestHelper.ATTR_RELATIONSHIPS);
+        JsonObject jsonAttributes = jsonObj.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
         dto.setId(json.getAsJsonObject().getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
-        dto.setType((EntityType) dynEnumManager.valueOf(EntityType.valueOf(RestHelper.parseString(attributes, RestHelper.ATTR_TYPE))));
-        dto.setEid(RestHelper.parseString(attributes, SignalsIEntityDTO.ATTR_EID));
-        dto.setName(RestHelper.parseString(attributes, RestHelper.ATTR_NAME));
-        dto.setDescription(RestHelper.parseString(attributes, RestHelper.ATTR_DESCRIPTION));
-        dto.setDigest(RestHelper.parseLong(attributes, RestHelper.ATTR_DIGEST));
+        dto.setType((EntityType) dynEnumManager.valueOf(EntityType.valueOf(RestHelper.parseString(jsonAttributes, RestHelper.ATTR_TYPE))));
+        dto.setEid(RestHelper.parseString(jsonAttributes, SignalsEntityDTO.ATTR_EID));
+        dto.setName(RestHelper.parseString(jsonAttributes, RestHelper.ATTR_NAME));
+        dto.setDescription(RestHelper.parseString(jsonAttributes, RestHelper.ATTR_DESCRIPTION));
+        dto.setDigest(RestHelper.parseLong(jsonAttributes, RestHelper.ATTR_DIGEST));
 
-        parseTimestamps(attributes, dto);
+        parseTimestamps(jsonAttributes, dto);
         parseRelationships(jsonObj, dto);
         return dto;
     }
 
     public static void parseTimestamps(JsonObject attributes, IObjectMetaData entity) {
-        entity.setCreatedAt(RestHelper.parseDate(attributes, SignalsIEntityDTO.ATTR_CREATED_AT));
-        entity.setEditedAt(RestHelper.parseDate(attributes, SignalsIEntityDTO.ATTR_EDITED_AT));
+        entity.setCreatedAt(RestHelper.parseDate(attributes, SignalsEntityDTO.ATTR_CREATED_AT));
+        entity.setEditedAt(RestHelper.parseDate(attributes, SignalsEntityDTO.ATTR_EDITED_AT));
     }
 
     public static void parseRelationships(JsonObject relationships, IObjectMetaData entity) {
         entity.setCreatedBy(new UserReference(
                 RestHelper.parseString(
-                        RestHelper.getPrimitiveFromPath(relationships, SignalsIEntityDTO.ATTR_CREATED_BY), null)));
+                        RestHelper.getPrimitiveFromPath(relationships, SignalsEntityDTO.ATTR_CREATED_BY), null)));
         entity.setEditedBy(new UserReference(
                 RestHelper.parseString(
-                        RestHelper.getPrimitiveFromPath(relationships, SignalsIEntityDTO.ATTR_EDITED_BY), null)));
+                        RestHelper.getPrimitiveFromPath(relationships, SignalsEntityDTO.ATTR_EDITED_BY), null)));
         entity.setOwner(new UserReference(
                 RestHelper.parseString(
-                        RestHelper.getPrimitiveFromPath(relationships, SignalsIEntityDTO.ATTR_OWNER), null)));
+                        RestHelper.getPrimitiveFromPath(relationships, SignalsEntityDTO.ATTR_OWNER), null)));
     }
 
-    public static void parseAncestors(JsonObject json, IEntityRelationships entity) {
-        throw new RuntimeException("SEM:-> parseAncestors NOT IMPLEMENTED");
-        // entity.addAllAncestors(...);
-    }
-    private static void parseChildren(JsonObject relationships, IEntityRelationships entity) {
-        throw new RuntimeException("SEM:-> parseChildren NOT IMPLEMENTED");
-        // entity.addAllChildren(...);
-    }
-
-    public RestResultIterator<SignalsIEntityDTO> doGetEntities(Map<String, Object> cmap) {
+    public RestResultIterator<SignalsEntityDTO> doGetEntities(Map<String, Object> cmap) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
         restClient.reset()
                 .setMethod(Method.GET)
@@ -112,7 +106,29 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsIEntityD
                     dateFormat.format((Date) cmap.get(PARAMETER_END)));
         }
 
-        return new RestResultIterator<SignalsIEntityDTO>(restClient, this, true);
+        return new RestResultIterator<SignalsEntityDTO>(restClient, this, true);
+    }
+
+    /**
+     * children can be displayed through REST-endpoint entity/eid/children
+     * fields are: eid, name, description, createdAt, editedAt, type, state, digest, fields
+     */
+    public RestResultIterator<SignalsEntityDTO> doGetChildren(SignalsEntityDTO parentEntity) {
+        try {
+            restClient.reset()
+                    .setMethod(Method.GET)
+                    .setEndpoint(String.format(SIGNALS_ENTITY_CHILDREN_ENDPOINT, parentEntity.getId()))
+                    .execute();
+            return new RestResultIterator<SignalsEntityDTO>(restClient,
+                    new SignalsChildParser(dynEnumManager), true);
+        } catch (UnexpectedResponseCodeException ue) {
+            logger.warn("Unexpected code {}", ue.getMessage(), ue);
+        } catch (URISyntaxException me) {
+            logger.warn("Malformed URL {}", me.getMessage(), me);
+        } catch (IOException ioe) {
+            logger.warn("IOException {}", ioe.getMessage(), ioe);
+        }
+        return null;
     }
 
     private void configureEntityTypes(Map<String, Object> cmap) {

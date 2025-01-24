@@ -23,7 +23,7 @@ import de.ipb_halle.signals.dynEnum.DynEnum;
 import de.ipb_halle.signals.dynEnum.DynEnumDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.SignalsEntity;
-import de.ipb_halle.signals.entity.SignalsIEntityDTO;
+import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.entity.SignalsEntityDbService;
 import de.ipb_halle.signals.rest.MockRestClient;
 import de.ipb_halle.signals.users.LdapClient;
@@ -80,7 +80,7 @@ public class LocationManagerTest {
     @Classes(cdi = true, value = {LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class,
             MockRestClient.class, SignalsConfig.class,
             DynEnum.class, DynEnumDbService.class, DynEnumManager.class,
-            SignalsEntity.class, SignalsIEntityDTO.class, SignalsEntityDbService.class,
+            SignalsEntity.class, SignalsEntityDTO.class, SignalsEntityDbService.class,
             GroupDbService.class, GroupManager.class, GroupRestService.class,
             RoleDbService.class, RoleManager.class, RoleRestService.class,
             UserDbService.class, UserManager.class, UserRestService.class,
@@ -114,7 +114,7 @@ public class LocationManagerTest {
 
     @Test
     public void locationManagerTest() {
-        SignalsIEntityDTO dto = new SignalsIEntityDTO();
+        SignalsEntityDTO dto = new SignalsEntityDTO();
         dto.setId(TEST_LOCATION_ID);
         manager.fetchSingleLocation(dto);
 

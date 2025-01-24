@@ -23,7 +23,7 @@ import de.ipb_halle.signals.users.UserReference;
 
 import java.util.*;
 
-public class SignalsIEntityDTO implements IEntityRelationships {
+public class SignalsEntityDTO implements IEntityRelationships, ISignalsEntity {
 
     public final static String ATTR_EID = "eid";
     public final static String ATTR_CREATED_AT = "createdAt";
@@ -47,18 +47,17 @@ public class SignalsIEntityDTO implements IEntityRelationships {
     private IUser editedBy;
     private Long digest;
     private Date timeStamp;
-    private Set<ISignalsEntity> ancestors;
     private Set<ISignalsEntity> children;
     //private List<String> flags;
 
     /**
      * default constructor
      */
-    public SignalsIEntityDTO() {
-        ancestors = new HashSet<>();
+    public SignalsEntityDTO() {
+        children = new HashSet<>();
     }
 
-    public SignalsIEntityDTO(SignalsEntity entity, DynEnumManager dynEnumManager) {
+    public SignalsEntityDTO(SignalsEntity entity, DynEnumManager dynEnumManager) {
         id = entity.getId();
         type = (EntityType) dynEnumManager.valueOf(entity.getType());
         this.eid = entity.getEid();
@@ -73,7 +72,6 @@ public class SignalsIEntityDTO implements IEntityRelationships {
         this.digest = entity.getDigest();
         this.timeStamp = entity.getTimeStamp();
         /* complex types */
-        this.ancestors = new HashSet<>();
         this.children = new HashSet<>();
     }
 
@@ -92,11 +90,6 @@ public class SignalsIEntityDTO implements IEntityRelationships {
         entity.setTimeStamp(timeStamp);
         entity.setType(type.getId());
         return entity;
-    }
-
-    @Override
-    public void addAllAncestors(Collection<ISignalsEntity> ancestors) {
-        this.ancestors.addAll(ancestors);
     }
 
     @Override
@@ -119,22 +112,20 @@ public class SignalsIEntityDTO implements IEntityRelationships {
         return sb.toString();
     }
 
+    public void addChild(ISignalsEntity entity) {
+        this.children.add(entity);
+    }
+
+    public void addChildren(Collection<ISignalsEntity> children) {
+        this.children.addAll(children);
+    }
+
     public String getId() {
         return id;
     }
 
     public EntityType getType() {
         return type;
-    }
-
-    @Override
-    public Set<ISignalsEntity> getAncestors() {
-        return ancestors;
-    }
-
-    @Override
-    public void setAncestors(Set<ISignalsEntity> ancestors) {
-        this.ancestors = ancestors;
     }
 
     public void setId(String i) {
@@ -235,15 +226,28 @@ public class SignalsIEntityDTO implements IEntityRelationships {
         this.timeStamp = timeStamp;
     }
 
-/*
-    public List<String> getChildren() {
+    @Override
+    public Set<ISignalsEntity> getChildren() {
         return children;
     }
 
-    public void setChildren(List<String> children) {
-        this.children = children;
+    public void setChildren(Collection<ISignalsEntity> children) {
+        this.children = new HashSet<> (children);
     }
 
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        SignalsEntityDTO entityDTO = (SignalsEntityDTO) object;
+        return Objects.equals(id, entityDTO.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+/*
     public List<String> getFlags() {
         return flags;
     }

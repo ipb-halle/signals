@@ -22,9 +22,8 @@ import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntityDbService;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
-import de.ipb_halle.signals.entity.SignalsIEntityDTO;
+import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.field.*;
-import de.ipb_halle.signals.materials.Material;
 import de.ipb_halle.signals.rest.RestReply;
 import de.ipb_halle.signals.storage.StorageService;
 import de.ipb_halle.signals.users.UserManager;
@@ -85,6 +84,7 @@ public class ContainerManager {
     @Inject
     private AttachmentDbService attachmentDbService;
 
+
     private Logger logger = LoggerFactory.getLogger(ContainerManager.class);
 
     /**
@@ -118,10 +118,10 @@ public class ContainerManager {
         cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, entityTypes);
 
         // 4) Loads all containers from db
-        List<SignalsIEntityDTO> containers = signalsEntityDbService.load(cmap);
+        List<SignalsEntityDTO> containers = signalsEntityDbService.load(cmap);
 
         // 5) Processes container sequentially
-        for (SignalsIEntityDTO dto : containers) {
+        for (SignalsEntityDTO dto : containers) {
             // filter out type definitions, if signals DB put them together
             if (!containerTypeIds.contains(dto.getId())) {
                 processContainer(dto.getId(), attachmentFields);

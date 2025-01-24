@@ -70,12 +70,6 @@ CREATE TABLE signalsentities_children (
  * the signalsentities table, when the ancestor_id is discovered.
  */
 
-CREATE TABLE signalsentities_ancestors (
-    signals_entity_id VARCHAR NOT NULL REFERENCES signalsentities(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    ancestor_id VARCHAR NOT NULL,
-    PRIMARY KEY (signals_entity_id, ancestor_id)
-);
-
 CREATE TABLE signalsentities_flags (
     signals_entity_id VARCHAR,
     flag_value VARCHAR,

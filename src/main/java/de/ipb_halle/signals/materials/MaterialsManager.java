@@ -24,7 +24,7 @@ import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntityDbService;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
-import de.ipb_halle.signals.entity.SignalsIEntityDTO;
+import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldDbService;
 import jakarta.ejb.Stateless;
@@ -103,7 +103,7 @@ public class MaterialsManager {
         Map<String, Map<String, Field>> allFields = mapFieldsByLibraryId();
 
         // Load all materials from the database
-        List<SignalsIEntityDTO> entityDTOs = signalsEntityDbService.load(cmap);
+        List<SignalsEntityDTO> entityDTOs = signalsEntityDbService.load(cmap);
 
         //Parallel processing
         processMaterialsSequentially(entityDTOs, allFields);
@@ -157,18 +157,18 @@ public class MaterialsManager {
 
     /**
      * Processes the given list of material DTOs in a sequential manner, delegating
-     * each to {@link MaterialProcessorBean#processSingleMaterial(SignalsIEntityDTO, Map)}.
+     * each to {@link MaterialProcessorBean#processSingleMaterial(SignalsEntityDTO, Map)}.
      * <p>
      * Logs progress for every 500 materials processed.
      *
-     * @param materials a list of {@link SignalsIEntityDTO} representing materials
+     * @param materials a list of {@link SignalsEntityDTO} representing materials
      * @param allFields a nested map of library ID -> field ID -> {@link Field}, used
      *                  for contextualizing field data in each material
      */
-    private void processMaterialsSequentially(List<SignalsIEntityDTO> materials,
+    private void processMaterialsSequentially(List<SignalsEntityDTO> materials,
                                               Map<String, Map<String, Field>> allFields) {
         int count = 0;
-        for (SignalsIEntityDTO dto : materials) {
+        for (SignalsEntityDTO dto : materials) {
             materialProcessorBean.processSingleMaterial(dto, allFields);
             count++;
             if (count % 500 == 0) {

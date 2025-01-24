@@ -71,8 +71,8 @@ public class LocationManager {
         cmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
         cmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
         cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, entityTypes);
-        List<SignalsIEntityDTO> locations = signalsEntityDbService.load(cmap);
-        for (SignalsIEntityDTO entityDTO : locations) {
+        List<SignalsEntityDTO> locations = signalsEntityDbService.load(cmap);
+        for (SignalsEntityDTO entityDTO : locations) {
             /*
              * LocationTypes (e.g. building, room, shelf, ...) are represented as
              * Locations in the signalsentities table (db)! We need to exclude them.
@@ -90,7 +90,7 @@ public class LocationManager {
      * @param entityDTO
      * @return the location entity
      */
-    public LocationEntity fetchSingleLocation(SignalsIEntityDTO entityDTO) {
+    public LocationEntity fetchSingleLocation(SignalsEntityDTO entityDTO) {
         LocationEntity location = restService.doGetLocation(entityDTO.getId());
         dbService.save(location);
         return location;

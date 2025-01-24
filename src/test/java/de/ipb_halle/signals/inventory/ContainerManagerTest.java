@@ -24,7 +24,7 @@ import de.ipb_halle.signals.dynEnum.DynEnum;
 import de.ipb_halle.signals.dynEnum.DynEnumDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.SignalsEntity;
-import de.ipb_halle.signals.entity.SignalsIEntityDTO;
+import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.entity.SignalsEntityDbService;
 import de.ipb_halle.signals.rest.MockRestClient;
 import de.ipb_halle.signals.users.LdapClient;
@@ -89,7 +89,7 @@ public class ContainerManagerTest {
     @Module
     @Classes(cdi = true, value = { LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class,
             MockRestClient.class, SignalsConfig.class,
-            SignalsEntity.class, SignalsIEntityDTO.class, SignalsEntityDbService.class,
+            SignalsEntity.class, SignalsEntityDTO.class, SignalsEntityDbService.class,
             DynEnum.class, DynEnumManager.class, DynEnumDbService.class,
             LocationDbService.class, LocationManager.class, LocationRestService.class,
             LocationType.class, LocationTypeDbService.class, 

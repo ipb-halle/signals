@@ -40,8 +40,8 @@ public class SignalsEntityDbService {
     @Inject
     private DynEnumManager dynEnumManager;
 
-    public List<SignalsIEntityDTO> load(Map<String, Object> cmap) {
-        List<SignalsIEntityDTO> results = new ArrayList<>();
+    public List<SignalsEntityDTO> load(Map<String, Object> cmap) {
+        List<SignalsEntityDTO> results = new ArrayList<>();
         List<Predicate> predicates = new ArrayList<>();
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<SignalsEntity> criteriaQuery = builder.createQuery(SignalsEntity.class);
@@ -63,24 +63,46 @@ public class SignalsEntityDbService {
         }
         criteriaQuery.where(builder.and(predicates.toArray(new Predicate[0])));
         for (SignalsEntity entity : em.createQuery(criteriaQuery).getResultList()) {
-            results.add(new SignalsIEntityDTO(entity, dynEnumManager));
+            results.add(new SignalsEntityDTO(entity, dynEnumManager));
         }
         return results;
     }
 
-    public SignalsIEntityDTO loadById(String id) {
+    public SignalsEntityDTO loadById(String id) {
         SignalsEntity entity = this.em.find(SignalsEntity.class, id);
         if (entity != null) {
-            return new SignalsIEntityDTO(entity, dynEnumManager);
+            SignalsEntityDTO dto = new SignalsEntityDTO(entity, dynEnumManager);
+            dto.addChildren(loadChildren(id));
         }
         return null;
     }
 
-    public void save(SignalsIEntityDTO dto) {
-        SignalsEntity entity = dto.createEntity();
-        this.em.merge(entity);
+    private List<ISignalsEntity> loadChildren(String id) {
+        List<ISignalsEntity> results = new ArrayList<>();
+        List<Predicate> predicates = new ArrayList<>();
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<SignalsEntityChild> criteriaQuery = builder.createQuery(SignalsEntityChild.class);
+        Root<SignalsEntityChild> root = criteriaQuery.from(SignalsEntityChild.class);
+        criteriaQuery.select(root);
+        criteriaQuery.where(builder.equal(root.get("id"), id));
+        for (SignalsEntityChild child : em.createQuery(criteriaQuery).getResultList()) {
+            results.add(loadById(child.getChildId()));
+        }
+        return results;
     }
 
+
+    public void save(SignalsEntityDTO dto) {
+        SignalsEntity entity = dto.createEntity();
+        this.em.merge(entity);
+        saveChildren(dto);
+    }
+
+    public void saveChildren(SignalsEntityDTO dto)  {
+        for (ISignalsEntity child : dto.getChildren()) {
+            em.merge(new SignalsEntityChild(dto.getId(), child.getId()));
+        }
+    }
 }
 
 

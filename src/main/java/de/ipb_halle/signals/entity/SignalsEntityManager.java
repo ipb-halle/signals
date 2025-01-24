@@ -17,14 +17,13 @@
  */
 package de.ipb_halle.signals.entity;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.rest.RestResultIterator;
 import jakarta.ejb.Stateless;
+import jakarta.ejb.TransactionAttribute;
+import jakarta.ejb.TransactionAttributeType;
 import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
@@ -44,15 +43,22 @@ public class SignalsEntityManager {
     @Inject
     private SignalsEntityRestService restService;
 
+    @Inject
+    private SEProcessorBean signalsEntitiesProcessorBean;
+
     private Logger logger = LoggerFactory.getLogger(SignalsEntityManager.class);
 
-    public SignalsIEntityDTO getDbEntity(String id) {
+    public SignalsEntityDTO getDbEntity(String id) {
         return dbService.loadById(id);
     }
 
-    /*
-     * produce a database dump of SignalsEntities
-     * @param dateRange start and end datum of the database dump
+    /**
+     * Lists entities from the database that fall within a certain date range
+     * and match the specified included entity types. The results are printed
+     * to the console (stdout).
+     *
+     * @param dateRange     an array with two {@code Date} objects: [0] for start, [1] for end
+     * @param includedTypes the array of entity types to be included in the database query
      */
     public void listEntities(Date[] dateRange, EntityType[] includedTypes) {
         System.out.print("""
@@ -67,34 +73,48 @@ public class SignalsEntityManager {
         cmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
         cmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
         cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, includedTypes);
-        List<SignalsIEntityDTO> results = dbService.load(cmap);
-        for (SignalsIEntityDTO dto : results) {
+        List<SignalsEntityDTO> results = dbService.load(cmap);
+        for (SignalsEntityDTO dto : results) {
             System.out.println(dto.dump());
         }
     }
 
-    /*
-     * fetch entities via REST from Signals Notebook
-     * @param dateRange array with start and end points of data to be fetched
-     * @param includeTypes comma separated list of entity types (experiment, notebook, asset, etc.) to be fetched
-     */
-    public void fetchSnbEntities(Date[] dateRange, EntityType[] includeTypes, RuntimeConfig config) {
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+    public void manageSignalsEntities(Date[] dateRange, EntityType[] includeTypes, RuntimeConfig config) {
+        logger.info("SEM:-> Starting manageSignalsEntities");
+
+        // 1) Build query parameters for local database load
+        Map<String, Object> cmap = buildQueryParameters(dateRange, includeTypes);
+
+        // 2) Fetch snbEntities including children from remote
+        fetchSnbEntities(cmap, config);
+    }
+
+    private static Map<String, Object> buildQueryParameters(Date[] dateRange, EntityType[] includeTypes) {
         Map<String, Object> cmap = new HashMap<>();
-        if ((includeTypes != null) && (includeTypes.length > 0)) {
+        if (dateRange != null && dateRange.length > 0) {
+            cmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
+            if (dateRange.length > 1) {
+                cmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
+            }
+        }
+        if (includeTypes != null && includeTypes.length > 0) {
             cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, includeTypes);
         }
-        if (dateRange != null) {
-            cmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
-            cmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
-        }
-        RestResultIterator<SignalsIEntityDTO> iter =  restService.doGetEntities(cmap);
+        return cmap;
+    }
+
+    public void fetchSnbEntities(Map<String, Object> cmap, RuntimeConfig config) {
+        RestResultIterator<SignalsEntityDTO> iter = restService.doGetEntities(cmap);
         while (iter.hasNext()) {
-            SignalsIEntityDTO dto = iter.next();
-            logger.debug(dto.dump());
-            if (config.updateDb) {
-                dbService.save(dto);
+            SignalsEntityDTO dto = iter.next();
+
+            if (dto.getId().split(":")[0].equalsIgnoreCase("container")
+                    || dto.getId().split(":")[0].equalsIgnoreCase("location")) {
+                dto.setId(dto.getId().split(":")[1]);
             }
+            // switch bean context to obtain a transaction boundary
+            signalsEntitiesProcessorBean.processEntity(config, dto);
         }
     }
 }
-

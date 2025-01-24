@@ -115,8 +115,7 @@ public class SignalsEntityConfig {
                 EntityType.valueOf("experiment"),
                 EntityType.valueOf("journal"),
                 EntityType.valueOf(LocationEntity.ENTITY_TYPE_LOCATION),
-                EntityType.valueOf("sample"),
-                EntityType.valueOf("text")
+                EntityType.valueOf("sample")
         };
     }
 
@@ -142,7 +141,7 @@ public class SignalsEntityConfig {
 
         attributeManager.manageAttributes();
 
-        signalsEntityManager.fetchSnbEntities(dateRange,
+        signalsEntityManager.manageSignalsEntities(dateRange,
                 includedTypes,
                 runtimeConfig);
     }

@@ -22,7 +22,7 @@ package de.ipb_halle.signals.materials;
 
 
 import de.ipb_halle.signals.attachment.*;
-import de.ipb_halle.signals.entity.SignalsIEntityDTO;
+import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldDbService;
 import de.ipb_halle.signals.field.FieldType;
@@ -71,28 +71,28 @@ public class MaterialProcessorBean {
     /**
      * This method will be called once per Material in order to process it in one transaction
      *
-     * @param signalsIEntityDTO DTO of materials (contains e.g. the id of material)
+     * @param signalsEntityDTO DTO of materials (contains e.g. the id of material)
      * @param allFields         Mapping all fields, grouped by Library-ID
      */
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void processSingleMaterial(SignalsIEntityDTO signalsIEntityDTO,
+    public void processSingleMaterial(SignalsEntityDTO signalsEntityDTO,
                                       Map<String, Map<String, Field>> allFields) {
         try {
             logger.trace("MPB:-> Start processing material: {} at {}",
-                    signalsIEntityDTO.getId(), LocalTime.now());
+                    signalsEntityDTO.getId(), LocalTime.now());
 
             //The main processing of material takes places in this method
-            doProcessMaterial(signalsIEntityDTO, allFields);
+            doProcessMaterial(signalsEntityDTO, allFields);
 
-            logger.trace("MPB:-> Finished processing material: {}\n", signalsIEntityDTO.getId());
+            logger.trace("MPB:-> Finished processing material: {}\n", signalsEntityDTO.getId());
         } catch (Exception e) {
             //Transaction will be automatically rolled back if exception occurs
             logger.error("MPB:-> Error in ProcessSingleMaterial, material {}: {}",
-                    signalsIEntityDTO.getId(), e.getMessage(), e);
+                    signalsEntityDTO.getId(), e.getMessage(), e);
         }
     }
 
-    private void doProcessMaterial(SignalsIEntityDTO signalsIEntityDTO, Map<String, Map<String, Field>> allFields) throws IOException {
+    private void doProcessMaterial(SignalsEntityDTO signalsEntityDTO, Map<String, Map<String, Field>> allFields) throws IOException {
 
         //If transaction marked for rollback, then break it
         if (transactionSynchronizationRegistry.getTransactionStatus()
@@ -102,16 +102,16 @@ public class MaterialProcessorBean {
 
         //1) Load material vie REST
         long startFetchTime = System.currentTimeMillis();
-        Material material = materialRestService.doGetMaterial(signalsIEntityDTO.getId());
+        Material material = materialRestService.doGetMaterial(signalsEntityDTO.getId());
         long endFetchTime = System.currentTimeMillis();
         logger.trace("MPB:-> Fetched material {} in {} ms",
-                signalsIEntityDTO.getId(), (endFetchTime - startFetchTime));
+                signalsEntityDTO.getId(), (endFetchTime - startFetchTime));
 
         //2) Process fields
         Map<String, Field> fieldsByLibraryId = allFields.get(material.getLibraryId());
         if (fieldsByLibraryId == null) {
             logger.warn("MPB:-> No fields found for libraryId {}, skipping material {}",
-                    material.getLibraryId(), signalsIEntityDTO.getId());
+                    material.getLibraryId(), signalsEntityDTO.getId());
             return;
         }
 
@@ -119,14 +119,14 @@ public class MaterialProcessorBean {
         processMaterialFields(fieldsByLibraryId, material);
         long endFieldProcessTime = System.currentTimeMillis();
         logger.trace("MPB:-> Processed fields for material {} in {} ms",
-                signalsIEntityDTO.getId(), (endFieldProcessTime - startFieldProcessTime));
+                signalsEntityDTO.getId(), (endFieldProcessTime - startFieldProcessTime));
 
         //3) Save materials in database
         long startSaveTime = System.currentTimeMillis();
         materialDbService.save(material);
         long endSaveTime = System.currentTimeMillis();
         logger.trace("MPB:-> Saved material {} in DB in {} ms",
-                signalsIEntityDTO.getId(), (endSaveTime - startSaveTime));
+                signalsEntityDTO.getId(), (endSaveTime - startSaveTime));
     }
 
     private void processMaterialFields(Map<String, Field> fieldLibrariesById, Material material) throws IOException {
