@@ -22,6 +22,8 @@ import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.reporting.HtmlReport;
 import de.ipb_halle.signals.rest.MockRestClient;
+import de.ipb_halle.signals.rest.RestClient;
+import de.ipb_halle.tda.DeploymentElement;
 
 import java.util.HashMap;
 import java.util.Properties;
@@ -41,9 +43,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertThrows;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@RunWith(ApplicationComposer.class)
-public class UserManagerTest {
+// @RunWith(ApplicationComposer.class)
+public abstract class UserManagerTest {
 
     private final String TEST_RESOURCE_1 = "UserManagerTest001.json";
     private final String TEST_KEY_1 =
@@ -81,17 +85,29 @@ public class UserManagerTest {
     private final String TEST_ROLE4_NAME = "Inventory Admin";
 
     @Inject
-    private MockRestClient mockRestClient;
+    @DeploymentElement(mock="de.ipb_halle.signals.rest.MockRestClient")
+    private RestClient mockRestClient;
 
     @Inject
+    @DeploymentElement(mock="de.ipb_halle.signals.users.MockLdapAdapterFactory")
+    private LdapAdapterFactory ldapAdapterFactory;
+    
+    @DeploymentElement(mock="de.ipb_halle.signals.users.MockLdapAdapter")
+    private LdapAdapter ldapAdapter;
+    
+    @Inject
+    @DeploymentElement
     private UserManager manager;
 
     @Inject
+    @DeploymentElement
     private RoleDbService roleDbService;
 
     @Inject
+    @DeploymentElement
     private UserDbService userDbService;
 
+/*
     @Module
     @Classes(cdi = true, value = { LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class,
         MockRestClient.class, SignalsConfig.class, 
@@ -111,25 +127,26 @@ public class UserManagerTest {
     public Properties configuration() {
         return TestBase.configuration();
     }
-
+*/
+    
     @Before
     public void testSetup() {
-        TestBase.prepareRestClients(mockRestClient,
+        TestBase.prepareRestClients((MockRestClient) mockRestClient,
             TEST_KEY_1,
             getClass().getResourceAsStream(TEST_RESOURCE_1));
-        TestBase.prepareRestClients(mockRestClient,
+        TestBase.prepareRestClients((MockRestClient) mockRestClient,
             TEST_KEY_2,
             getClass().getResourceAsStream(TEST_RESOURCE_2));
-        TestBase.prepareRestClients(mockRestClient,
+        TestBase.prepareRestClients((MockRestClient) mockRestClient,
             TEST_KEY_3a,
             getClass().getResourceAsStream(TEST_RESOURCE_3));
-        TestBase.prepareRestClients(mockRestClient,
+        TestBase.prepareRestClients((MockRestClient) mockRestClient,
             TEST_KEY_3b,
             getClass().getResourceAsStream(TEST_RESOURCE_3));
-        TestBase.prepareRestClients(mockRestClient,
+        TestBase.prepareRestClients((MockRestClient) mockRestClient,
             TEST_KEY_3c,
             getClass().getResourceAsStream(TEST_RESOURCE_3));
-        TestBase.prepareRestClients(mockRestClient,
+        TestBase.prepareRestClients((MockRestClient) mockRestClient,
             TEST_KEY_4,
             getClass().getResourceAsStream(TEST_RESOURCE_4));
 

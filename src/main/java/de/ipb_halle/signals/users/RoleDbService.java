@@ -17,6 +17,8 @@
  */
 package de.ipb_halle.signals.users;
 
+import de.ipb_halle.tda.PersistenceElements;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,6 +38,7 @@ import jakarta.persistence.criteria.Root;
  */
 
 @Stateless
+@PersistenceElements(entities = { RoleEntity.class, RolePriv.class, RolePrivDef.class })
 public class RoleDbService {
 
     private static Set<String> rolePrivileges;
