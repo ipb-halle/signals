@@ -272,8 +272,7 @@ public class TDAGenerated%s extends %s {
 
     /**
      * generate the imports for the JPA entities used in this test
-     *
-     * ToDo: this is mock, create a real list!
+     * @return import clauses
      */
     private String getImports() {
         StringBuilder sb = new StringBuilder();
