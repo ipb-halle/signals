@@ -32,22 +32,20 @@ import java.util.Set;
 
 import de.ipb_halle.signals.util.EmbeddedKeyValue;
 import jakarta.inject.Inject;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.junit.ApplicationComposer;
+import org.apache.openejb.junit5.RunWithApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
 import org.apache.openejb.testing.Module;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
 
-@RunWith(ApplicationComposer.class)
+@RunWithApplicationComposer
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ContainerTypeManagerTest {
 
     private final String TEST_RESOURCE_1 = "ContainerTypeManagerTest001.json";
@@ -96,7 +94,7 @@ public class ContainerTypeManagerTest {
         return TestBase.configuration();
     }
 
-    @Before
+    @BeforeAll
     public void testSetup() {
         dynEnumMgr.allowEnumDiscovery();
         TestBase.prepareRestClients(mockRestClient,
@@ -129,20 +127,20 @@ public class ContainerTypeManagerTest {
         manager.save(ctypes);
 
         ContainerType ct = manager.getDbContainerType(TEST_CONTAINER_TYPE_ID);
-        assertEquals("ContainerType name mismatch", TEST_CONTAINER_TYPE_NAME, ct.getName());
+        Assertions.assertEquals(TEST_CONTAINER_TYPE_NAME, ct.getName(), "ContainerType name mismatch");
 
         // attachments
         /*
         Attachment a = getAttachmentById(
                 ct.getAttachments(),
                 TEST_CONTAINER_ATTACHMENT_ID);
-        assertEquals("Attachment file name matches", TEST_CONTAINER_ATTACHMENT_FILE_NAME, a.getFileName());
+        Assertionss.assertEquals(TEST_CONTAINER_ATTACHMENT_FILE_NAME, a.getFileName(), "Attachment file name matches");
         */
 
         // field definitions
         Field f = getFieldById(
                 ct.getFields(),
                 TEST_CONTAINER_FIELD_ID);
-        assertEquals("Field definition key matches", TEST_CONTAINER_FIELD_KEY, f.getKey());
+        Assertions.assertEquals(TEST_CONTAINER_FIELD_KEY, f.getKey(), "Field definition key matches");
     }
 }

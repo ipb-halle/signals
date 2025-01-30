@@ -26,22 +26,21 @@ import de.ipb_halle.signals.rest.MockRestClient;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.RestReplyParser;
 import jakarta.inject.Inject;
+import java.util.List;
+import java.util.Properties;
 import org.apache.openejb.jee.EjbJar;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
-import org.apache.openejb.junit.ApplicationComposer;
+import org.apache.openejb.junit5.RunWithApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
 import org.apache.openejb.testing.Module;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.TestInstance;
 
-import java.util.List;
-import java.util.Properties;
-
-import static org.junit.Assert.*;
-
-@RunWith(ApplicationComposer.class)
+@RunWithApplicationComposer
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class AttributeTest {
 
     // contains attribute ids 17, 48, 21 in this order
@@ -102,7 +101,7 @@ public class AttributeTest {
         return TestBase.configuration();
     }
 
-    @Before
+    @BeforeAll
     public void setup() {
 
         dynEnumMgr.allowEnumDiscovery();
@@ -136,9 +135,9 @@ public class AttributeTest {
 
         Attribute fromDb = dbService.loadById(TEST_ID_1);
 
-        assertEquals("id matches", TEST_ID_1, fromDb.getId());
-        assertEquals("name matches", "testAttribute", fromDb.getName());
-        assertEquals("option count matches", 3, fromDb.getOptions().size());
+        Assertions.assertEquals(TEST_ID_1, fromDb.getId(), "id matches");
+        Assertions.assertEquals("testAttribute", fromDb.getName(), "name matches");
+        Assertions.assertEquals(3, fromDb.getOptions().size(), "option count matches");
     }
 
     @Test
@@ -148,14 +147,14 @@ public class AttributeTest {
             dbService.save(attr);
         }
         Attribute fromDb = dbService.loadById(TEST_ID_4);
-        assertEquals("Attr format matches", "{user.alias}{###}", fromDb.getFormat());
+        Assertions.assertEquals("{user.alias}{###}", fromDb.getFormat(), "Attr format matches");
         fromDb = dbService.loadById(TEST_ID_2);
         AttributeValue option = new AttributeValue(TEST_ID_2, "Bottle");
-        assertTrue("Option is present", fromDb.getOptions().contains(option));
+        Assertions.assertTrue(fromDb.getOptions().contains(option), "Option is present");
         fromDb = dbService.loadById(TEST_ID_3);
         option = new AttributeValue("TEST_ID_3", "foobar_does_not_exist");
-        assertEquals("Name matches", "NMR Experiment Types", fromDb.getName());
-        assertEquals("Description matches", "selectable in NMR Request Sheet", fromDb.getDescription());
-        assertFalse("Bogus option not present", fromDb.getOptions().contains(option));
+        Assertions.assertEquals("NMR Experiment Types", fromDb.getName(), "Name matches");
+        Assertions.assertEquals("selectable in NMR Request Sheet", fromDb.getDescription(), "Description matches");
+        Assertions.assertFalse(fromDb.getOptions().contains(option), "Bogus option not present");
     }
 }

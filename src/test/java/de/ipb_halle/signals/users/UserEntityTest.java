@@ -19,13 +19,9 @@ package de.ipb_halle.signals.users;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-
 import de.ipb_halle.signals.TestBase;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 public class UserEntityTest {
@@ -48,9 +44,9 @@ public class UserEntityTest {
         UserEntity entity = user.createEntity();
         user = new User(entity);
 
-        assertEquals("id matches", TEST_ID, user.getId());
-        assertEquals("createdAt date matches", TEST_CREATED, user.getCreatedAt().getTime());
-        assertEquals("lastLoginAt date matches", TEST_LAST_LOGIN, user.getLastLoginAt().getTime());
-        assertEquals("userName matches", TEST_USER_NAME, user.getUserName());
+        Assertions.assertEquals(TEST_ID, user.getId(), "id matches");
+        Assertions.assertEquals(TEST_CREATED, user.getCreatedAt().getTime(), "createdAt date matches");
+        Assertions.assertEquals(TEST_LAST_LOGIN, user.getLastLoginAt().getTime(), "lastLoginAt date matches");
+        Assertions.assertEquals(TEST_USER_NAME, user.getUserName(), "userName matches");
     }
 }

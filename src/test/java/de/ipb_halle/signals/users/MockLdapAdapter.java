@@ -39,7 +39,7 @@ import javax.naming.directory.BasicAttributes;
 
 
 /**
- * Mock LDAPAdapter 
+ * Mock LDAPAdapter
  */
 public class MockLdapAdapter implements AutoCloseable, LdapAdapter {
 
@@ -86,7 +86,7 @@ public class MockLdapAdapter implements AutoCloseable, LdapAdapter {
             String key = entry.getKey();
             JsonElement element = entry.getValue();
             switch(key) {
-                case "dn" : 
+                case "dn" :
                     dn = element.getAsJsonPrimitive().getAsString();
                     break;
                 case "member" :
@@ -94,9 +94,9 @@ public class MockLdapAdapter implements AutoCloseable, LdapAdapter {
                 case "objectClass" :
                     attributes.put(parseArrayAttribute(key, element));
                     break;
-                default: 
+                default:
                     attributes.put(new BasicAttribute(
-                            key, 
+                            key,
                             element.getAsJsonPrimitive().getAsString()));
             }
         }

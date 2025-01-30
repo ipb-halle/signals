@@ -380,6 +380,14 @@
             <version>9.0.0</version>
         </dependency>
 
+
+        <!-- OpenEJB JUnit -->
+        <dependency>
+            <groupId>org.apache.tomee</groupId>
+            <artifactId>openejb-junit5</artifactId>
+            <version>9.0.0</version>
+        </dependency>
+
         <!-- needed on JDK 11: API, java.xml.bind module -->
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
@@ -433,14 +441,6 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.8.2</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- keeps old JUnit4 tests functional -->
-        <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
             <version>5.8.2</version>
             <scope>test</scope>
         </dependency>

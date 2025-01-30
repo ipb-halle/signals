@@ -17,14 +17,10 @@
  */
 package de.ipb_halle.signals.reporting;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertThrows;
 
 public class MailReportTest {
 
@@ -32,7 +28,7 @@ public class MailReportTest {
      * Test ignored because addresses are invalid. Didn't
      * want to commit real address data.
      */
-    @Ignore @Test
+    @Disabled @Test
     public void reportTest() {
         MailReport report = new MailReport();
 
@@ -49,7 +45,7 @@ public class MailReportTest {
                 .send();
         } catch (Exception e) {
         }
-        
-        assertTrue("Report does not throw exception", true);
+
+        Assertions.assertTrue(true, "Report does not throw exception");
     }
 }

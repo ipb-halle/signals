@@ -21,30 +21,26 @@ import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.rest.MockRestClient;
-
 import java.util.Properties;
 import jakarta.inject.Inject;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.junit.ApplicationComposer;
+import org.apache.openejb.junit5.RunWithApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
 import org.apache.openejb.testing.Module;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertThrows;
 
-@RunWith(ApplicationComposer.class)
+@RunWithApplicationComposer
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class GroupManagerTest {
 
     private final String TEST_RESOURCE_1 = "GroupManagerTest001.json";
-    private final String TEST_KEY_1 = 
+    private final String TEST_KEY_1 =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/groups";
     private final String TEST_GROUP_ID = "132";
     private final String TEST_GROUP_DESCRIPTION = "Research Group 1, Gamma department";
@@ -79,7 +75,7 @@ public class GroupManagerTest {
         return TestBase.configuration();
     }
 
-    @Before
+    @BeforeAll
     public void testSetup() {
         TestBase.prepareRestClients(mockRestClient,
             TEST_KEY_1,
@@ -96,13 +92,13 @@ public class GroupManagerTest {
             testGroup.setName("--- WRONG ---");
             groupDbService.save(testGroup);
         }
-        
+
         manager.syncDbGroupsFromSnb(new RuntimeConfig());
         Group group = groupDbService.loadById(TEST_GROUP_ID);
 
-        assertEquals("Group name mismatch", TEST_GROUP_NAME, group.getName());
-        assertEquals("Group description mismatch", TEST_GROUP_DESCRIPTION, group.getDescription());
-        assertEquals("Group type mismatch", TEST_GROUP_TYPE, group.getType());
-        assertEquals("Group systemGroup mismatch", TEST_GROUP_SYSTEM, group.isSystem());
+        Assertions.assertEquals(TEST_GROUP_NAME, group.getName(), "Group name mismatch");
+        Assertions.assertEquals(TEST_GROUP_DESCRIPTION, group.getDescription(), "Group description mismatch");
+        Assertions.assertEquals(TEST_GROUP_TYPE, group.getType(), "Group type mismatch");
+        Assertions.assertEquals(TEST_GROUP_SYSTEM, group.isSystem(), "Group systemGroup mismatch");
     }
 }

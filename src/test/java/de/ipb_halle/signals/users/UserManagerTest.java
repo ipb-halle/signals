@@ -1,6 +1,6 @@
 /*
  * IPB Signals client
- * Copyright 2022 Leibniz-Institut f. Pflanzenbiochemie
+ * Copyright 2025 Leibniz-Institut f. Pflanzenbiochemie
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,29 +24,30 @@ import de.ipb_halle.signals.reporting.HtmlReport;
 import de.ipb_halle.signals.rest.MockRestClient;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.tda.DeploymentElement;
-
-import java.util.HashMap;
-import java.util.Properties;
 import jakarta.inject.Inject;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import java.util.HashMap;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/*
+ * no longer needed
+ *
+import java.util.Properties;
 import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.junit.ApplicationComposer;
+import org.apache.openejb.junit5.RunWithApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
 import org.apache.openejb.testing.Module;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
+import org.junit.jupiter.api.TestInstance;
+*/
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertThrows;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-// @RunWith(ApplicationComposer.class)
+//@RunWithApplicationComposer
+//@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class UserManagerTest {
 
     private final String TEST_RESOURCE_1 = "UserManagerTest001.json";
@@ -57,7 +58,7 @@ public abstract class UserManagerTest {
     private final String TEST_KEY_2 =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/107";
     private final String TEST_RESOURCE_3 = "UserManagerTest003.json";
-    private final String TEST_KEY_3a = 
+    private final String TEST_KEY_3a =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/102/systemGroups";
     private final String TEST_KEY_3b =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/107/systemGroups";
@@ -65,10 +66,8 @@ public abstract class UserManagerTest {
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/122/systemGroups";
 
     private final String TEST_RESOURCE_4 = "UserManagerTest004.json";
-    private final String TEST_KEY_4 = 
+    private final String TEST_KEY_4 =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users?page%5Blimit%5D=20&page%5Boffset%5D=0&enabled=false";
-
-
 
     private final String TEST_USER1_ID = "102";
     private final String TEST_USER1_ALIAS = "USR3";
@@ -110,9 +109,9 @@ public abstract class UserManagerTest {
 /*
     @Module
     @Classes(cdi = true, value = { LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class,
-        MockRestClient.class, SignalsConfig.class, 
+        MockRestClient.class, SignalsConfig.class,
         GroupDbService.class, GroupManager.class, GroupRestService.class,
-        RoleDbService.class, RoleManager.class, RoleRestService.class, 
+        RoleDbService.class, RoleManager.class, RoleRestService.class,
         UserDbService.class, UserManager.class, UserRestService.class })
     public EjbJar app() {
         return new EjbJar();
@@ -128,8 +127,8 @@ public abstract class UserManagerTest {
         return TestBase.configuration();
     }
 */
-    
-    @Before
+
+    @BeforeAll
     public void testSetup() {
         TestBase.prepareRestClients((MockRestClient) mockRestClient,
             TEST_KEY_1,
@@ -150,8 +149,6 @@ public abstract class UserManagerTest {
             TEST_KEY_4,
             getClass().getResourceAsStream(TEST_RESOURCE_4));
 
-
-
         Role role = new Role();
         role.setId(TEST_ROLE1_ID);
         role.setName(TEST_ROLE1_NAME);
@@ -166,21 +163,19 @@ public abstract class UserManagerTest {
         roleDbService.save(role);
     }
 
-
     @Test
     public void syncFromSnbTest() {
 
         manager.syncDbUsersFromSnb(new RuntimeConfig());
         User user = userDbService.loadById(TEST_USER1_ID);
 
-
-        assertEquals("user alias mismatch", TEST_USER1_ALIAS, user.getAlias());
-        assertEquals("user first name mismatch", TEST_USER1_FIRST_NAME, user.getFirstName());
-        assertEquals("user last name mismatch", TEST_USER1_LAST_NAME, user.getLastName());
+        Assertions.assertEquals(TEST_USER1_ALIAS, user.getAlias(), "user alias mismatch");
+        Assertions.assertEquals(TEST_USER1_FIRST_NAME, user.getFirstName(), "user first name mismatch");
+        Assertions.assertEquals(TEST_USER1_LAST_NAME, user.getLastName(), "user last name mismatch");
 
         user = userDbService.loadById(TEST_USER2_ID);
-        assertEquals("user first name mismatch", TEST_USER2_FIRST_NAME, user.getFirstName());
-        assertEquals("user last name mismatch", TEST_USER2_LAST_NAME, user.getLastName());
+        Assertions.assertEquals(TEST_USER2_FIRST_NAME, user.getFirstName(), "user first name mismatch");
+        Assertions.assertEquals(TEST_USER2_LAST_NAME, user.getLastName(), "user last name mismatch");
     }
 
     @Test
@@ -192,7 +187,6 @@ public abstract class UserManagerTest {
         AccessManager.prepareReport(context,  new HtmlReport());
         manager.syncUsersFromLdap(context);
         String html = context.report.render();
-        // System.out.printf("\n******************************\n%s\n******************************\n", html);
-        assertTrue("report contains 'ae@somewhere.invalid'", context.report.render().contains("ae@somewhere.invalid"));
+        Assertions.assertTrue(context.report.render().contains("ae@somewhere.invalid"), "report contains 'ae@somewhere.invalid'");
     }
 }

@@ -46,26 +46,24 @@ import de.ipb_halle.signals.users.UserManager;
 import java.util.Date;
 import java.util.Properties;
 import jakarta.inject.Inject;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.junit.ApplicationComposer;
+import org.apache.openejb.junit5.RunWithApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
 import org.apache.openejb.testing.Module;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
 
-@RunWith(ApplicationComposer.class)
+@RunWithApplicationComposer
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ContainerManagerTest {
 
     private final String TEST_RESOURCE_1 = "ContainerManagerTest001.json";
-    private final String TEST_KEY_1 = 
+    private final String TEST_KEY_1 =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/containers/ef16c7af-a763-49f2-b218-294ac02fc224";
     private final String TEST_CONTAINER_ID = "ef16c7af-a763-49f2-b218-294ac02fc224";
     private final String TEST_CONTAINER_BARCODE =  "0000000026";
@@ -97,7 +95,7 @@ public class ContainerManagerTest {
             SignalsEntity.class, SignalsEntityDTO.class, SignalsEntityDbService.class,
             DynEnum.class, DynEnumManager.class, DynEnumDbService.class,
             LocationDbService.class, LocationManager.class, LocationRestService.class,
-            LocationType.class, LocationTypeDbService.class, 
+            LocationType.class, LocationTypeDbService.class,
             GroupDbService.class, GroupManager.class, GroupRestService.class,
             RoleDbService.class, RoleManager.class, RoleRestService.class,
             UserDbService.class, UserManager.class, UserRestService.class,
@@ -120,7 +118,7 @@ public class ContainerManagerTest {
         return TestBase.configuration();
     }
 
-    @Before
+    @BeforeAll
     public void testSetup() {
         TestBase.prepareRestClients(mockRestClient,
             TEST_KEY_1,
@@ -158,13 +156,13 @@ public class ContainerManagerTest {
 
         Container ct = manager.getSnbContainer(TEST_CONTAINER_ID);
         manager.save(ct);
-        assertEquals("Container name mismatch", TEST_CONTAINER_NAME, ct.getName());
+        Assertions.assertEquals(TEST_CONTAINER_NAME, ct.getName(), "Container name mismatch");
 
         ct = manager.getContainer(TEST_CONTAINER_ID, true);
-        assertEquals("Container barcode mismatch", TEST_CONTAINER_BARCODE, ct.getBarcode());
-        assertEquals("Created by Id matches", TEST_USER1_ID, ct.getCreatedBy().getId());
-        assertEquals("Created by first name matches", TEST_USER1_FIRST, ((User) ct.getCreatedBy()).getFirstName());
-        assertEquals("Location name matches", TEST_LOCATION_NAME, ((LocationEntity) ct.getLocation()).getName());
-        assertEquals("Location updated by matches", TEST_USER2_ID, ((LocationEntity) ct.getLocation()).getUpdatedBy());
+        Assertions.assertEquals(TEST_CONTAINER_BARCODE, ct.getBarcode(), "Container barcode mismatch");
+        Assertions.assertEquals(TEST_USER1_ID, ct.getCreatedBy().getId(), "Created by Id matches");
+        Assertions.assertEquals(TEST_USER1_FIRST, ((User) ct.getCreatedBy()).getFirstName(), "Created by first name matches");
+        Assertions.assertEquals(TEST_LOCATION_NAME, ((LocationEntity) ct.getLocation()).getName(), "Location name matches");
+        Assertions.assertEquals(TEST_USER2_ID, ((LocationEntity) ct.getLocation()).getUpdatedBy(), "Location updated by matches");
     }
 }

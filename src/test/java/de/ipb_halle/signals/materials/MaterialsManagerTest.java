@@ -33,26 +33,26 @@ import de.ipb_halle.signals.rest.MockRestClient;
 import de.ipb_halle.signals.storage.StorageService;
 import de.ipb_halle.signals.util.EmbeddedKeyValue;
 import jakarta.inject.Inject;
+import java.util.Properties;
+import java.util.Set;
 import org.apache.openejb.jee.EjbJar;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
-import org.apache.openejb.junit.ApplicationComposer;
+import org.apache.openejb.junit5.RunWithApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
 import org.apache.openejb.testing.Module;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
-import java.util.Properties;
-import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-
-@RunWith(ApplicationComposer.class)
+@RunWithApplicationComposer
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MaterialsManagerTest {
 
     private final String TEST_RESOURCE_1 = "LibraryManagerTest001.json";
-    private final String TEST_KEY_1 = 
+    private final String TEST_KEY_1 =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/materials/libraries";
     private final String TEST_LIBRARY_ID = "6215104dab0ad27bf79429ff";
     private final String TEST_LIBRARY_NAME = "Reagents (SNB)";
@@ -69,7 +69,7 @@ public class MaterialsManagerTest {
 
     @Inject
     private LibraryDbService dbService;
-    
+
     @Inject
     private MaterialsManager manager;
 
@@ -101,7 +101,7 @@ public class MaterialsManagerTest {
         return TestBase.configuration();
     }
 
-    @Before
+    @BeforeAll
     public void testSetup() {
         dynEnumMgr.allowEnumDiscovery();
         TestBase.prepareRestClients(mockRestClient,
@@ -125,17 +125,19 @@ public class MaterialsManagerTest {
         manager.manageLibraries(config);
 
         Library lib = dbService.loadById(TEST_LIBRARY_ID);
-        assertEquals("Library name mismatch", TEST_LIBRARY_NAME, lib.getName());
+        Assertions.assertEquals(TEST_LIBRARY_NAME, lib.getName(), "Library name mismatch");
 
         /*
         // field definitions
-        assertEquals("Asset field count matches", TEST_LIBRARY_ASSET_FIELD_COUNT, 
-                lib.getAssetFieldDefinitions().size());
+        Assertions.assertEquals(TEST_LIBRARY_ASSET_FIELD_COUNT,
+                lib.getAssetFieldDefinitions().size(),
+                "Asset field count matches");
 
         FieldDefinition fd = getFieldDefinitionById(
-                lib.getAssetFieldDefinitions(), 
+                lib.getAssetFieldDefinitions(),
                 TEST_LIBRARY_ASSET_FIELD_ID);
-        assertEquals("Asset field definition key matches", TEST_LIBRARY_ASSET_FIELD_TITLE, fd.getTitle());
+        Assertions.assertEquals(TEST_LIBRARY_ASSET_FIELD_TITLE,
+                fd.getTitle(), "Asset field definition key matches");
          */
     }
 }

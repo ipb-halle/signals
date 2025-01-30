@@ -22,10 +22,8 @@ import de.ipb_halle.signals.users.UserManagerTest;
 import de.ipb_halle.tda.DeploymentElement;
 import jakarta.ejb.Local;
 import jakarta.inject.Inject;
-import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertThrows;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /*
  * Imports no longer needed, when working with the
@@ -33,23 +31,20 @@ import static org.junit.Assert.assertThrows;
  *
 import de.ipb_halle.signals.TestBase;
 import java.util.Properties;
-import org.junit.runner.RunWith;
-
 import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.junit.ApplicationComposer;
+import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
+import org.apache.openejb.junit5.RunWithApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
 import org.apache.openejb.testing.Module;
-import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
-*/
+ */
 
-// @RunWith(ApplicationComposer.class)
+// @RunWithApplicationComposer
 public abstract class DynEnumManagerTest {
 
     @Inject
     @DeploymentElement
     public DynEnumManager dynEnumMgr;
-
 
     /*
      * Will be provided by de.ipb_halle.tda.DeploymentProcessor
@@ -70,23 +65,16 @@ public abstract class DynEnumManagerTest {
     public Properties configuration() {
         return TestBase.configuration();
     }
-*/
-    
-/*
-    @Before
-    public void testSetup() {
-    }
-*/
-    
+     */
+        
     @Test
     public void dynEnumManagerTest() {
 
-
         final DynEnum first = EntityType.valueOf("invalidValueForTesting");
-        assertThrows(RuntimeException.class, () -> dynEnumMgr.valueOf(first));
+        Assertions.assertThrows(RuntimeException.class, () -> dynEnumMgr.valueOf(first));
 
         dynEnumMgr.allowEnumDiscovery();
         DynEnum saved = dynEnumMgr.valueOf(first);
-        assertTrue("DynEnum id is not null", saved.getId() != null);
+        Assertions.assertTrue(saved.getId() != null, "DynEnum id is not null");
     }
 }
