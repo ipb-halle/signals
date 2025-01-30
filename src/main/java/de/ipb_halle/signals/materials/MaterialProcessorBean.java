@@ -139,7 +139,7 @@ public class MaterialProcessorBean {
             if (field == null) {
                 //if ad-hoc resp. new field
                 logger.trace("MPB:-> Definition of field is null => saving new field");
-                field = fieldValue.getAdHocField();
+                field = fieldValue.getField();
                 fieldDbService.save(field);
                 fieldLibrariesById.put(field.getId(), field);
             }

@@ -19,7 +19,7 @@ public class Synonym {
      * default constructor
      */
     public Synonym() {
-        new EmbeddedKeyValue();
+        id = new EmbeddedKeyValue();
     }
 
     public Synonym(String id, String synonym) {

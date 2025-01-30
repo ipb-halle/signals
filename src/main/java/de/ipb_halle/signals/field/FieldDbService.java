@@ -159,6 +159,7 @@ public class FieldDbService {
 
         for (FieldValueEntity fve : em.createQuery(query).getResultList()) {
             FieldValue fv = new FieldValue(fve);
+            fv.setField(loadById(fv.getFieldId()));
             results.add(fv);
         }
         return results;

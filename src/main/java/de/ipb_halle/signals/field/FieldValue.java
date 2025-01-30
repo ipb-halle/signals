@@ -40,7 +40,14 @@ public class FieldValue {
     private String fieldTitle;
     private String value;
     private LinkType linkType;
-    private transient Field adHocField;
+
+    /**
+     * Field definition.
+     * This field stores either an ad hoc field definition, which will be created
+     * during parsing of materials or a field definition from the database, if
+     * one exists.
+     */
+    private transient Field field;
 
     public FieldValue() {
         linkType = LinkType.UNSPECIFIED;
@@ -119,12 +126,12 @@ public class FieldValue {
         return Objects.hash(entityId, fieldId, fieldTitle, value, linkType);
     }
 
-    public Field getAdHocField() {
-        return adHocField;
+    public Field getField() {
+        return field;
     }
 
-    public void setAdHocField(Field adHocField) {
-        this.adHocField = adHocField;
+    public void setField(Field field) {
+        this.field = field;
     }
 
     @Override
@@ -135,7 +142,7 @@ public class FieldValue {
                 ", fieldTitle='" + fieldTitle + '\'' +
                 ", value='" + value + '\'' +
                 ", linkType=" + linkType +'\'' +
-                ", adHocField=" + adHocField+
+                ", adHocField=" + field+
                 '}';
     }
 }

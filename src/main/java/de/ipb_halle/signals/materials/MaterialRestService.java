@@ -54,6 +54,8 @@ public class MaterialRestService implements RestReplyParser<Material> {
      * same information would be available from the /entities/eid endpoint
      * but only after parsing the ancestor ids.
      */
+    public final String ASSET_CREATE_ENDPOINT = "/materials/%s/assets";
+    public final String BATCH_CREATE_ENDPOINT = "/materials/%s/assets/%s/batches";
     public final String MATERIAL_ENDPOINT = "/materials/%s";
     public final String MATERIAL_ATTACHMENT_ENDPOINT = "/materials/%s/attachments/%s";
     public final String MATERIAL_DRAWING_ENDPOINT = "/materials/%s/drawing";
@@ -173,7 +175,7 @@ public class MaterialRestService implements RestReplyParser<Material> {
         if (field == null) {
             logger.trace("MRS:-> FIELD IS NULL !!!!! \n");
             //receiving a file information from material attachment->
-            fieldValue.setAdHocField(parseFieldDefinition(metaFieldJsonObject));
+            fieldValue.setField(parseFieldDefinition(metaFieldJsonObject));
         }
 
         return fieldValue;
@@ -305,5 +307,117 @@ public class MaterialRestService implements RestReplyParser<Material> {
 
     public Material doGetMaterial(String id) {
         return parseReply(fetch(MATERIAL_ENDPOINT, id));
+    }
+
+    public Material doCreateMaterial(Library lib, Material mat) {
+        JsonObject request;
+        String endpoint;
+
+        if (mat.getEntityType().equals(EntityType.valueOf(Material.ENTITY_TYPE_ASSET))) {
+            endpoint = String.format(ASSET_CREATE_ENDPOINT, lib.getName());
+            request = prepareAsset(lib, mat);
+        } else {
+            endpoint = String.format(BATCH_CREATE_ENDPOINT, lib.getName(), mat.getMaterial().getId());
+            request = prepareBatch(lib, mat);
+        }
+        try {
+            restClient.reset()
+                .setMethod(Method.POST)
+                .setEndpoint(endpoint)
+                .setRequestData(request.toString())
+                .execute(RestClient.HTTP_CREATED);
+
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
+            Material result = parseReply(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
+            return result;
+
+        } catch(UnexpectedResponseCodeException ue) {
+            logger.warn("doCreateMaterial() got unexpected return code from API call: {}", request);
+        } catch(URISyntaxException me) {
+            logger.warn("doCreateMaterial() malformed URL");
+        } catch(IOException ioe) {
+            logger.warn("IOException", (Throwable) ioe);
+        }
+        return null;
+    }
+
+    private JsonObject prepareAsset(Library lib, Material mat) {
+
+        JsonObject attr = new JsonObject();
+        attr.addProperty(RestHelper.ATTR_LIBRARY, lib.getName());
+        attr.add(Material.ATTR_SYNONYMS, prepareSynonyms(mat));
+        attr.add(RestHelper.ATTR_FIELDS, prepareFields(mat));
+
+        JsonObject data = new JsonObject();
+        data.addProperty(RestHelper.ATTR_ID, mat.getStrippedId());
+        data.addProperty(RestHelper.ATTR_TYPE, mat.getEntityType().getShortType());
+        data.add(RestHelper.ATTR_ATTRIBUTES, attr);
+
+        JsonObject asset = new JsonObject();
+        asset.add(RestHelper.ATTR_DATA, data);
+        return asset;
+    }
+
+    private JsonObject prepareBatch(Library lib, Material mat) {
+
+        JsonObject attr = new JsonObject();
+        attr.addProperty(RestHelper.ATTR_LIBRARY, lib.getName());
+        attr.add(RestHelper.ATTR_FIELDS, prepareFields(mat));
+
+        JsonObject data = new JsonObject();
+        data.addProperty(RestHelper.ATTR_ID, mat.getStrippedId());
+        data.addProperty(RestHelper.ATTR_TYPE, mat.getEntityType().getShortType());
+        data.add(RestHelper.ATTR_ATTRIBUTES, attr);
+
+        JsonObject batch = new JsonObject();
+        batch.add(RestHelper.ATTR_DATA, data);
+        return batch;
+    }
+
+    /**
+     * Prepare an array of synonyms.
+     * @param mat
+     * @return
+     */
+    private JsonElement prepareSynonyms(Material mat) {
+        JsonArray array = new JsonArray();
+        for (Synonym synonym : mat.getSynonyms()) {
+            array.add(synonym.getOption());
+        }
+        return array;
+    }
+
+    /**
+     * prepare a JsonArray of field values for transmission.
+     * @param mat
+     * @return array of required field values
+     */
+    private JsonElement prepareFields(Material mat) {
+        JsonArray array = new JsonArray();
+        for (FieldValue fieldValue : mat.getFieldValues()) {
+            if (fieldValue.getField().getRequired()
+                    || ((! fieldValue.getField().getCalculated())
+                    && (! fieldValue.getField().getReadOnly()))) {
+                array.add(prepareFieldValue(fieldValue));
+            }
+        }
+        return array;
+    }
+
+    /**
+     * Convert a single FieldValue to a JsonObject for transmission
+     * @param fieldValue
+     * @return JsonObject ready representing this field value formatted for
+     * transmission to the REST endpoint.
+     */
+    private JsonElement prepareFieldValue(FieldValue fieldValue) {
+        JsonObject obj = new JsonObject();
+        obj.addProperty(RestHelper.ATTR_ID, fieldValue.getFieldId());
+        /*
+         * ToDo: Handle Attachments including chemical drawings and
+         * sequences. Include the base64 encoded attachment file data.
+         */
+        obj.add(RestHelper.ATTR_VALUE, JsonParser.parseString(fieldValue.getValue()));
+        return obj;
     }
 }

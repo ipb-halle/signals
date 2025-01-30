@@ -137,6 +137,15 @@ public class Material implements IMaterial, IObjectMetaData {
         return id;
     }
 
+    /**
+     * @return splits the id into prefix, id (and suffix) and return the id part
+     */
+    public String getStrippedId() {
+        String[] parts = id.split(":");
+        return parts.length > 1 ? parts[1] : parts[0];
+    }
+
+
     public IMaterial setId(String i) {
         id = i;
         return this;
