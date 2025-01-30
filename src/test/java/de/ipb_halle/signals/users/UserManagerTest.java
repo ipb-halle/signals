@@ -22,27 +22,23 @@ import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.reporting.HtmlReport;
 import de.ipb_halle.signals.rest.MockRestClient;
-
+import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Properties;
-import jakarta.inject.Inject;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.junit.ApplicationComposer;
+import org.apache.openejb.junit5.RunWithApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
 import org.apache.openejb.testing.Module;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertThrows;
 
-@RunWith(ApplicationComposer.class)
+@RunWithApplicationComposer
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UserManagerTest {
 
     private final String TEST_RESOURCE_1 = "UserManagerTest001.json";
@@ -53,7 +49,7 @@ public class UserManagerTest {
     private final String TEST_KEY_2 =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/107";
     private final String TEST_RESOURCE_3 = "UserManagerTest003.json";
-    private final String TEST_KEY_3a = 
+    private final String TEST_KEY_3a =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/102/systemGroups";
     private final String TEST_KEY_3b =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/107/systemGroups";
@@ -61,7 +57,7 @@ public class UserManagerTest {
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/122/systemGroups";
 
     private final String TEST_RESOURCE_4 = "UserManagerTest004.json";
-    private final String TEST_KEY_4 = 
+    private final String TEST_KEY_4 =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users?page%5Blimit%5D=20&page%5Boffset%5D=0&enabled=false";
 
 
@@ -94,9 +90,9 @@ public class UserManagerTest {
 
     @Module
     @Classes(cdi = true, value = { LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class,
-        MockRestClient.class, SignalsConfig.class, 
+        MockRestClient.class, SignalsConfig.class,
         GroupDbService.class, GroupManager.class, GroupRestService.class,
-        RoleDbService.class, RoleManager.class, RoleRestService.class, 
+        RoleDbService.class, RoleManager.class, RoleRestService.class,
         UserDbService.class, UserManager.class, UserRestService.class })
     public EjbJar app() {
         return new EjbJar();
@@ -112,7 +108,7 @@ public class UserManagerTest {
         return TestBase.configuration();
     }
 
-    @Before
+    @BeforeAll
     public void testSetup() {
         TestBase.prepareRestClients(mockRestClient,
             TEST_KEY_1,
@@ -149,7 +145,6 @@ public class UserManagerTest {
         roleDbService.save(role);
     }
 
-
     @Test
     public void syncFromSnbTest() {
 
@@ -157,13 +152,13 @@ public class UserManagerTest {
         User user = userDbService.loadById(TEST_USER1_ID);
 
 
-        assertEquals("user alias mismatch", TEST_USER1_ALIAS, user.getAlias());
-        assertEquals("user first name mismatch", TEST_USER1_FIRST_NAME, user.getFirstName());
-        assertEquals("user last name mismatch", TEST_USER1_LAST_NAME, user.getLastName());
+        Assertions.assertEquals(TEST_USER1_ALIAS, user.getAlias(), "user alias mismatch");
+        Assertions.assertEquals(TEST_USER1_FIRST_NAME, user.getFirstName(), "user first name mismatch");
+        Assertions.assertEquals(TEST_USER1_LAST_NAME, user.getLastName(), "user last name mismatch");
 
         user = userDbService.loadById(TEST_USER2_ID);
-        assertEquals("user first name mismatch", TEST_USER2_FIRST_NAME, user.getFirstName());
-        assertEquals("user last name mismatch", TEST_USER2_LAST_NAME, user.getLastName());
+        Assertions.assertEquals(TEST_USER2_FIRST_NAME, user.getFirstName(), "user first name mismatch");
+        Assertions.assertEquals(TEST_USER2_LAST_NAME, user.getLastName(), "user last name mismatch");
     }
 
     @Test
@@ -175,7 +170,6 @@ public class UserManagerTest {
         AccessManager.prepareReport(context,  new HtmlReport());
         manager.syncUsersFromLdap(context);
         String html = context.report.render();
-        // System.out.printf("\n******************************\n%s\n******************************\n", html);
-        assertTrue("report contains 'ae@somewhere.invalid'", context.report.render().contains("ae@somewhere.invalid"));
+        Assertions.assertTrue(context.report.render().contains("ae@somewhere.invalid"), "report contains 'ae@somewhere.invalid'");
     }
 }

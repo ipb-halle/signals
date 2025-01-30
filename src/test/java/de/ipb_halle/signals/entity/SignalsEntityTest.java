@@ -28,21 +28,21 @@ import de.ipb_halle.signals.rest.MockRestClient;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.RestReplyParser;
 import jakarta.inject.Inject;
+import java.util.Properties;
 import org.apache.openejb.jee.EjbJar;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
-import org.apache.openejb.junit.ApplicationComposer;
+import org.apache.openejb.junit5.RunWithApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
 import org.apache.openejb.testing.Module;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
-import java.util.Properties;
 
-import static org.junit.Assert.assertEquals;
-
-@RunWith(ApplicationComposer.class)
+@RunWithApplicationComposer
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class SignalsEntityTest {
 
     private final String TEST_RESOURCE = "SignalsEntityTest001.json";
@@ -75,7 +75,7 @@ public class SignalsEntityTest {
         return TestBase.configuration();
     }
 
-    @Before
+    @BeforeAll
     public void setup() {
         dynEnumMgr.allowEnumDiscovery();
     }
@@ -88,9 +88,9 @@ public class SignalsEntityTest {
         JsonElement j = JsonParser.parseString(test);
         SignalsEntityDTO dto = restService.parseReply(j);
 
-        assertEquals("id matches", TEST_ID, dto.getId());
+        Assertions.assertEquals(TEST_ID, dto.getId(), "id matches");
 
         SignalsEntity entity = dto.createEntity();
-        assertEquals("id matches", TEST_ID, entity.getId());
+        Assertions.assertEquals(TEST_ID, entity.getId(), "id matches");
     }
 }

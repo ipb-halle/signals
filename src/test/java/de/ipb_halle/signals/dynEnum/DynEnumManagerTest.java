@@ -21,29 +21,25 @@ import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.entity.EntityType;
 import jakarta.inject.Inject;
 import java.util.Properties;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.junit.ApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
 import org.apache.openejb.testing.Module;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
+import org.apache.openejb.junit5.RunWithApplicationComposer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertThrows;
-
-@RunWith(ApplicationComposer.class)
+@RunWithApplicationComposer
 public class DynEnumManagerTest {
 
     @Inject
+
     private DynEnumManager dynEnumMgr;
 
 
     @Module
-    @Classes(cdi = true, value = { DynEnumDbService.class, DynEnumManager.class, 
-        DynEnum.class, EntityType.class })
+    @Classes(cdi = true, value = { DynEnumDbService.class, DynEnumManager.class })
     public EjbJar app() {
         return new EjbJar();
     }
@@ -59,7 +55,7 @@ public class DynEnumManagerTest {
     }
 
 /*
-    @Before
+    @BeforeAll
     public void testSetup() {
     }
 */
@@ -68,10 +64,10 @@ public class DynEnumManagerTest {
     public void dynEnumManagerTest() {
 
         final DynEnum first = EntityType.valueOf("invalidValueForTesting");
-        assertThrows(RuntimeException.class, () -> dynEnumMgr.valueOf(first));
+        Assertions.assertThrows(RuntimeException.class, () -> dynEnumMgr.valueOf(first));
 
         dynEnumMgr.allowEnumDiscovery();
         DynEnum saved = dynEnumMgr.valueOf(first);
-        assertTrue("DynEnum id is not null", saved.getId() != null);
+        Assertions.assertTrue(saved.getId() != null, "DynEnum id is not null");
     }
 }

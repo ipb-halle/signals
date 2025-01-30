@@ -19,31 +19,19 @@ package de.ipb_halle.signals.users;
 
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.SignalsConfig;
-
 import jakarta.annotation.Resource;
 import jakarta.inject.Inject;
-
-import java.util.HashSet;
 import java.util.Properties;
-import java.util.Set;
-
 import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.junit.ApplicationComposer;
+import org.apache.openejb.junit5.RunWithApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
 import org.apache.openejb.testing.Module;
-import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertThrows;
 
-@RunWith(ApplicationComposer.class)
+@RunWithApplicationComposer
 public class LdapClientTest {
 
     public final static String TEST_ALL_USERS_DN = "CN=All Users, OU=groups, DC=somewhere, DC=invalid";
@@ -58,7 +46,7 @@ public class LdapClientTest {
 
     @Module
     @Classes(cdi = true, value = { MockLdapAdapterFactory.class, SignalsConfig.class,
-        LdapClient.class, Role.class, RoleEntity.class, RolePriv.class, 
+        LdapClient.class, Role.class, RoleEntity.class, RolePriv.class,
         Group.class, User.class })
     public EjbJar app() {
         return new EjbJar();
@@ -79,16 +67,16 @@ public class LdapClientTest {
 
     @Test
     public void getGroupTest() {
-        assertEquals("Name of Group matches", TEST_ALL_USERS_NAME, ldapClient.getGroup(TEST_ALL_USERS_DN).getName());
+        Assertions.assertEquals(TEST_ALL_USERS_NAME, ldapClient.getGroup(TEST_ALL_USERS_DN).getName(), "Name of Group matches");
     }
 
     @Test
     public void getMembersTest() {
-        assertTrue("'All Users' has member 'Goethe'", ldapClient.getMembers(TEST_ALL_USERS_DN, true).contains(TEST_GOETHE_DN));
+        Assertions.assertTrue(ldapClient.getMembers(TEST_ALL_USERS_DN, true).contains(TEST_GOETHE_DN), "'All Users' has member 'Goethe'");
     }
 
     @Test
     public void getMembershipTest() {
-        assertTrue("'Goethe' is member in 'All Users'", ldapClient.getMemberships(TEST_GOETHE_DN, true).contains(TEST_ALL_USERS_DN));
+        Assertions.assertTrue(ldapClient.getMemberships(TEST_GOETHE_DN, true).contains(TEST_ALL_USERS_DN), "'Goethe' is member in 'All Users'");
     }
 }

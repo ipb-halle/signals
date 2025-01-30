@@ -25,24 +25,25 @@ import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.rest.MockRestClient;
 import java.util.Properties;
 import jakarta.inject.Inject;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.junit.ApplicationComposer;
+import org.apache.openejb.junit5.RunWithApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
 import org.apache.openejb.testing.Module;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
-import static org.junit.Assert.assertEquals;
 
-@RunWith(ApplicationComposer.class)
+
+@RunWithApplicationComposer
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class LocationTypeManagerTest {
 
     private final String TEST_RESOURCE_1 = "LocationTypeManagerTest001.json";
-    private final String TEST_KEY_1 = 
+    private final String TEST_KEY_1 =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/types?page%5Blimit%5D=20&page%5Boffset%5D=0&entityType=location";
     private final String TEST_LOCATION_TYPE_ID = "017929f3-cd0e-466c-ac94-c21ce5fe8c31";
     private final String TEST_LOCATION_TYPE_NAME = "Cabinet";
@@ -75,7 +76,7 @@ public class LocationTypeManagerTest {
         return TestBase.configuration();
     }
 
-    @Before
+    @BeforeAll
     public void testSetup() {
         dynEnumManager.allowEnumDiscovery();
         TestBase.prepareRestClients(mockRestClient,
@@ -89,6 +90,6 @@ public class LocationTypeManagerTest {
         locationTypeManager.fetchLocationTypes();
 
         LocationType lt = locationTypeManager.loadById(TEST_LOCATION_TYPE_ID, false);
-        assertEquals("LocationType name mismatch", TEST_LOCATION_TYPE_NAME, lt.getName());
+        Assertions.assertEquals(TEST_LOCATION_TYPE_NAME, lt.getName(), "LocationType name mismatch");
     }
 }

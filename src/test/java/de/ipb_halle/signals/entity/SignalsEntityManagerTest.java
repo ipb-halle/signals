@@ -25,27 +25,26 @@ import de.ipb_halle.signals.dynEnum.DynEnumDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.rest.MockRestClient;
 import jakarta.inject.Inject;
+import java.util.Properties;
 import org.apache.openejb.jee.EjbJar;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
-import org.apache.openejb.junit.ApplicationComposer;
+import org.apache.openejb.junit5.RunWithApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
 import org.apache.openejb.testing.Module;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.util.Properties;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 
-@RunWith(ApplicationComposer.class)
+@RunWithApplicationComposer
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class SignalsEntityManagerTest {
 
     private final String TEST_MOCK_RESOURCE = "SignalsEntityManagerTestMockResources.json";
     private final String TEST_RESOURCE_1 = "SignalsEntityManagerTest001.json";
-    private final String TEST_KEY_1 = 
+    private final String TEST_KEY_1 =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities?includeTypes=location&page%5Blimit%5D=20&page%5Boffset%5D=0";
     private final String TEST_RESOURCE_2 = "SignalsEntityManagerTest002.json";
     private final String TEST_KEY_2 =
@@ -84,7 +83,7 @@ public class SignalsEntityManagerTest {
         return TestBase.configuration();
     }
 
-    @Before
+    @BeforeAll
     public void testSetup() {
 //        TestBase.prepareRestClients(mockRestClient,
 //            TEST_KEY_1,
@@ -103,6 +102,6 @@ public class SignalsEntityManagerTest {
         manager.manageSignalsEntities(null, includedTypes, new RuntimeConfig());
         SignalsEntityDTO entity = manager.getDbEntity(TEST_LOCATION_ID);
         System.out.print(entity.dump());
-        assertEquals("entity type mismatch", TEST_ENTITY_TYPE, entity.getType().getValue());
+        Assertions.assertEquals(TEST_ENTITY_TYPE, entity.getType().getValue(), "entity type mismatch");
     }
 }

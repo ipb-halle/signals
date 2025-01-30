@@ -21,21 +21,14 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.StringJoiner;
 
 import jakarta.ejb.LocalBean;
-import jakarta.ejb.Stateful;
-import jakarta.inject.Inject;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import org.apache.openejb.OpenEjbContainer;
-import org.apache.openejb.api.LocalClient;
 
 @LocalBean
 public class MockRestClient extends RestClientImpl {
 
-    private static Map<String, String> responseMap = new HashMap<> ();
+    private static final Map<String, String> responseMap = new HashMap<> ();
 
     public void addResponse(String key, String value) {
         responseMap.put(key, value);

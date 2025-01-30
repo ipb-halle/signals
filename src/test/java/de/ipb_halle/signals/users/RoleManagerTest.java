@@ -24,27 +24,23 @@ import de.ipb_halle.signals.rest.MockRestClient;
 
 import java.util.Properties;
 import jakarta.inject.Inject;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.junit.ApplicationComposer;
+import org.apache.openejb.junit5.RunWithApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
 import org.apache.openejb.testing.Module;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertThrows;
-
-@RunWith(ApplicationComposer.class)
+@RunWithApplicationComposer
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class RoleManagerTest {
 
     private final String TEST_RESOURCE_1 = "RoleManagerTest001.json";
-    private final String TEST_KEY_1 = 
+    private final String TEST_KEY_1 =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/roles";
     private final String TEST_ROLE_ID = "1";
     private final String TEST_ROLE_DESCRIPTION = "Users with this role have all privileges.";
@@ -60,7 +56,7 @@ public class RoleManagerTest {
     private RoleDbService roleDbService;
 
     @Module
-    @Classes(cdi = true, value = { LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class, 
+    @Classes(cdi = true, value = { LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class,
         MockRestClient.class, SignalsConfig.class,
         Role.class, RolePriv.class, RoleDbService.class, RoleManager.class, RoleRestService.class })
     public EjbJar app() {
@@ -77,7 +73,7 @@ public class RoleManagerTest {
         return TestBase.configuration();
     }
 
-    @Before
+    @BeforeAll
     public void testSetup() {
         TestBase.prepareRestClients(mockRestClient,
             TEST_KEY_1,
@@ -93,8 +89,8 @@ public class RoleManagerTest {
         manager.syncDbRolesFromSnb(context);
         Role role = roleDbService.loadById(TEST_ROLE_ID);
 
-        assertEquals("Role name mismatch", TEST_ROLE_NAME, role.getName());
-        assertEquals("Role description mismatch", TEST_ROLE_DESCRIPTION, role.getDescription());
-        assertTrue("Role has privilege canViewMaterials", role.hasPrivilege("canViewMaterials"));
+        Assertions.assertEquals(TEST_ROLE_NAME, role.getName(), "Role name mismatch");
+        Assertions.assertEquals(TEST_ROLE_DESCRIPTION, role.getDescription(), "Role description mismatch");
+        Assertions.assertTrue(role.hasPrivilege("canViewMaterials"), "Role has privilege canViewMaterials");
     }
 }

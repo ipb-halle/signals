@@ -17,7 +17,6 @@
  */
 package de.ipb_halle.signals;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -49,12 +48,12 @@ public class TestBase {
      * @param entities array of JPA entity classes to be handled by the PersistenceUnit
      * @return configured PersistenceUnit
      */
-    public static PersistenceUnit persistence(String [] entities) {
+   public static PersistenceUnit persistence(String [] entities) {
         PersistenceUnit unit = new PersistenceUnit("signalsDB");
         unit.setJtaDataSource("testDS");
         unit.setNonJtaDataSource("testDSNonJTA");
         unit.setProvider("org.hibernate.jpa.HibernatePersistenceProvider");
-        unit.getClazz().addAll(Arrays.asList(entities)); 
+        unit.getClazz().addAll(Arrays.asList(entities));
         unit.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
 //      unit.setProperty("hibernate.show_sql", "true");
 //      unit.setProperty("hibernate.format_sql", "true");
@@ -73,8 +72,8 @@ public class TestBase {
      * add test data to the resultMap of the MockRestClient
      * to enable it to return meaningful test data.
      * @param client the MockRestClient
-     * @param urlKey the concatenated HTTP method and the request url 
-     * @param stream an InputStream obtained by Class.getResourceAsStream() 
+     * @param urlKey the concatenated HTTP method and the request url
+     * @param stream an InputStream obtained by Class.getResourceAsStream()
      * and holding the expected test data
      */
     public static void prepareRestClients(MockRestClient client, String urlKey, InputStream stream) {
@@ -101,7 +100,7 @@ public class TestBase {
 
     /**
      * @param stream the InputStream as obtained from Class.getResourceAsStream()
-     * @return the stream content 
+     * @return the stream content
      */
     public static String readStream(InputStream stream) {
         StringBuilder sb = new StringBuilder();

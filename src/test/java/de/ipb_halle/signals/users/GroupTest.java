@@ -18,13 +18,9 @@
 package de.ipb_halle.signals.users;
 
 import java.util.Date;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertThrows;
 
 public class GroupTest {
 
@@ -45,21 +41,21 @@ public class GroupTest {
         Group groupA = createGroup("1", "TestGroup", "Description of TestGroup");
         Group groupB = createGroup("1", "TestGroup", "Description of TestGroup");
 
-        assertTrue("groups are equal", groupA.equals(groupB));
-        assertTrue("hashCodes are equal", groupA.hashCode() == groupB.hashCode());
+        Assertions.assertTrue(groupA.equals(groupB),"groups are equal");
+        Assertions.assertTrue(groupA.hashCode() == groupB.hashCode(), "hashCodes are equal");
 
         groupA.setName("OtherName");
-        assertTrue("name has been modified", groupA.isModified(CompareType.SNB, groupB));
-        assertTrue("groups are equal", groupA.equals(groupB));
+        Assertions.assertTrue(groupA.isModified(CompareType.SNB, groupB), "name has been modified");
+        Assertions.assertTrue(groupA.equals(groupB), "groups are equal");
 
         groupA.setName("TestGroup");
         groupA.setDescription("other description");
-        assertTrue("description has been modified", groupA.isModified(CompareType.SNB, groupB));
-    
+        Assertions.assertTrue(groupA.isModified(CompareType.SNB, groupB), "description has been modified");
+
         groupA.setDescription("Description of TestGroup");
         groupA.setId("2");
-        assertFalse("Change of id is no modification", groupA.isModified(CompareType.SNB, groupB));
-        assertFalse("groups are NOT equal", groupA.equals(groupB));
-        assertFalse("hashCodes do NOT match", groupA.hashCode() == groupB.hashCode());
+        Assertions.assertFalse(groupA.isModified(CompareType.SNB, groupB), "Change of id is no modification");
+        Assertions.assertFalse(groupA.equals(groupB), "groups are NOT equal");
+        Assertions.assertFalse(groupA.hashCode() == groupB.hashCode(), "hashCodes do NOT match");
     }
 }

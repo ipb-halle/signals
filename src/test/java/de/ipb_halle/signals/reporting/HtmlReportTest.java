@@ -17,13 +17,9 @@
  */
 package de.ipb_halle.signals.reporting;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertThrows;
 
 public class HtmlReportTest {
 
@@ -39,7 +35,7 @@ public class HtmlReportTest {
         sectionOne.addContent("George Washington");
         sectionOne.addContent("Charles de Gaulle");
         sectionOne.addContent("Winston Churchill");
-        
+
         HtmlList sectionTwo = new HtmlList("Oceans", "Oceans of the world");
 
         report.addSection("header", pageHeader);
@@ -51,8 +47,8 @@ public class HtmlReportTest {
         report.addContent("two", "Indian Ocean");
 
         String reportString = report.render();
-        assertTrue("Report contains heading", reportString.contains("few introductory words"));
-        assertTrue("Report contains Caesar", reportString.contains("from history</div><ul><li>Julius Caesar</li>"));
-        assertTrue("Report contains Indian Ocean", reportString.contains("<li>Indian Ocean</li></ul></p></body></html>"));
+        Assertions.assertTrue(reportString.contains("few introductory words"), "Report contains heading");
+        Assertions.assertTrue(reportString.contains("from history</div><ul><li>Julius Caesar</li>"), "Report contains Caesar");
+        Assertions.assertTrue(reportString.contains("<li>Indian Ocean</li></ul></p></body></html>"), "Report contains Indian Ocean");
     }
 }

@@ -38,26 +38,23 @@ import de.ipb_halle.signals.users.RoleRestService;
 import de.ipb_halle.signals.users.UserDbService;
 import de.ipb_halle.signals.users.UserManager;
 import de.ipb_halle.signals.users.UserRestService;
-
 import java.util.Properties;
-
 import jakarta.inject.Inject;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.junit.ApplicationComposer;
+import org.apache.openejb.junit5.RunWithApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
 import org.apache.openejb.testing.Module;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
 
-@RunWith(ApplicationComposer.class)
+
+@RunWithApplicationComposer
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class LocationManagerTest {
 
     private final String TEST_RESOURCE_1 = "LocationManagerTest001.json";
@@ -103,7 +100,7 @@ public class LocationManagerTest {
         return TestBase.configuration();
     }
 
-    @Before
+    @BeforeAll
     public void testSetup() {
         dynEnumManager.allowEnumDiscovery();
         TestBase.prepareRestClients(mockRestClient,
@@ -119,7 +116,7 @@ public class LocationManagerTest {
         manager.fetchSingleLocation(dto);
 
         LocationEntity loc = manager.loadById(TEST_LOCATION_ID, false);
-        assertEquals("Location name mismatch", TEST_LOCATION_NAME, loc.getName());
-        assertEquals("Location barcode mismatch", TEST_LOCATION_BARCODE, loc.getBarcode());
+        Assertions.assertEquals(TEST_LOCATION_NAME, loc.getName(), "Location name mismatch");
+        Assertions.assertEquals(TEST_LOCATION_BARCODE, loc.getBarcode(), "Location barcode mismatch");
     }
 }

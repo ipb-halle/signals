@@ -19,13 +19,9 @@ package de.ipb_halle.signals.users;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertThrows;
 
 public class RoleTest {
 
@@ -37,7 +33,6 @@ public class RoleTest {
         return role;
     }
 
-
     @Test
     public void roleTest() {
         Role roleA = createRole("1", "TestRole", "Description of TestRole");
@@ -47,19 +42,19 @@ public class RoleTest {
         roleA.addPrivilege("canShare");
         roleB.addPrivilege("canArchive");
 
-        assertTrue("roles are equal", roleA.equals(roleB));
-        assertTrue("hashCodes are equal", roleA.hashCode() == roleB.hashCode());
+        Assertions.assertTrue(roleA.equals(roleB), "roles are equal");
+        Assertions.assertTrue(roleA.hashCode() == roleB.hashCode(), "hashCodes are equal");
 
-        assertTrue("isModified() is true", roleA.isModified(roleB));
+        Assertions.assertTrue(roleA.isModified(roleB), "isModified() is true");
 
-        assertTrue("Role equals RoleRef", roleA.equals(roleRefA));
-        assertTrue("RoleRef equals Role", roleRefA.equals(roleA));
+        Assertions.assertTrue(roleA.equals(roleRefA), "Role equals RoleRef");
+        Assertions.assertTrue(roleRefA.equals(roleA), "RoleRef equals Role");
 
         Set<IRole> setA = new HashSet<> ();
         setA.add(roleRefA);
         Set<IRole> setB = new HashSet<> ();
         setB.add(roleB);
-        assertTrue("Sets are equal", setA.equals(setB));
-        assertFalse("role is already present in set", setB.add(roleA));
+        Assertions.assertTrue(setA.equals(setB), "Sets are equal");
+        Assertions.assertFalse(setB.add(roleA), "role is already present in set");
     }
 }
