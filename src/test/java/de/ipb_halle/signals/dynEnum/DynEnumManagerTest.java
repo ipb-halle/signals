@@ -17,29 +17,41 @@
  */
 package de.ipb_halle.signals.dynEnum;
 
-import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.entity.EntityType;
+import de.ipb_halle.signals.users.UserManagerTest;
+import de.ipb_halle.tda.DeploymentElement;
+import jakarta.ejb.Local;
 import jakarta.inject.Inject;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+/*
+ * Imports no longer needed, when working with the
+ * @DeploymentElement annotation.
+ *
+import de.ipb_halle.signals.TestBase;
 import java.util.Properties;
 import org.apache.openejb.jee.EjbJar;
+import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
+import org.apache.openejb.junit5.RunWithApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
 import org.apache.openejb.testing.Module;
-import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
-import org.apache.openejb.junit5.RunWithApplicationComposer;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions;
+ */
 
-@RunWithApplicationComposer
-public class DynEnumManagerTest {
+// @RunWithApplicationComposer
+public abstract class DynEnumManagerTest {
 
     @Inject
+    @DeploymentElement
+    public DynEnumManager dynEnumMgr;
 
-    private DynEnumManager dynEnumMgr;
-
-
+    /*
+     * Will be provided by de.ipb_halle.tda.DeploymentProcessor
+     *
     @Module
-    @Classes(cdi = true, value = { DynEnumDbService.class, DynEnumManager.class })
+    @Classes(cdi = true, value = { DynEnumDbService.class, 
+        DynEnumManager.class })
     public EjbJar app() {
         return new EjbJar();
     }
@@ -53,13 +65,8 @@ public class DynEnumManagerTest {
     public Properties configuration() {
         return TestBase.configuration();
     }
-
-/*
-    @BeforeAll
-    public void testSetup() {
-    }
-*/
-
+     */
+        
     @Test
     public void dynEnumManagerTest() {
 

@@ -35,6 +35,7 @@
 
         <!-- check Maven Central for latest versions! -->
         <cxf.version>4.0.0</cxf.version>
+        <auto-service.version>1.1.1</auto-service.version>
     </properties>
 
     <!-- define (additional) repositories -->
@@ -64,13 +65,77 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.13.0</version>
                 <configuration>
                     <source>17</source>
                     <target>17</target>
-                    <compilerArgument>-Xlint:all</compilerArgument>
+                    <!-- <compilerArgument>-Xlint:all</compilerArgument> -->
+                    <compilerArgs>
+                        <arg>-Xlint:all</arg>
+                        <arg>-Aclasspath=${maven.compile.classpath}</arg>
+                    </compilerArgs>
                     <encoding>${project.build.sourceEncoding}</encoding>
+                    <annotationProcessorPaths>
+                        <!-- unfortunately our DeploymentProcessor needs all these APIs in its classpath -->
+                        <path>
+                            <groupId>com.google.auto.service</groupId>
+                            <artifactId>auto-service</artifactId>
+                            <version>${auto-service.version}</version>
+                        </path>
+                        <path>
+                            <groupId>de.ipb-halle</groupId>
+                            <artifactId>tdap</artifactId>
+                            <version>1.0</version>
+                        </path>
+                        <path>
+                            <groupId>de.ipb-halle</groupId>
+                            <artifactId>tda</artifactId>
+                            <version>1.0</version>
+                        </path>
+                        <path>
+                            <groupId>jakarta.inject</groupId>
+                            <artifactId>jakarta.inject-api</artifactId>
+                            <version>2.0.0</version>
+                        </path>
+                        <path>
+                            <groupId>jakarta.ejb</groupId>
+                            <artifactId>jakarta.ejb-api</artifactId>
+                            <version>4.0.0</version>
+                        </path>
+                        <path>
+                            <groupId>jakarta.persistence</groupId>
+                            <artifactId>jakarta.persistence-api</artifactId>
+                            <version>3.1.0</version>
+                        </path>
+                        <path>
+                            <groupId>jakarta.annotation</groupId>
+                            <artifactId>jakarta.annotation-api</artifactId>
+                            <version>2.1.1</version>
+                        </path>
+
+                    </annotationProcessorPaths>
+                    <annotationProcessors>
+                        <annotationProcessor>de.ipb_halle.tda.DeploymentProcessor</annotationProcessor>
+                    </annotationProcessors>
                 </configuration>
+            </plugin>
+
+            <!-- dependency plugin -->
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.8.1</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>build-classpath</goal>
+                        </goals>
+                        <configuration>
+                            <outputProperty>maven.compile.classpath</outputProperty>
+                            <pathSeparator>:</pathSeparator>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- assembly plugin -->
@@ -225,6 +290,20 @@
     </reporting>
 
     <dependencies>
+
+        <!-- google auto service annotations -->
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service-annotations</artifactId>
+            <version>${auto-service.version}</version>
+        </dependency>
+
+        <!-- test deployment annotations -->
+        <dependency>
+            <groupId>de.ipb-halle</groupId>
+            <artifactId>tda</artifactId>
+            <version>1.0</version>
+       </dependency>
 
         <!-- Reference implementation of JSON encoders/decoders -->
         <dependency>

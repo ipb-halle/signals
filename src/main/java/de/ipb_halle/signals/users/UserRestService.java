@@ -24,7 +24,7 @@ import com.google.gson.JsonParser;
 
 import de.ipb_halle.signals.rest.Method;
 import de.ipb_halle.signals.rest.RestClient;
-import de.ipb_halle.signals.rest.RestClientImpl;
+//import de.ipb_halle.signals.rest.RestClientImpl;
 import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.RestResultIterator;
 import de.ipb_halle.signals.rest.RestReplyParser;
@@ -111,7 +111,7 @@ public class UserRestService implements RestReplyParser<User> {
 
 
     @Inject
-    private RestClientImpl restClient;
+    private RestClient restClient;
 
     /**
      * deserialize user

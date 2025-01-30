@@ -17,6 +17,13 @@
  */
 package de.ipb_halle.signals.dynEnum;
 
+import de.ipb_halle.tda.PersistenceElements;
+import de.ipb_halle.signals.attachment.AttachmentType;
+import de.ipb_halle.signals.attribute.AttributeType;
+import de.ipb_halle.signals.field.FieldDesignation;
+import de.ipb_halle.signals.field.FieldType;
+
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +42,8 @@ import org.slf4j.LoggerFactory;
 
 @Singleton(name = "dynEnumManager")
 @Startup
+@PersistenceElements(entities={AttachmentType.class, AttributeType.class,
+    DynEnum.class, FieldDesignation.class, FieldType.class})
 public class DynEnumManager {
 
     private final Logger logger = LoggerFactory.getLogger(DynEnumManager.class);

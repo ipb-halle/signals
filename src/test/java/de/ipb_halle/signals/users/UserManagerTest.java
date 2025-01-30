@@ -1,6 +1,6 @@
 /*
  * IPB Signals client
- * Copyright 2022 Leibniz-Institut f. Pflanzenbiochemie
+ * Copyright 2025 Leibniz-Institut f. Pflanzenbiochemie
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,19 @@ import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.reporting.HtmlReport;
 import de.ipb_halle.signals.rest.MockRestClient;
+import de.ipb_halle.signals.rest.RestClient;
+import de.ipb_halle.tda.DeploymentElement;
 import jakarta.inject.Inject;
 import java.util.HashMap;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/*
+ * no longer needed
+ *
 import java.util.Properties;
 import org.apache.openejb.jee.EjbJar;
 import org.apache.openejb.junit5.RunWithApplicationComposer;
@@ -31,15 +42,13 @@ import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
 import org.apache.openejb.testing.Module;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+*/
 
 
-@RunWithApplicationComposer
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class UserManagerTest {
+//@RunWithApplicationComposer
+//@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public abstract class UserManagerTest {
 
     private final String TEST_RESOURCE_1 = "UserManagerTest001.json";
     private final String TEST_KEY_1 =
@@ -60,8 +69,6 @@ public class UserManagerTest {
     private final String TEST_KEY_4 =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users?page%5Blimit%5D=20&page%5Boffset%5D=0&enabled=false";
 
-
-
     private final String TEST_USER1_ID = "102";
     private final String TEST_USER1_ALIAS = "USR3";
     private final String TEST_USER1_FIRST_NAME = "ThreeFirst";
@@ -77,17 +84,29 @@ public class UserManagerTest {
     private final String TEST_ROLE4_NAME = "Inventory Admin";
 
     @Inject
-    private MockRestClient mockRestClient;
+    @DeploymentElement(mock="de.ipb_halle.signals.rest.MockRestClient")
+    private RestClient mockRestClient;
 
     @Inject
+    @DeploymentElement(mock="de.ipb_halle.signals.users.MockLdapAdapterFactory")
+    private LdapAdapterFactory ldapAdapterFactory;
+    
+    @DeploymentElement(mock="de.ipb_halle.signals.users.MockLdapAdapter")
+    private LdapAdapter ldapAdapter;
+    
+    @Inject
+    @DeploymentElement
     private UserManager manager;
 
     @Inject
+    @DeploymentElement
     private RoleDbService roleDbService;
 
     @Inject
+    @DeploymentElement
     private UserDbService userDbService;
 
+/*
     @Module
     @Classes(cdi = true, value = { LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class,
         MockRestClient.class, SignalsConfig.class,
@@ -107,29 +126,28 @@ public class UserManagerTest {
     public Properties configuration() {
         return TestBase.configuration();
     }
+*/
 
     @BeforeAll
     public void testSetup() {
-        TestBase.prepareRestClients(mockRestClient,
+        TestBase.prepareRestClients((MockRestClient) mockRestClient,
             TEST_KEY_1,
             getClass().getResourceAsStream(TEST_RESOURCE_1));
-        TestBase.prepareRestClients(mockRestClient,
+        TestBase.prepareRestClients((MockRestClient) mockRestClient,
             TEST_KEY_2,
             getClass().getResourceAsStream(TEST_RESOURCE_2));
-        TestBase.prepareRestClients(mockRestClient,
+        TestBase.prepareRestClients((MockRestClient) mockRestClient,
             TEST_KEY_3a,
             getClass().getResourceAsStream(TEST_RESOURCE_3));
-        TestBase.prepareRestClients(mockRestClient,
+        TestBase.prepareRestClients((MockRestClient) mockRestClient,
             TEST_KEY_3b,
             getClass().getResourceAsStream(TEST_RESOURCE_3));
-        TestBase.prepareRestClients(mockRestClient,
+        TestBase.prepareRestClients((MockRestClient) mockRestClient,
             TEST_KEY_3c,
             getClass().getResourceAsStream(TEST_RESOURCE_3));
-        TestBase.prepareRestClients(mockRestClient,
+        TestBase.prepareRestClients((MockRestClient) mockRestClient,
             TEST_KEY_4,
             getClass().getResourceAsStream(TEST_RESOURCE_4));
-
-
 
         Role role = new Role();
         role.setId(TEST_ROLE1_ID);
@@ -150,7 +168,6 @@ public class UserManagerTest {
 
         manager.syncDbUsersFromSnb(new RuntimeConfig());
         User user = userDbService.loadById(TEST_USER1_ID);
-
 
         Assertions.assertEquals(TEST_USER1_ALIAS, user.getAlias(), "user alias mismatch");
         Assertions.assertEquals(TEST_USER1_FIRST_NAME, user.getFirstName(), "user first name mismatch");

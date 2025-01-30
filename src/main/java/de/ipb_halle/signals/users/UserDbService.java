@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals.users;
 
+import de.ipb_halle.tda.PersistenceElements;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,6 +44,8 @@ import org.slf4j.LoggerFactory;
  */
 
 @Stateless
+@PersistenceElements(entities={Group.class, GroupMembership.class, RoleEntity.class, RolePrivDef.class, 
+            RolePriv.class, UserEntity.class, UserRole.class})
 public class UserDbService {
 
     @PersistenceContext(unitName="signalsDB")
