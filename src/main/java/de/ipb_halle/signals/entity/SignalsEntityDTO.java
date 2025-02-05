@@ -25,6 +25,10 @@ import java.util.*;
 
 public class SignalsEntityDTO implements IEntityRelationships, ISignalsEntity {
 
+    public enum StripIdPart {
+        SUFFIX,
+        BOTH
+    }
     public final static String ATTR_EID = "eid";
     public final static String ATTR_CREATED_AT = "createdAt";
     public final static String ATTR_EDITED_AT = "editedAt";
@@ -126,9 +130,17 @@ public class SignalsEntityDTO implements IEntityRelationships, ISignalsEntity {
     /**
      * @return splits the id into prefix, id (and suffix) and return the id part
      */
-    public String getStrippedId() {
+    public String getStrippedId(StripIdPart part) {
         String[] parts = id.split(":");
-        return parts.length > 1 ? parts[1] : parts[0];
+        switch(part) {
+            case BOTH:
+                return parts.length > 1 ? parts[1] : parts[0];
+            case SUFFIX:
+                return parts.length > 2
+                        ? parts[0] + ":" + parts[1]
+                        : id;
+        }
+        throw new IllegalArgumentException("getStrippedId()");
     }
 
     public EntityType getType() {

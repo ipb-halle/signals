@@ -185,8 +185,13 @@ public class Signals {
         inventoryConfig.manageInventory(dateRange);
     }
 
+    @Deprecated // use getMaterialsConfig() instead
     public void manageMaterials(Date[] dateRange) {
         materialsConfig.manageMaterials(dateRange);
+    }
+
+    public MaterialsConfig getMaterialsConfig() {
+        return materialsConfig;
     }
 
     public void manageElements(Date[] dateRange) {

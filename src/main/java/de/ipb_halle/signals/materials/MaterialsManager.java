@@ -1,23 +1,20 @@
 /*
+ * IPB Signals client
+ * Copyright 2024 Leibniz-Institut f. Pflanzenbiochemie
  *
- *  * IPB Signals client
- *  * Copyright 2024 Leibniz-Institut f. Pflanzenbiochemie
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  * you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  *     http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
- *  *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
-
 package de.ipb_halle.signals.materials;
 
 import de.ipb_halle.signals.RuntimeConfig;
@@ -61,9 +58,25 @@ public class MaterialsManager {
     private LibraryRestService libraryRestService;
 
     @Inject
+    private MaterialDbService materialDbService;
+
+    @Inject
     private MaterialProcessorBean materialProcessorBean;
 
-    private Logger logger = LoggerFactory.getLogger(MaterialsManager.class);
+    @Inject
+    private MaterialRestService materialRestService;
+
+    private final Logger logger = LoggerFactory.getLogger(MaterialsManager.class);
+
+
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+    public void importMaterial(RuntimeConfig runtimeConfig, String id) {
+        Material mat = materialDbService.loadById(id);
+        Library lib = libraryDbService.loadById(mat.getLibraryId());
+        if (runtimeConfig.updateSNB) {
+            materialRestService.doCreateMaterial(lib, mat);
+        }
+    }
 
     /**
      * Fetches materials from the Signals database within a specified date range
@@ -205,8 +218,6 @@ public class MaterialsManager {
             }
         }
     }
-
-
 }
 
 

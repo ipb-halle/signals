@@ -41,6 +41,15 @@ public class MaterialsConfig {
             .desc("\nSynchronize materials libraries and materials from SNB to DB.")
             .build();
 
+    @SuppressWarnings("static-access")
+    private static final Option materialImportOpt = Option.builder("mi")
+            .longOpt("materialImport")
+            .hasArgs()
+            .argName("ENTITY_ID")
+            .optionalArg(false)
+            .desc("\nImport a single material from DB into SNB (i.e. create new material in SNB).")
+            .build();
+
     private MaterialsManager materialsManager;
     private RuntimeConfig runtimeConfig;
     private SignalsConfig signalsConfig;
@@ -68,9 +77,22 @@ public class MaterialsConfig {
         materialsManager.manageMaterials(runtimeConfig, dateRange);
     }
 
+    public void importMaterials(String id) {
+        logger.info("""
+
+                ******************************************************
+                *
+                * Import single Material
+                * {} / {}
+                *
+                ******************************************************
+                """, signalsConfig.getSnbInstanceName(), id);
+        materialsManager.importMaterial(runtimeConfig, id);
+    }
 
     public static void registerOptions(Options options) {
         options.addOption(materialsSyncOpt);
+        options.addOption(materialImportOpt);
     }
 
     /**
@@ -85,7 +107,12 @@ public class MaterialsConfig {
 
         if (cmdline.hasOption(materialsSyncOpt.getOpt())) {
             String[] dateRangeArgs = cmdline.getOptionValues(materialsSyncOpt.getOpt());
-            signals.manageMaterials(DateRangeParser.parseDateRange(dateRangeArgs));
+            signals.getMaterialsConfig().manageMaterials(DateRangeParser.parseDateRange(dateRangeArgs));
+        }
+
+        if (cmdline.hasOption(materialImportOpt.getOpt())) {
+            signals.getMaterialsConfig().importMaterials(
+                    cmdline.getOptionValue(materialImportOpt.getOpt()));
         }
     }
 }

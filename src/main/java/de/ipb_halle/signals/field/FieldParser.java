@@ -56,10 +56,6 @@ public class FieldParser implements RestReplyParser<Field> {
         return (FieldType) dynEnumMgr.valueOf(FieldType.valueOf(typeString));
     }
 
-    private FieldAttachment lookupFieldAttachment(String typeString) {
-        return (FieldAttachment) dynEnumMgr.valueOf(FieldType.valueOf(typeString));
-    }
-
     /**
      * ToDO: ATTR_COLLECTION currently not implemented!
      */

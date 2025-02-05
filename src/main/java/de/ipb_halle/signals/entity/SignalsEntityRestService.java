@@ -116,7 +116,8 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
     public RestResultIterator<SignalsEntityDTO> doGetChildren(SignalsEntityDTO parentEntity) {
         restClient.reset()
                 .setMethod(Method.GET)
-                .setEndpoint(String.format(SIGNALS_ENTITY_CHILDREN_ENDPOINT, parentEntity.getStrippedId()));
+                .setEndpoint(String.format(SIGNALS_ENTITY_CHILDREN_ENDPOINT,
+                        parentEntity.getStrippedId(SignalsEntityDTO.StripIdPart.SUFFIX)));
         return new RestResultIterator<SignalsEntityDTO>(restClient,
                 new SignalsChildParser(dynEnumManager), true);
     }

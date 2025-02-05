@@ -34,7 +34,7 @@ import java.util.Date;
 public class ElementConfig {
 
     @SuppressWarnings("static-access")
-    private static final Option elementsSyncOpt = Option.builder("eS")
+    private static final Option elementsSyncOpt = Option.builder("xS")
             .longOpt("elementsSync")
             .hasArgs()
             .argName("=all | =START[:END]")
