@@ -20,7 +20,7 @@ package de.ipb_halle.signals.entity;
 import java.util.HashMap;
 import java.util.Map;
 
-/** 
+/**
  * Mapping between Quality and SNB measure
  */
 

@@ -28,8 +28,8 @@ import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
 
 
-/** 
- * Container type field definition 
+/**
+ * Container type field definition
  */
 
 @Entity
@@ -54,9 +54,9 @@ public class ContainerTypeAttachment {
 
     @Override
     public boolean equals(Object o) {
-        if ((o == null) || (getClass() != o.getClass())) { 
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
-        } 
+        }
         ContainerTypeAttachment other = (ContainerTypeAttachment) o;
         return Objects.equals(container_type_id, other.container_type_id)
             && Objects.equals(attachment_id, other.attachment_id);

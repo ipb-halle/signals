@@ -40,7 +40,7 @@ public class FieldDefinition {
     private Integer fieldDesignation;
 
     @Column
-    private Boolean calculated;
+    private boolean calculated;
 
     @Column(name = "default_unit")
     private String defaultUnit;
@@ -61,25 +61,25 @@ public class FieldDefinition {
     private Integer fieldType;
 
     @Column
-    private Boolean hidden;
+    private boolean hidden;
 
     @Column
     private String key;
 
     @Column(name = "multiselect")
-    private Boolean multiSelect;
+    private boolean multiSelect;
 
     @Column(name = "read_only")
-    private Boolean readOnly;
+    private boolean readOnly;
 
     @Column
-    private Boolean required;
+    private boolean required;
 
     @Column
     private String title;
 
     @Column(name = "user_defined")
-    private Boolean userDefined;
+    private boolean userDefined;
 
 
     public String dump() {
@@ -94,7 +94,7 @@ public class FieldDefinition {
         return attributeListEid;
     }
 
-    public Boolean getCalculated() {
+    public boolean getCalculated() {
         return calculated;
     }
 
@@ -122,23 +122,23 @@ public class FieldDefinition {
         return title;
     }
 
-    public Boolean isHidden() {
+    public boolean isHidden() {
         return hidden;
     }
 
-    public Boolean isMultiSelect() {
+    public boolean isMultiSelect() {
         return multiSelect;
     }
 
-    public Boolean isReadOnly() {
+    public boolean isReadOnly() {
         return readOnly;
     }
 
-    public Boolean isRequired() {
+    public boolean isRequired() {
         return required;
     }
 
-    public Boolean isUserDefined() {
+    public boolean isUserDefined() {
         return userDefined;
     }
 
@@ -160,7 +160,7 @@ public class FieldDefinition {
         return this;
     }
 
-    public FieldDefinition setCalculated(Boolean c) {
+    public FieldDefinition setCalculated(boolean c) {
         calculated = c;
         return this;
     }
@@ -184,7 +184,7 @@ public class FieldDefinition {
         return this;
     }
 
-    public FieldDefinition setHidden(Boolean h) {
+    public FieldDefinition setHidden(boolean h) {
         hidden = h;
         return this;
     }
@@ -194,17 +194,17 @@ public class FieldDefinition {
         return this;
     }
 
-    public FieldDefinition setMultiSelect(Boolean b) {
+    public FieldDefinition setMultiSelect(boolean b) {
         multiSelect = b;
         return this;
     }
 
-    public FieldDefinition setReadOnly(Boolean r) {
+    public FieldDefinition setReadOnly(boolean r) {
         readOnly = r;
         return this;
     }
 
-    public FieldDefinition setRequired(Boolean r) {
+    public FieldDefinition setRequired(boolean r) {
         required = r;
         return this;
     }
@@ -214,7 +214,7 @@ public class FieldDefinition {
         return this;
     }
 
-    public FieldDefinition setUserDefined(Boolean u) {
+    public FieldDefinition setUserDefined(boolean u) {
         userDefined = u;
         return this;
     }

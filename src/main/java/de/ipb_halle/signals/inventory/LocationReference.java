@@ -17,8 +17,8 @@
  */
 package de.ipb_halle.signals.inventory;
 
-/** 
- * Location reference 
+/**
+ * Location reference
  */
 public class LocationReference implements ILocation {
 

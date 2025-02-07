@@ -29,7 +29,7 @@ import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
 
 
-/** 
+/**
  * Dynamically discovered "enum" types from Signals Notebook
  */
 
@@ -37,7 +37,7 @@ import jakarta.persistence.Table;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(name = "DYN_ENUMS")
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING, length = 40)
-public abstract class DynEnum <T> { 
+public abstract class DynEnum <T> {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

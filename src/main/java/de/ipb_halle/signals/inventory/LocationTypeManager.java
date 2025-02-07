@@ -21,8 +21,8 @@ import de.ipb_halle.signals.rest.RestResultIterator;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 
-/** 
- * Manager for location types (inventory/types API endpoint) 
+/**
+ * Manager for location types (inventory/types API endpoint)
  */
 
 @Stateless

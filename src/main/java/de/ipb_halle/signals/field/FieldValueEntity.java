@@ -24,7 +24,7 @@ import de.ipb_halle.signals.util.EmbeddedKeyValue;
 import jakarta.persistence.*;
 
 
-/** 
+/**
  * Field values (field definition, entity id, value)
  */
 

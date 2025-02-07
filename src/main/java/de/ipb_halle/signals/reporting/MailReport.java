@@ -55,7 +55,7 @@ public class MailReport extends HtmlReport {
 
             transport.connect(smtpHost, smtpPort, smtpUser, smtpPassword);
             transport.sendMessage(msg, msg.getAllRecipients());
-        } 
+        }
     }
 
     private Properties getProperties() {
@@ -64,7 +64,7 @@ public class MailReport extends HtmlReport {
         props.put("mail.smtp.port", smtpPort);
         props.put("mail.smtp.auth", "false");
 
-//      props.put("mail.smtp.auth.login.disable", "true");      // default authorization order is "LOGIN PLAIN DIGEST-MD5 NTLM". 
+//      props.put("mail.smtp.auth.login.disable", "true");      // default authorization order is "LOGIN PLAIN DIGEST-MD5 NTLM".
                                                                 // 'LOGIN' must be disabled since Email Delivery authorizes as 'PLAIN'
 
 //      props.put("mail.smtp.auth", "true");

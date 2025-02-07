@@ -66,14 +66,20 @@ public class FieldParser implements RestReplyParser<Field> {
         fd.setId(j.getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
 
         if (j.has(Field.ATTR_DEFINITION)) {
+            /*
+             * containers, ...
+             */
             parseDefinition(j.getAsJsonObject(Field.ATTR_DEFINITION), fd);
         } else {
+            /*
+             *
+             */
             fd.setAttributeListEid(RestHelper.parseString(j, Field.ATTR_ATTRIBUTE));
-            fd.setCalculated(RestHelper.parseBool(j, Field.ATTR_CALCULATED));
+            fd.setCalculated(RestHelper.parseBool(j, Field.ATTR_CALCULATED, false));
             fd.setDefinedBy(RestHelper.parseString(j, Field.ATTR_DEFINED_BY));
             fd.setFieldType(lookupFieldType(RestHelper.parseString(j, Field.ATTR_DATA_TYPE)));
-            fd.setHidden(RestHelper.parseBool(j, Field.ATTR_HIDDEN));
-            fd.setRequired(RestHelper.parseBool(j, Field.ATTR_MANDATORY));
+            fd.setHidden(RestHelper.parseBool(j, Field.ATTR_HIDDEN, false));
+            fd.setRequired(RestHelper.parseBool(j, Field.ATTR_MANDATORY, false));
             fd.setTitle(RestHelper.parseString(j, RestHelper.ATTR_NAME));
 
             if (j.has(Field.ATTR_MEASURE_OPTIONS)) {
@@ -88,21 +94,21 @@ public class FieldParser implements RestReplyParser<Field> {
 
     /**
      * JSON object is for Material fields extraction
-     *
+     * Parse field definition as appropriate for containers, ...
      * @param def
      * @param fd
      */
-
     private void parseDefinition(JsonObject def, Field fd) {
         fd.setAttributeListEid(RestHelper.parseString(def, Field.ATTR_ATTRIBUTE_LIST_EID));
         fd.setDefaultUnit(RestHelper.parseString(def, Field.ATTR_DEFAULT_UNIT));
         fd.setDefinedBy(RestHelper.parseString(def, Field.ATTR_DEFINED_BY));
         fd.setFieldType(lookupFieldType(RestHelper.parseString(def, Field.ATTR_FIELD_TYPE)));
-        fd.setHidden(RestHelper.parseBool(def, Field.ATTR_HIDDEN));
         fd.setKey(RestHelper.parseString(def, Field.ATTR_KEY));
-        fd.setRequired(RestHelper.parseBool(def, Field.ATTR_REQUIRED));
         fd.setTitle(RestHelper.parseString(def, Field.ATTR_TITLE));
-        fd.setUserDefined(RestHelper.parseBool(def, Field.ATTR_USER_DEFINED));
+        fd.setHidden(RestHelper.parseBool(def, Field.ATTR_HIDDEN, false));
+        fd.setMultiSelect(RestHelper.parseBool(def, Field.ATTR_MULTISELECT, false));
+        fd.setRequired(RestHelper.parseBool(def, Field.ATTR_REQUIRED, false));
+        fd.setUserDefined(RestHelper.parseBool(def, Field.ATTR_USER_DEFINED, false));
 
         if (def.has(Field.ATTR_MEASURES)) {
             parseMeasures(def.getAsJsonArray(Field.ATTR_MEASURES), fd);

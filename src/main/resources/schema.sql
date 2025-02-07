@@ -5,7 +5,7 @@ CREATE TABLE dyn_enums (
     value VARCHAR NOT NULL,
     UNIQUE (type, value));
 
-INSERT INTO dyn_enums (type, value) VALUES 
+INSERT INTO dyn_enums (type, value) VALUES
     ('EntityType', 'experiment'),
     ('EntityType', 'journal'),
     ('EntityType', 'request'),
@@ -173,20 +173,20 @@ CREATE TABLE group_memberships (
 CREATE TABLE field_definitions (
     id VARCHAR NOT NULL PRIMARY KEY,
     attribute_list_eid VARCHAR,
-    calculated BOOLEAN,
     default_unit VARCHAR,
     defined_by VARCHAR,
     defining_entity_id VARCHAR /* NOT NULL signalsentities(id) */,
     description VARCHAR,
     designation INTEGER NOT NULL REFERENCES dyn_enums(id) ON UPDATE CASCADE ON DELETE CASCADE,
     field_type INTEGER NOT NULL REFERENCES dyn_enums(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    hidden VARCHAR,
     key VARCHAR,
-    multiselect BOOLEAN,
-    read_only BOOLEAN,
     required VARCHAR,
     title VARCHAR,
-    user_defined VARCHAR
+    calculated BOOLEAN NOT NULL DEFAULT FALSE,
+    hidden BOOLEAN NOT NULL DEFAULT FALSE,
+    multiselect BOOLEAN NOT NULL DEFAULT FALSE,
+    read_only BOOLEAN NOT NULL DEFAULT FALSE,
+    user_defined BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE field_measures (

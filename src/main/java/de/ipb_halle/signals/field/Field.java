@@ -34,7 +34,7 @@ public class Field {
     public final static String ATTR_KEY = "key";
     public final static String ATTR_MEASURE_OPTIONS = "measureOptions";
     public final static String ATTR_MEASURES = "measures";
-    //public final static String ATTR_MULTISELECT = "multiSelect";
+    public final static String ATTR_MULTISELECT = "multiSelect";
     public final static String ATTR_OPTIONS = "options";
     public final static String ATTR_READ_ONLY = "readOnly";
     public final static String ATTR_REQUIRED = "isRequired";
@@ -52,17 +52,17 @@ public class Field {
 
     private String id;
     private String attributeListEid;
-    private Boolean calculated;
+    private boolean calculated;
     private String defaultUnit;
     private String definedBy;
     private String definingEntityId;
-    private Boolean hidden;
+    private boolean hidden;
     private String key;
-    private Boolean multiSelect;
-    private Boolean readOnly;
-    private Boolean required;
+    private boolean multiSelect;
+    private boolean readOnly;
+    private boolean required;
     private String title;
-    private Boolean userDefined;
+    private boolean userDefined;
     /* complex types */
     private FieldType fieldType;
     private Set<FieldMeasure> measures;
@@ -151,11 +151,11 @@ public class Field {
         this.attributeListEid = attributeListEid;
     }
 
-    public Boolean getCalculated() {
+    public boolean getCalculated() {
         return calculated;
     }
 
-    public void setCalculated(Boolean calculated) {
+    public void setCalculated(boolean calculated) {
         this.calculated = calculated;
     }
 
@@ -183,11 +183,11 @@ public class Field {
         this.definingEntityId = definingEntityId;
     }
 
-    public Boolean getHidden() {
+    public boolean getHidden() {
         return hidden;
     }
 
-    public void setHidden(Boolean hidden) {
+    public void setHidden(boolean hidden) {
         this.hidden = hidden;
     }
 
@@ -199,27 +199,27 @@ public class Field {
         this.key = key;
     }
 
-    public Boolean getMultiSelect() {
+    public boolean getMultiSelect() {
         return multiSelect;
     }
 
-    public void setMultiSelect(Boolean multiSelect) {
+    public void setMultiSelect(boolean multiSelect) {
         this.multiSelect = multiSelect;
     }
 
-    public Boolean getReadOnly() {
+    public boolean getReadOnly() {
         return readOnly;
     }
 
-    public void setReadOnly(Boolean readOnly) {
+    public void setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
     }
 
-    public Boolean getRequired() {
+    public boolean getRequired() {
         return required;
     }
 
-    public void setRequired(Boolean required) {
+    public void setRequired(boolean required) {
         this.required = required;
     }
 
@@ -231,11 +231,11 @@ public class Field {
         this.title = title;
     }
 
-    public Boolean getUserDefined() {
+    public boolean getUserDefined() {
         return userDefined;
     }
 
-    public void setUserDefined(Boolean userDefined) {
+    public void setUserDefined(boolean userDefined) {
         this.userDefined = userDefined;
     }
 

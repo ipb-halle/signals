@@ -17,8 +17,8 @@
  */
 package de.ipb_halle.signals.inventory;
 
-/** 
- * Location interface 
+/**
+ * Location interface
  */
 public interface ILocation {
 

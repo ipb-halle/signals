@@ -26,8 +26,8 @@ import jakarta.persistence.Table;
 import java.util.Date;
 import java.util.Set;
 
-/** 
- * Location entity (/inventory/locations/ API endpoint) 
+/**
+ * Location entity (/inventory/locations/ API endpoint)
  */
 
 @Entity

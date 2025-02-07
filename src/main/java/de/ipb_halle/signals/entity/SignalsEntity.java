@@ -22,8 +22,8 @@ import jakarta.persistence.*;
 import java.util.Date;
 import java.util.List;
 
-/** 
- * Single signals entity (entities API endpoint) 
+/**
+ * Single signals entity (entities API endpoint)
  */
 
 @Entity

@@ -41,9 +41,9 @@ public class HtmlList implements HtmlSection {
 
     public Tag getContent() {
         return p(
-            b(title), 
+            b(title),
             br(),
-            div(description), 
+            div(description),
             ul(
                 each(contentList, listItem -> li(listItem))
             )

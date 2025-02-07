@@ -23,7 +23,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-/** 
+/**
  * material library db entity
  */
 
@@ -84,7 +84,7 @@ public class LibraryEntity {
 
     @Column
     private String uniqueness;                  // JSON
-    
+
     public String getAssetDisplayName() {
         return assetDisplayName;
     }

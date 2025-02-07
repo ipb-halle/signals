@@ -26,8 +26,8 @@ import jakarta.persistence.Table;
 import java.util.Objects;
 import java.util.Set;
 
-/** 
- * Single signals entity (entities API endpoint) 
+/**
+ * Single signals entity (entities API endpoint)
  */
 
 @Entity

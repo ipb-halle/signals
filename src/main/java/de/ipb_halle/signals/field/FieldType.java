@@ -22,7 +22,7 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
 
-/** 
+/**
  * Field types as defined by SNB Swagger API
  */
 
@@ -51,10 +51,10 @@ public class FieldType extends DynEnum <FieldType> {
     }
 
 /*
-     * Return a FieldType corresponding to a given String. As 
+     * Return a FieldType corresponding to a given String. As
      * the SNB Swagger API uses mixed casing, the String will be
      * converted to all uppercase before looking up the FieldType.
-     * @param v the string 
+     * @param v the string
      * @return the corresponding FieldType
      *
     public static FieldType valueOfAnyCase(String v) {

@@ -23,7 +23,7 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 
 
-/** 
+/**
  * Quality (measure) - field assignments
  */
 

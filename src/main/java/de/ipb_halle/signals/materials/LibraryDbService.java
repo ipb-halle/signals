@@ -67,9 +67,9 @@ public class LibraryDbService {
         List<Library> results = new ArrayList<>();
         for (LibraryEntity entity : em.createQuery(criteriaQuery).getResultList()) {
             Library library = new Library(entity);
-            library.addAllAssetFields(loadFieldDefinitions(entity.getId(), 
+            library.addAllAssetFields(loadFieldDefinitions(entity.getId(),
                     FieldDesignation.valueOf(FieldDesignation.ASSET)));
-            library.addAllBatchFields(loadFieldDefinitions(entity.getId(), 
+            library.addAllBatchFields(loadFieldDefinitions(entity.getId(),
                     FieldDesignation.valueOf(FieldDesignation.BATCH)));
             results.add(library);
         }
@@ -80,9 +80,9 @@ public class LibraryDbService {
         logger.trace("Load library: id={}", id);
         LibraryEntity entity = em.find(LibraryEntity.class, id);
         Library lib = new Library(entity);
-        lib.addAllAssetFields(loadFieldDefinitions(entity.getId(), 
+        lib.addAllAssetFields(loadFieldDefinitions(entity.getId(),
                 FieldDesignation.valueOf(FieldDesignation.ASSET)));
-        lib.addAllBatchFields(loadFieldDefinitions(entity.getId(), 
+        lib.addAllBatchFields(loadFieldDefinitions(entity.getId(),
                 FieldDesignation.valueOf(FieldDesignation.BATCH)));
         return lib;
     }

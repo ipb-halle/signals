@@ -17,6 +17,8 @@
  */
 package de.ipb_halle.signals.field;
 
+import de.ipb_halle.signals.attachment.Attachment;
+
 import java.util.Objects;
 
 public class FieldValue {
@@ -40,6 +42,7 @@ public class FieldValue {
     private String fieldTitle;
     private String value;
     private LinkType linkType;
+    private transient Attachment attachment;
 
     /**
      * Field definition.
@@ -68,6 +71,10 @@ public class FieldValue {
         return entity;
     }
 
+    public Attachment getAttachment() {
+        return attachment;
+    }
+
     public String getEntityId() {
         return entityId;
     }
@@ -86,6 +93,10 @@ public class FieldValue {
 
     public String getValue() {
         return value;
+    }
+
+    public void setAttachment(Attachment attachment) {
+        this.attachment = attachment;
     }
 
     public FieldValue setEntityId(String id) {

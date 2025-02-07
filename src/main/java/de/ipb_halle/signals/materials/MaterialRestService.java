@@ -28,6 +28,7 @@ import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldType;
 import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.rest.*;
+import de.ipb_halle.signals.storage.StorageService;
 import jakarta.ejb.Local;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
@@ -71,6 +72,9 @@ public class MaterialRestService implements RestReplyParser<Material> {
 
     @Inject
     private DynEnumManager dynEnumManager;
+
+    @Inject
+    private StorageService storageService;
 
     private Logger logger = LoggerFactory.getLogger(MaterialRestService.class);
 
@@ -330,7 +334,6 @@ public class MaterialRestService implements RestReplyParser<Material> {
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
             Material result = parseReply(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
             return result;
-
         } catch(UnexpectedResponseCodeException ue) {
             logger.warn("doCreateMaterial() got unexpected return code from API call: {}", request);
         } catch(URISyntaxException me) {
@@ -338,20 +341,41 @@ public class MaterialRestService implements RestReplyParser<Material> {
         } catch(IOException ioe) {
             logger.warn("IOException", (Throwable) ioe);
         }
+        logger.info(request.toString());
         return null;
     }
 
     private JsonObject prepareAsset(Library lib, Material mat) {
 
         JsonObject attr = new JsonObject();
-        attr.addProperty(RestHelper.ATTR_LIBRARY, lib.getName());
         attr.add(Material.ATTR_SYNONYMS, prepareSynonyms(mat));
         attr.add(RestHelper.ATTR_FIELDS, prepareFields(mat));
+        attr.add(RestHelper.ATTR_RELATIONSHIPS, new JsonObject());
 
         JsonObject data = new JsonObject();
         data.addProperty(RestHelper.ATTR_ID, mat.getStrippedId());
-        data.addProperty(RestHelper.ATTR_TYPE, mat.getEntityType().getShortType());
+        data.addProperty(RestHelper.ATTR_TYPE, mat.getEntityType().getValue());
         data.add(RestHelper.ATTR_ATTRIBUTES, attr);
+
+        /*
+         * batch is mandatory, if library is configured with batches (lots):
+         * "relationships": {
+         *      "batch": {
+         *              "data":{
+         *                      "type":"batch",
+         *                      "id":"bc824377-682d-4bbd-bce5-c090e3b55f12",
+         *                      "attributes": {
+         *                              "fields": [
+         *                                      {
+         *                                              "id":"6215104dab0ad27bf7942a57",
+         *                                              "value":"123456789"
+         *                                      }
+         *                              ]
+         *                      }
+         *              }
+         *      }
+         *  }
+         */
 
         JsonObject asset = new JsonObject();
         asset.add(RestHelper.ATTR_DATA, data);
@@ -361,12 +385,11 @@ public class MaterialRestService implements RestReplyParser<Material> {
     private JsonObject prepareBatch(Library lib, Material mat) {
 
         JsonObject attr = new JsonObject();
-        attr.addProperty(RestHelper.ATTR_LIBRARY, lib.getName());
         attr.add(RestHelper.ATTR_FIELDS, prepareFields(mat));
 
         JsonObject data = new JsonObject();
         data.addProperty(RestHelper.ATTR_ID, mat.getStrippedId());
-        data.addProperty(RestHelper.ATTR_TYPE, mat.getEntityType().getShortType());
+        data.addProperty(RestHelper.ATTR_TYPE, mat.getEntityType().getValue());
         data.add(RestHelper.ATTR_ATTRIBUTES, attr);
 
         JsonObject batch = new JsonObject();
@@ -417,7 +440,33 @@ public class MaterialRestService implements RestReplyParser<Material> {
          * ToDo: Handle Attachments including chemical drawings and
          * sequences. Include the base64 encoded attachment file data.
          */
-        obj.add(RestHelper.ATTR_VALUE, JsonParser.parseString(fieldValue.getValue()));
+        switch(fieldValue.getField().getFieldType().getValue().toUpperCase()) {
+            case FieldType.ATTACHED_FILE:
+            case FieldType.CHEMICAL_DRAWING:
+            case FieldType.SEQUENCE_FILE:
+                obj.add(RestHelper.ATTR_VALUE, prepareAttachment(fieldValue));
+                // obj.add(RestHelper.ATTR_VALUE,
+                //        JsonParser.parseString("{\"filename\":\"hello.txt\", \"base64\":\"SGFsbG8gV2VsdCEK\"}"));
+                break;
+            default:
+                obj.addProperty(RestHelper.ATTR_VALUE, fieldValue.getValue()); ;
+        }
         return obj;
+    }
+
+    /**
+     * create a base64 representation of the attachment file
+     * @param fieldValue
+     * @return
+     */
+    private JsonElement prepareAttachment(FieldValue fieldValue) {
+        JsonObject attachmentData = new JsonObject();
+        Attachment attachment = fieldValue.getAttachment();
+        AttachmentRevision revision = attachment.getLatestRevision();
+        // ToDo: check whether all lower case in attribute names is required!
+        attachmentData.addProperty(Attachment.ATTR_filename, revision.getOriginalName());
+        String base64 = storageService.getFileBase64(attachment.getFiles(revision.getId()));
+        attachmentData.addProperty(Attachment.ATTR_BASE64, base64);
+        return attachmentData;
     }
 }

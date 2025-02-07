@@ -25,7 +25,7 @@ import jakarta.persistence.Table;
 import java.io.Serializable;
 
 
-/** 
+/**
  * Quality (measure) - field assignments
  */
 
@@ -51,9 +51,9 @@ public class FieldOption implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if ((o == null) || (getClass() != o.getClass())) { 
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
-        } 
+        }
         FieldOption other = (FieldOption) o;
         return id.equals(other.id);
     }

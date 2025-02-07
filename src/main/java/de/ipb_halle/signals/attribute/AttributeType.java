@@ -21,7 +21,7 @@ import de.ipb_halle.signals.dynEnum.DynEnum;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
-/** 
+/**
  * Dynamically discovered entity types from Signals Notebook
  */
 

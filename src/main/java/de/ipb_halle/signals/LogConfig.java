@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
-/** 
+/**
  * Logger configuration
  */
 @Stateless
@@ -44,7 +44,7 @@ public class LogConfig {
     private Logger logger = LoggerFactory.getLogger(LogConfig.class);
 
     /**
-     * @param userLevel text representation of the log level, should be one of 
+     * @param userLevel text representation of the log level, should be one of
      * <code>FATAL, ERROR, WARN, INFO, DEBUG, TRACE</code>.
      * @return true if setting of log level succeeded, false otherwise
      */

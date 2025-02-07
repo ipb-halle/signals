@@ -17,7 +17,7 @@
  */
 package de.ipb_halle.signals.materials;
 
-/** 
+/**
  * Material Reference, used by e.g. REST endpoints in place of the
  * full Material object.
  */

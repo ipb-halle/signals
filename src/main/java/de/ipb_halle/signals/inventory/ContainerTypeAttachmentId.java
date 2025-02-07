@@ -20,8 +20,8 @@ package de.ipb_halle.signals.inventory;
 import java.io.Serializable;
 import java.util.Objects;
 
-/** 
- * Attachment to container type compound id. This class solely exists for 
+/**
+ * Attachment to container type compound id. This class solely exists for
  * JPA purposes.
  */
 public class ContainerTypeAttachmentId implements Serializable {
@@ -35,7 +35,7 @@ public class ContainerTypeAttachmentId implements Serializable {
     public boolean equals(Object o) {
         if ((o == null) || (getClass() != o.getClass())) {
             return false;
-        } 
+        }
         ContainerTypeAttachmentId other = (ContainerTypeAttachmentId) o;
         return Objects.equals(container_type_id, other.container_type_id)
             && Objects.equals(attachment_id, other.attachment_id);

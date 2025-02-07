@@ -90,10 +90,10 @@ public abstract class UserManagerTest {
     @Inject
     @DeploymentElement(mock="de.ipb_halle.signals.users.MockLdapAdapterFactory")
     private LdapAdapterFactory ldapAdapterFactory;
-    
+
     @DeploymentElement(mock="de.ipb_halle.signals.users.MockLdapAdapter")
     private LdapAdapter ldapAdapter;
-    
+
     @Inject
     @DeploymentElement
     private UserManager manager;

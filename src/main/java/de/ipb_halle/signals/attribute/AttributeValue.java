@@ -20,7 +20,7 @@ package de.ipb_halle.signals.attribute;
 import java.util.Objects;
 import jakarta.persistence.*;
 
-/** 
+/**
  * Signals Attribute values
  */
 

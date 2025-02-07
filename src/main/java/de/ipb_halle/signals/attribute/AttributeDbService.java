@@ -45,7 +45,7 @@ public class AttributeDbService {
 
     @Inject
     private DynEnumManager dynEnumManager;
-    
+
     private Logger logger = LoggerFactory.getLogger(AttributeDbService.class);
 
     private List<AttributeValue> loadValues(String id) {

@@ -17,6 +17,8 @@
  */
 package de.ipb_halle.signals.field;
 
+import de.ipb_halle.signals.attachment.Attachment;
+import de.ipb_halle.signals.attachment.AttachmentDbService;
 import de.ipb_halle.signals.dynEnum.DynEnum;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.util.EmbeddedKeyValue;
@@ -33,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,6 +54,9 @@ public class FieldDbService {
 
     @Inject
     private DynEnumManager dynEnumManager;
+
+    @Inject
+    private AttachmentDbService attachmentDbService;
 
     private Logger logger = LoggerFactory.getLogger(FieldDbService.class);
 
@@ -159,10 +165,26 @@ public class FieldDbService {
 
         for (FieldValueEntity fve : em.createQuery(query).getResultList()) {
             FieldValue fv = new FieldValue(fve);
-            fv.setField(loadById(fv.getFieldId()));
+            Field field = loadById(fv.getFieldId());
+            fv.setField(field);
+            switch(field.getFieldType().getValue().toUpperCase()) {
+                case FieldType.ATTACHED_FILE,
+                     FieldType.CHEMICAL_DRAWING,
+                     FieldType.SEQUENCE_FILE -> loadFieldAttachment(fv);
+            }
             results.add(fv);
         }
         return results;
+    }
+
+    private void loadFieldAttachment(FieldValue fieldValue) {
+        Map<String, Object> cmap = new HashMap<>();
+        cmap.put(Attachment.FIELD_ID, fieldValue.getFieldId());
+        cmap.put(Attachment.ANCESTOR_ID, fieldValue.getEntityId());
+        List<Attachment> attachments = attachmentDbService.load(cmap);
+        if (! attachments.isEmpty()) {
+            fieldValue.setAttachment(attachments.get(0));
+        }
     }
 
     /**

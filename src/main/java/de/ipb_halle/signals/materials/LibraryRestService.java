@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-/** 
+/**
  * REST service for material libraries
  */
 
@@ -83,7 +83,7 @@ public class LibraryRestService implements RestReplyParser<Library> {
 
         return lib;
     }
-    
+
     private Iterator<JsonElement> fetch() {
         JsonElement jsonResult;
         try {
@@ -101,7 +101,7 @@ public class LibraryRestService implements RestReplyParser<Library> {
         } catch(IOException ioe) {
             logger.warn("LibraryRestService:-> IOException", ioe);
         }
-        return null; 
+        return null;
     }
 
     public List<Library> doGetLibraries() {
