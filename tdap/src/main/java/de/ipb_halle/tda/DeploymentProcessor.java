@@ -231,19 +231,18 @@ package %s;
 import de.ipb_halle.signals.TestBase;
 // import jakarta.inject.Inject;
 import java.util.Properties;
-import org.junit.runner.RunWith;
-import org.junit.Test;
 import org.apache.openejb.jee.EjbJar;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
-import org.apache.openejb.junit.ApplicationComposer;
+import org.apache.openejb.junit5.RunWithApplicationComposer;
 import org.apache.openejb.testing.Classes;
 import org.apache.openejb.testing.Configuration;
 import org.apache.openejb.testing.Module;
+import org.junit.jupiter.api.TestInstance;
 // import org.slf4j.Logger;
 // import org.slf4j.LoggerFactory;
-// import static org.junit.Assert.assertTrue;
 
-@RunWith(ApplicationComposer.class)
+@RunWithApplicationComposer
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TDAGenerated%s extends %s {
 
     @Module
