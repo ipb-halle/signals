@@ -17,26 +17,37 @@
  */
 package de.ipb_halle.signals.materials;
 
+import de.ipb_halle.signals.attachment.AttachmentType;
+import de.ipb_halle.signals.attribute.AttributeType;
+import de.ipb_halle.signals.dynEnum.DynEnum;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.EntityType;
+import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldDbService;
+import de.ipb_halle.signals.field.FieldDefinition;
 import de.ipb_halle.signals.field.FieldValue;
+import de.ipb_halle.tda.PersistenceElements;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Stateless
+@PersistenceElements(entities={MaterialEntity.class })
 public class MaterialDbService {
+
+    public final static String ENTITY_ID = "id";
+    public final static String ENTITY_TYPE = "entityType";
+    public final static String LIBRARY_ID = "libraryId";
+    public final static String MATERIAL_ID = "materialId";
 
     @PersistenceContext(unitName = "signalsDB")
     private EntityManager em;
@@ -48,6 +59,36 @@ public class MaterialDbService {
     private FieldDbService fieldDbService;
 
     private Logger logger = LoggerFactory.getLogger(LibraryDbService.class);
+
+    /**
+     * Obtain a list of materials matching given criteria
+     */
+    public List<Material> load(Map<String, Object> cmap) {
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<MaterialEntity> criteriaQuery = criteriaBuilder.createQuery(MaterialEntity.class);
+        Root<MaterialEntity> root = criteriaQuery.from(MaterialEntity.class);
+        criteriaQuery.select(root);
+
+        List<Predicate> predicates = new ArrayList<>();
+        if (cmap.containsKey(MATERIAL_ID)) {
+            predicates.add(criteriaBuilder.equal(root.get(MATERIAL_ID), cmap.get(MATERIAL_ID)));
+        }
+        if (cmap.containsKey(LIBRARY_ID)) {
+            predicates.add(criteriaBuilder.equal(root.get(LIBRARY_ID), cmap.get(LIBRARY_ID)));
+        }
+        if (cmap.containsKey(ENTITY_ID)) {
+            predicates.add(criteriaBuilder.equal(root.get(ENTITY_ID), cmap.get(ENTITY_ID)));
+        }
+        if (cmap.containsKey(ENTITY_TYPE)) {
+            predicates.add(criteriaBuilder.equal(root.get(ENTITY_TYPE), cmap.get(ENTITY_TYPE)));
+        }
+        criteriaQuery.where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
+        List<Material> results = new ArrayList<>();
+        for (MaterialEntity entity : em.createQuery(criteriaQuery).getResultList()) {
+            results.add(loadById(entity.getId()));
+        }
+        return results;
+    }
 
     public Material loadById(String id) {
         MaterialEntity entity = this.em.find(MaterialEntity.class, id);

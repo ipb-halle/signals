@@ -290,19 +290,6 @@ CREATE TABLE materials (
     material_id VARCHAR REFERENCES materials(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-CREATE TABLE material_batches (
-    id VARCHAR NOT NULL PRIMARY KEY,
-    created_at TIMESTAMP,
-    created_by VARCHAR /* NOT NULL REFERENCES users(id) */,
-    description VARCHAR,
-    digest VARCHAR,
-    edited_at TIMESTAMP,
-    edited_by VARCHAR /* NOT NULL REFERENCES users(id) */,
-    material_id VARCHAR REFERENCES materials(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    name VARCHAR,
-    owner VARCHAR /* NOT NULL REFERENCES users(id) */
-);
-
 CREATE TABLE containers (
     id VARCHAR NOT NULL PRIMARY KEY,
     amount FLOAT,

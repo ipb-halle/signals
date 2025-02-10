@@ -18,6 +18,12 @@
 package de.ipb_halle.signals.dynEnum;
 
 import java.util.List;
+
+import de.ipb_halle.signals.attachment.AttachmentType;
+import de.ipb_halle.signals.attribute.AttributeType;
+import de.ipb_halle.signals.field.FieldDesignation;
+import de.ipb_halle.signals.field.FieldType;
+import de.ipb_halle.tda.PersistenceElements;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -34,6 +40,8 @@ import org.slf4j.LoggerFactory;
  */
 
 @Stateless
+@PersistenceElements(entities={AttachmentType.class, AttributeType.class,
+        DynEnum.class, FieldDesignation.class, FieldType.class})
 public class DynEnumDbService {
 
     @PersistenceContext(unitName="signalsDB")

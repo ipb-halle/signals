@@ -153,6 +153,10 @@ public class Library {
         return this;
     }
 
+    public boolean hasBatches(){
+        return batchDisplayName != null;
+    }
+
     public void addAssetField(Field f) {
         assetFields.add(f);
     }

@@ -313,13 +313,13 @@ public class MaterialRestService implements RestReplyParser<Material> {
         return parseReply(fetch(MATERIAL_ENDPOINT, id));
     }
 
-    public Material doCreateMaterial(Library lib, Material mat) {
+    public Material doCreateMaterial(Library lib, Material mat, Material batch) {
         JsonObject request;
         String endpoint;
 
         if (mat.getEntityType().equals(EntityType.valueOf(Material.ENTITY_TYPE_ASSET))) {
             endpoint = String.format(ASSET_CREATE_ENDPOINT, lib.getName());
-            request = prepareAsset(lib, mat);
+            request = prepareAsset(lib, mat, batch);
         } else {
             endpoint = String.format(BATCH_CREATE_ENDPOINT, lib.getName(), mat.getMaterial().getId());
             request = prepareBatch(lib, mat);
@@ -345,37 +345,42 @@ public class MaterialRestService implements RestReplyParser<Material> {
         return null;
     }
 
-    private JsonObject prepareAsset(Library lib, Material mat) {
+    private JsonObject prepareAsset(Library lib, Material mat, Material batch) {
 
         JsonObject attr = new JsonObject();
         attr.add(Material.ATTR_SYNONYMS, prepareSynonyms(mat));
         attr.add(RestHelper.ATTR_FIELDS, prepareFields(mat));
-        attr.add(RestHelper.ATTR_RELATIONSHIPS, new JsonObject());
+        if (batch == null) {
+            attr.add(RestHelper.ATTR_RELATIONSHIPS, new JsonObject());
+        } else {
+            /*
+             * batch is mandatory, if library is configured with batches (lots):
+             * "relationships": {
+             *      "batch": {
+             *              "data":{
+             *                      "type":"batch",
+             *                      "id":"bc824377-682d-4bbd-bce5-c090e3b55f12",
+             *                      "attributes": {
+             *                              "fields": [
+             *                                      {
+             *                                              "id":"6215104dab0ad27bf7942a57",
+             *                                              "value":"123456789"
+             *                                      }
+             *                              ]
+             *                      }
+             *              }
+             *      }
+             *  }
+             */
+            JsonObject jsonBatch = new JsonObject();
+            jsonBatch.add(Material.ATTR_BATCH, prepareBatch(lib, batch));
+            attr.add(RestHelper.ATTR_RELATIONSHIPS, jsonBatch);
+        }
 
         JsonObject data = new JsonObject();
         data.addProperty(RestHelper.ATTR_ID, mat.getStrippedId());
         data.addProperty(RestHelper.ATTR_TYPE, mat.getEntityType().getValue());
         data.add(RestHelper.ATTR_ATTRIBUTES, attr);
-
-        /*
-         * batch is mandatory, if library is configured with batches (lots):
-         * "relationships": {
-         *      "batch": {
-         *              "data":{
-         *                      "type":"batch",
-         *                      "id":"bc824377-682d-4bbd-bce5-c090e3b55f12",
-         *                      "attributes": {
-         *                              "fields": [
-         *                                      {
-         *                                              "id":"6215104dab0ad27bf7942a57",
-         *                                              "value":"123456789"
-         *                                      }
-         *                              ]
-         *                      }
-         *              }
-         *      }
-         *  }
-         */
 
         JsonObject asset = new JsonObject();
         asset.add(RestHelper.ATTR_DATA, data);
@@ -449,6 +454,9 @@ public class MaterialRestService implements RestReplyParser<Material> {
                 //        JsonParser.parseString("{\"filename\":\"hello.txt\", \"base64\":\"SGFsbG8gV2VsdCEK\"}"));
                 break;
             default:
+                // works, if fieldValue contains a simple String
+                // probably won't work if fieldValue contains array, number, measurement
+                // or otherwise complex value.
                 obj.addProperty(RestHelper.ATTR_VALUE, fieldValue.getValue()); ;
         }
         return obj;

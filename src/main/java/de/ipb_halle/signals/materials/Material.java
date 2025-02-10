@@ -35,6 +35,7 @@ public class Material implements IMaterial, IObjectMetaData {
 
     public final static String ATTR_ASSET_TYPE_ID = "assetTypeId";
     public final static String ATTR_ASSET_ID = "assetId";
+    public final static String ATTR_BATCH = "batch";
     public final static String ATTR_SYNONYMS = "synonyms";
     public static final String MATERIAL_ASSET_PREFIX = "asset:" ;
     private Logger logger = LoggerFactory.getLogger(MaterialRestService.class);

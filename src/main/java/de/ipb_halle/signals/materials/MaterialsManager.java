@@ -72,9 +72,21 @@ public class MaterialsManager {
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void importMaterial(RuntimeConfig runtimeConfig, String id) {
         Material mat = materialDbService.loadById(id);
+        Material batch = null;
+        // also need to load batch if material supports batches!
         Library lib = libraryDbService.loadById(mat.getLibraryId());
+        if(lib.hasBatches()){
+            Map<String, Object> cmap = new HashMap<> ();
+            cmap.put(MaterialDbService.MATERIAL_ID, mat.getId());
+            List<Material> batches = materialDbService.load(cmap);
+            if (batches.size() > 0) {
+                batch = batches.get(0);
+            } else {
+                throw new RuntimeException("Could not obtain required batch for material " + mat.getId());
+            }
+        }
         if (runtimeConfig.updateSNB) {
-            materialRestService.doCreateMaterial(lib, mat);
+            materialRestService.doCreateMaterial(lib, mat, batch);
         }
     }
 
