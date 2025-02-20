@@ -18,23 +18,24 @@
 
 package de.ipb_halle.signals.storage;
 
+import com.google.gson.JsonElement;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.attachment.AttachmentFile;
+import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.rest.RestReply;
 import jakarta.annotation.Resource;
 import jakarta.ejb.Stateless;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Stateless
 public class StorageService {
@@ -98,7 +99,7 @@ public class StorageService {
         } catch (IOException e) {
             this.logger.warn("storeFile() caught IOException on move {} -> {} ({})",
                     file.getTempPath().toFile(), destination.toString(), e.getMessage());
-            throw(e);
+            throw (e);
         }
     }
 
@@ -119,6 +120,7 @@ public class StorageService {
      * preferred version, where CDXML is preferred over MDL MOL, which
      * is preferred over SMILES. In the same way, GenBank is preferred
      * over FASTA.
+     *
      * @param files
      * @return
      */
@@ -139,7 +141,7 @@ public class StorageService {
     public AttachmentFile selectPreferredMimeType(Set<AttachmentFile> files) {
         AttachmentFile preferred = null;
         int level = 0;
-        for(AttachmentFile file : files) {
+        for (AttachmentFile file : files) {
             int l = standardMimePreferences.get(file.getMimeType());
             if (l > level) {
                 preferred = file;
@@ -148,4 +150,29 @@ public class StorageService {
         }
         return preferred;
     }
+
+    public String getFileAsString(Set<AttachmentFile> files) {
+        if (files == null || files.isEmpty()) {
+            logger.warn("StorageService -> getFileAsString() -> Attachment Chemical_Drawing, method prepareField(): No data, empty set");
+            return "";
+        }
+        List<AttachmentFile> afiles = new ArrayList<>();
+        for (AttachmentFile file : files) {
+            afiles.add(file);
+        }
+        AttachmentFile file = afiles.get(0);
+        if (file == null) {
+            logger.warn("StorageService -> getFileAsString() -> Attachment Chemical_Drawing, method prepareField(): attachmentFile is null.");
+        }
+        try {
+            // Inhalt als UTF-8-String laden
+            String s = Files.readString(file.getTempPath(), StandardCharsets.UTF_8);
+            return s;
+        } catch (IOException e) {
+            logger.error("Error while reading file{}: {}", file.getTempPath(), e.getMessage());
+            return "";
+        }
+    }
+
+
 }
