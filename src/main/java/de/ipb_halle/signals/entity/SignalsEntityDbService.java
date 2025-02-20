@@ -64,9 +64,12 @@ public class SignalsEntityDbService {
             List<Integer> enumIds = dynEnumManager.getDynEnumIds(
                     (EntityType[]) cmap.get(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES));
             predicates.add(root.get("type").in(enumIds));
+
         }
+
         criteriaQuery.where(builder.and(predicates.toArray(new Predicate[0])));
-        for (SignalsEntity entity : em.createQuery(criteriaQuery).getResultList()) {
+        List<SignalsEntity> resultList = em.createQuery(criteriaQuery).getResultList();
+        for (SignalsEntity entity : resultList) {
             results.add(new SignalsEntityDTO(entity, dynEnumManager));
         }
         return results;
@@ -105,7 +108,7 @@ public class SignalsEntityDbService {
         saveChildren(dto);
     }
 
-    public void saveChildren(SignalsEntityDTO dto)  {
+    public void saveChildren(SignalsEntityDTO dto) {
         for (ISignalsEntity child : dto.getChildren()) {
             em.merge(new SignalsEntityChild(dto.getId(), child.getId()));
         }

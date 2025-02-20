@@ -70,7 +70,7 @@ public class ContainerTypeDbService {
             System.out.println("Query result: " + resultList);
 
             if (resultList == null || resultList.isEmpty()) {
-                System.err.println("ContainerTypeDbService:-> No results found for ContainerTypeEntity.");
+                logger.error("ContainerTypeDbService:-> No results found for ContainerTypeEntity.");
                 return entityIds;
             }
 

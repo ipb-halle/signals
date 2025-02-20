@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -105,8 +106,10 @@ public class ContainerManager {
         // 1) Loads set of container type ids
         Set<String> containerTypeIds = containerTypeDbService.getContainerTypeIds();
 
+
         // 2) Load (and map) all container fields for attachmentFiles
         Map<String, Field> attachmentFields = loadAttachmentFieldsMap();
+        logger.info("Container Manager -> manage Containers() -> Number of attachment fields = {}", attachmentFields.size());
 
         // 3) Loads signals entities by date range and type
         EntityType[] entityTypes = {EntityType.valueOf(ContainerEntity.ENTITY_TYPE_CONTAINER)};
@@ -116,14 +119,16 @@ public class ContainerManager {
             cmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
         }
         cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, entityTypes);
-
+        logger.info("Bevore laoding");
         // 4) Loads all containers from db
         List<SignalsEntityDTO> containers = signalsEntityDbService.load(cmap);
+        logger.info("After laoding");
 
         // 5) Processes container sequentially
         for (SignalsEntityDTO dto : containers) {
             // filter out type definitions, if signals DB put them together
-            if (!containerTypeIds.contains(dto.getStrippedId(SignalsEntityDTO.StripIdPart.BOTH))) {
+            if (!containerTypeIds.contains(dto.getId())) {
+                logger.info("TRUE!! containerTypeId {} and conatnier id {}\n", Arrays.toString(containerTypeIds.toArray()), dto.getStrippedId(SignalsEntityDTO.StripIdPart.BOTH));
                 processContainer(dto.getId(), attachmentFields);
             }
         }

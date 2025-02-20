@@ -18,6 +18,7 @@
 package de.ipb_halle.signals.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Type;
 
 import java.util.Date;
 import java.util.List;
@@ -43,7 +44,6 @@ public class SignalsEntity {
     private String name;
 
     @Column
-    @Lob
     private String description;
 
     @Column(name = "created_at")
@@ -63,7 +63,7 @@ public class SignalsEntity {
     @Column(name = "edited_by")
     private String editedBy;
 
-    @Column(name = "digest")
+    @Column(name = "digest", nullable = false, columnDefinition = "BIGINT")
     private Long digest;
 
     @Column(name = "timestamp")
@@ -81,6 +81,10 @@ public class SignalsEntity {
     @Column(name = "flag_value")
     private List<String> flags;
 */
+
+    public SignalsEntity() {
+    }
+
     public String dump() {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("SignalsEntity(%s) --> %d\n", id,  type));
@@ -168,7 +172,7 @@ public class SignalsEntity {
     }
 
     public Long getDigest() {
-        return digest;
+        return digest != null ? digest : 0L;
     }
 
     public void setDigest(Long digest) {
