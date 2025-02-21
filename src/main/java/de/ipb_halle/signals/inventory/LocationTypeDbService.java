@@ -23,12 +23,14 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.HashSet;
 import java.util.Set;
 
 
-/** 
+/**
  * Database service for location types
  */
 
@@ -37,12 +39,12 @@ public class LocationTypeDbService {
 
     private final static String LOCATION_TYPE_ENTITY_PREFIX = "location:";
     private final static String LOCATION_TYPE_ENTITY_SUFFIX = ":ivt";
+    private final static Logger logger = LogManager.getLogger(LocationTypeDbService.class);
 
-    @PersistenceContext(unitName="signalsDB")
+    @PersistenceContext(unitName = "signalsDB")
     private EntityManager em;
 
     /**
-     *
      * @return a set of entity ids of LocationTypes. The entity ids are
      * prefixed and suffixed to match the form of the entities endpoint
      * (e.g. "b9fab5b8-6c26-47f8-8694-320c7c439879" is converted
@@ -50,16 +52,21 @@ public class LocationTypeDbService {
      */
     public Set<String> getLocationTypIds() {
         Set<String> entityIds = new HashSet<>();
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<LocationType> criteriaQuery = builder.createQuery(LocationType.class);
-        Root<LocationType> root = criteriaQuery.from(LocationType.class);
-        criteriaQuery.select(root);
+        try {
+            CriteriaBuilder builder = em.getCriteriaBuilder();
+            CriteriaQuery<LocationTypeEntity> criteriaQuery = builder.createQuery(LocationType.class);
+            Root<LocationType> root = criteriaQuery.from(LocationType.class);
+            criteriaQuery.select(root);
 
-        for (LocationType locationType: em.createQuery(criteriaQuery).getResultList()) {
-            entityIds.add(LOCATION_TYPE_ENTITY_PREFIX
-                    + locationType.getId()
-                    + LOCATION_TYPE_ENTITY_SUFFIX);
+            for (LocationType locationType : em.createQuery(criteriaQuery).getResultList()) {
+                entityIds.add(LOCATION_TYPE_ENTITY_PREFIX
+                        + locationType.getId()
+                        + LOCATION_TYPE_ENTITY_SUFFIX);
+            }
+        } catch (Exception e) {
+            logger.error("LocationTypeDbService: -> Error while fetching container type IDs: {}", e.getMessage(), e);
         }
+
         return entityIds;
     }
 

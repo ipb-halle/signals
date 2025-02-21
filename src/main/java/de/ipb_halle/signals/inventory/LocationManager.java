@@ -51,14 +51,11 @@ public class LocationManager {
 
     private Logger logger = LoggerFactory.getLogger(ContainerManager.class);
 
-    public void augmentLocation(LocationEntity loc) {
-/*
-        cannot yet augment LocationEntity (need to introduce DTO)
+ public void manageLocations(Date[] dateRange){
+     // 1) Loads a set of location type ids
+     Set<String> locationTypeIds = locationTypeDbService.getLocationTypIds();
 
-        loc.setCreatedBy(userManager.getUser(loc.getCreatedBy().getId()));
-        loc.setUpdatedBy(userManager.getUser(loc.getUpdatedBy().getId()));
-*/
-    }
+ }
 
     public LocationEntity loadById(String id, boolean augmented) {
         return dbService.loadById(id);

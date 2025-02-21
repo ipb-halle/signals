@@ -119,10 +119,8 @@ public class ContainerManager {
             cmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
         }
         cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, entityTypes);
-        logger.info("Bevore laoding");
         // 4) Loads all containers from db
         List<SignalsEntityDTO> containers = signalsEntityDbService.load(cmap);
-        logger.info("After laoding");
 
         // 5) Processes container sequentially
         for (SignalsEntityDTO dto : containers) {
