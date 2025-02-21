@@ -20,11 +20,10 @@ package de.ipb_halle.signals.inventory;
 import de.ipb_halle.signals.attachment.Attachment;
 import de.ipb_halle.signals.attachment.AttachmentEntity;
 import de.ipb_halle.signals.field.Field;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -41,24 +40,17 @@ public class ContainerType {
     public final static String ATTR_NAME = "name";
     public final static String ATTR_TYPE = "entityType";
     public final static String ATTR_UPDATED_AT = "updatedAt";
+    private final static Logger logger = LogManager.getLogger(ContainerType.class);
 
     private String id;
-
-    private Set<AttachmentEntity> attachments;
-
     private Date createdAt;
-
     private String description;
-
-    private Set<Field> fields;
-
     private boolean inUse;
-
     private boolean movable;
-
     private String name;
-
     private Date updatedAt;
+    private Set<Field> fields;
+    private Set<AttachmentEntity> attachments;
 
     /**
      * default constructor
@@ -99,7 +91,7 @@ public class ContainerType {
                 .setMovable(movable)
                 .setName(name)
                 .setUpdatedAt(updatedAt);
-        System.out.println(cte.getId());
+        logger.trace("ContainerTypeEntity created {}", cte.getId());
         return cte;
     }
 
@@ -194,5 +186,33 @@ public class ContainerType {
 
     public void setUpdatedAt(Date u) {
         updatedAt = u;
+    }
+
+    @Override
+    public String toString() {
+        return "ContainerType{" +
+                "id='" + id + '\'' +
+                ", createdAt=" + createdAt +
+                ", description='" + description + '\'' +
+                ", inUse=" + inUse +
+                ", movable=" + movable +
+                ", name='" + name + '\'' +
+                ", updatedAt=" + updatedAt +
+                ", fields=" + fields +
+                ", attachments=" + attachments +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        ContainerType that = (ContainerType) object;
+        return Objects.equals(id, that.id) && Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
     }
 }
