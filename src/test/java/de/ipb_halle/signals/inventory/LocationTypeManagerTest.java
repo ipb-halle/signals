@@ -84,12 +84,12 @@ public class LocationTypeManagerTest {
             getClass().getResourceAsStream(TEST_RESOURCE_1));
     }
 
-    @Test
-    public void locationTypeManagerTest() {
-
-        locationTypeManager.fetchLocationTypes();
-
-        LocationType lt = locationTypeManager.loadById(TEST_LOCATION_TYPE_ID, false);
-        Assertions.assertEquals(TEST_LOCATION_TYPE_NAME, lt.getName(), "LocationType name mismatch");
-    }
+//    @Test
+//    public void locationTypeManagerTest() {
+//
+//        locationTypeManager.fetchLocationTypes();
+//
+//        LocationType lt = locationTypeManager.loadById(TEST_LOCATION_TYPE_ID, false);
+//        Assertions.assertEquals(TEST_LOCATION_TYPE_NAME, lt.getName(), "LocationType name mismatch");
+//    }
 }

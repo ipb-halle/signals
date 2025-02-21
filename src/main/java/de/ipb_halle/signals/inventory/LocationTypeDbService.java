@@ -54,11 +54,11 @@ public class LocationTypeDbService {
         Set<String> entityIds = new HashSet<>();
         try {
             CriteriaBuilder builder = em.getCriteriaBuilder();
-            CriteriaQuery<LocationTypeEntity> criteriaQuery = builder.createQuery(LocationType.class);
-            Root<LocationType> root = criteriaQuery.from(LocationType.class);
+            CriteriaQuery<LocationTypeEntity> criteriaQuery = builder.createQuery(LocationTypeEntity.class);
+            Root<LocationTypeEntity> root = criteriaQuery.from(LocationTypeEntity.class);
             criteriaQuery.select(root);
 
-            for (LocationType locationType : em.createQuery(criteriaQuery).getResultList()) {
+            for (LocationTypeEntity locationType : em.createQuery(criteriaQuery).getResultList()) {
                 entityIds.add(LOCATION_TYPE_ENTITY_PREFIX
                         + locationType.getId()
                         + LOCATION_TYPE_ENTITY_SUFFIX);
@@ -71,11 +71,13 @@ public class LocationTypeDbService {
     }
 
     public LocationType loadById(String id) {
-        return this.em.find(LocationType.class, id);
+        LocationTypeEntity lte = this.em.find(LocationTypeEntity.class, id);
+        return new LocationType(lte, null);
     }
 
     public void save(LocationType lt) {
-        this.em.merge(lt);
+        LocationTypeEntity lte = lt.createEntity();
+        this.em.merge(lte);
     }
 }
 

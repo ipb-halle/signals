@@ -96,5 +96,4 @@ public class LocationManager {
     public void save(LocationEntity loc) {
         dbService.save(loc);
     }
-
 }

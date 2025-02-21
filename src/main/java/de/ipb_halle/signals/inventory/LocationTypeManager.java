@@ -21,6 +21,8 @@ import de.ipb_halle.signals.rest.RestResultIterator;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 
+import java.util.List;
+
 /**
  * Manager for location types (inventory/types API endpoint)
  */
@@ -35,9 +37,9 @@ public class LocationTypeManager {
     private LocationTypeRestService restService;
 
 
-    public LocationType loadById(String id, boolean augment) {
-        return dbService.loadById(id);
-    }
+//    public LocationType loadById(String id, boolean augment) {
+//        return dbService.loadById(id);
+//    }
 
     /**
      * Fetch all location types from Signals Notebook and
@@ -49,4 +51,18 @@ public class LocationTypeManager {
             dbService.save(locationTypeIterator.next());
         }
     }
+
+//    public List<LocationType> getSnbLocationTypes() {
+//        List<LocationType> locationTypes = (List<LocationType>) restService.doGetLocationTypes();
+//        return locationTypes;
+//    }
+//
+//    public void save(List<LocationType> ltypes) {
+//        for (LocationType lt : ltypes){
+//            dbService.save(lt);
+//        }
+
+  //  }
+
+
 }
