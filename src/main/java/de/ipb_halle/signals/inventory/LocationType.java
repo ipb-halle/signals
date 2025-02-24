@@ -17,35 +17,71 @@
  */
 package de.ipb_halle.signals.inventory;
 
+import de.ipb_halle.signals.attachment.AttachmentEntity;
 import de.ipb_halle.signals.field.Field;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Single signals entity (entities API endpoint)
  */
 
-@Entity
-@Table(name="location_types")
 public class LocationType {
 
     public final static String ATTR_NAME = "name";
+    private final static Logger logger = LogManager.getLogger(LocationType.class);
+    private final static String LOCATION_TYPE_ENTITY_PREFIX = "location:";
+    private final static String LOCATION_TYPE_ENTITY_SUFFIX = ":ivt";
 
-    @Id
     private String id;
-
-    @Column
     private String name;
-
-    @Column
     private String description;
+    private boolean inUse;
+    private boolean movable;
+    private Date createdAt;
+    private Date updatedAt;
+    private Set<Field> fields;
+    private Set<AttachmentEntity> attachments;
 
-    private transient Set<Field> fields;
+    //Default constructor
+    public LocationType() {
+        createdAt = new Date();
+        updatedAt = new Date();
+        attachments = new HashSet<>();
+        fields = new HashSet<>();
+    }
+
+    public LocationType(LocationTypeEntity lte, List<Field> fd) {
+        this.id = lte.getId();
+        this.name = lte.getName();
+        this.description = lte.getDescription();
+        this.inUse = lte.isMovable();
+        this.movable = lte.isMovable();
+        this.createdAt = lte.getCreatedAt();
+        this.updatedAt = lte.getUpdateAt();
+
+        this.fields = new HashSet<>();
+        fields.addAll(fd);
+        this.attachments = new HashSet<>();
+    }
+
+    public LocationTypeEntity createEntity() {
+        LocationTypeEntity lte = new LocationTypeEntity()
+                .setId(this.id)
+                .setName(this.name)
+                .setDescription(this.description)
+                .setCreatedAt(this.createdAt)
+                .setUpdateAt(this.updatedAt)
+                .setInUse(this.inUse)
+                .setMovable(this.movable);
+        return lte;
+    }
 
     public String dump() {
         StringBuilder sb = new StringBuilder();
@@ -55,6 +91,10 @@ public class LocationType {
 
     public String getId() {
         return id;
+    }
+
+    public String getSuffixPrefixId() {
+        return LOCATION_TYPE_ENTITY_PREFIX + this.getId() + LOCATION_TYPE_ENTITY_SUFFIX;
     }
 
     public String getDescription() {
@@ -69,20 +109,62 @@ public class LocationType {
         return fields;
     }
 
-    public void setId(String i) {
+    public void addField(Field f) {
+        fields.add(f);
+    }
+
+    public LocationType setId(String i) {
         id = i;
+        return this;
     }
 
     public void setDescription(String d) {
         description = d;
     }
 
-    public void setName(String n) {
+    public LocationType setName(String n) {
         name = n;
+        return this;
     }
 
     public void addFields(Set<Field> fd) {
         fields = fd;
+    }
+
+    public boolean isInUse() {
+        return inUse;
+    }
+
+    public void setInUse(boolean inUse) {
+        this.inUse = inUse;
+    }
+
+    public boolean isMovable() {
+        return movable;
+    }
+
+    public void setMovable(boolean movable) {
+        this.movable = movable;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public void setFields(Set<Field> fields) {
+        this.fields = fields;
     }
 
     @Override
@@ -91,6 +173,12 @@ public class LocationType {
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
+                ", inUse=" + inUse +
+                ", movable=" + movable +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", fields=" + fields +
+                ", attachments=" + attachments +
                 '}';
     }
 

@@ -1,1 +1,2401 @@
-{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/types?entityType=location&page[offset]=0&page[limit]=20","first":"https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/types?entityType=location&page[offset]=0&page[limit]=20"},"data":[{"type":"inventoryType","id":"389f413b-4125-4c61-8bda-50114695751b","attributes":{"id":"389f413b-4125-4c61-8bda-50114695751b","name":"GridBox","entityType":"location","description":"Box with variable grid (Cell address > Row=Letters, Column=Number)","isMovable":false,"inUse":true,"createdAt":"2022-07-21T12:45:42.929Z","updatedAt":"2022-07-21T12:48:34.568436Z","fields":[{"id":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","definition":{"key":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","multiSelect":false,"hidden":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isRequired":true}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isRequired":true}},{"id":"PE_INV_SYSTEM_Description","definition":{"key":"Description","title":"Description","type":"text","isRequired":true}},{"id":"PE_INV_SYSTEM_GRID_LAYOUT","definition":{"key":"GridLayout","title":"Grid Layout","type":"text","isRequired":true}},{"id":"fe1be52b-7dfb-4350-99db-91429fc09f06","definition":{"key":"fe1be52b-7dfb-4350-99db-91429fc09f06","title":"Temperature","type":"unit","measure":"temperature","multiSelect":false,"hidden":true}}],"digest":"6118a8d6-75af-473d-b5cc-02128b0ff584"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"},"data":{"type":"user","id":"102"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"},"data":{"type":"user","id":"102"}}}},{"type":"inventoryType","id":"43452cb8-5aa3-4ef5-b5e2-9b2ca4803af5","attributes":{"id":"43452cb8-5aa3-4ef5-b5e2-9b2ca4803af5","name":"Stockroom","entityType":"location","description":"","isMovable":false,"inUse":false,"attachments":[{"entityId":"43452cb8-5aa3-4ef5-b5e2-9b2ca4803af5","attachmentId":"40de7743-9c62-4be9-9691-9258ca20f02f","versionId":"ED2yTpzuItj5LqN1m2wxK_Z1ZbksVJ9D","entityType":"location","isTemplate":true,"fileName":"DefaultImage_Location_Stockroom.png","createdAt":"2022-02-22T16:33:39.531Z","updatedAt":"2022-02-22T16:33:39.531Z"}],"createdAt":"2022-02-22T16:33:39.233Z","updatedAt":"2022-02-22T16:33:39.233Z","fields":[{"id":"48dfda12-4084-47c7-b365-5b797131cb59","definition":{"key":"48dfda12-4084-47c7-b365-5b797131cb59","title":"Address","type":"text","hidden":true}},{"id":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","definition":{"key":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","title":"Allowed Hazards","type":"multiSelect","options":["GHS01 Exploding Bomb, Explosives","GHS02 Flame, Flammables","GHS03 Oxidizers","GHS04 Compressed Gasses","GHS05 Corrosives","GHS06 Acute Toxicity","GHS07 Irritant","GHS08 Health Hazard","GHS09 Environment"],"hidden":true}},{"id":"9309bab6-1382-45fe-948b-00afcfafd43f","definition":{"key":"9309bab6-1382-45fe-948b-00afcfafd43f","title":"Building","type":"text","hidden":true}},{"id":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","definition":{"key":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","title":"Emergency Contact","type":"text","hidden":true}},{"id":"976713b3-a546-458b-83e3-30ebce9f86f8","definition":{"key":"976713b3-a546-458b-83e3-30ebce9f86f8","title":"Floor","type":"text","hidden":true}},{"id":"ae19bdd7-b69d-47c8-aa83-a56fb11550d8","definition":{"key":"ae19bdd7-b69d-47c8-aa83-a56fb11550d8","title":"Room Number","type":"text","hidden":true}},{"id":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","definition":{"key":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Description","definition":{"key":"Description","title":"Description","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}}],"digest":"39601ce2-13e3-4ef2-a41f-fba79dbc1179"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}},{"type":"inventoryType","id":"f394d3e5-3c14-4165-ab26-4e8409c1fe16","attributes":{"id":"f394d3e5-3c14-4165-ab26-4e8409c1fe16","name":"Cart","entityType":"location","description":"","isMovable":false,"inUse":false,"attachments":[{"entityId":"f394d3e5-3c14-4165-ab26-4e8409c1fe16","attachmentId":"f438b1ea-a7f9-4a0c-b5c8-d5f64e692416","versionId":"x5qYDHatuevp5WVdzXfU_0HwnY9Tg7T9","entityType":"location","isTemplate":true,"fileName":"DefaultImage_Location_Cart.png","createdAt":"2022-02-22T16:33:39.468Z","updatedAt":"2022-02-22T16:33:39.468Z"}],"createdAt":"2022-02-22T16:33:39.229Z","updatedAt":"2022-02-22T16:33:39.229Z","fields":[{"id":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","definition":{"key":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","title":"Allowed Hazards","type":"multiSelect","options":["GHS01 Exploding Bomb, Explosives","GHS02 Flame, Flammables","GHS03 Oxidizers","GHS04 Compressed Gasses","GHS05 Corrosives","GHS06 Acute Toxicity","GHS07 Irritant","GHS08 Health Hazard","GHS09 Environment"],"hidden":true}},{"id":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","definition":{"key":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","title":"Emergency Contact","type":"text","hidden":true}},{"id":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","definition":{"key":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Description","definition":{"key":"Description","title":"Description","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}}],"digest":"b84be252-6695-4387-9de9-52a8cacc8aed"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}},{"type":"inventoryType","id":"017929f3-cd0e-466c-ac94-c21ce5fe8c31","attributes":{"id":"017929f3-cd0e-466c-ac94-c21ce5fe8c31","name":"Cabinet","entityType":"location","description":"","isMovable":false,"inUse":true,"attachments":[{"entityId":"017929f3-cd0e-466c-ac94-c21ce5fe8c31","attachmentId":"680b8011-20e9-45c4-8cff-57018b1ff036","versionId":"pBc2dcF_Rgk7xQSXOJw1Uj_8ta8VNh1.","entityType":"location","isTemplate":true,"fileName":"DefaultImage_Location_Cabinet.png","createdAt":"2022-02-22T16:33:39.502Z","updatedAt":"2022-02-22T16:33:39.502Z"}],"createdAt":"2022-02-22T16:33:39.218Z","updatedAt":"2022-02-22T16:33:39.218Z","fields":[{"id":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","definition":{"key":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","title":"Allowed Hazards","type":"multiSelect","options":["GHS01 Exploding Bomb, Explosives","GHS02 Flame, Flammables","GHS03 Oxidizers","GHS04 Compressed Gasses","GHS05 Corrosives","GHS06 Acute Toxicity","GHS07 Irritant","GHS08 Health Hazard","GHS09 Environment"],"hidden":true}},{"id":"9309bab6-1382-45fe-948b-00afcfafd43f","definition":{"key":"9309bab6-1382-45fe-948b-00afcfafd43f","title":"Building","type":"text","hidden":true}},{"id":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","definition":{"key":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","title":"Emergency Contact","type":"text","hidden":true}},{"id":"976713b3-a546-458b-83e3-30ebce9f86f8","definition":{"key":"976713b3-a546-458b-83e3-30ebce9f86f8","title":"Floor","type":"text","hidden":true}},{"id":"ae19bdd7-b69d-47c8-aa83-a56fb11550d8","definition":{"key":"ae19bdd7-b69d-47c8-aa83-a56fb11550d8","title":"Room Number","type":"text","hidden":true}},{"id":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","definition":{"key":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Description","definition":{"key":"Description","title":"Description","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}}],"digest":"be1b0c83-e061-4906-9924-8301d626d740"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}},{"type":"inventoryType","id":"4211988a-03bf-4103-a8d9-aff5dcf16067","attributes":{"id":"4211988a-03bf-4103-a8d9-aff5dcf16067","name":"Refrigerator","entityType":"location","description":"","isMovable":false,"inUse":false,"attachments":[{"entityId":"4211988a-03bf-4103-a8d9-aff5dcf16067","attachmentId":"76d9fdc8-5e8f-4b1a-8b48-d228bf518d11","versionId":"v_44woXQGeVEfa6EIMm3xBgCz..T0cTU","entityType":"location","isTemplate":true,"fileName":"DefaultImage_Location_Refrigerator.png","createdAt":"2022-02-22T16:33:40.053Z","updatedAt":"2022-02-22T16:33:40.053Z"}],"createdAt":"2022-02-22T16:33:39.206Z","updatedAt":"2022-02-22T16:33:39.206Z","fields":[{"id":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","definition":{"key":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","title":"Allowed Hazards","type":"multiSelect","options":["GHS01 Exploding Bomb, Explosives","GHS02 Flame, Flammables","GHS03 Oxidizers","GHS04 Compressed Gasses","GHS05 Corrosives","GHS06 Acute Toxicity","GHS07 Irritant","GHS08 Health Hazard","GHS09 Environment"],"hidden":true}},{"id":"9309bab6-1382-45fe-948b-00afcfafd43f","definition":{"key":"9309bab6-1382-45fe-948b-00afcfafd43f","title":"Building","type":"text","hidden":true}},{"id":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","definition":{"key":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","title":"Emergency Contact","type":"text","hidden":true}},{"id":"976713b3-a546-458b-83e3-30ebce9f86f8","definition":{"key":"976713b3-a546-458b-83e3-30ebce9f86f8","title":"Floor","type":"text","hidden":true}},{"id":"ae19bdd7-b69d-47c8-aa83-a56fb11550d8","definition":{"key":"ae19bdd7-b69d-47c8-aa83-a56fb11550d8","title":"Room Number","type":"text","hidden":true}},{"id":"fe1be52b-7dfb-4350-99db-91429fc09f06","definition":{"key":"fe1be52b-7dfb-4350-99db-91429fc09f06","title":"Temperature","type":"unit","measure":"temperature","hidden":true}},{"id":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","definition":{"key":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Description","definition":{"key":"Description","title":"Description","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}}],"digest":"9c8bc43b-16e9-4ca2-b8b1-1495be0e84fb"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}},{"type":"inventoryType","id":"609ba5dd-7015-4c39-8132-14588d4261e8","attributes":{"id":"609ba5dd-7015-4c39-8132-14588d4261e8","name":"Freezer","entityType":"location","description":"","isMovable":false,"inUse":true,"attachments":[{"entityId":"609ba5dd-7015-4c39-8132-14588d4261e8","attachmentId":"f22e97d7-d223-4b5f-8189-cbb055af28a5","versionId":"ysR6KhJeCwkruy5cU77EBEYpTSLu7PqX","entityType":"location","isTemplate":true,"fileName":"DefaultImage_Location_Freezer.png","createdAt":"2022-02-22T16:33:39.965Z","updatedAt":"2022-02-22T16:33:39.965Z"}],"createdAt":"2022-02-22T16:33:39.190Z","updatedAt":"2022-02-22T16:33:39.190Z","fields":[{"id":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","definition":{"key":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","title":"Allowed Hazards","type":"multiSelect","options":["GHS01 Exploding Bomb, Explosives","GHS02 Flame, Flammables","GHS03 Oxidizers","GHS04 Compressed Gasses","GHS05 Corrosives","GHS06 Acute Toxicity","GHS07 Irritant","GHS08 Health Hazard","GHS09 Environment"],"hidden":true}},{"id":"9309bab6-1382-45fe-948b-00afcfafd43f","definition":{"key":"9309bab6-1382-45fe-948b-00afcfafd43f","title":"Building","type":"text","hidden":true}},{"id":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","definition":{"key":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","title":"Emergency Contact","type":"text","hidden":true}},{"id":"976713b3-a546-458b-83e3-30ebce9f86f8","definition":{"key":"976713b3-a546-458b-83e3-30ebce9f86f8","title":"Floor","type":"text","hidden":true}},{"id":"ae19bdd7-b69d-47c8-aa83-a56fb11550d8","definition":{"key":"ae19bdd7-b69d-47c8-aa83-a56fb11550d8","title":"Room Number","type":"text","hidden":true}},{"id":"fe1be52b-7dfb-4350-99db-91429fc09f06","definition":{"key":"fe1be52b-7dfb-4350-99db-91429fc09f06","title":"Temperature","type":"unit","measure":"temperature","hidden":true}},{"id":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","definition":{"key":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Description","definition":{"key":"Description","title":"Description","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}}],"digest":"5a7c6c2a-42eb-4983-bd0e-10cedd3571f4"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}},{"type":"inventoryType","id":"13a9fcfe-101e-4ed8-83b2-69e61b69ec88","attributes":{"id":"13a9fcfe-101e-4ed8-83b2-69e61b69ec88","name":"Drawer","entityType":"location","description":"","isMovable":false,"inUse":false,"attachments":[{"entityId":"13a9fcfe-101e-4ed8-83b2-69e61b69ec88","attachmentId":"9fde5a3e-8de1-4149-b2df-1778c57a4c3f","versionId":"RrEFYy49vuz93l.gxgKZ_mfGOCd86u.y","entityType":"location","isTemplate":true,"fileName":"DefaultImage_Location_Drawer.png","createdAt":"2022-02-22T16:33:39.767Z","updatedAt":"2022-02-22T16:33:39.767Z"}],"createdAt":"2022-02-22T16:33:39.166Z","updatedAt":"2022-02-22T16:33:39.166Z","fields":[{"id":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","definition":{"key":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","title":"Allowed Hazards","type":"multiSelect","options":["GHS01 Exploding Bomb, Explosives","GHS02 Flame, Flammables","GHS03 Oxidizers","GHS04 Compressed Gasses","GHS05 Corrosives","GHS06 Acute Toxicity","GHS07 Irritant","GHS08 Health Hazard","GHS09 Environment"],"hidden":true}},{"id":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","definition":{"key":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Description","definition":{"key":"Description","title":"Description","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}}],"digest":"52d24eca-52db-43ca-8267-9ec129bdcfa4"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}},{"type":"inventoryType","id":"cce34cb5-4053-478d-ac9f-a3ca7550dc29","attributes":{"id":"cce34cb5-4053-478d-ac9f-a3ca7550dc29","name":"Hood","entityType":"location","description":"","isMovable":false,"inUse":false,"attachments":[{"entityId":"cce34cb5-4053-478d-ac9f-a3ca7550dc29","attachmentId":"fed5bbb1-50b9-4d25-a484-dc4683925510","versionId":"fQ1lBsHyHJy9Z3rImazf7Z8oV2kW9cPY","entityType":"location","isTemplate":true,"fileName":"DefaultImage_Location_Hood.png","createdAt":"2022-02-22T16:33:39.417Z","updatedAt":"2022-02-22T16:33:39.417Z"}],"createdAt":"2022-02-22T16:33:39.159Z","updatedAt":"2022-02-22T16:33:39.159Z","fields":[{"id":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","definition":{"key":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","title":"Allowed Hazards","type":"multiSelect","options":["GHS01 Exploding Bomb, Explosives","GHS02 Flame, Flammables","GHS03 Oxidizers","GHS04 Compressed Gasses","GHS05 Corrosives","GHS06 Acute Toxicity","GHS07 Irritant","GHS08 Health Hazard","GHS09 Environment"],"hidden":true}},{"id":"9309bab6-1382-45fe-948b-00afcfafd43f","definition":{"key":"9309bab6-1382-45fe-948b-00afcfafd43f","title":"Building","type":"text","hidden":true}},{"id":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","definition":{"key":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","title":"Emergency Contact","type":"text","hidden":true}},{"id":"976713b3-a546-458b-83e3-30ebce9f86f8","definition":{"key":"976713b3-a546-458b-83e3-30ebce9f86f8","title":"Floor","type":"text","hidden":true}},{"id":"ae19bdd7-b69d-47c8-aa83-a56fb11550d8","definition":{"key":"ae19bdd7-b69d-47c8-aa83-a56fb11550d8","title":"Room Number","type":"text","hidden":true}},{"id":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","definition":{"key":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Description","definition":{"key":"Description","title":"Description","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}}],"digest":"e56fc6eb-6870-4558-a29b-5d90ad1b6120"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}},{"type":"inventoryType","id":"89c0a78a-1940-45b5-9f14-6873251d865a","attributes":{"id":"89c0a78a-1940-45b5-9f14-6873251d865a","name":"Site","entityType":"location","description":"","isMovable":false,"inUse":false,"attachments":[{"entityId":"89c0a78a-1940-45b5-9f14-6873251d865a","attachmentId":"3dea91ff-cee7-4719-967a-932b5cec2787","versionId":"o27H6douEQO1eJeqGQRE_zawzxTFzaqZ","entityType":"location","isTemplate":true,"fileName":"DefaultImage_Location_Site.png","createdAt":"2022-02-22T16:33:39.623Z","updatedAt":"2022-02-22T16:33:39.623Z"}],"createdAt":"2022-02-22T16:33:39.149Z","updatedAt":"2022-02-22T16:33:39.149Z","fields":[{"id":"48dfda12-4084-47c7-b365-5b797131cb59","definition":{"key":"48dfda12-4084-47c7-b365-5b797131cb59","title":"Address","type":"text","hidden":true}},{"id":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","definition":{"key":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","title":"Allowed Hazards","type":"multiSelect","options":["GHS01 Exploding Bomb, Explosives","GHS02 Flame, Flammables","GHS03 Oxidizers","GHS04 Compressed Gasses","GHS05 Corrosives","GHS06 Acute Toxicity","GHS07 Irritant","GHS08 Health Hazard","GHS09 Environment"],"hidden":true}},{"id":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","definition":{"key":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","title":"Emergency Contact","type":"text","hidden":true}},{"id":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","definition":{"key":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Description","definition":{"key":"Description","title":"Description","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}}],"digest":"4791f835-82cb-46ae-a374-c038712bd05a"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}},{"type":"inventoryType","id":"fd7e3140-4716-4ad2-83fa-fbc08ee23b39","attributes":{"id":"fd7e3140-4716-4ad2-83fa-fbc08ee23b39","name":"Box","entityType":"location","description":"","isMovable":false,"inUse":false,"attachments":[{"entityId":"fd7e3140-4716-4ad2-83fa-fbc08ee23b39","attachmentId":"fd7ef2df-5972-4e2d-a6ca-c91be1d40b50","versionId":"P_UEGLHh7u6EbJ5CBjC66s5llC_zuyiC","entityType":"location","isTemplate":true,"fileName":"DefaultImage_Location_Box.png","createdAt":"2022-02-22T16:33:39.473Z","updatedAt":"2022-02-22T16:33:39.473Z"}],"createdAt":"2022-02-22T16:33:39.145Z","updatedAt":"2022-02-22T16:33:39.145Z","fields":[{"id":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","definition":{"key":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","title":"Allowed Hazards","type":"multiSelect","options":["GHS01 Exploding Bomb, Explosives","GHS02 Flame, Flammables","GHS03 Oxidizers","GHS04 Compressed Gasses","GHS05 Corrosives","GHS06 Acute Toxicity","GHS07 Irritant","GHS08 Health Hazard","GHS09 Environment"],"hidden":true}},{"id":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","definition":{"key":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Description","definition":{"key":"Description","title":"Description","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}}],"digest":"5f9bf699-0873-49bc-a99e-2f5afe3b1544"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}},{"type":"inventoryType","id":"81ff1644-2a27-4fb1-a597-5d83e1920c0d","attributes":{"id":"81ff1644-2a27-4fb1-a597-5d83e1920c0d","name":"Bench","entityType":"location","description":"","isMovable":false,"inUse":false,"attachments":[{"entityId":"81ff1644-2a27-4fb1-a597-5d83e1920c0d","attachmentId":"4f22339c-68bc-45ec-84a8-ab409dec3243","versionId":"Z5xXb0E06o0PnSjzo9YZ4gTaFNoGD3NS","entityType":"location","isTemplate":true,"fileName":"DefaultImage_Location_Bench.png","createdAt":"2022-02-22T16:33:39.502Z","updatedAt":"2022-02-22T16:33:39.502Z"}],"createdAt":"2022-02-22T16:33:39.140Z","updatedAt":"2022-02-22T16:33:39.140Z","fields":[{"id":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","definition":{"key":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","title":"Allowed Hazards","type":"multiSelect","options":["GHS01 Exploding Bomb, Explosives","GHS02 Flame, Flammables","GHS03 Oxidizers","GHS04 Compressed Gasses","GHS05 Corrosives","GHS06 Acute Toxicity","GHS07 Irritant","GHS08 Health Hazard","GHS09 Environment"],"hidden":true}},{"id":"9309bab6-1382-45fe-948b-00afcfafd43f","definition":{"key":"9309bab6-1382-45fe-948b-00afcfafd43f","title":"Building","type":"text","hidden":true}},{"id":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","definition":{"key":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","title":"Emergency Contact","type":"text","hidden":true}},{"id":"976713b3-a546-458b-83e3-30ebce9f86f8","definition":{"key":"976713b3-a546-458b-83e3-30ebce9f86f8","title":"Floor","type":"text","hidden":true}},{"id":"ae19bdd7-b69d-47c8-aa83-a56fb11550d8","definition":{"key":"ae19bdd7-b69d-47c8-aa83-a56fb11550d8","title":"Room Number","type":"text","hidden":true}},{"id":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","definition":{"key":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Description","definition":{"key":"Description","title":"Description","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}}],"digest":"74d02641-63b2-4569-b125-915df5be91aa"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}},{"type":"inventoryType","id":"0b9853f4-39aa-488b-a8bd-d9da5c2712dd","attributes":{"id":"0b9853f4-39aa-488b-a8bd-d9da5c2712dd","name":"Lab","entityType":"location","description":"","isMovable":false,"inUse":true,"attachments":[{"entityId":"0b9853f4-39aa-488b-a8bd-d9da5c2712dd","attachmentId":"552de188-8f1b-4f66-9501-b9bc707fdc91","versionId":"JHVyjuLIa6DFvnCUUtfeFGympEjkiGh0","entityType":"location","isTemplate":true,"fileName":"DefaultImage_Location_Lab.png","createdAt":"2022-02-22T16:33:39.896Z","updatedAt":"2022-02-22T16:33:39.896Z"}],"createdAt":"2022-02-22T16:33:39.132Z","updatedAt":"2022-02-22T16:33:39.132Z","fields":[{"id":"48dfda12-4084-47c7-b365-5b797131cb59","definition":{"key":"48dfda12-4084-47c7-b365-5b797131cb59","title":"Address","type":"text","hidden":true}},{"id":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","definition":{"key":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","title":"Allowed Hazards","type":"multiSelect","options":["GHS01 Exploding Bomb, Explosives","GHS02 Flame, Flammables","GHS03 Oxidizers","GHS04 Compressed Gasses","GHS05 Corrosives","GHS06 Acute Toxicity","GHS07 Irritant","GHS08 Health Hazard","GHS09 Environment"],"hidden":true}},{"id":"9309bab6-1382-45fe-948b-00afcfafd43f","definition":{"key":"9309bab6-1382-45fe-948b-00afcfafd43f","title":"Building","type":"text","hidden":true}},{"id":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","definition":{"key":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","title":"Emergency Contact","type":"text","hidden":true}},{"id":"976713b3-a546-458b-83e3-30ebce9f86f8","definition":{"key":"976713b3-a546-458b-83e3-30ebce9f86f8","title":"Floor","type":"text","hidden":true}},{"id":"ae19bdd7-b69d-47c8-aa83-a56fb11550d8","definition":{"key":"ae19bdd7-b69d-47c8-aa83-a56fb11550d8","title":"Room Number","type":"text","hidden":true}},{"id":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","definition":{"key":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Description","definition":{"key":"Description","title":"Description","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}}],"digest":"923d9d8c-7a84-4057-a1fa-14a6888b3afd"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}},{"type":"inventoryType","id":"62648727-2ea8-41e1-8e67-d1ee4d7d4af5","attributes":{"id":"62648727-2ea8-41e1-8e67-d1ee4d7d4af5","name":"Building","entityType":"location","description":"","isMovable":false,"inUse":false,"attachments":[{"entityId":"62648727-2ea8-41e1-8e67-d1ee4d7d4af5","attachmentId":"d0cd4306-600d-415c-8db8-e09c2c0b7d47","versionId":"qqpTW0ThbcxkZGe.bjYk2P8hiMoig4p1","entityType":"location","isTemplate":true,"fileName":"DefaultImage_Location_Building.png","createdAt":"2022-02-22T16:33:39.625Z","updatedAt":"2022-02-22T16:33:39.625Z"}],"createdAt":"2022-02-22T16:33:39.123Z","updatedAt":"2022-02-22T16:33:39.123Z","fields":[{"id":"48dfda12-4084-47c7-b365-5b797131cb59","definition":{"key":"48dfda12-4084-47c7-b365-5b797131cb59","title":"Address","type":"text","hidden":true}},{"id":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","definition":{"key":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","title":"Allowed Hazards","type":"multiSelect","options":["GHS01 Exploding Bomb, Explosives","GHS02 Flame, Flammables","GHS03 Oxidizers","GHS04 Compressed Gasses","GHS05 Corrosives","GHS06 Acute Toxicity","GHS07 Irritant","GHS08 Health Hazard","GHS09 Environment"],"hidden":true}},{"id":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","definition":{"key":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","title":"Emergency Contact","type":"text","hidden":true}},{"id":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","definition":{"key":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Description","definition":{"key":"Description","title":"Description","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}}],"digest":"5c6d7922-ff1e-49ea-814b-080cb45b7a4e"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}},{"type":"inventoryType","id":"3fd2af9d-e066-405c-8a64-d67c4a781e5d","attributes":{"id":"3fd2af9d-e066-405c-8a64-d67c4a781e5d","name":"Rack","entityType":"location","description":"Freezer/Refrigerator Rack","isMovable":false,"inUse":false,"attachments":[{"entityId":"3fd2af9d-e066-405c-8a64-d67c4a781e5d","attachmentId":"1eefa8cc-40d2-4d0b-83d5-3c5760259425","versionId":"9G_spWG96GwRkx9XuBW6Rx9hrUPer7Qa","entityType":"location","isTemplate":true,"fileName":"DefaultImage_Location_RackStationary.png","createdAt":"2022-02-22T16:33:39.487Z","updatedAt":"2022-02-22T16:33:39.487Z"}],"createdAt":"2022-02-22T16:33:39.106Z","updatedAt":"2022-02-22T16:33:39.106Z","fields":[{"id":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","definition":{"key":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","title":"Allowed Hazards","type":"multiSelect","options":["GHS01 Exploding Bomb, Explosives","GHS02 Flame, Flammables","GHS03 Oxidizers","GHS04 Compressed Gasses","GHS05 Corrosives","GHS06 Acute Toxicity","GHS07 Irritant","GHS08 Health Hazard","GHS09 Environment"],"hidden":true}},{"id":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","definition":{"key":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Description","definition":{"key":"Description","title":"Description","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}}],"digest":"3b1614ef-5996-4387-ba27-f534df1af8b3"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}},{"type":"inventoryType","id":"cb870ae2-41eb-456d-8374-357c58a9a7d4","attributes":{"id":"cb870ae2-41eb-456d-8374-357c58a9a7d4","name":"Shelf","entityType":"location","description":"","isMovable":false,"inUse":false,"attachments":[{"entityId":"cb870ae2-41eb-456d-8374-357c58a9a7d4","attachmentId":"094e3515-e559-4378-ad78-f8b8b2e37823","versionId":"FY7W8uzUS1RhGk5w7zNTods9hfA2kt1o","entityType":"location","isTemplate":true,"fileName":"DefaultImage_Location_Shelf.png","createdAt":"2022-02-22T16:33:39.391Z","updatedAt":"2022-02-22T16:33:39.391Z"}],"createdAt":"2022-02-22T16:33:39.092Z","updatedAt":"2022-02-22T16:33:39.092Z","fields":[{"id":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","definition":{"key":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","title":"Allowed Hazards","type":"multiSelect","options":["GHS01 Exploding Bomb, Explosives","GHS02 Flame, Flammables","GHS03 Oxidizers","GHS04 Compressed Gasses","GHS05 Corrosives","GHS06 Acute Toxicity","GHS07 Irritant","GHS08 Health Hazard","GHS09 Environment"],"hidden":true}},{"id":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","definition":{"key":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Description","definition":{"key":"Description","title":"Description","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}}],"digest":"b221550b-5ade-45c0-ab1f-797ab4f9026b"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}},{"type":"inventoryType","id":"7059715c-6ad8-47e9-951a-c9caf42b097f","attributes":{"id":"7059715c-6ad8-47e9-951a-c9caf42b097f","name":"Rack: Lab","entityType":"location","description":"Movable Rack that can hold samples/tubes","isMovable":false,"inUse":false,"attachments":[{"entityId":"7059715c-6ad8-47e9-951a-c9caf42b097f","attachmentId":"0fe83d2e-3755-43aa-9c23-c0354d0cc635","versionId":"bflt2NF2DC0ipCLb9ZIu_1QG2Smh3gNF","entityType":"location","isTemplate":true,"fileName":"DefaultImage_Location_RackTestTube.png","createdAt":"2022-02-22T16:33:39.830Z","updatedAt":"2022-02-22T16:33:39.830Z"}],"createdAt":"2022-02-22T16:33:39.088Z","updatedAt":"2022-02-22T16:33:39.088Z","fields":[{"id":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","definition":{"key":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Description","definition":{"key":"Description","title":"Description","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}}],"digest":"3f383fb0-0f68-4a99-83ff-295e367e1fc8"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}},{"type":"inventoryType","id":"44ab8051-81fe-4f48-b251-8f629a89ddf4","attributes":{"id":"44ab8051-81fe-4f48-b251-8f629a89ddf4","name":"Bin","entityType":"location","description":"","isMovable":false,"inUse":false,"attachments":[{"entityId":"44ab8051-81fe-4f48-b251-8f629a89ddf4","attachmentId":"6579752f-4d0a-469d-80b2-452d67a7524a","versionId":"OHvnkrnx6W.ua0KO9isrCTiKxnz6XYV9","entityType":"location","isTemplate":true,"fileName":"DefaultImage_Location_Bin.png","createdAt":"2022-02-22T16:33:39.323Z","updatedAt":"2022-02-22T16:33:39.323Z"}],"createdAt":"2022-02-22T16:33:39.084Z","updatedAt":"2022-02-22T16:33:39.084Z","fields":[{"id":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","definition":{"key":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","title":"Allowed Hazards","type":"multiSelect","options":["GHS01 Exploding Bomb, Explosives","GHS02 Flame, Flammables","GHS03 Oxidizers","GHS04 Compressed Gasses","GHS05 Corrosives","GHS06 Acute Toxicity","GHS07 Irritant","GHS08 Health Hazard","GHS09 Environment"],"hidden":true}},{"id":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","definition":{"key":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Description","definition":{"key":"Description","title":"Description","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}}],"digest":"b60a0bfe-8cb3-4400-90ef-29b1fe8a89a5"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}},{"type":"inventoryType","id":"04dea172-38cb-4020-8741-b4e23102cf07","attributes":{"id":"04dea172-38cb-4020-8741-b4e23102cf07","name":"Receiving","entityType":"location","description":"","isMovable":false,"inUse":false,"attachments":[{"entityId":"04dea172-38cb-4020-8741-b4e23102cf07","attachmentId":"e77900bd-5801-4222-be16-91009e1e86b8","versionId":"ESkBg43l8_7.rvHwmKqMgq8jzVF3_J2R","entityType":"location","isTemplate":true,"fileName":"DefaultImage_Location_ReceivingArea.png","createdAt":"2022-02-22T16:33:39.430Z","updatedAt":"2022-02-22T16:33:39.430Z"}],"createdAt":"2022-02-22T16:33:39.080Z","updatedAt":"2022-02-22T16:33:39.080Z","fields":[{"id":"48dfda12-4084-47c7-b365-5b797131cb59","definition":{"key":"48dfda12-4084-47c7-b365-5b797131cb59","title":"Address","type":"text","hidden":true}},{"id":"9309bab6-1382-45fe-948b-00afcfafd43f","definition":{"key":"9309bab6-1382-45fe-948b-00afcfafd43f","title":"Building","type":"text","hidden":true}},{"id":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","definition":{"key":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","title":"Emergency Contact","type":"text","hidden":true}},{"id":"976713b3-a546-458b-83e3-30ebce9f86f8","definition":{"key":"976713b3-a546-458b-83e3-30ebce9f86f8","title":"Floor","type":"text","hidden":true}},{"id":"ae19bdd7-b69d-47c8-aa83-a56fb11550d8","definition":{"key":"ae19bdd7-b69d-47c8-aa83-a56fb11550d8","title":"Room Number","type":"text","hidden":true}},{"id":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","definition":{"key":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Description","definition":{"key":"Description","title":"Description","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}}],"digest":"9b966b07-b2c4-4faa-8ab7-7c2a2e8c2a26"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}},{"type":"inventoryType","id":"b9fab5b8-6c26-47f8-8694-320c7c439879","attributes":{"id":"b9fab5b8-6c26-47f8-8694-320c7c439879","name":"Room","entityType":"location","description":"","isMovable":false,"inUse":true,"attachments":[{"entityId":"b9fab5b8-6c26-47f8-8694-320c7c439879","attachmentId":"acb656c6-6d61-4e25-979a-62ff2bdf4059","versionId":"6pqV5x4SRflX01hYDkTLbgLd.Tykm8Nr","entityType":"location","isTemplate":true,"fileName":"DefaultImage_Location_Room.png","createdAt":"2022-02-22T16:33:39.434Z","updatedAt":"2022-02-22T16:33:39.434Z"}],"createdAt":"2022-02-22T16:33:39.075Z","updatedAt":"2022-02-22T16:33:39.075Z","fields":[{"id":"48dfda12-4084-47c7-b365-5b797131cb59","definition":{"key":"48dfda12-4084-47c7-b365-5b797131cb59","title":"Address","type":"text","hidden":true}},{"id":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","definition":{"key":"b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf","title":"Allowed Hazards","type":"multiSelect","options":["GHS01 Exploding Bomb, Explosives","GHS02 Flame, Flammables","GHS03 Oxidizers","GHS04 Compressed Gasses","GHS05 Corrosives","GHS06 Acute Toxicity","GHS07 Irritant","GHS08 Health Hazard","GHS09 Environment"],"hidden":true}},{"id":"9309bab6-1382-45fe-948b-00afcfafd43f","definition":{"key":"9309bab6-1382-45fe-948b-00afcfafd43f","title":"Building","type":"text","hidden":true}},{"id":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","definition":{"key":"c09b9e45-f68e-43b8-9a89-af92f7322a1d","title":"Emergency Contact","type":"text","hidden":true}},{"id":"976713b3-a546-458b-83e3-30ebce9f86f8","definition":{"key":"976713b3-a546-458b-83e3-30ebce9f86f8","title":"Floor","type":"text","hidden":true}},{"id":"ae19bdd7-b69d-47c8-aa83-a56fb11550d8","definition":{"key":"ae19bdd7-b69d-47c8-aa83-a56fb11550d8","title":"Room Number","type":"text","hidden":true}},{"id":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","definition":{"key":"242870a3-dc72-4c84-82e7-6ab8cfc854e7","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Description","definition":{"key":"Description","title":"Description","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}}],"digest":"38392105-9fe1-4d91-9056-39047bb01ce6"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}}],"included":[{"type":"user","id":"102","links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"},"attributes":{"userId":"102","userName":"user.three@someplace.invalid","alias":"USR3","email":"user.three@someplace.invalid","firstName":"ThreeFirst","lastName":"ThreeLast","country":"Germany","organization":"trialorg"},"relationships":{"systemGroups":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/102/systemGroups"}}}},{"type":"user","id":"3","links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"attributes":{"userId":"3","userName":"system","firstName":"System","lastName":""},"relationships":{"systemGroups":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3/systemGroups"}}}}]}
+{
+  "links": {
+    "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/types?entityType=location&page[offset]=0&page[limit]=20",
+    "first": "https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/types?entityType=location&page[offset]=0&page[limit]=20"
+  },
+  "data": [
+    {
+      "type": "inventoryType",
+      "id": "389f413b-4125-4c61-8bda-50114695751b",
+      "attributes": {
+        "id": "389f413b-4125-4c61-8bda-50114695751b",
+        "name": "GridBox",
+        "entityType": "location",
+        "description": "Box with variable grid (Cell address > Row=Letters, Column=Number)",
+        "isMovable": false,
+        "inUse": true,
+        "createdAt": "2022-07-21T12:45:42.929Z",
+        "updatedAt": "2022-07-21T12:48:34.568436Z",
+        "fields": [
+          {
+            "id": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+            "definition": {
+              "key": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "multiSelect": false,
+              "hidden": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Description",
+            "definition": {
+              "key": "Description",
+              "title": "Description",
+              "type": "text",
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_GRID_LAYOUT",
+            "definition": {
+              "key": "GridLayout",
+              "title": "Grid Layout",
+              "type": "text",
+              "isRequired": true
+            }
+          },
+          {
+            "id": "fe1be52b-7dfb-4350-99db-91429fc09f06",
+            "definition": {
+              "key": "fe1be52b-7dfb-4350-99db-91429fc09f06",
+              "title": "Temperature",
+              "type": "unit",
+              "measure": "temperature",
+              "multiSelect": false,
+              "hidden": true
+            }
+          }
+        ],
+        "digest": "6118a8d6-75af-473d-b5cc-02128b0ff584"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"
+          },
+          "data": { "type": "user", "id": "102" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"
+          },
+          "data": { "type": "user", "id": "102" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "43452cb8-5aa3-4ef5-b5e2-9b2ca4803af5",
+      "attributes": {
+        "id": "43452cb8-5aa3-4ef5-b5e2-9b2ca4803af5",
+        "name": "Stockroom",
+        "entityType": "location",
+        "description": "",
+        "isMovable": false,
+        "inUse": false,
+        "attachments": [
+          {
+            "entityId": "43452cb8-5aa3-4ef5-b5e2-9b2ca4803af5",
+            "attachmentId": "40de7743-9c62-4be9-9691-9258ca20f02f",
+            "versionId": "ED2yTpzuItj5LqN1m2wxK_Z1ZbksVJ9D",
+            "entityType": "location",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Location_Stockroom.png",
+            "createdAt": "2022-02-22T16:33:39.531Z",
+            "updatedAt": "2022-02-22T16:33:39.531Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.233Z",
+        "updatedAt": "2022-02-22T16:33:39.233Z",
+        "fields": [
+          {
+            "id": "48dfda12-4084-47c7-b365-5b797131cb59",
+            "definition": {
+              "key": "48dfda12-4084-47c7-b365-5b797131cb59",
+              "title": "Address",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+            "definition": {
+              "key": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+              "title": "Allowed Hazards",
+              "type": "multiSelect",
+              "options": [
+                "GHS01 Exploding Bomb, Explosives",
+                "GHS02 Flame, Flammables",
+                "GHS03 Oxidizers",
+                "GHS04 Compressed Gasses",
+                "GHS05 Corrosives",
+                "GHS06 Acute Toxicity",
+                "GHS07 Irritant",
+                "GHS08 Health Hazard",
+                "GHS09 Environment"
+              ],
+              "hidden": true
+            }
+          },
+          {
+            "id": "9309bab6-1382-45fe-948b-00afcfafd43f",
+            "definition": {
+              "key": "9309bab6-1382-45fe-948b-00afcfafd43f",
+              "title": "Building",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+            "definition": {
+              "key": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+              "title": "Emergency Contact",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "976713b3-a546-458b-83e3-30ebce9f86f8",
+            "definition": {
+              "key": "976713b3-a546-458b-83e3-30ebce9f86f8",
+              "title": "Floor",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "ae19bdd7-b69d-47c8-aa83-a56fb11550d8",
+            "definition": {
+              "key": "ae19bdd7-b69d-47c8-aa83-a56fb11550d8",
+              "title": "Room Number",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+            "definition": {
+              "key": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Description",
+            "definition": {
+              "key": "Description",
+              "title": "Description",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          }
+        ],
+        "digest": "39601ce2-13e3-4ef2-a41f-fba79dbc1179"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "f394d3e5-3c14-4165-ab26-4e8409c1fe16",
+      "attributes": {
+        "id": "f394d3e5-3c14-4165-ab26-4e8409c1fe16",
+        "name": "Cart",
+        "entityType": "location",
+        "description": "",
+        "isMovable": false,
+        "inUse": false,
+        "attachments": [
+          {
+            "entityId": "f394d3e5-3c14-4165-ab26-4e8409c1fe16",
+            "attachmentId": "f438b1ea-a7f9-4a0c-b5c8-d5f64e692416",
+            "versionId": "x5qYDHatuevp5WVdzXfU_0HwnY9Tg7T9",
+            "entityType": "location",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Location_Cart.png",
+            "createdAt": "2022-02-22T16:33:39.468Z",
+            "updatedAt": "2022-02-22T16:33:39.468Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.229Z",
+        "updatedAt": "2022-02-22T16:33:39.229Z",
+        "fields": [
+          {
+            "id": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+            "definition": {
+              "key": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+              "title": "Allowed Hazards",
+              "type": "multiSelect",
+              "options": [
+                "GHS01 Exploding Bomb, Explosives",
+                "GHS02 Flame, Flammables",
+                "GHS03 Oxidizers",
+                "GHS04 Compressed Gasses",
+                "GHS05 Corrosives",
+                "GHS06 Acute Toxicity",
+                "GHS07 Irritant",
+                "GHS08 Health Hazard",
+                "GHS09 Environment"
+              ],
+              "hidden": true
+            }
+          },
+          {
+            "id": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+            "definition": {
+              "key": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+              "title": "Emergency Contact",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+            "definition": {
+              "key": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Description",
+            "definition": {
+              "key": "Description",
+              "title": "Description",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          }
+        ],
+        "digest": "b84be252-6695-4387-9de9-52a8cacc8aed"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "017929f3-cd0e-466c-ac94-c21ce5fe8c31",
+      "attributes": {
+        "id": "017929f3-cd0e-466c-ac94-c21ce5fe8c31",
+        "name": "Cabinet",
+        "entityType": "location",
+        "description": "",
+        "isMovable": false,
+        "inUse": true,
+        "attachments": [
+          {
+            "entityId": "017929f3-cd0e-466c-ac94-c21ce5fe8c31",
+            "attachmentId": "680b8011-20e9-45c4-8cff-57018b1ff036",
+            "versionId": "pBc2dcF_Rgk7xQSXOJw1Uj_8ta8VNh1.",
+            "entityType": "location",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Location_Cabinet.png",
+            "createdAt": "2022-02-22T16:33:39.502Z",
+            "updatedAt": "2022-02-22T16:33:39.502Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.218Z",
+        "updatedAt": "2022-02-22T16:33:39.218Z",
+        "fields": [
+          {
+            "id": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+            "definition": {
+              "key": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+              "title": "Allowed Hazards",
+              "type": "multiSelect",
+              "options": [
+                "GHS01 Exploding Bomb, Explosives",
+                "GHS02 Flame, Flammables",
+                "GHS03 Oxidizers",
+                "GHS04 Compressed Gasses",
+                "GHS05 Corrosives",
+                "GHS06 Acute Toxicity",
+                "GHS07 Irritant",
+                "GHS08 Health Hazard",
+                "GHS09 Environment"
+              ],
+              "hidden": true
+            }
+          },
+          {
+            "id": "9309bab6-1382-45fe-948b-00afcfafd43f",
+            "definition": {
+              "key": "9309bab6-1382-45fe-948b-00afcfafd43f",
+              "title": "Building",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+            "definition": {
+              "key": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+              "title": "Emergency Contact",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "976713b3-a546-458b-83e3-30ebce9f86f8",
+            "definition": {
+              "key": "976713b3-a546-458b-83e3-30ebce9f86f8",
+              "title": "Floor",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "ae19bdd7-b69d-47c8-aa83-a56fb11550d8",
+            "definition": {
+              "key": "ae19bdd7-b69d-47c8-aa83-a56fb11550d8",
+              "title": "Room Number",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+            "definition": {
+              "key": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Description",
+            "definition": {
+              "key": "Description",
+              "title": "Description",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          }
+        ],
+        "digest": "be1b0c83-e061-4906-9924-8301d626d740"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "4211988a-03bf-4103-a8d9-aff5dcf16067",
+      "attributes": {
+        "id": "4211988a-03bf-4103-a8d9-aff5dcf16067",
+        "name": "Refrigerator",
+        "entityType": "location",
+        "description": "",
+        "isMovable": false,
+        "inUse": false,
+        "attachments": [
+          {
+            "entityId": "4211988a-03bf-4103-a8d9-aff5dcf16067",
+            "attachmentId": "76d9fdc8-5e8f-4b1a-8b48-d228bf518d11",
+            "versionId": "v_44woXQGeVEfa6EIMm3xBgCz..T0cTU",
+            "entityType": "location",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Location_Refrigerator.png",
+            "createdAt": "2022-02-22T16:33:40.053Z",
+            "updatedAt": "2022-02-22T16:33:40.053Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.206Z",
+        "updatedAt": "2022-02-22T16:33:39.206Z",
+        "fields": [
+          {
+            "id": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+            "definition": {
+              "key": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+              "title": "Allowed Hazards",
+              "type": "multiSelect",
+              "options": [
+                "GHS01 Exploding Bomb, Explosives",
+                "GHS02 Flame, Flammables",
+                "GHS03 Oxidizers",
+                "GHS04 Compressed Gasses",
+                "GHS05 Corrosives",
+                "GHS06 Acute Toxicity",
+                "GHS07 Irritant",
+                "GHS08 Health Hazard",
+                "GHS09 Environment"
+              ],
+              "hidden": true
+            }
+          },
+          {
+            "id": "9309bab6-1382-45fe-948b-00afcfafd43f",
+            "definition": {
+              "key": "9309bab6-1382-45fe-948b-00afcfafd43f",
+              "title": "Building",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+            "definition": {
+              "key": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+              "title": "Emergency Contact",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "976713b3-a546-458b-83e3-30ebce9f86f8",
+            "definition": {
+              "key": "976713b3-a546-458b-83e3-30ebce9f86f8",
+              "title": "Floor",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "ae19bdd7-b69d-47c8-aa83-a56fb11550d8",
+            "definition": {
+              "key": "ae19bdd7-b69d-47c8-aa83-a56fb11550d8",
+              "title": "Room Number",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "fe1be52b-7dfb-4350-99db-91429fc09f06",
+            "definition": {
+              "key": "fe1be52b-7dfb-4350-99db-91429fc09f06",
+              "title": "Temperature",
+              "type": "unit",
+              "measure": "temperature",
+              "hidden": true
+            }
+          },
+          {
+            "id": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+            "definition": {
+              "key": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Description",
+            "definition": {
+              "key": "Description",
+              "title": "Description",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          }
+        ],
+        "digest": "9c8bc43b-16e9-4ca2-b8b1-1495be0e84fb"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "609ba5dd-7015-4c39-8132-14588d4261e8",
+      "attributes": {
+        "id": "609ba5dd-7015-4c39-8132-14588d4261e8",
+        "name": "Freezer",
+        "entityType": "location",
+        "description": "",
+        "isMovable": false,
+        "inUse": true,
+        "attachments": [
+          {
+            "entityId": "609ba5dd-7015-4c39-8132-14588d4261e8",
+            "attachmentId": "f22e97d7-d223-4b5f-8189-cbb055af28a5",
+            "versionId": "ysR6KhJeCwkruy5cU77EBEYpTSLu7PqX",
+            "entityType": "location",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Location_Freezer.png",
+            "createdAt": "2022-02-22T16:33:39.965Z",
+            "updatedAt": "2022-02-22T16:33:39.965Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.190Z",
+        "updatedAt": "2022-02-22T16:33:39.190Z",
+        "fields": [
+          {
+            "id": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+            "definition": {
+              "key": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+              "title": "Allowed Hazards",
+              "type": "multiSelect",
+              "options": [
+                "GHS01 Exploding Bomb, Explosives",
+                "GHS02 Flame, Flammables",
+                "GHS03 Oxidizers",
+                "GHS04 Compressed Gasses",
+                "GHS05 Corrosives",
+                "GHS06 Acute Toxicity",
+                "GHS07 Irritant",
+                "GHS08 Health Hazard",
+                "GHS09 Environment"
+              ],
+              "hidden": true
+            }
+          },
+          {
+            "id": "9309bab6-1382-45fe-948b-00afcfafd43f",
+            "definition": {
+              "key": "9309bab6-1382-45fe-948b-00afcfafd43f",
+              "title": "Building",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+            "definition": {
+              "key": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+              "title": "Emergency Contact",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "976713b3-a546-458b-83e3-30ebce9f86f8",
+            "definition": {
+              "key": "976713b3-a546-458b-83e3-30ebce9f86f8",
+              "title": "Floor",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "ae19bdd7-b69d-47c8-aa83-a56fb11550d8",
+            "definition": {
+              "key": "ae19bdd7-b69d-47c8-aa83-a56fb11550d8",
+              "title": "Room Number",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "fe1be52b-7dfb-4350-99db-91429fc09f06",
+            "definition": {
+              "key": "fe1be52b-7dfb-4350-99db-91429fc09f06",
+              "title": "Temperature",
+              "type": "unit",
+              "measure": "temperature",
+              "hidden": true
+            }
+          },
+          {
+            "id": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+            "definition": {
+              "key": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Description",
+            "definition": {
+              "key": "Description",
+              "title": "Description",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          }
+        ],
+        "digest": "5a7c6c2a-42eb-4983-bd0e-10cedd3571f4"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "13a9fcfe-101e-4ed8-83b2-69e61b69ec88",
+      "attributes": {
+        "id": "13a9fcfe-101e-4ed8-83b2-69e61b69ec88",
+        "name": "Drawer",
+        "entityType": "location",
+        "description": "",
+        "isMovable": false,
+        "inUse": false,
+        "attachments": [
+          {
+            "entityId": "13a9fcfe-101e-4ed8-83b2-69e61b69ec88",
+            "attachmentId": "9fde5a3e-8de1-4149-b2df-1778c57a4c3f",
+            "versionId": "RrEFYy49vuz93l.gxgKZ_mfGOCd86u.y",
+            "entityType": "location",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Location_Drawer.png",
+            "createdAt": "2022-02-22T16:33:39.767Z",
+            "updatedAt": "2022-02-22T16:33:39.767Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.166Z",
+        "updatedAt": "2022-02-22T16:33:39.166Z",
+        "fields": [
+          {
+            "id": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+            "definition": {
+              "key": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+              "title": "Allowed Hazards",
+              "type": "multiSelect",
+              "options": [
+                "GHS01 Exploding Bomb, Explosives",
+                "GHS02 Flame, Flammables",
+                "GHS03 Oxidizers",
+                "GHS04 Compressed Gasses",
+                "GHS05 Corrosives",
+                "GHS06 Acute Toxicity",
+                "GHS07 Irritant",
+                "GHS08 Health Hazard",
+                "GHS09 Environment"
+              ],
+              "hidden": true
+            }
+          },
+          {
+            "id": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+            "definition": {
+              "key": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Description",
+            "definition": {
+              "key": "Description",
+              "title": "Description",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          }
+        ],
+        "digest": "52d24eca-52db-43ca-8267-9ec129bdcfa4"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "cce34cb5-4053-478d-ac9f-a3ca7550dc29",
+      "attributes": {
+        "id": "cce34cb5-4053-478d-ac9f-a3ca7550dc29",
+        "name": "Hood",
+        "entityType": "location",
+        "description": "",
+        "isMovable": false,
+        "inUse": false,
+        "attachments": [
+          {
+            "entityId": "cce34cb5-4053-478d-ac9f-a3ca7550dc29",
+            "attachmentId": "fed5bbb1-50b9-4d25-a484-dc4683925510",
+            "versionId": "fQ1lBsHyHJy9Z3rImazf7Z8oV2kW9cPY",
+            "entityType": "location",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Location_Hood.png",
+            "createdAt": "2022-02-22T16:33:39.417Z",
+            "updatedAt": "2022-02-22T16:33:39.417Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.159Z",
+        "updatedAt": "2022-02-22T16:33:39.159Z",
+        "fields": [
+          {
+            "id": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+            "definition": {
+              "key": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+              "title": "Allowed Hazards",
+              "type": "multiSelect",
+              "options": [
+                "GHS01 Exploding Bomb, Explosives",
+                "GHS02 Flame, Flammables",
+                "GHS03 Oxidizers",
+                "GHS04 Compressed Gasses",
+                "GHS05 Corrosives",
+                "GHS06 Acute Toxicity",
+                "GHS07 Irritant",
+                "GHS08 Health Hazard",
+                "GHS09 Environment"
+              ],
+              "hidden": true
+            }
+          },
+          {
+            "id": "9309bab6-1382-45fe-948b-00afcfafd43f",
+            "definition": {
+              "key": "9309bab6-1382-45fe-948b-00afcfafd43f",
+              "title": "Building",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+            "definition": {
+              "key": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+              "title": "Emergency Contact",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "976713b3-a546-458b-83e3-30ebce9f86f8",
+            "definition": {
+              "key": "976713b3-a546-458b-83e3-30ebce9f86f8",
+              "title": "Floor",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "ae19bdd7-b69d-47c8-aa83-a56fb11550d8",
+            "definition": {
+              "key": "ae19bdd7-b69d-47c8-aa83-a56fb11550d8",
+              "title": "Room Number",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+            "definition": {
+              "key": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Description",
+            "definition": {
+              "key": "Description",
+              "title": "Description",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          }
+        ],
+        "digest": "e56fc6eb-6870-4558-a29b-5d90ad1b6120"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "89c0a78a-1940-45b5-9f14-6873251d865a",
+      "attributes": {
+        "id": "89c0a78a-1940-45b5-9f14-6873251d865a",
+        "name": "Site",
+        "entityType": "location",
+        "description": "",
+        "isMovable": false,
+        "inUse": false,
+        "attachments": [
+          {
+            "entityId": "89c0a78a-1940-45b5-9f14-6873251d865a",
+            "attachmentId": "3dea91ff-cee7-4719-967a-932b5cec2787",
+            "versionId": "o27H6douEQO1eJeqGQRE_zawzxTFzaqZ",
+            "entityType": "location",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Location_Site.png",
+            "createdAt": "2022-02-22T16:33:39.623Z",
+            "updatedAt": "2022-02-22T16:33:39.623Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.149Z",
+        "updatedAt": "2022-02-22T16:33:39.149Z",
+        "fields": [
+          {
+            "id": "48dfda12-4084-47c7-b365-5b797131cb59",
+            "definition": {
+              "key": "48dfda12-4084-47c7-b365-5b797131cb59",
+              "title": "Address",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+            "definition": {
+              "key": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+              "title": "Allowed Hazards",
+              "type": "multiSelect",
+              "options": [
+                "GHS01 Exploding Bomb, Explosives",
+                "GHS02 Flame, Flammables",
+                "GHS03 Oxidizers",
+                "GHS04 Compressed Gasses",
+                "GHS05 Corrosives",
+                "GHS06 Acute Toxicity",
+                "GHS07 Irritant",
+                "GHS08 Health Hazard",
+                "GHS09 Environment"
+              ],
+              "hidden": true
+            }
+          },
+          {
+            "id": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+            "definition": {
+              "key": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+              "title": "Emergency Contact",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+            "definition": {
+              "key": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Description",
+            "definition": {
+              "key": "Description",
+              "title": "Description",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          }
+        ],
+        "digest": "4791f835-82cb-46ae-a374-c038712bd05a"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "fd7e3140-4716-4ad2-83fa-fbc08ee23b39",
+      "attributes": {
+        "id": "fd7e3140-4716-4ad2-83fa-fbc08ee23b39",
+        "name": "Box",
+        "entityType": "location",
+        "description": "",
+        "isMovable": false,
+        "inUse": false,
+        "attachments": [
+          {
+            "entityId": "fd7e3140-4716-4ad2-83fa-fbc08ee23b39",
+            "attachmentId": "fd7ef2df-5972-4e2d-a6ca-c91be1d40b50",
+            "versionId": "P_UEGLHh7u6EbJ5CBjC66s5llC_zuyiC",
+            "entityType": "location",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Location_Box.png",
+            "createdAt": "2022-02-22T16:33:39.473Z",
+            "updatedAt": "2022-02-22T16:33:39.473Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.145Z",
+        "updatedAt": "2022-02-22T16:33:39.145Z",
+        "fields": [
+          {
+            "id": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+            "definition": {
+              "key": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+              "title": "Allowed Hazards",
+              "type": "multiSelect",
+              "options": [
+                "GHS01 Exploding Bomb, Explosives",
+                "GHS02 Flame, Flammables",
+                "GHS03 Oxidizers",
+                "GHS04 Compressed Gasses",
+                "GHS05 Corrosives",
+                "GHS06 Acute Toxicity",
+                "GHS07 Irritant",
+                "GHS08 Health Hazard",
+                "GHS09 Environment"
+              ],
+              "hidden": true
+            }
+          },
+          {
+            "id": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+            "definition": {
+              "key": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Description",
+            "definition": {
+              "key": "Description",
+              "title": "Description",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          }
+        ],
+        "digest": "5f9bf699-0873-49bc-a99e-2f5afe3b1544"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "81ff1644-2a27-4fb1-a597-5d83e1920c0d",
+      "attributes": {
+        "id": "81ff1644-2a27-4fb1-a597-5d83e1920c0d",
+        "name": "Bench",
+        "entityType": "location",
+        "description": "",
+        "isMovable": false,
+        "inUse": false,
+        "attachments": [
+          {
+            "entityId": "81ff1644-2a27-4fb1-a597-5d83e1920c0d",
+            "attachmentId": "4f22339c-68bc-45ec-84a8-ab409dec3243",
+            "versionId": "Z5xXb0E06o0PnSjzo9YZ4gTaFNoGD3NS",
+            "entityType": "location",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Location_Bench.png",
+            "createdAt": "2022-02-22T16:33:39.502Z",
+            "updatedAt": "2022-02-22T16:33:39.502Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.140Z",
+        "updatedAt": "2022-02-22T16:33:39.140Z",
+        "fields": [
+          {
+            "id": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+            "definition": {
+              "key": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+              "title": "Allowed Hazards",
+              "type": "multiSelect",
+              "options": [
+                "GHS01 Exploding Bomb, Explosives",
+                "GHS02 Flame, Flammables",
+                "GHS03 Oxidizers",
+                "GHS04 Compressed Gasses",
+                "GHS05 Corrosives",
+                "GHS06 Acute Toxicity",
+                "GHS07 Irritant",
+                "GHS08 Health Hazard",
+                "GHS09 Environment"
+              ],
+              "hidden": true
+            }
+          },
+          {
+            "id": "9309bab6-1382-45fe-948b-00afcfafd43f",
+            "definition": {
+              "key": "9309bab6-1382-45fe-948b-00afcfafd43f",
+              "title": "Building",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+            "definition": {
+              "key": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+              "title": "Emergency Contact",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "976713b3-a546-458b-83e3-30ebce9f86f8",
+            "definition": {
+              "key": "976713b3-a546-458b-83e3-30ebce9f86f8",
+              "title": "Floor",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "ae19bdd7-b69d-47c8-aa83-a56fb11550d8",
+            "definition": {
+              "key": "ae19bdd7-b69d-47c8-aa83-a56fb11550d8",
+              "title": "Room Number",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+            "definition": {
+              "key": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Description",
+            "definition": {
+              "key": "Description",
+              "title": "Description",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          }
+        ],
+        "digest": "74d02641-63b2-4569-b125-915df5be91aa"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "0b9853f4-39aa-488b-a8bd-d9da5c2712dd",
+      "attributes": {
+        "id": "0b9853f4-39aa-488b-a8bd-d9da5c2712dd",
+        "name": "Lab",
+        "entityType": "location",
+        "description": "",
+        "isMovable": false,
+        "inUse": true,
+        "attachments": [
+          {
+            "entityId": "0b9853f4-39aa-488b-a8bd-d9da5c2712dd",
+            "attachmentId": "552de188-8f1b-4f66-9501-b9bc707fdc91",
+            "versionId": "JHVyjuLIa6DFvnCUUtfeFGympEjkiGh0",
+            "entityType": "location",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Location_Lab.png",
+            "createdAt": "2022-02-22T16:33:39.896Z",
+            "updatedAt": "2022-02-22T16:33:39.896Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.132Z",
+        "updatedAt": "2022-02-22T16:33:39.132Z",
+        "fields": [
+          {
+            "id": "48dfda12-4084-47c7-b365-5b797131cb59",
+            "definition": {
+              "key": "48dfda12-4084-47c7-b365-5b797131cb59",
+              "title": "Address",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+            "definition": {
+              "key": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+              "title": "Allowed Hazards",
+              "type": "multiSelect",
+              "options": [
+                "GHS01 Exploding Bomb, Explosives",
+                "GHS02 Flame, Flammables",
+                "GHS03 Oxidizers",
+                "GHS04 Compressed Gasses",
+                "GHS05 Corrosives",
+                "GHS06 Acute Toxicity",
+                "GHS07 Irritant",
+                "GHS08 Health Hazard",
+                "GHS09 Environment"
+              ],
+              "hidden": true
+            }
+          },
+          {
+            "id": "9309bab6-1382-45fe-948b-00afcfafd43f",
+            "definition": {
+              "key": "9309bab6-1382-45fe-948b-00afcfafd43f",
+              "title": "Building",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+            "definition": {
+              "key": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+              "title": "Emergency Contact",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "976713b3-a546-458b-83e3-30ebce9f86f8",
+            "definition": {
+              "key": "976713b3-a546-458b-83e3-30ebce9f86f8",
+              "title": "Floor",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "ae19bdd7-b69d-47c8-aa83-a56fb11550d8",
+            "definition": {
+              "key": "ae19bdd7-b69d-47c8-aa83-a56fb11550d8",
+              "title": "Room Number",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+            "definition": {
+              "key": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Description",
+            "definition": {
+              "key": "Description",
+              "title": "Description",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          }
+        ],
+        "digest": "923d9d8c-7a84-4057-a1fa-14a6888b3afd"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "62648727-2ea8-41e1-8e67-d1ee4d7d4af5",
+      "attributes": {
+        "id": "62648727-2ea8-41e1-8e67-d1ee4d7d4af5",
+        "name": "Building",
+        "entityType": "location",
+        "description": "",
+        "isMovable": false,
+        "inUse": false,
+        "attachments": [
+          {
+            "entityId": "62648727-2ea8-41e1-8e67-d1ee4d7d4af5",
+            "attachmentId": "d0cd4306-600d-415c-8db8-e09c2c0b7d47",
+            "versionId": "qqpTW0ThbcxkZGe.bjYk2P8hiMoig4p1",
+            "entityType": "location",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Location_Building.png",
+            "createdAt": "2022-02-22T16:33:39.625Z",
+            "updatedAt": "2022-02-22T16:33:39.625Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.123Z",
+        "updatedAt": "2022-02-22T16:33:39.123Z",
+        "fields": [
+          {
+            "id": "48dfda12-4084-47c7-b365-5b797131cb59",
+            "definition": {
+              "key": "48dfda12-4084-47c7-b365-5b797131cb59",
+              "title": "Address",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+            "definition": {
+              "key": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+              "title": "Allowed Hazards",
+              "type": "multiSelect",
+              "options": [
+                "GHS01 Exploding Bomb, Explosives",
+                "GHS02 Flame, Flammables",
+                "GHS03 Oxidizers",
+                "GHS04 Compressed Gasses",
+                "GHS05 Corrosives",
+                "GHS06 Acute Toxicity",
+                "GHS07 Irritant",
+                "GHS08 Health Hazard",
+                "GHS09 Environment"
+              ],
+              "hidden": true
+            }
+          },
+          {
+            "id": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+            "definition": {
+              "key": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+              "title": "Emergency Contact",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+            "definition": {
+              "key": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Description",
+            "definition": {
+              "key": "Description",
+              "title": "Description",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          }
+        ],
+        "digest": "5c6d7922-ff1e-49ea-814b-080cb45b7a4e"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "3fd2af9d-e066-405c-8a64-d67c4a781e5d",
+      "attributes": {
+        "id": "3fd2af9d-e066-405c-8a64-d67c4a781e5d",
+        "name": "Rack",
+        "entityType": "location",
+        "description": "Freezer/Refrigerator Rack",
+        "isMovable": false,
+        "inUse": false,
+        "attachments": [
+          {
+            "entityId": "3fd2af9d-e066-405c-8a64-d67c4a781e5d",
+            "attachmentId": "1eefa8cc-40d2-4d0b-83d5-3c5760259425",
+            "versionId": "9G_spWG96GwRkx9XuBW6Rx9hrUPer7Qa",
+            "entityType": "location",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Location_RackStationary.png",
+            "createdAt": "2022-02-22T16:33:39.487Z",
+            "updatedAt": "2022-02-22T16:33:39.487Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.106Z",
+        "updatedAt": "2022-02-22T16:33:39.106Z",
+        "fields": [
+          {
+            "id": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+            "definition": {
+              "key": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+              "title": "Allowed Hazards",
+              "type": "multiSelect",
+              "options": [
+                "GHS01 Exploding Bomb, Explosives",
+                "GHS02 Flame, Flammables",
+                "GHS03 Oxidizers",
+                "GHS04 Compressed Gasses",
+                "GHS05 Corrosives",
+                "GHS06 Acute Toxicity",
+                "GHS07 Irritant",
+                "GHS08 Health Hazard",
+                "GHS09 Environment"
+              ],
+              "hidden": true
+            }
+          },
+          {
+            "id": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+            "definition": {
+              "key": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Description",
+            "definition": {
+              "key": "Description",
+              "title": "Description",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          }
+        ],
+        "digest": "3b1614ef-5996-4387-ba27-f534df1af8b3"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "cb870ae2-41eb-456d-8374-357c58a9a7d4",
+      "attributes": {
+        "id": "cb870ae2-41eb-456d-8374-357c58a9a7d4",
+        "name": "Shelf",
+        "entityType": "location",
+        "description": "",
+        "isMovable": false,
+        "inUse": false,
+        "attachments": [
+          {
+            "entityId": "cb870ae2-41eb-456d-8374-357c58a9a7d4",
+            "attachmentId": "094e3515-e559-4378-ad78-f8b8b2e37823",
+            "versionId": "FY7W8uzUS1RhGk5w7zNTods9hfA2kt1o",
+            "entityType": "location",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Location_Shelf.png",
+            "createdAt": "2022-02-22T16:33:39.391Z",
+            "updatedAt": "2022-02-22T16:33:39.391Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.092Z",
+        "updatedAt": "2022-02-22T16:33:39.092Z",
+        "fields": [
+          {
+            "id": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+            "definition": {
+              "key": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+              "title": "Allowed Hazards",
+              "type": "multiSelect",
+              "options": [
+                "GHS01 Exploding Bomb, Explosives",
+                "GHS02 Flame, Flammables",
+                "GHS03 Oxidizers",
+                "GHS04 Compressed Gasses",
+                "GHS05 Corrosives",
+                "GHS06 Acute Toxicity",
+                "GHS07 Irritant",
+                "GHS08 Health Hazard",
+                "GHS09 Environment"
+              ],
+              "hidden": true
+            }
+          },
+          {
+            "id": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+            "definition": {
+              "key": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Description",
+            "definition": {
+              "key": "Description",
+              "title": "Description",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          }
+        ],
+        "digest": "b221550b-5ade-45c0-ab1f-797ab4f9026b"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "7059715c-6ad8-47e9-951a-c9caf42b097f",
+      "attributes": {
+        "id": "7059715c-6ad8-47e9-951a-c9caf42b097f",
+        "name": "Rack: Lab",
+        "entityType": "location",
+        "description": "Movable Rack that can hold samples/tubes",
+        "isMovable": false,
+        "inUse": false,
+        "attachments": [
+          {
+            "entityId": "7059715c-6ad8-47e9-951a-c9caf42b097f",
+            "attachmentId": "0fe83d2e-3755-43aa-9c23-c0354d0cc635",
+            "versionId": "bflt2NF2DC0ipCLb9ZIu_1QG2Smh3gNF",
+            "entityType": "location",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Location_RackTestTube.png",
+            "createdAt": "2022-02-22T16:33:39.830Z",
+            "updatedAt": "2022-02-22T16:33:39.830Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.088Z",
+        "updatedAt": "2022-02-22T16:33:39.088Z",
+        "fields": [
+          {
+            "id": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+            "definition": {
+              "key": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Description",
+            "definition": {
+              "key": "Description",
+              "title": "Description",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          }
+        ],
+        "digest": "3f383fb0-0f68-4a99-83ff-295e367e1fc8"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "44ab8051-81fe-4f48-b251-8f629a89ddf4",
+      "attributes": {
+        "id": "44ab8051-81fe-4f48-b251-8f629a89ddf4",
+        "name": "Bin",
+        "entityType": "location",
+        "description": "",
+        "isMovable": false,
+        "inUse": false,
+        "attachments": [
+          {
+            "entityId": "44ab8051-81fe-4f48-b251-8f629a89ddf4",
+            "attachmentId": "6579752f-4d0a-469d-80b2-452d67a7524a",
+            "versionId": "OHvnkrnx6W.ua0KO9isrCTiKxnz6XYV9",
+            "entityType": "location",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Location_Bin.png",
+            "createdAt": "2022-02-22T16:33:39.323Z",
+            "updatedAt": "2022-02-22T16:33:39.323Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.084Z",
+        "updatedAt": "2022-02-22T16:33:39.084Z",
+        "fields": [
+          {
+            "id": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+            "definition": {
+              "key": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+              "title": "Allowed Hazards",
+              "type": "multiSelect",
+              "options": [
+                "GHS01 Exploding Bomb, Explosives",
+                "GHS02 Flame, Flammables",
+                "GHS03 Oxidizers",
+                "GHS04 Compressed Gasses",
+                "GHS05 Corrosives",
+                "GHS06 Acute Toxicity",
+                "GHS07 Irritant",
+                "GHS08 Health Hazard",
+                "GHS09 Environment"
+              ],
+              "hidden": true
+            }
+          },
+          {
+            "id": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+            "definition": {
+              "key": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Description",
+            "definition": {
+              "key": "Description",
+              "title": "Description",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          }
+        ],
+        "digest": "b60a0bfe-8cb3-4400-90ef-29b1fe8a89a5"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "04dea172-38cb-4020-8741-b4e23102cf07",
+      "attributes": {
+        "id": "04dea172-38cb-4020-8741-b4e23102cf07",
+        "name": "Receiving",
+        "entityType": "location",
+        "description": "",
+        "isMovable": false,
+        "inUse": false,
+        "attachments": [
+          {
+            "entityId": "04dea172-38cb-4020-8741-b4e23102cf07",
+            "attachmentId": "e77900bd-5801-4222-be16-91009e1e86b8",
+            "versionId": "ESkBg43l8_7.rvHwmKqMgq8jzVF3_J2R",
+            "entityType": "location",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Location_ReceivingArea.png",
+            "createdAt": "2022-02-22T16:33:39.430Z",
+            "updatedAt": "2022-02-22T16:33:39.430Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.080Z",
+        "updatedAt": "2022-02-22T16:33:39.080Z",
+        "fields": [
+          {
+            "id": "48dfda12-4084-47c7-b365-5b797131cb59",
+            "definition": {
+              "key": "48dfda12-4084-47c7-b365-5b797131cb59",
+              "title": "Address",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "9309bab6-1382-45fe-948b-00afcfafd43f",
+            "definition": {
+              "key": "9309bab6-1382-45fe-948b-00afcfafd43f",
+              "title": "Building",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+            "definition": {
+              "key": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+              "title": "Emergency Contact",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "976713b3-a546-458b-83e3-30ebce9f86f8",
+            "definition": {
+              "key": "976713b3-a546-458b-83e3-30ebce9f86f8",
+              "title": "Floor",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "ae19bdd7-b69d-47c8-aa83-a56fb11550d8",
+            "definition": {
+              "key": "ae19bdd7-b69d-47c8-aa83-a56fb11550d8",
+              "title": "Room Number",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+            "definition": {
+              "key": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Description",
+            "definition": {
+              "key": "Description",
+              "title": "Description",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          }
+        ],
+        "digest": "9b966b07-b2c4-4faa-8ab7-7c2a2e8c2a26"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "b9fab5b8-6c26-47f8-8694-320c7c439879",
+      "attributes": {
+        "id": "b9fab5b8-6c26-47f8-8694-320c7c439879",
+        "name": "Room",
+        "entityType": "location",
+        "description": "",
+        "isMovable": false,
+        "inUse": true,
+        "attachments": [
+          {
+            "entityId": "b9fab5b8-6c26-47f8-8694-320c7c439879",
+            "attachmentId": "acb656c6-6d61-4e25-979a-62ff2bdf4059",
+            "versionId": "6pqV5x4SRflX01hYDkTLbgLd.Tykm8Nr",
+            "entityType": "location",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Location_Room.png",
+            "createdAt": "2022-02-22T16:33:39.434Z",
+            "updatedAt": "2022-02-22T16:33:39.434Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.075Z",
+        "updatedAt": "2022-02-22T16:33:39.075Z",
+        "fields": [
+          {
+            "id": "48dfda12-4084-47c7-b365-5b797131cb59",
+            "definition": {
+              "key": "48dfda12-4084-47c7-b365-5b797131cb59",
+              "title": "Address",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+            "definition": {
+              "key": "b58c5d12-acd5-43a3-8cbd-4fa4d04e7eaf",
+              "title": "Allowed Hazards",
+              "type": "multiSelect",
+              "options": [
+                "GHS01 Exploding Bomb, Explosives",
+                "GHS02 Flame, Flammables",
+                "GHS03 Oxidizers",
+                "GHS04 Compressed Gasses",
+                "GHS05 Corrosives",
+                "GHS06 Acute Toxicity",
+                "GHS07 Irritant",
+                "GHS08 Health Hazard",
+                "GHS09 Environment"
+              ],
+              "hidden": true
+            }
+          },
+          {
+            "id": "9309bab6-1382-45fe-948b-00afcfafd43f",
+            "definition": {
+              "key": "9309bab6-1382-45fe-948b-00afcfafd43f",
+              "title": "Building",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+            "definition": {
+              "key": "c09b9e45-f68e-43b8-9a89-af92f7322a1d",
+              "title": "Emergency Contact",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "976713b3-a546-458b-83e3-30ebce9f86f8",
+            "definition": {
+              "key": "976713b3-a546-458b-83e3-30ebce9f86f8",
+              "title": "Floor",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "ae19bdd7-b69d-47c8-aa83-a56fb11550d8",
+            "definition": {
+              "key": "ae19bdd7-b69d-47c8-aa83-a56fb11550d8",
+              "title": "Room Number",
+              "type": "text",
+              "hidden": true
+            }
+          },
+          {
+            "id": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+            "definition": {
+              "key": "242870a3-dc72-4c84-82e7-6ab8cfc854e7",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Description",
+            "definition": {
+              "key": "Description",
+              "title": "Description",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          }
+        ],
+        "digest": "38392105-9fe1-4d91-9056-39047bb01ce6"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    }
+  ],
+  "included": [
+    {
+      "type": "user",
+      "id": "102",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"
+      },
+      "attributes": {
+        "userId": "102",
+        "userName": "user.three@someplace.invalid",
+        "alias": "USR3",
+        "email": "user.three@someplace.invalid",
+        "firstName": "ThreeFirst",
+        "lastName": "ThreeLast",
+        "country": "Germany",
+        "organization": "trialorg"
+      },
+      "relationships": {
+        "systemGroups": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102/systemGroups"
+          }
+        }
+      }
+    },
+    {
+      "type": "user",
+      "id": "3",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+      },
+      "attributes": {
+        "userId": "3",
+        "userName": "system",
+        "firstName": "System",
+        "lastName": ""
+      },
+      "relationships": {
+        "systemGroups": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3/systemGroups"
+          }
+        }
+      }
+    }
+  ]
+}

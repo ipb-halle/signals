@@ -65,9 +65,8 @@ public class InventoryManager {
         fetchLocations(dateRange);
         fetchContainers(dateRange);
     }
-
-    public void fetchContainers(Date[] dateRange) {
-        containerManager.manageContainers(dateRange);
+    public void fetchLocationTypes() {
+        locationTypeManager.save(locationTypeManager.getSnbLocationTypes());
     }
 
     public void fetchContainerTypes() {
@@ -75,10 +74,11 @@ public class InventoryManager {
     }
 
     public void fetchLocations(Date[] dateRange) {
-        locationManager.fetchLocations(dateRange);
+        locationManager.manageLocations(dateRange);
     }
 
-    public void fetchLocationTypes() {
-        locationTypeManager.fetchLocationTypes();
+    public void fetchContainers(Date[] dateRange) {
+        containerManager.manageContainers(dateRange);
     }
+
 }

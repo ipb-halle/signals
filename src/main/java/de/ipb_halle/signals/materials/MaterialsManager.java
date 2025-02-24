@@ -114,7 +114,7 @@ public class MaterialsManager {
     public void manageMaterials(RuntimeConfig runtimeConfig, Date[] dateRange) {
         logger.debug("MM:-> START MANAGE MATERIALS");
 
-        //Query parameters for load
+        // 1) Query parameters for load
         Map<String, Object> cmap = new HashMap<>();
         cmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
         if (dateRange.length > 1) {

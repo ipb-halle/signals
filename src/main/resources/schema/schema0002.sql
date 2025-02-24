@@ -109,7 +109,17 @@ CREATE TABLE synonyms (
 CREATE TABLE location_types (
     id VARCHAR NOT NULL PRIMARY KEY,
     name VARCHAR,
-    description VARCHAR
+    description VARCHAR,
+    created_at TIMESTAMP,
+    in_use BOOLEAN NOT NULL DEFAULT FALSE,
+    movable BOOLEAN NOT NULL DEFAULT FALSE,
+    updated_at TIMESTAMP
+);
+
+CREATE TABLE location_type_fields (
+    id VARCHAR NOT NULL REFERENCES location_types (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    value VARCHAR NOT NULL REFERENCES field_definitions (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    PRIMARY KEY (id, value)
 );
 
 CREATE TABLE locations (
@@ -291,8 +301,8 @@ CREATE TABLE container_types (
     id VARCHAR NOT NULL PRIMARY KEY,
     created_at TIMESTAMP,
     description VARCHAR,
-    in_use BOOLEAN,
-    movable BOOLEAN,
+    in_use BOOLEAN NOT NULL DEFAULT FALSE,
+    movable BOOLEAN NOT NULL DEFAULT FALSE,
     name VARCHAR,
     updated_at TIMESTAMP
 );

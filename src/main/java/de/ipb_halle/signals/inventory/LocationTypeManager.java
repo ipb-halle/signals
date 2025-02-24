@@ -20,6 +20,10 @@ package de.ipb_halle.signals.inventory;
 import de.ipb_halle.signals.rest.RestResultIterator;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.List;
 
 /**
  * Manager for location types (inventory/types API endpoint)
@@ -27,6 +31,8 @@ import jakarta.inject.Inject;
 
 @Stateless
 public class LocationTypeManager {
+
+    private final static Logger logger = LogManager.getLogger(LocationTypeManager.class);
 
     @Inject
     private LocationTypeDbService dbService;
@@ -43,10 +49,28 @@ public class LocationTypeManager {
      * Fetch all location types from Signals Notebook and
      * update the local database.
      */
-    public void fetchLocationTypes() {
-        RestResultIterator<LocationType> locationTypeIterator = restService.doGetLocationTypes();
-        while (locationTypeIterator.hasNext()) {
-            dbService.save(locationTypeIterator.next());
+//    public void fetchLocationTypes() {
+//        RestResultIterator<LocationType> locationTypeIterator = restService.doGetLocationTypes();
+//        while (locationTypeIterator.hasNext()) {
+//            LocationType next = locationTypeIterator.next();
+//              dbService.save(next);
+//        }
+//    }
+
+    public LocationType getDbLocationType(String id){
+        return dbService.loadById(id);
+    }
+
+    public List<LocationType> getSnbLocationTypes() {
+        List<LocationType> locationTypes = (List<LocationType>) restService.doGetLocationTypes();
+        return locationTypes;
+    }
+
+    public void save(List<LocationType> ltypes) {
+        for (LocationType lt : ltypes) {
+            dbService.save(lt);
         }
     }
+
+
 }

@@ -242,7 +242,7 @@ public class MaterialRestService implements RestReplyParser<Material> {
             return JsonParser.parseString(restClient.getResponse().getString());
 
         } catch (UnexpectedResponseCodeException ue) {
-            logger.warn("MRS:-> Unexpected code {}", ue.getMessage(),ue);
+            logger.warn("MRS:-> Unexpected code {}", ue.getMessage(), ue);
         } catch (URISyntaxException me) {
             logger.warn("MRS:-> Malformed URL {}", me.getMessage(), me);
         } catch (IOException ioe) {
@@ -326,19 +326,19 @@ public class MaterialRestService implements RestReplyParser<Material> {
         }
         try {
             restClient.reset()
-                .setMethod(Method.POST)
-                .setEndpoint(endpoint)
-                .setRequestData(request.toString())
-                .execute(RestClient.HTTP_CREATED);
+                    .setMethod(Method.POST)
+                    .setEndpoint(endpoint)
+                    .setRequestData(request.toString())
+                    .execute(RestClient.HTTP_CREATED);
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
             Material result = parseReply(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
             return result;
-        } catch(UnexpectedResponseCodeException ue) {
+        } catch (UnexpectedResponseCodeException ue) {
             logger.warn("doCreateMaterial() got unexpected return code from API call: {}", request);
-        } catch(URISyntaxException me) {
+        } catch (URISyntaxException me) {
             logger.warn("doCreateMaterial() malformed URL");
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             logger.warn("IOException", (Throwable) ioe);
         }
         logger.info(request.toString());
@@ -404,6 +404,7 @@ public class MaterialRestService implements RestReplyParser<Material> {
 
     /**
      * Prepare an array of synonyms.
+     *
      * @param mat
      * @return
      */
@@ -417,6 +418,7 @@ public class MaterialRestService implements RestReplyParser<Material> {
 
     /**
      * prepare a JsonArray of field values for transmission.
+     *
      * @param mat
      * @return array of required field values
      */
@@ -424,8 +426,8 @@ public class MaterialRestService implements RestReplyParser<Material> {
         JsonArray array = new JsonArray();
         for (FieldValue fieldValue : mat.getFieldValues()) {
             if (fieldValue.getField().getRequired()
-                    || ((! fieldValue.getField().getCalculated())
-                    && (! fieldValue.getField().getReadOnly()))) {
+                    || ((!fieldValue.getField().getCalculated())
+                    && (!fieldValue.getField().getReadOnly()))) {
                 array.add(prepareFieldValue(fieldValue));
             }
         }
@@ -434,6 +436,7 @@ public class MaterialRestService implements RestReplyParser<Material> {
 
     /**
      * Convert a single FieldValue to a JsonObject for transmission
+     *
      * @param fieldValue
      * @return JsonObject ready representing this field value formatted for
      * transmission to the REST endpoint.
@@ -445,25 +448,32 @@ public class MaterialRestService implements RestReplyParser<Material> {
          * ToDo: Handle Attachments including chemical drawings and
          * sequences. Include the base64 encoded attachment file data.
          */
-        switch(fieldValue.getField().getFieldType().getValue().toUpperCase()) {
+        switch (fieldValue.getField().getFieldType().getValue().toUpperCase()) {
             case FieldType.ATTACHED_FILE:
-            case FieldType.CHEMICAL_DRAWING:
             case FieldType.SEQUENCE_FILE:
                 obj.add(RestHelper.ATTR_VALUE, prepareAttachment(fieldValue));
                 // obj.add(RestHelper.ATTR_VALUE,
                 //        JsonParser.parseString("{\"filename\":\"hello.txt\", \"base64\":\"SGFsbG8gV2VsdCEK\"}"));
                 break;
+            case FieldType.CHEMICAL_DRAWING:
+                Attachment attachment = fieldValue.getAttachment();
+                AttachmentRevision revision = attachment.getLatestRevision();
+                String fileAsString = storageService.getFileAsString(attachment.getFiles(revision.getId()));
+                obj.addProperty(RestHelper.ATTR_VALUE, fileAsString);
+                break;
             default:
                 // works, if fieldValue contains a simple String
                 // probably won't work if fieldValue contains array, number, measurement
                 // or otherwise complex value.
-                obj.addProperty(RestHelper.ATTR_VALUE, fieldValue.getValue()); ;
+                obj.addProperty(RestHelper.ATTR_VALUE, fieldValue.getValue());
+                ;
         }
         return obj;
     }
 
     /**
      * create a base64 representation of the attachment file
+     *
      * @param fieldValue
      * @return
      */

@@ -91,7 +91,7 @@ public class ContainerRestService implements RestReplyParser<Container> {
 
         parseChangeRecords(j, ct);
 
-        logger.trace("ContainerRestService:-> Parsed container with ID={}", ct.getId());
+        //logger.trace("ContainerRestService:-> Parsed container with ID={}", ct.getId());
         return ct;
     }
 

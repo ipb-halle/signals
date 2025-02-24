@@ -51,36 +51,35 @@ public class LocationManager {
 
     private Logger logger = LoggerFactory.getLogger(ContainerManager.class);
 
-    public void augmentLocation(LocationEntity loc) {
-/*
-        cannot yet augment LocationEntity (need to introduce DTO)
+    public void manageLocations(Date[] dateRange) {
+        // 1) Loads a set of location type ids (checked -> location types are present)
+        Set<String> locationTypeIds = locationTypeDbService.getLocationTypIds();
 
-        loc.setCreatedBy(userManager.getUser(loc.getCreatedBy().getId()));
-        loc.setUpdatedBy(userManager.getUser(loc.getUpdatedBy().getId()));
-*/
+        // 2) Load (and map) all location fields for attachmentFiles
+        /*toDo: implement*/
+
+        // 3) Preparing criteria map for loading signals entities by date range and type
+        EntityType entityTypes[] = {EntityType.valueOf(LocationEntity.ENTITY_TYPE_LOCATION)};
+        Map<String, Object> cmap = new HashMap<>();
+        cmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
+        if (dateRange.length > 1) {
+            cmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
+        }
+        cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, entityTypes);
+
+        // 4) Loading all locations from db (checked everything is working)
+        List<SignalsEntityDTO> locations = signalsEntityDbService.load(cmap);
+
+        // 5) Process locations (checked, everything is working)
+        for (SignalsEntityDTO dto : locations) {
+            if (!locationTypeIds.contains(dto.getId())) {
+                fetchSingleLocation(dto);
+            }
+        }
     }
 
     public LocationEntity loadById(String id, boolean augmented) {
         return dbService.loadById(id);
-    }
-
-    public void fetchLocations(Date[] dateRange) {
-        Set<String> locationTypeIds = locationTypeDbService.getLocationTypIds();
-        EntityType entityTypes[] = {EntityType.valueOf(LocationEntity.ENTITY_TYPE_LOCATION)};
-        Map<String, Object> cmap = new HashMap<>();
-        cmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
-        cmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
-        cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, entityTypes);
-        List<SignalsEntityDTO> locations = signalsEntityDbService.load(cmap);
-        for (SignalsEntityDTO entityDTO : locations) {
-            /*
-             * LocationTypes (e.g. building, room, shelf, ...) are represented as
-             * Locations in the signalsentities table (db)! We need to exclude them.
-             */
-            if (!locationTypeIds.contains(entityDTO.getStrippedId(SignalsEntityDTO.StripIdPart.BOTH))) {
-                fetchSingleLocation(entityDTO);
-            }
-        }
     }
 
     /**
@@ -99,5 +98,4 @@ public class LocationManager {
     public void save(LocationEntity loc) {
         dbService.save(loc);
     }
-
 }

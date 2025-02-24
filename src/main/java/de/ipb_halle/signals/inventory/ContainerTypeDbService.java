@@ -69,10 +69,9 @@ public class ContainerTypeDbService {
             query.select(root);
 
             List<ContainerTypeEntity> resultList = em.createQuery(query).getResultList();
-            System.out.println("Query result: " + resultList);
 
             if (resultList == null || resultList.isEmpty()) {
-                System.err.println("ContainerTypeDbService:-> No results found for ContainerTypeEntity.");
+                logger.error("ContainerTypeDbService:-> No results found for ContainerTypeEntity.");
                 return entityIds;
             }
 
@@ -130,10 +129,12 @@ public class ContainerTypeDbService {
          */
         for (Field fd : ct.getFields()) {
             fieldService.save(fd);
-            ContainerTypeField ctfd = new ContainerTypeField()
+            ContainerTypeField ctf = new ContainerTypeField()
+                    //striped id from containerType
                     .setContainerTypeId(cte.getId())
+                    //field id from containerTypes library
                     .setFieldId(fd.getId());
-            em.merge(ctfd);
+            em.merge(ctf);
         }
     }
 }

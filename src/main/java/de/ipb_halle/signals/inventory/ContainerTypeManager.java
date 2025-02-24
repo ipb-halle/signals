@@ -47,7 +47,6 @@ public class ContainerTypeManager {
     public void save(List<ContainerType> ctypes) {
         for (ContainerType ct : ctypes) {
             dbService.save(ct);
-            System.out.println(ct);
         }
     }
 

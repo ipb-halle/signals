@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -105,10 +106,11 @@ public class ContainerManager {
         // 1) Loads set of container type ids
         Set<String> containerTypeIds = containerTypeDbService.getContainerTypeIds();
 
+
         // 2) Load (and map) all container fields for attachmentFiles
         Map<String, Field> attachmentFields = loadAttachmentFieldsMap();
 
-        // 3) Loads signals entities by date range and type
+        // 3) Preparing criteria map for loading signals entities by date range and type
         EntityType[] entityTypes = {EntityType.valueOf(ContainerEntity.ENTITY_TYPE_CONTAINER)};
         Map<String, Object> cmap = new HashMap<>();
         cmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
@@ -117,13 +119,13 @@ public class ContainerManager {
         }
         cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, entityTypes);
 
-        // 4) Loads all containers from db
+        // 4) Loads all containers from db (checked its working)
         List<SignalsEntityDTO> containers = signalsEntityDbService.load(cmap);
 
         // 5) Processes container sequentially
         for (SignalsEntityDTO dto : containers) {
-            // filter out type definitions, if signals DB put them together
-            if (!containerTypeIds.contains(dto.getStrippedId(SignalsEntityDTO.StripIdPart.BOTH))) {
+            // filter out type definitions, if signals DB put them together (checked its working)
+            if (!containerTypeIds.contains(dto.getId())) {
                 processContainer(dto.getId(), attachmentFields);
             }
         }
@@ -155,9 +157,8 @@ public class ContainerManager {
             Container container = containerRestService.doGetContainer(id);
             processContainerFields(container, attachmentFields);
             containerDbService.save(container.createEntity());
-            logger.trace("ContainerManager:-> Fetched & saved container with ID={}", id);
         } catch (IOException e) {
-            logger.warn("processContainer() caught an exception.", (Throwable) e);
+            logger.error("processContainer() caught an exception.", (Throwable) e);
         }
     }
 
@@ -232,7 +233,7 @@ public class ContainerManager {
 
         if (transactionSynchronizationRegistry.getTransactionStatus()
                 == jakarta.transaction.Status.STATUS_MARKED_ROLLBACK) {
-            logger.warn("Transaction marked for rollback, skipping attachment storage.");
+            logger.error("Transaction marked for rollback, skipping attachment storage.");
             return;
         }
 
@@ -243,9 +244,7 @@ public class ContainerManager {
         file.setTempPath(reply.getPath());
         attachment.addFile(file);
 
-        logger.trace("MPB:-> Saving attachment: {}", attachment);
         attachmentDbService.save(attachment);
-        logger.trace("MPB:-> Persisting files for revision: {}", attachment.getLatestRevision().getId());
 
         for (AttachmentFile stagedFile : attachment.getFiles(attachment.getLatestRevision().getId())) {
             storageService.storeFile(stagedFile);

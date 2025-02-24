@@ -18,14 +18,22 @@
 package de.ipb_halle.signals.inventory;
 
 import de.ipb_halle.tda.PersistenceElements;
+import de.ipb_halle.signals.field.Field;
+import de.ipb_halle.signals.field.FieldDbService;
 import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import serp.bytecode.LocalTable;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -39,12 +47,15 @@ public class LocationTypeDbService {
 
     private final static String LOCATION_TYPE_ENTITY_PREFIX = "location:";
     private final static String LOCATION_TYPE_ENTITY_SUFFIX = ":ivt";
+    private final static Logger logger = LogManager.getLogger(LocationTypeDbService.class);
 
-    @PersistenceContext(unitName="signalsDB")
+    @Inject
+    private FieldDbService fieldDbService;
+
+    @PersistenceContext(unitName = "signalsDB")
     private EntityManager em;
 
     /**
-     *
      * @return a set of entity ids of LocationTypes. The entity ids are
      * prefixed and suffixed to match the form of the entities endpoint
      * (e.g. "b9fab5b8-6c26-47f8-8694-320c7c439879" is converted
@@ -52,25 +63,50 @@ public class LocationTypeDbService {
      */
     public Set<String> getLocationTypIds() {
         Set<String> entityIds = new HashSet<>();
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<LocationType> criteriaQuery = builder.createQuery(LocationType.class);
-        Root<LocationType> root = criteriaQuery.from(LocationType.class);
-        criteriaQuery.select(root);
+        try {
+            CriteriaBuilder builder = em.getCriteriaBuilder();
+            CriteriaQuery<LocationTypeEntity> query = builder.createQuery(LocationTypeEntity.class);
+            Root<LocationTypeEntity> root = query.from(LocationTypeEntity.class);
+            query.select(root);
 
-        for (LocationType locationType: em.createQuery(criteriaQuery).getResultList()) {
-            entityIds.add(LOCATION_TYPE_ENTITY_PREFIX
-                    + locationType.getId()
-                    + LOCATION_TYPE_ENTITY_SUFFIX);
+            List<LocationTypeEntity> resultList = em.createQuery(query).getResultList();
+
+            if (resultList == null || resultList.isEmpty()) {
+                logger.error("LocationTypeDbService:-> No results found for location types");
+                return entityIds;
+            }
+            for (LocationTypeEntity locationType : resultList) {
+                if (locationType.getId() != null) {
+                    entityIds.add(LOCATION_TYPE_ENTITY_PREFIX + locationType.getId() + LOCATION_TYPE_ENTITY_SUFFIX);
+                } else {
+                    logger.error("LocationTypeDbService:-> Null id found for a LocationTypeEntity {}\n", locationType.getId());
+                }
+            }
+        } catch (Exception e) {
+            logger.error("LocationTypeDbService: -> Error while fetching container type IDs: {}", e.getMessage(), e);
         }
         return entityIds;
     }
 
     public LocationType loadById(String id) {
-        return this.em.find(LocationType.class, id);
+        LocationTypeEntity lte = this.em.find(LocationTypeEntity.class, id);
+        LocationType locationType = new LocationType(lte, null);
+        logger.info("THIS IS AUCH IMPORTANAT =======================>{}\n", locationType.dump());
+        return locationType;
     }
 
     public void save(LocationType lt) {
-        this.em.merge(lt);
+        LocationTypeEntity lte = lt.createEntity();
+        this.em.merge(lte);
+        for (Field fd : lt.getFields()) {
+            fieldDbService.save(fd);
+            LocationTypeField ltf = new LocationTypeField()
+                    //striped id from locationType
+                    .setLocationTypeId(lte.getId())
+                    //field id from locationTypes library
+                    .setFieldId(fd.getId());
+            this.em.merge(ltf);
+        }
     }
 }
 
