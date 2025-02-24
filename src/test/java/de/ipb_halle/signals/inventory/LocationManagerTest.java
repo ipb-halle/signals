@@ -18,47 +18,24 @@
 package de.ipb_halle.signals.inventory;
 
 import de.ipb_halle.signals.PostgresqlContainerExtension;
-import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
-import de.ipb_halle.signals.dynEnum.DynEnum;
-import de.ipb_halle.signals.dynEnum.DynEnumDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
-import de.ipb_halle.signals.entity.SignalsEntity;
 import de.ipb_halle.signals.entity.SignalsEntityDTO;
-import de.ipb_halle.signals.entity.SignalsEntityDbService;
 import de.ipb_halle.signals.rest.MockRestClient;
-import de.ipb_halle.signals.users.LdapClient;
-import de.ipb_halle.signals.users.MockLdapAdapter;
-import de.ipb_halle.signals.users.MockLdapAdapterFactory;
-import de.ipb_halle.signals.users.GroupDbService;
-import de.ipb_halle.signals.users.GroupManager;
-import de.ipb_halle.signals.users.GroupRestService;
-import de.ipb_halle.signals.users.RoleDbService;
-import de.ipb_halle.signals.users.RoleManager;
-import de.ipb_halle.signals.users.RoleRestService;
-import de.ipb_halle.signals.users.UserDbService;
-import de.ipb_halle.signals.users.UserManager;
-import de.ipb_halle.signals.users.UserRestService;
-
-import java.util.Properties;
-
+import de.ipb_halle.signals.users.LdapAdapter;
+import de.ipb_halle.signals.users.LdapAdapterFactory;
+import de.ipb_halle.tda.DeploymentElement;
 import jakarta.inject.Inject;
-import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.junit5.RunWithApplicationComposer;
-import org.apache.openejb.testing.Classes;
-import org.apache.openejb.testing.Configuration;
-import org.apache.openejb.testing.Module;
-import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-@RunWithApplicationComposer
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(PostgresqlContainerExtension.class)
-public class LocationManagerTest {
+public abstract class LocationManagerTest {
 
     private final String TEST_RESOURCE_1 = "LocationManagerTest001.json";
     private final String TEST_KEY_1 =
@@ -68,61 +45,23 @@ public class LocationManagerTest {
     private final String TEST_LOCATION_NAME = "R-ABC";
 
     @Inject
+    @DeploymentElement(mock = "de.ipb_halle.signals.rest.MockRestClient")
     private MockRestClient mockRestClient;
 
     @Inject
+    @DeploymentElement
     private LocationManager manager;
 
     @Inject
+    @DeploymentElement(mock="de.ipb_halle.signals.users.MockLdapAdapterFactory")
+    private LdapAdapterFactory ldapAdapterFactory;
+
+    @DeploymentElement(mock="de.ipb_halle.signals.users.MockLdapAdapter")
+    private LdapAdapter ldapAdapter;
+
+    @Inject
+    @DeploymentElement
     private DynEnumManager dynEnumManager;
-
-    @Module
-    @Classes(cdi = true, value = {
-            LdapClient.class,
-            MockLdapAdapter.class,
-            MockLdapAdapterFactory.class,
-            MockRestClient.class,
-            SignalsConfig.class,
-            DynEnum.class,
-            DynEnumDbService.class,
-            DynEnumManager.class,
-            SignalsEntity.class,
-            SignalsEntityDTO.class,
-            SignalsEntityDbService.class,
-            GroupDbService.class,
-            GroupManager.class,
-            GroupRestService.class,
-            RoleDbService.class,
-            RoleManager.class,
-            RoleRestService.class,
-            UserDbService.class,
-            UserManager.class,
-            UserRestService.class,
-            LocationType.class,
-            LocationTypeDbService.class,
-            LocationDbService.class,
-            LocationManager.class,
-            LocationRestService.class
-    })
-    public EjbJar app() {
-        return new EjbJar();
-    }
-
-    @Module
-    public PersistenceUnit persistence() {
-        return TestBase.persistence(
-                new String[]{
-                        LocationType.class.getName(),
-                        LocationEntity.class.getName(),
-                        DynEnum.class.getName(),
-                        SignalsEntity.class.getName()
-                });
-    }
-
-    @Configuration
-    public Properties configuration() {
-        return TestBase.configuration();
-    }
 
     @BeforeAll
     public void testSetup() {

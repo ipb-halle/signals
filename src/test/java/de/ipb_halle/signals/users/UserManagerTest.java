@@ -18,21 +18,19 @@
 package de.ipb_halle.signals.users;
 
 import de.ipb_halle.signals.PostgresqlContainerExtension;
-import de.ipb_halle.signals.SignalsConfig;
-import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.RuntimeConfig;
+import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.reporting.HtmlReport;
 import de.ipb_halle.signals.rest.MockRestClient;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.tda.DeploymentElement;
 import jakarta.inject.Inject;
-import java.util.HashMap;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
 
 @ExtendWith(PostgresqlContainerExtension.class)
 public abstract class UserManagerTest {
