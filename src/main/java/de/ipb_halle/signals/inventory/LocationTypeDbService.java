@@ -17,7 +17,12 @@
  */
 package de.ipb_halle.signals.inventory;
 
+import de.ipb_halle.signals.field.Field;
+import de.ipb_halle.signals.field.FieldDbService;
+import de.ipb_halle.signals.field.FieldValue;
+import de.ipb_halle.signals.field.FieldValueEntity;
 import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -25,8 +30,11 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import serp.bytecode.LocalTable;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -41,6 +49,9 @@ public class LocationTypeDbService {
     private final static String LOCATION_TYPE_ENTITY_SUFFIX = ":ivt";
     private final static Logger logger = LogManager.getLogger(LocationTypeDbService.class);
 
+    @Inject
+    private FieldDbService fieldDbService;
+
     @PersistenceContext(unitName = "signalsDB")
     private EntityManager em;
 
@@ -54,30 +65,48 @@ public class LocationTypeDbService {
         Set<String> entityIds = new HashSet<>();
         try {
             CriteriaBuilder builder = em.getCriteriaBuilder();
-            CriteriaQuery<LocationTypeEntity> criteriaQuery = builder.createQuery(LocationTypeEntity.class);
-            Root<LocationTypeEntity> root = criteriaQuery.from(LocationTypeEntity.class);
-            criteriaQuery.select(root);
+            CriteriaQuery<LocationTypeEntity> query = builder.createQuery(LocationTypeEntity.class);
+            Root<LocationTypeEntity> root = query.from(LocationTypeEntity.class);
+            query.select(root);
 
-            for (LocationTypeEntity locationType : em.createQuery(criteriaQuery).getResultList()) {
-                entityIds.add(LOCATION_TYPE_ENTITY_PREFIX
-                        + locationType.getId()
-                        + LOCATION_TYPE_ENTITY_SUFFIX);
+            List<LocationTypeEntity> resultList = em.createQuery(query).getResultList();
+
+            if (resultList == null || resultList.isEmpty()) {
+                logger.error("LocationTypeDbService:-> No results found for location types");
+                return entityIds;
+            }
+            for (LocationTypeEntity locationType : resultList) {
+                if (locationType.getId() != null) {
+                    entityIds.add(LOCATION_TYPE_ENTITY_PREFIX + locationType.getId() + LOCATION_TYPE_ENTITY_SUFFIX);
+                } else {
+                    logger.error("LocationTypeDbService:-> Null id found for a LocationTypeEntity {}\n", locationType.getId());
+                }
             }
         } catch (Exception e) {
             logger.error("LocationTypeDbService: -> Error while fetching container type IDs: {}", e.getMessage(), e);
         }
-
         return entityIds;
     }
 
     public LocationType loadById(String id) {
         LocationTypeEntity lte = this.em.find(LocationTypeEntity.class, id);
-        return new LocationType(lte, null);
+        LocationType locationType = new LocationType(lte, null);
+        logger.info("THIS IS AUCH IMPORTANAT =======================>{}\n", locationType.dump());
+        return locationType;
     }
 
     public void save(LocationType lt) {
         LocationTypeEntity lte = lt.createEntity();
         this.em.merge(lte);
+        for (Field fd : lt.getFields()) {
+            fieldDbService.save(fd);
+            LocationTypeField ltf = new LocationTypeField()
+                    //striped id from locationType
+                    .setLocationTypeId(lte.getId())
+                    //field id from locationTypes library
+                    .setFieldId(fd.getId());
+            this.em.merge(ltf);
+        }
     }
 }
 

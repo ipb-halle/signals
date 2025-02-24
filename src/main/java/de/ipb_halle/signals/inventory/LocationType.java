@@ -36,6 +36,8 @@ public class LocationType {
 
     public final static String ATTR_NAME = "name";
     private final static Logger logger = LogManager.getLogger(LocationType.class);
+    private final static String LOCATION_TYPE_ENTITY_PREFIX = "location:";
+    private final static String LOCATION_TYPE_ENTITY_SUFFIX = ":ivt";
 
     private String id;
     private String name;
@@ -78,7 +80,6 @@ public class LocationType {
                 .setUpdateAt(this.updatedAt)
                 .setInUse(this.inUse)
                 .setMovable(this.movable);
-        logger.info("LocalTypeEntity created {}", lte.getId());
         return lte;
     }
 
@@ -90,6 +91,10 @@ public class LocationType {
 
     public String getId() {
         return id;
+    }
+
+    public String getSuffixPrefixId() {
+        return LOCATION_TYPE_ENTITY_PREFIX + this.getId() + LOCATION_TYPE_ENTITY_SUFFIX;
     }
 
     public String getDescription() {
@@ -104,16 +109,22 @@ public class LocationType {
         return fields;
     }
 
-    public void setId(String i) {
+    public void addField(Field f) {
+        fields.add(f);
+    }
+
+    public LocationType setId(String i) {
         id = i;
+        return this;
     }
 
     public void setDescription(String d) {
         description = d;
     }
 
-    public void setName(String n) {
+    public LocationType setName(String n) {
         name = n;
+        return this;
     }
 
     public void addFields(Set<Field> fd) {

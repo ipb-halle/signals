@@ -82,7 +82,7 @@ public class SignalsEntityDbService {
             dto.addChildren(loadChildren(id));
             return dto;
         }
-        logger.trace("loadById({}) returned null", id);
+        logger.error("loadById({}) returned null", id);
         return null;
     }
 
@@ -104,7 +104,6 @@ public class SignalsEntityDbService {
     public void save(SignalsEntityDTO dto) {
         SignalsEntity entity = dto.createEntity();
         this.em.merge(entity);
-        logger.trace("save({})", dto.getId());
         saveChildren(dto);
     }
 

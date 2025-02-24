@@ -75,7 +75,6 @@ public class LocationRestService implements RestReplyParser<LocationEntity> {
         parseChangeRecords(jsonObj, loc);
         parseFields(attributes, loc);
 
-        logger.info("LRS:-> *********** CreatedBy {} ******", loc.getCreatedBy());
         return loc;
     }
 
@@ -90,11 +89,11 @@ public class LocationRestService implements RestReplyParser<LocationEntity> {
             return jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA);
 
         } catch (UnexpectedResponseCodeException ue) {
-            logger.warn("LRS:-> Unexpected response code when fetching location with ID: {}", id, ue);
+            logger.error("LRS:-> Unexpected response code when fetching location with ID: {}", id, ue);
         } catch (URISyntaxException me) {
-            logger.warn("LRS:-> Malformed URL for ID: {}", id, me);
+            logger.error("LRS:-> Malformed URL for ID: {}", id, me);
         } catch (IOException ioe) {
-            logger.warn("LRS:-> IOException occurred while fetching location with ID: {}", id, ioe);
+            logger.error("LRS:-> IOException occurred while fetching location with ID: {}", id, ioe);
         }
         return null;
     }

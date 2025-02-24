@@ -22,8 +22,12 @@ import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.dynEnum.DynEnum;
 import de.ipb_halle.signals.dynEnum.DynEnumDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
+import de.ipb_halle.signals.field.*;
 import de.ipb_halle.signals.rest.MockRestClient;
+
+import java.util.List;
 import java.util.Properties;
+
 import jakarta.inject.Inject;
 import org.apache.openejb.jee.EjbJar;
 import org.apache.openejb.junit5.RunWithApplicationComposer;
@@ -37,14 +41,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 
-
 @RunWithApplicationComposer
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class LocationTypeManagerTest {
 
     private final String TEST_RESOURCE_1 = "LocationTypeManagerTest001.json";
     private final String TEST_KEY_1 =
-        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/types?page%5Blimit%5D=20&page%5Boffset%5D=0&entityType=location";
+            "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/types?page%5Blimit%5D=20&page%5Boffset%5D=0&entityType=location";
     private final String TEST_LOCATION_TYPE_ID = "017929f3-cd0e-466c-ac94-c21ce5fe8c31";
     private final String TEST_LOCATION_TYPE_NAME = "Cabinet";
 
@@ -58,17 +61,35 @@ public class LocationTypeManagerTest {
     private DynEnumManager dynEnumManager;
 
     @Module
-    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class, // RestResultIterator.class, RestService.class,
-            DynEnumManager.class, DynEnum.class, DynEnumDbService.class,
-            LocationType.class, LocationTypeManager.class, LocationTypeDbService.class,  LocationTypeRestService.class})
+    @Classes(cdi = true, value = {
+            MockRestClient.class,
+            SignalsConfig.class, // RestResultIterator.class, RestService.class,
+            DynEnum.class,
+            DynEnumManager.class,
+            DynEnumDbService.class,
+            Field.class,
+            FieldDefinition.class,
+            FieldDbService.class,
+            FieldParser.class,
+            LocationType.class,
+            LocationTypeEntity.class,
+            LocationTypeManager.class,
+            LocationTypeDbService.class,
+            LocationTypeRestService.class
+    })
     public EjbJar app() {
         return new EjbJar();
     }
 
     @Module
     public PersistenceUnit persistence() {
-        return TestBase.persistence(new String[]{ LocationType.class.getName(),
-                DynEnum.class.getName()});
+        return TestBase.persistence(
+                new String[]{
+                        LocationType.class.getName(),
+                        LocationTypeEntity.class.getName(),
+                        FieldDefinition.class.getName(),
+                        FieldType.class.getName(),
+                        DynEnum.class.getName()});
     }
 
     @Configuration
@@ -80,16 +101,18 @@ public class LocationTypeManagerTest {
     public void testSetup() {
         dynEnumManager.allowEnumDiscovery();
         TestBase.prepareRestClients(mockRestClient,
-            TEST_KEY_1,
-            getClass().getResourceAsStream(TEST_RESOURCE_1));
+                TEST_KEY_1,
+                getClass().getResourceAsStream(TEST_RESOURCE_1));
     }
 
-//    @Test
-//    public void locationTypeManagerTest() {
-//
-//        locationTypeManager.fetchLocationTypes();
-//
-//        LocationType lt = locationTypeManager.loadById(TEST_LOCATION_TYPE_ID, false);
-//        Assertions.assertEquals(TEST_LOCATION_TYPE_NAME, lt.getName(), "LocationType name mismatch");
-//    }
+    @Test
+    public void locationTypeManagerTest() {
+
+        List<LocationType> ltypes = locationTypeManager.getSnbLocationTypes();
+        locationTypeManager.save(ltypes);
+
+
+        LocationType lt = locationTypeManager.getDbLocationType(TEST_LOCATION_TYPE_ID);
+        Assertions.assertEquals(TEST_LOCATION_TYPE_NAME, lt.getName(), "LocationType name mismatch");
+    }
 }

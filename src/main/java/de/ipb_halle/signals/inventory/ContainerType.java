@@ -91,7 +91,6 @@ public class ContainerType {
                 .setMovable(movable)
                 .setName(name)
                 .setUpdatedAt(updatedAt);
-        logger.trace("ContainerTypeEntity created {}", cte.getId());
         return cte;
     }
 

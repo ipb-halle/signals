@@ -20,7 +20,6 @@ package de.ipb_halle.signals.inventory;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import de.ipb_halle.signals.attachment.AttachmentRestService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldDesignation;
@@ -67,10 +66,22 @@ public class ContainerTypeRestService implements RestReplyParser<ContainerType> 
          * which may contain e.g. a ContainerType icon (e.g. "DefaultImage_Container_Bottle.png")
          */
         if (attributes.has(RestHelper.ATTR_FIELDS)) {
-            parseFieldDefinitions(attributes.getAsJsonArray(RestHelper.ATTR_FIELDS), ct);
+            parseFields(attributes.getAsJsonArray(RestHelper.ATTR_FIELDS), ct);
         }
 
         return ct;
+    }
+
+
+
+    private void parseFields(JsonArray fields, ContainerType ct) {
+        Iterator<JsonElement> iter = fields.iterator();
+        while (iter.hasNext()) {
+            Field field = fieldParser.parseReply(iter.next());
+            field.setDesignation((FieldDesignation) dynEnumManager.valueOf(FieldDesignation.valueOf(FieldDesignation.CONTAINER)));
+            field.setDefiningEntityId(CONTAINER_TYPE_ENTITY_PREFIX + ct.getId() + CONTAINER_TYPE_ENTITY_SUFFIX);
+            ct.addField(field);
+        }
     }
 
     public List<ContainerType> doGetContainerTypes() {
@@ -86,16 +97,6 @@ public class ContainerTypeRestService implements RestReplyParser<ContainerType> 
             containerTypes.add(iter.next());
         }
         return containerTypes;
-    }
-
-    private void parseFieldDefinitions(JsonArray j, ContainerType ct) {
-        Iterator<JsonElement> iter = j.iterator();
-        while (iter.hasNext()) {
-            Field field = fieldParser.parseReply(iter.next());
-            field.setDesignation((FieldDesignation) dynEnumManager.valueOf(FieldDesignation.valueOf(FieldDesignation.CONTAINER)));
-            field.setDefiningEntityId(CONTAINER_TYPE_ENTITY_PREFIX + ct.getId() + CONTAINER_TYPE_ENTITY_SUFFIX);
-            ct.addField(field);
-        }
     }
 }
 

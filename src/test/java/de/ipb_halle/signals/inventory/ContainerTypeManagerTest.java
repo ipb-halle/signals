@@ -26,6 +26,7 @@ import de.ipb_halle.signals.dynEnum.DynEnumDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.field.*;
 import de.ipb_halle.signals.rest.MockRestClient;
+
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -50,7 +51,7 @@ public class ContainerTypeManagerTest {
 
     private final String TEST_RESOURCE_1 = "ContainerTypeManagerTest001.json";
     private final String TEST_KEY_1 =
-        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/types?page%5Blimit%5D=20&page%5Boffset%5D=0&entityType=container";
+            "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/types?page%5Blimit%5D=20&page%5Boffset%5D=0&entityType=container";
     private final String TEST_CONTAINER_TYPE_ID = "b17da130-259d-4009-b99e-49e9352b3b89";
     private final String TEST_CONTAINER_TYPE_NAME = "Bottle";
     private final String TEST_CONTAINER_ATTACHMENT_ID = "7e38bb31-4860-4d6f-b481-e83ba32d27fb";
@@ -68,25 +69,43 @@ public class ContainerTypeManagerTest {
     private DynEnumManager dynEnumMgr;
 
     @Module
-    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
-        Attachment.class, AttachmentDbService.class, DynEnumManager.class,
-        DynEnumDbService.class, DynEnum.class,
-        Field.class, FieldDefinition.class, FieldDbService.class, FieldParser.class,
-        ContainerType.class, ContainerTypeEntity.class,
-        ContainerTypeAttachment.class, ContainerTypeAttachmentId.class,
-        ContainerTypeField.class, EmbeddedKeyValue.class,
-        ContainerTypeDbService.class, ContainerTypeManager.class, ContainerTypeRestService.class })
+    @Classes(cdi = true, value = {
+            MockRestClient.class,
+            SignalsConfig.class,
+            Attachment.class,
+            AttachmentDbService.class,
+            DynEnum.class,
+            DynEnumManager.class,
+            DynEnumDbService.class,
+            Field.class,
+            FieldDefinition.class,
+            FieldDbService.class,
+            FieldParser.class,
+            ContainerType.class,
+            ContainerTypeEntity.class,
+            ContainerTypeAttachment.class,
+            ContainerTypeAttachmentId.class,
+            ContainerTypeField.class,
+            EmbeddedKeyValue.class,
+            ContainerTypeDbService.class,
+            ContainerTypeManager.class,
+            ContainerTypeRestService.class})
     public EjbJar app() {
         return new EjbJar();
     }
 
     @Module
     public PersistenceUnit persistence() {
-        return TestBase.persistence(new String[]{ ContainerType.class.getName(),
-                ContainerTypeField.class.getName(), FieldDefinition.class.getName(),
-                ContainerTypeAttachment.class.getName(), Attachment.class.getName(),
-                DynEnum.class.getName(), FieldType.class.getName()
-            });
+        return TestBase.persistence(
+                new String[]{
+                        ContainerType.class.getName(),
+                        ContainerTypeField.class.getName(),
+                        FieldDefinition.class.getName(),
+                        ContainerTypeAttachment.class.getName(),
+                        Attachment.class.getName(),
+                        DynEnum.class.getName(),
+                        FieldType.class.getName()
+                });
     }
 
     @Configuration
@@ -98,8 +117,8 @@ public class ContainerTypeManagerTest {
     public void testSetup() {
         dynEnumMgr.allowEnumDiscovery();
         TestBase.prepareRestClients(mockRestClient,
-            TEST_KEY_1,
-            getClass().getResourceAsStream(TEST_RESOURCE_1));
+                TEST_KEY_1,
+                getClass().getResourceAsStream(TEST_RESOURCE_1));
     }
 
     private Attachment getAttachmentById(Set<Attachment> aSet, String id) {

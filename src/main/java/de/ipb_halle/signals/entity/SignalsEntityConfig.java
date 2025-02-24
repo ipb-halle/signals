@@ -114,7 +114,7 @@ public class SignalsEntityConfig {
                 EntityType.valueOf("container"),
                 EntityType.valueOf("experiment"),
                 EntityType.valueOf("journal"),
-                EntityType.valueOf(LocationEntity.ENTITY_TYPE_LOCATION),
+                EntityType.valueOf("location"),
                 EntityType.valueOf("sample")
         };
     }

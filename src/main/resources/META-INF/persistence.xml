@@ -24,7 +24,7 @@
         <class>de.ipb_halle.signals.field.FieldType</class>
         <class>de.ipb_halle.signals.field.FieldValueEntity</class>
         <class>de.ipb_halle.signals.inventory.ContainerEntity</class>
-        <class>de.ipb_halle.signals.inventory.ContainerTypeEntity</class>
+        <class>de.ipb_halle.signals.inventory.ContainerTypeEntityde.</class>
         <class>de.ipb_halle.signals.inventory.ContainerTypeAttachment</class>
         <class>de.ipb_halle.signals.inventory.ContainerTypeField</class>
         <class>de.ipb_halle.signals.inventory.LocationEntity</class>

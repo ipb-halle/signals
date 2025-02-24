@@ -1,1 +1,983 @@
-{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/types?entityType=container&page[offset]=0&page[limit]=20","first":"https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/types?entityType=container&page[offset]=0&page[limit]=20"},"data":[{"type":"inventoryType","id":"19eae158-d5f5-4d2e-9318-605ab9b7474b","attributes":{"id":"19eae158-d5f5-4d2e-9318-605ab9b7474b","name":"Flask1","entityType":"container","description":"","isMovable":false,"inUse":false,"createdAt":"2022-07-19T09:14:53.467Z","updatedAt":"2022-07-19T09:14:53.467Z","fields":[{"id":"b50d782a-8247-4adb-8dc9-9ea69aff987e","definition":{"key":"b50d782a-8247-4adb-8dc9-9ea69aff987e","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","multiSelect":false,"hidden":false}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isRequired":true}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isRequired":true}},{"id":"PE_INV_SYSTEM_Amount","definition":{"key":"PE_INV_SYSTEM_Amount","title":"Amount","type":"unit","measures":[{"measure":"mass","label":"Mass"},{"measure":"volume","label":"Volume"},{"measure":"count","label":"Count"}],"isUserDefined":false,"isRequired":true,"defaultUnit":"g"}},{"id":"PE_INV_SYSTEM_Responsible_Person","definition":{"key":"PE_INV_SYSTEM_Responsible_Person","title":"Responsible Person","type":"user","isRequired":true}}],"digest":"f46c7da8-e25f-4e85-837e-39a857d9d179"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/116"},"data":{"type":"user","id":"116"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/116"},"data":{"type":"user","id":"116"}}}},{"type":"inventoryType","id":"b17da130-259d-4009-b99e-49e9352b3b89","attributes":{"id":"b17da130-259d-4009-b99e-49e9352b3b89","name":"Bottle","entityType":"container","description":"","isMovable":false,"inUse":true,"attachments":[{"entityId":"b17da130-259d-4009-b99e-49e9352b3b89","attachmentId":"7e38bb31-4860-4d6f-b481-e83ba32d27fb","versionId":"t7H1D7YSCPYafhAO.FxCi83o_lcd1TJW","entityType":"container","isTemplate":true,"fileName":"DefaultImage_Container_Bottle.png","createdAt":"2022-02-22T16:33:40.455Z","updatedAt":"2022-02-22T16:33:40.455Z"}],"createdAt":"2022-02-22T16:33:39.281Z","updatedAt":"2022-07-16T17:00:07.290159Z","fields":[{"id":"abc5bb4b-2375-4313-b505-cd6e1a196877","definition":{"key":"abc5bb4b-2375-4313-b505-cd6e1a196877","title":"Expiration Date","type":"datetime","hidden":true}},{"id":"1a814fb2-d967-4988-872a-d476deaf16c4","definition":{"key":"1a814fb2-d967-4988-872a-d476deaf16c4","title":"Opening Date","type":"datetime","hidden":true}},{"id":"958d0b68-3f82-4160-8d05-885fa5c80d19","definition":{"key":"958d0b68-3f82-4160-8d05-885fa5c80d19","title":"Use by Date","type":"datetime","hidden":true}},{"id":"b50d782a-8247-4adb-8dc9-9ea69aff987e","definition":{"key":"b50d782a-8247-4adb-8dc9-9ea69aff987e","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Amount","definition":{"key":"PE_INV_SYSTEM_Amount","title":"Amount","type":"unit","measures":[{"measure":"volume","label":"Volume"},{"measure":"mass","label":"Mass"},{"measure":"count","label":"Count"}],"isUserDefined":false,"isRequired":true,"defaultUnit":"g"}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Responsible_Person","definition":{"key":"PE_INV_SYSTEM_Responsible_Person","title":"Responsible Person","type":"user","isUserDefined":false,"isRequired":false}}],"digest":"293ec2a8-8c0f-4c89-8107-615876974ce2"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}},{"type":"inventoryType","id":"e82a3130-03de-44d9-8aa4-fc92c7f658ea","attributes":{"id":"e82a3130-03de-44d9-8aa4-fc92c7f658ea","name":"Drum","entityType":"container","description":"","isMovable":false,"inUse":true,"attachments":[{"entityId":"e82a3130-03de-44d9-8aa4-fc92c7f658ea","attachmentId":"04bc2428-5ad5-4862-a23e-875e7285e121","versionId":"_o7gIduAsrTWmfsULDiQez28lsSIZOZK","entityType":"container","isTemplate":true,"fileName":"DefaultImage_Container_Drum.png","createdAt":"2022-02-22T16:33:40.622Z","updatedAt":"2022-02-22T16:33:40.622Z"}],"createdAt":"2022-02-22T16:33:39.277Z","updatedAt":"2022-07-16T17:00:07.302740Z","fields":[{"id":"abc5bb4b-2375-4313-b505-cd6e1a196877","definition":{"key":"abc5bb4b-2375-4313-b505-cd6e1a196877","title":"Expiration Date","type":"datetime","hidden":true}},{"id":"f9fe482a-d9d7-4033-88f5-4659691ffc96","definition":{"key":"f9fe482a-d9d7-4033-88f5-4659691ffc96","title":"Min Stock Threshold (mass)","type":"unit","measure":"mass","hidden":true}},{"id":"7c6cb07a-cb30-45ec-84de-816d30077a67","definition":{"key":"7c6cb07a-cb30-45ec-84de-816d30077a67","title":"Min Stock Threshold (volume)","type":"unit","measure":"volume","hidden":true}},{"id":"1a814fb2-d967-4988-872a-d476deaf16c4","definition":{"key":"1a814fb2-d967-4988-872a-d476deaf16c4","title":"Opening Date","type":"datetime","hidden":true}},{"id":"958d0b68-3f82-4160-8d05-885fa5c80d19","definition":{"key":"958d0b68-3f82-4160-8d05-885fa5c80d19","title":"Use by Date","type":"datetime","hidden":true}},{"id":"b50d782a-8247-4adb-8dc9-9ea69aff987e","definition":{"key":"b50d782a-8247-4adb-8dc9-9ea69aff987e","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Amount","definition":{"key":"PE_INV_SYSTEM_Amount","title":"Amount","type":"unit","measures":[{"measure":"volume","label":"Volume"},{"measure":"mass","label":"Mass"},{"measure":"count","label":"Count"}],"isUserDefined":false,"isRequired":true,"defaultUnit":"g"}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Responsible_Person","definition":{"key":"PE_INV_SYSTEM_Responsible_Person","title":"Responsible Person","type":"user","isUserDefined":false,"isRequired":false}}],"digest":"d9986680-4a89-4a7e-a5cc-50678f195945"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}},{"type":"inventoryType","id":"e3dcd097-02a0-4b32-abe1-8e8433974939","attributes":{"id":"e3dcd097-02a0-4b32-abe1-8e8433974939","name":"Tube","entityType":"container","description":"","isMovable":false,"inUse":true,"attachments":[{"entityId":"e3dcd097-02a0-4b32-abe1-8e8433974939","attachmentId":"30462d9d-2bd2-4ce3-aa39-0d8dd547d733","versionId":"U4OkfTeE4PHghwrZcXl0tCf0IYsj.ojt","entityType":"container","isTemplate":true,"fileName":"DefaultImage_Container_Tube.png","createdAt":"2022-02-22T16:33:40.545Z","updatedAt":"2022-02-22T16:33:40.545Z"}],"createdAt":"2022-02-22T16:33:39.273Z","updatedAt":"2022-07-19T09:18:28.291769Z","fields":[{"id":"b50d782a-8247-4adb-8dc9-9ea69aff987e","definition":{"key":"b50d782a-8247-4adb-8dc9-9ea69aff987e","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Amount","definition":{"key":"PE_INV_SYSTEM_Amount","title":"Amount","type":"unit","measures":[{"measure":"volume","label":"Volume"},{"measure":"mass","label":"Mass"},{"measure":"count","label":"Count"}],"isUserDefined":false,"isRequired":true,"defaultUnit":"g"}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Responsible_Person","definition":{"key":"PE_INV_SYSTEM_Responsible_Person","title":"Responsible Person","type":"user","isUserDefined":false,"isRequired":false}},{"id":"ec4cdb3f-06e6-4522-84d2-3eea6c82bc1d","definition":{"key":"ec4cdb3f-06e6-4522-84d2-3eea6c82bc1d","title":"Inventory Material Type","type":"list","options":["Chemical Compound","Primer","Cell Line","Macroscopic Biology"],"multiSelect":false,"hidden":false}}],"digest":"6a1a675d-b01b-48bb-a773-63b515fcfe44"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/116"},"data":{"type":"user","id":"116"}}}},{"type":"inventoryType","id":"c9f6916e-9f66-4ad3-a5b6-b9502064ec46","attributes":{"id":"c9f6916e-9f66-4ad3-a5b6-b9502064ec46","name":"Bag","entityType":"container","description":"","isMovable":false,"inUse":true,"attachments":[{"entityId":"c9f6916e-9f66-4ad3-a5b6-b9502064ec46","attachmentId":"cdead04a-55c5-42d3-8481-3b94e11cf290","versionId":"pVcDz5qY3rg4caWO2anS_oED415VJzXT","entityType":"container","isTemplate":true,"fileName":"DefaultImage_Container_Bag.png","createdAt":"2022-02-22T16:33:39.470Z","updatedAt":"2022-02-22T16:33:39.470Z"}],"createdAt":"2022-02-22T16:33:39.268Z","updatedAt":"2022-07-16T17:00:07.325238Z","fields":[{"id":"abc5bb4b-2375-4313-b505-cd6e1a196877","definition":{"key":"abc5bb4b-2375-4313-b505-cd6e1a196877","title":"Expiration Date","type":"datetime","hidden":true}},{"id":"b50d782a-8247-4adb-8dc9-9ea69aff987e","definition":{"key":"b50d782a-8247-4adb-8dc9-9ea69aff987e","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Amount","definition":{"key":"PE_INV_SYSTEM_Amount","title":"Amount","type":"unit","measures":[{"measure":"volume","label":"Volume"},{"measure":"mass","label":"Mass"},{"measure":"count","label":"Count"}],"isUserDefined":false,"isRequired":true,"defaultUnit":"g"}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Responsible_Person","definition":{"key":"PE_INV_SYSTEM_Responsible_Person","title":"Responsible Person","type":"user","isUserDefined":false,"isRequired":false}}],"digest":"d6a23e09-f6f9-4e1c-8fc4-e5a817abf7d7"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}},{"type":"inventoryType","id":"2f58c50a-f847-4a41-9b48-c54a4e6f025d","attributes":{"id":"2f58c50a-f847-4a41-9b48-c54a4e6f025d","name":"Can","entityType":"container","description":"","isMovable":false,"inUse":true,"attachments":[{"entityId":"2f58c50a-f847-4a41-9b48-c54a4e6f025d","attachmentId":"57cebb50-816f-4965-a466-98d015404c7a","versionId":"PjB0JEjcz6qbn7xH2o0gAEOHU_HIha77","entityType":"container","isTemplate":true,"fileName":"DefaultImage_Container_Can.png","createdAt":"2022-02-22T16:33:39.703Z","updatedAt":"2022-02-22T16:33:39.703Z"}],"createdAt":"2022-02-22T16:33:39.263Z","updatedAt":"2022-07-16T17:00:07.337765Z","fields":[{"id":"abc5bb4b-2375-4313-b505-cd6e1a196877","definition":{"key":"abc5bb4b-2375-4313-b505-cd6e1a196877","title":"Expiration Date","type":"datetime","hidden":true}},{"id":"1a814fb2-d967-4988-872a-d476deaf16c4","definition":{"key":"1a814fb2-d967-4988-872a-d476deaf16c4","title":"Opening Date","type":"datetime","hidden":true}},{"id":"958d0b68-3f82-4160-8d05-885fa5c80d19","definition":{"key":"958d0b68-3f82-4160-8d05-885fa5c80d19","title":"Use by Date","type":"datetime","hidden":true}},{"id":"b50d782a-8247-4adb-8dc9-9ea69aff987e","definition":{"key":"b50d782a-8247-4adb-8dc9-9ea69aff987e","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Amount","definition":{"key":"PE_INV_SYSTEM_Amount","title":"Amount","type":"unit","measures":[{"measure":"volume","label":"Volume"},{"measure":"mass","label":"Mass"},{"measure":"count","label":"Count"}],"isUserDefined":false,"isRequired":true,"defaultUnit":"g"}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Responsible_Person","definition":{"key":"PE_INV_SYSTEM_Responsible_Person","title":"Responsible Person","type":"user","isUserDefined":false,"isRequired":false}}],"digest":"8ec5f1ff-0d82-4db8-af9e-8f0ce06a302b"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}},{"type":"inventoryType","id":"b9f1ac14-3a84-4812-98b3-6543abc68d62","attributes":{"id":"b9f1ac14-3a84-4812-98b3-6543abc68d62","name":"Vial","entityType":"container","description":"","isMovable":false,"inUse":true,"attachments":[{"entityId":"b9f1ac14-3a84-4812-98b3-6543abc68d62","attachmentId":"2bdb4e86-5eb3-4644-93a0-54e81c3b7e3f","versionId":"Pk2DJNJiQk6Ov1xS3MI18Wx4BWGnfBBv","entityType":"container","isTemplate":true,"fileName":"DefaultImage_Container_Vial.png","createdAt":"2022-02-22T16:33:40.333Z","updatedAt":"2022-02-22T16:33:40.333Z"}],"createdAt":"2022-02-22T16:33:39.258Z","updatedAt":"2022-07-16T17:00:07.350064Z","fields":[{"id":"abc5bb4b-2375-4313-b505-cd6e1a196877","definition":{"key":"abc5bb4b-2375-4313-b505-cd6e1a196877","title":"Expiration Date","type":"datetime","hidden":true}},{"id":"b50d782a-8247-4adb-8dc9-9ea69aff987e","definition":{"key":"b50d782a-8247-4adb-8dc9-9ea69aff987e","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Amount","definition":{"key":"PE_INV_SYSTEM_Amount","title":"Amount","type":"unit","measures":[{"measure":"volume","label":"Volume"},{"measure":"mass","label":"Mass"},{"measure":"count","label":"Count"}],"isUserDefined":false,"isRequired":true,"defaultUnit":"g"}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Responsible_Person","definition":{"key":"PE_INV_SYSTEM_Responsible_Person","title":"Responsible Person","type":"user","isUserDefined":false,"isRequired":false}}],"digest":"8e5149ab-7461-45cb-93ad-4074579586fa"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}},{"type":"inventoryType","id":"6d8b2b34-3c25-426e-93e4-1a7411107bb2","attributes":{"id":"6d8b2b34-3c25-426e-93e4-1a7411107bb2","name":"Cylinder","entityType":"container","description":"","isMovable":false,"inUse":true,"attachments":[{"entityId":"6d8b2b34-3c25-426e-93e4-1a7411107bb2","attachmentId":"da09f165-c245-4403-93d5-482e44d3a790","versionId":"wWHjjt52ibpUk8gco4ahxQ3CSANxEpck","entityType":"container","isTemplate":true,"fileName":"DefaultImage_Container_Cylinder.png","createdAt":"2022-02-22T16:33:40.234Z","updatedAt":"2022-02-22T16:33:40.234Z"}],"createdAt":"2022-02-22T16:33:39.238Z","updatedAt":"2022-07-16T17:00:07.361727Z","fields":[{"id":"abc5bb4b-2375-4313-b505-cd6e1a196877","definition":{"key":"abc5bb4b-2375-4313-b505-cd6e1a196877","title":"Expiration Date","type":"datetime","hidden":true}},{"id":"b50d782a-8247-4adb-8dc9-9ea69aff987e","definition":{"key":"b50d782a-8247-4adb-8dc9-9ea69aff987e","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Barcode","definition":{"key":"Barcode","title":"Barcode","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Amount","definition":{"key":"PE_INV_SYSTEM_Amount","title":"Amount","type":"unit","measures":[{"measure":"volume","label":"Volume"},{"measure":"mass","label":"Mass"},{"measure":"count","label":"Count"}],"isUserDefined":false,"isRequired":true,"defaultUnit":"g"}},{"id":"PE_INV_SYSTEM_Status","definition":{"key":"Status","title":"Status","type":"text","isUserDefined":false,"isRequired":true}},{"id":"PE_INV_SYSTEM_Responsible_Person","definition":{"key":"PE_INV_SYSTEM_Responsible_Person","title":"Responsible Person","type":"user","isUserDefined":false,"isRequired":false}}],"digest":"fe297241-03c7-416c-8df8-0cc88e2f32ee"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"data":{"type":"user","id":"3"}}}}],"included":[{"type":"user","id":"116","links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/116"},"attributes":{"userId":"116","userName":"user.two@someplace.invalid","alias":"USR2","email":"user.two@someplace.invalid","firstName":"TwoFirst","lastName":"TwoLast","country":"Germany","organization":"trialorg"},"relationships":{"systemGroups":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/116/systemGroups"}}}},{"type":"user","id":"3","links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"},"attributes":{"userId":"3","userName":"system","firstName":"System","lastName":""},"relationships":{"systemGroups":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/3/systemGroups"}}}}]}
+{
+  "links": {
+    "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/types?entityType=container&page[offset]=0&page[limit]=20",
+    "first": "https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/types?entityType=container&page[offset]=0&page[limit]=20"
+  },
+  "data": [
+    {
+      "type": "inventoryType",
+      "id": "19eae158-d5f5-4d2e-9318-605ab9b7474b",
+      "attributes": {
+        "id": "19eae158-d5f5-4d2e-9318-605ab9b7474b",
+        "name": "Flask1",
+        "entityType": "container",
+        "description": "",
+        "isMovable": false,
+        "inUse": false,
+        "createdAt": "2022-07-19T09:14:53.467Z",
+        "updatedAt": "2022-07-19T09:14:53.467Z",
+        "fields": [
+          {
+            "id": "b50d782a-8247-4adb-8dc9-9ea69aff987e",
+            "definition": {
+              "key": "b50d782a-8247-4adb-8dc9-9ea69aff987e",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "multiSelect": false,
+              "hidden": false
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Amount",
+            "definition": {
+              "key": "PE_INV_SYSTEM_Amount",
+              "title": "Amount",
+              "type": "unit",
+              "measures": [
+                { "measure": "mass", "label": "Mass" },
+                { "measure": "volume", "label": "Volume" },
+                { "measure": "count", "label": "Count" }
+              ],
+              "isUserDefined": false,
+              "isRequired": true,
+              "defaultUnit": "g"
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Responsible_Person",
+            "definition": {
+              "key": "PE_INV_SYSTEM_Responsible_Person",
+              "title": "Responsible Person",
+              "type": "user",
+              "isRequired": true
+            }
+          }
+        ],
+        "digest": "f46c7da8-e25f-4e85-837e-39a857d9d179"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/116"
+          },
+          "data": { "type": "user", "id": "116" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/116"
+          },
+          "data": { "type": "user", "id": "116" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "b17da130-259d-4009-b99e-49e9352b3b89",
+      "attributes": {
+        "id": "b17da130-259d-4009-b99e-49e9352b3b89",
+        "name": "Bottle",
+        "entityType": "container",
+        "description": "",
+        "isMovable": false,
+        "inUse": true,
+        "attachments": [
+          {
+            "entityId": "b17da130-259d-4009-b99e-49e9352b3b89",
+            "attachmentId": "7e38bb31-4860-4d6f-b481-e83ba32d27fb",
+            "versionId": "t7H1D7YSCPYafhAO.FxCi83o_lcd1TJW",
+            "entityType": "container",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Container_Bottle.png",
+            "createdAt": "2022-02-22T16:33:40.455Z",
+            "updatedAt": "2022-02-22T16:33:40.455Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.281Z",
+        "updatedAt": "2022-07-16T17:00:07.290159Z",
+        "fields": [
+          {
+            "id": "abc5bb4b-2375-4313-b505-cd6e1a196877",
+            "definition": {
+              "key": "abc5bb4b-2375-4313-b505-cd6e1a196877",
+              "title": "Expiration Date",
+              "type": "datetime",
+              "hidden": true
+            }
+          },
+          {
+            "id": "1a814fb2-d967-4988-872a-d476deaf16c4",
+            "definition": {
+              "key": "1a814fb2-d967-4988-872a-d476deaf16c4",
+              "title": "Opening Date",
+              "type": "datetime",
+              "hidden": true
+            }
+          },
+          {
+            "id": "958d0b68-3f82-4160-8d05-885fa5c80d19",
+            "definition": {
+              "key": "958d0b68-3f82-4160-8d05-885fa5c80d19",
+              "title": "Use by Date",
+              "type": "datetime",
+              "hidden": true
+            }
+          },
+          {
+            "id": "b50d782a-8247-4adb-8dc9-9ea69aff987e",
+            "definition": {
+              "key": "b50d782a-8247-4adb-8dc9-9ea69aff987e",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Amount",
+            "definition": {
+              "key": "PE_INV_SYSTEM_Amount",
+              "title": "Amount",
+              "type": "unit",
+              "measures": [
+                { "measure": "volume", "label": "Volume" },
+                { "measure": "mass", "label": "Mass" },
+                { "measure": "count", "label": "Count" }
+              ],
+              "isUserDefined": false,
+              "isRequired": true,
+              "defaultUnit": "g"
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Responsible_Person",
+            "definition": {
+              "key": "PE_INV_SYSTEM_Responsible_Person",
+              "title": "Responsible Person",
+              "type": "user",
+              "isUserDefined": false,
+              "isRequired": false
+            }
+          }
+        ],
+        "digest": "293ec2a8-8c0f-4c89-8107-615876974ce2"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "e82a3130-03de-44d9-8aa4-fc92c7f658ea",
+      "attributes": {
+        "id": "e82a3130-03de-44d9-8aa4-fc92c7f658ea",
+        "name": "Drum",
+        "entityType": "container",
+        "description": "",
+        "isMovable": false,
+        "inUse": true,
+        "attachments": [
+          {
+            "entityId": "e82a3130-03de-44d9-8aa4-fc92c7f658ea",
+            "attachmentId": "04bc2428-5ad5-4862-a23e-875e7285e121",
+            "versionId": "_o7gIduAsrTWmfsULDiQez28lsSIZOZK",
+            "entityType": "container",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Container_Drum.png",
+            "createdAt": "2022-02-22T16:33:40.622Z",
+            "updatedAt": "2022-02-22T16:33:40.622Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.277Z",
+        "updatedAt": "2022-07-16T17:00:07.302740Z",
+        "fields": [
+          {
+            "id": "abc5bb4b-2375-4313-b505-cd6e1a196877",
+            "definition": {
+              "key": "abc5bb4b-2375-4313-b505-cd6e1a196877",
+              "title": "Expiration Date",
+              "type": "datetime",
+              "hidden": true
+            }
+          },
+          {
+            "id": "f9fe482a-d9d7-4033-88f5-4659691ffc96",
+            "definition": {
+              "key": "f9fe482a-d9d7-4033-88f5-4659691ffc96",
+              "title": "Min Stock Threshold (mass)",
+              "type": "unit",
+              "measure": "mass",
+              "hidden": true
+            }
+          },
+          {
+            "id": "7c6cb07a-cb30-45ec-84de-816d30077a67",
+            "definition": {
+              "key": "7c6cb07a-cb30-45ec-84de-816d30077a67",
+              "title": "Min Stock Threshold (volume)",
+              "type": "unit",
+              "measure": "volume",
+              "hidden": true
+            }
+          },
+          {
+            "id": "1a814fb2-d967-4988-872a-d476deaf16c4",
+            "definition": {
+              "key": "1a814fb2-d967-4988-872a-d476deaf16c4",
+              "title": "Opening Date",
+              "type": "datetime",
+              "hidden": true
+            }
+          },
+          {
+            "id": "958d0b68-3f82-4160-8d05-885fa5c80d19",
+            "definition": {
+              "key": "958d0b68-3f82-4160-8d05-885fa5c80d19",
+              "title": "Use by Date",
+              "type": "datetime",
+              "hidden": true
+            }
+          },
+          {
+            "id": "b50d782a-8247-4adb-8dc9-9ea69aff987e",
+            "definition": {
+              "key": "b50d782a-8247-4adb-8dc9-9ea69aff987e",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Amount",
+            "definition": {
+              "key": "PE_INV_SYSTEM_Amount",
+              "title": "Amount",
+              "type": "unit",
+              "measures": [
+                { "measure": "volume", "label": "Volume" },
+                { "measure": "mass", "label": "Mass" },
+                { "measure": "count", "label": "Count" }
+              ],
+              "isUserDefined": false,
+              "isRequired": true,
+              "defaultUnit": "g"
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Responsible_Person",
+            "definition": {
+              "key": "PE_INV_SYSTEM_Responsible_Person",
+              "title": "Responsible Person",
+              "type": "user",
+              "isUserDefined": false,
+              "isRequired": false
+            }
+          }
+        ],
+        "digest": "d9986680-4a89-4a7e-a5cc-50678f195945"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "e3dcd097-02a0-4b32-abe1-8e8433974939",
+      "attributes": {
+        "id": "e3dcd097-02a0-4b32-abe1-8e8433974939",
+        "name": "Tube",
+        "entityType": "container",
+        "description": "",
+        "isMovable": false,
+        "inUse": true,
+        "attachments": [
+          {
+            "entityId": "e3dcd097-02a0-4b32-abe1-8e8433974939",
+            "attachmentId": "30462d9d-2bd2-4ce3-aa39-0d8dd547d733",
+            "versionId": "U4OkfTeE4PHghwrZcXl0tCf0IYsj.ojt",
+            "entityType": "container",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Container_Tube.png",
+            "createdAt": "2022-02-22T16:33:40.545Z",
+            "updatedAt": "2022-02-22T16:33:40.545Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.273Z",
+        "updatedAt": "2022-07-19T09:18:28.291769Z",
+        "fields": [
+          {
+            "id": "b50d782a-8247-4adb-8dc9-9ea69aff987e",
+            "definition": {
+              "key": "b50d782a-8247-4adb-8dc9-9ea69aff987e",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Amount",
+            "definition": {
+              "key": "PE_INV_SYSTEM_Amount",
+              "title": "Amount",
+              "type": "unit",
+              "measures": [
+                { "measure": "volume", "label": "Volume" },
+                { "measure": "mass", "label": "Mass" },
+                { "measure": "count", "label": "Count" }
+              ],
+              "isUserDefined": false,
+              "isRequired": true,
+              "defaultUnit": "g"
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Responsible_Person",
+            "definition": {
+              "key": "PE_INV_SYSTEM_Responsible_Person",
+              "title": "Responsible Person",
+              "type": "user",
+              "isUserDefined": false,
+              "isRequired": false
+            }
+          },
+          {
+            "id": "ec4cdb3f-06e6-4522-84d2-3eea6c82bc1d",
+            "definition": {
+              "key": "ec4cdb3f-06e6-4522-84d2-3eea6c82bc1d",
+              "title": "Inventory Material Type",
+              "type": "list",
+              "options": [
+                "Chemical Compound",
+                "Primer",
+                "Cell Line",
+                "Macroscopic Biology"
+              ],
+              "multiSelect": false,
+              "hidden": false
+            }
+          }
+        ],
+        "digest": "6a1a675d-b01b-48bb-a773-63b515fcfe44"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/116"
+          },
+          "data": { "type": "user", "id": "116" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "c9f6916e-9f66-4ad3-a5b6-b9502064ec46",
+      "attributes": {
+        "id": "c9f6916e-9f66-4ad3-a5b6-b9502064ec46",
+        "name": "Bag",
+        "entityType": "container",
+        "description": "",
+        "isMovable": false,
+        "inUse": true,
+        "attachments": [
+          {
+            "entityId": "c9f6916e-9f66-4ad3-a5b6-b9502064ec46",
+            "attachmentId": "cdead04a-55c5-42d3-8481-3b94e11cf290",
+            "versionId": "pVcDz5qY3rg4caWO2anS_oED415VJzXT",
+            "entityType": "container",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Container_Bag.png",
+            "createdAt": "2022-02-22T16:33:39.470Z",
+            "updatedAt": "2022-02-22T16:33:39.470Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.268Z",
+        "updatedAt": "2022-07-16T17:00:07.325238Z",
+        "fields": [
+          {
+            "id": "abc5bb4b-2375-4313-b505-cd6e1a196877",
+            "definition": {
+              "key": "abc5bb4b-2375-4313-b505-cd6e1a196877",
+              "title": "Expiration Date",
+              "type": "datetime",
+              "hidden": true
+            }
+          },
+          {
+            "id": "b50d782a-8247-4adb-8dc9-9ea69aff987e",
+            "definition": {
+              "key": "b50d782a-8247-4adb-8dc9-9ea69aff987e",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Amount",
+            "definition": {
+              "key": "PE_INV_SYSTEM_Amount",
+              "title": "Amount",
+              "type": "unit",
+              "measures": [
+                { "measure": "volume", "label": "Volume" },
+                { "measure": "mass", "label": "Mass" },
+                { "measure": "count", "label": "Count" }
+              ],
+              "isUserDefined": false,
+              "isRequired": true,
+              "defaultUnit": "g"
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Responsible_Person",
+            "definition": {
+              "key": "PE_INV_SYSTEM_Responsible_Person",
+              "title": "Responsible Person",
+              "type": "user",
+              "isUserDefined": false,
+              "isRequired": false
+            }
+          }
+        ],
+        "digest": "d6a23e09-f6f9-4e1c-8fc4-e5a817abf7d7"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "2f58c50a-f847-4a41-9b48-c54a4e6f025d",
+      "attributes": {
+        "id": "2f58c50a-f847-4a41-9b48-c54a4e6f025d",
+        "name": "Can",
+        "entityType": "container",
+        "description": "",
+        "isMovable": false,
+        "inUse": true,
+        "attachments": [
+          {
+            "entityId": "2f58c50a-f847-4a41-9b48-c54a4e6f025d",
+            "attachmentId": "57cebb50-816f-4965-a466-98d015404c7a",
+            "versionId": "PjB0JEjcz6qbn7xH2o0gAEOHU_HIha77",
+            "entityType": "container",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Container_Can.png",
+            "createdAt": "2022-02-22T16:33:39.703Z",
+            "updatedAt": "2022-02-22T16:33:39.703Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.263Z",
+        "updatedAt": "2022-07-16T17:00:07.337765Z",
+        "fields": [
+          {
+            "id": "abc5bb4b-2375-4313-b505-cd6e1a196877",
+            "definition": {
+              "key": "abc5bb4b-2375-4313-b505-cd6e1a196877",
+              "title": "Expiration Date",
+              "type": "datetime",
+              "hidden": true
+            }
+          },
+          {
+            "id": "1a814fb2-d967-4988-872a-d476deaf16c4",
+            "definition": {
+              "key": "1a814fb2-d967-4988-872a-d476deaf16c4",
+              "title": "Opening Date",
+              "type": "datetime",
+              "hidden": true
+            }
+          },
+          {
+            "id": "958d0b68-3f82-4160-8d05-885fa5c80d19",
+            "definition": {
+              "key": "958d0b68-3f82-4160-8d05-885fa5c80d19",
+              "title": "Use by Date",
+              "type": "datetime",
+              "hidden": true
+            }
+          },
+          {
+            "id": "b50d782a-8247-4adb-8dc9-9ea69aff987e",
+            "definition": {
+              "key": "b50d782a-8247-4adb-8dc9-9ea69aff987e",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Amount",
+            "definition": {
+              "key": "PE_INV_SYSTEM_Amount",
+              "title": "Amount",
+              "type": "unit",
+              "measures": [
+                { "measure": "volume", "label": "Volume" },
+                { "measure": "mass", "label": "Mass" },
+                { "measure": "count", "label": "Count" }
+              ],
+              "isUserDefined": false,
+              "isRequired": true,
+              "defaultUnit": "g"
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Responsible_Person",
+            "definition": {
+              "key": "PE_INV_SYSTEM_Responsible_Person",
+              "title": "Responsible Person",
+              "type": "user",
+              "isUserDefined": false,
+              "isRequired": false
+            }
+          }
+        ],
+        "digest": "8ec5f1ff-0d82-4db8-af9e-8f0ce06a302b"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "b9f1ac14-3a84-4812-98b3-6543abc68d62",
+      "attributes": {
+        "id": "b9f1ac14-3a84-4812-98b3-6543abc68d62",
+        "name": "Vial",
+        "entityType": "container",
+        "description": "",
+        "isMovable": false,
+        "inUse": true,
+        "attachments": [
+          {
+            "entityId": "b9f1ac14-3a84-4812-98b3-6543abc68d62",
+            "attachmentId": "2bdb4e86-5eb3-4644-93a0-54e81c3b7e3f",
+            "versionId": "Pk2DJNJiQk6Ov1xS3MI18Wx4BWGnfBBv",
+            "entityType": "container",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Container_Vial.png",
+            "createdAt": "2022-02-22T16:33:40.333Z",
+            "updatedAt": "2022-02-22T16:33:40.333Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.258Z",
+        "updatedAt": "2022-07-16T17:00:07.350064Z",
+        "fields": [
+          {
+            "id": "abc5bb4b-2375-4313-b505-cd6e1a196877",
+            "definition": {
+              "key": "abc5bb4b-2375-4313-b505-cd6e1a196877",
+              "title": "Expiration Date",
+              "type": "datetime",
+              "hidden": true
+            }
+          },
+          {
+            "id": "b50d782a-8247-4adb-8dc9-9ea69aff987e",
+            "definition": {
+              "key": "b50d782a-8247-4adb-8dc9-9ea69aff987e",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Amount",
+            "definition": {
+              "key": "PE_INV_SYSTEM_Amount",
+              "title": "Amount",
+              "type": "unit",
+              "measures": [
+                { "measure": "volume", "label": "Volume" },
+                { "measure": "mass", "label": "Mass" },
+                { "measure": "count", "label": "Count" }
+              ],
+              "isUserDefined": false,
+              "isRequired": true,
+              "defaultUnit": "g"
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Responsible_Person",
+            "definition": {
+              "key": "PE_INV_SYSTEM_Responsible_Person",
+              "title": "Responsible Person",
+              "type": "user",
+              "isUserDefined": false,
+              "isRequired": false
+            }
+          }
+        ],
+        "digest": "8e5149ab-7461-45cb-93ad-4074579586fa"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    },
+    {
+      "type": "inventoryType",
+      "id": "6d8b2b34-3c25-426e-93e4-1a7411107bb2",
+      "attributes": {
+        "id": "6d8b2b34-3c25-426e-93e4-1a7411107bb2",
+        "name": "Cylinder",
+        "entityType": "container",
+        "description": "",
+        "isMovable": false,
+        "inUse": true,
+        "attachments": [
+          {
+            "entityId": "6d8b2b34-3c25-426e-93e4-1a7411107bb2",
+            "attachmentId": "da09f165-c245-4403-93d5-482e44d3a790",
+            "versionId": "wWHjjt52ibpUk8gco4ahxQ3CSANxEpck",
+            "entityType": "container",
+            "isTemplate": true,
+            "fileName": "DefaultImage_Container_Cylinder.png",
+            "createdAt": "2022-02-22T16:33:40.234Z",
+            "updatedAt": "2022-02-22T16:33:40.234Z"
+          }
+        ],
+        "createdAt": "2022-02-22T16:33:39.238Z",
+        "updatedAt": "2022-07-16T17:00:07.361727Z",
+        "fields": [
+          {
+            "id": "abc5bb4b-2375-4313-b505-cd6e1a196877",
+            "definition": {
+              "key": "abc5bb4b-2375-4313-b505-cd6e1a196877",
+              "title": "Expiration Date",
+              "type": "datetime",
+              "hidden": true
+            }
+          },
+          {
+            "id": "b50d782a-8247-4adb-8dc9-9ea69aff987e",
+            "definition": {
+              "key": "b50d782a-8247-4adb-8dc9-9ea69aff987e",
+              "title": "Inventory Security",
+              "type": "attributeList",
+              "attributeListEid": "attribute:18",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Barcode",
+            "definition": {
+              "key": "Barcode",
+              "title": "Barcode",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Amount",
+            "definition": {
+              "key": "PE_INV_SYSTEM_Amount",
+              "title": "Amount",
+              "type": "unit",
+              "measures": [
+                { "measure": "volume", "label": "Volume" },
+                { "measure": "mass", "label": "Mass" },
+                { "measure": "count", "label": "Count" }
+              ],
+              "isUserDefined": false,
+              "isRequired": true,
+              "defaultUnit": "g"
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Status",
+            "definition": {
+              "key": "Status",
+              "title": "Status",
+              "type": "text",
+              "isUserDefined": false,
+              "isRequired": true
+            }
+          },
+          {
+            "id": "PE_INV_SYSTEM_Responsible_Person",
+            "definition": {
+              "key": "PE_INV_SYSTEM_Responsible_Person",
+              "title": "Responsible Person",
+              "type": "user",
+              "isUserDefined": false,
+              "isRequired": false
+            }
+          }
+        ],
+        "digest": "fe297241-03c7-416c-8df8-0cc88e2f32ee"
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        },
+        "updatedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": { "type": "user", "id": "3" }
+        }
+      }
+    }
+  ],
+  "included": [
+    {
+      "type": "user",
+      "id": "116",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/116"
+      },
+      "attributes": {
+        "userId": "116",
+        "userName": "user.two@someplace.invalid",
+        "alias": "USR2",
+        "email": "user.two@someplace.invalid",
+        "firstName": "TwoFirst",
+        "lastName": "TwoLast",
+        "country": "Germany",
+        "organization": "trialorg"
+      },
+      "relationships": {
+        "systemGroups": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/116/systemGroups"
+          }
+        }
+      }
+    },
+    {
+      "type": "user",
+      "id": "3",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+      },
+      "attributes": {
+        "userId": "3",
+        "userName": "system",
+        "firstName": "System",
+        "lastName": ""
+      },
+      "relationships": {
+        "systemGroups": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3/systemGroups"
+          }
+        }
+      }
+    }
+  ]
+}

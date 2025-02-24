@@ -142,4 +142,18 @@ public class LocationTypeEntity {
         this.fields = fields;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "LocationTypeEntity{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", inUse=" + inUse +
+                ", movable=" + movable +
+                ", createdAt=" + createdAt +
+                ", updateAt=" + updateAt +
+                ", fields=" + fields +
+                '}';
+    }
 }
