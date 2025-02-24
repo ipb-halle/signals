@@ -85,39 +85,7 @@ CREATE TABLE synonyms (
 );
 
 
-CREATE TABLE location_types (
-    id VARCHAR NOT NULL PRIMARY KEY,
-    name VARCHAR,
-    description VARCHAR,
-    created_at TIMESTAMP,
-    in_use BOOLEAN NOT NULL DEFAULT FALSE,
-    movable BOOLEAN NOT NULL DEFAULT FALSE,
-    updated_at TIMESTAMP
-);
 
-CREATE TABLE location_type_fields (
-    id VARCHAR NOT NULL REFERENCES location_types (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    value VARCHAR NOT NULL REFERENCES field_definitions (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    PRIMARY KEY (id, value)
-);
-
-CREATE TABLE locations (
-    id VARCHAR NOT NULL PRIMARY KEY,
-    ancestor_id VARCHAR,
-    ancestor_name VARCHAR,
-    barcode VARCHAR,
-    created_at DATE,
-    created_by VARCHAR /* REFERENCES users(id) */,
-    name VARCHAR,
-    description VARCHAR,
-    grid BOOLEAN,
-    grid_rows INTEGER,
-    grid_columns INTEGER,
-    type_id VARCHAR,
-    type_name VARCHAR,
-    updated_at DATE,
-    updated_by VARCHAR /* REFERENCES users(id) */
-);
 
 CREATE TABLE roles (
     id VARCHAR NOT NULL PRIMARY KEY,
@@ -317,4 +285,38 @@ CREATE TABLE containers (
     updated_at TIMESTAMP,
     updated_by VARCHAR /* REFERENCES users(id) */,
     unit VARCHAR
+);
+
+CREATE TABLE location_types (
+    id VARCHAR NOT NULL PRIMARY KEY,
+    name VARCHAR,
+    description VARCHAR,
+    created_at TIMESTAMP,
+    in_use BOOLEAN NOT NULL DEFAULT FALSE,
+    movable BOOLEAN NOT NULL DEFAULT FALSE,
+    updated_at TIMESTAMP
+);
+
+CREATE TABLE location_type_fields (
+    id VARCHAR NOT NULL REFERENCES location_types (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    value VARCHAR NOT NULL REFERENCES field_definitions (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    PRIMARY KEY (id, value)
+);
+
+CREATE TABLE locations (
+    id VARCHAR NOT NULL PRIMARY KEY,
+    ancestor_id VARCHAR,
+    ancestor_name VARCHAR,
+    barcode VARCHAR,
+    created_at DATE,
+    created_by VARCHAR /* REFERENCES users(id) */,
+    name VARCHAR,
+    description VARCHAR,
+    grid BOOLEAN,
+    grid_rows INTEGER,
+    grid_columns INTEGER,
+    type_id VARCHAR,
+    type_name VARCHAR,
+    updated_at DATE,
+    updated_by VARCHAR /* REFERENCES users(id) */
 );

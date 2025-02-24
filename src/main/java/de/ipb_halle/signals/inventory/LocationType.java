@@ -67,8 +67,10 @@ public class LocationType {
         this.updatedAt = lte.getUpdateAt();
 
         this.fields = new HashSet<>();
-        fields.addAll(fd);
         this.attachments = new HashSet<>();
+        if (fd != null) {
+            fields.addAll(fd);
+        }
     }
 
     public LocationTypeEntity createEntity() {

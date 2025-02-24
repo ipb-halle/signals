@@ -32,10 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import serp.bytecode.LocalTable;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -90,9 +87,23 @@ public class LocationTypeDbService {
 
     public LocationType loadById(String id) {
         LocationTypeEntity lte = this.em.find(LocationTypeEntity.class, id);
-        LocationType locationType = new LocationType(lte, null);
-        logger.info("THIS IS AUCH IMPORTANAT =======================>{}\n", locationType.dump());
+
+        LocationType locationType = new LocationType(lte, loadFields(lte.getId()));
         return locationType;
+    }
+
+    private List<Field> loadFields(String id) {
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<LocationTypeField> query = builder.createQuery(LocationTypeField.class);
+        Root<LocationTypeField> root = query.from(LocationTypeField.class);
+        query.select(root);
+        query.where(builder.equal(root.get("id").get("id"), id));
+
+        List<Field> fields = new ArrayList<>();
+        for (LocationTypeField ltf : em.createQuery(query).getResultList()) {
+            fields.add(fieldDbService.loadById(ltf.getFieldId()));
+        }
+        return null;
     }
 
     public void save(LocationType lt) {

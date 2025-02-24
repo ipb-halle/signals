@@ -86,6 +86,12 @@ public class ContainerTypeDbService {
         return entityIds;
     }
 
+    public ContainerType loadById(String id) {
+        ContainerTypeEntity cte = this.em.find(ContainerTypeEntity.class, id);
+        return new ContainerType(cte,
+                // loadAttachments(cte.getId()),
+                loadFields(cte.getId()));
+    }
 
     /**
      * @param id the ContainerType Id
@@ -103,13 +109,6 @@ public class ContainerTypeDbService {
             result.add(fieldService.loadById(fd.getFieldId()));
         }
         return result;
-    }
-
-    public ContainerType loadById(String id) {
-        ContainerTypeEntity cte = this.em.find(ContainerTypeEntity.class, id);
-        return new ContainerType(cte,
-                // loadAttachments(cte.getId()),
-                loadFields(cte.getId()));
     }
 
     public void save(ContainerType ct) {
