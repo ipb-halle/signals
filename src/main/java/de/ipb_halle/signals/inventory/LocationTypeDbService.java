@@ -39,7 +39,7 @@ import java.util.*;
  */
 
 @Stateless
-@PersistenceElements(entities = {LocationType.class})
+@PersistenceElements(entities = {LocationTypeEntity.class})
 public class LocationTypeDbService {
 
     private final static String LOCATION_TYPE_ENTITY_PREFIX = "location:";
@@ -87,36 +87,22 @@ public class LocationTypeDbService {
 
     public LocationType loadById(String id) {
         LocationTypeEntity lte = this.em.find(LocationTypeEntity.class, id);
-
         LocationType locationType = new LocationType(lte, loadFields(lte.getId()));
         return locationType;
     }
 
     private List<Field> loadFields(String id) {
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<LocationTypeField> query = builder.createQuery(LocationTypeField.class);
-        Root<LocationTypeField> root = query.from(LocationTypeField.class);
-        query.select(root);
-        query.where(builder.equal(root.get("id").get("id"), id));
-
-        List<Field> fields = new ArrayList<>();
-        for (LocationTypeField ltf : em.createQuery(query).getResultList()) {
-            fields.add(fieldDbService.loadById(ltf.getFieldId()));
-        }
-        return null;
+        Map<String, Object> cmap = new HashMap<> ();
+        cmap.put(Field.DEFINING_ENTITY_ID, id);
+        return fieldDbService.load(cmap);
     }
 
     public void save(LocationType lt) {
         LocationTypeEntity lte = lt.createEntity();
         this.em.merge(lte);
         for (Field fd : lt.getFields()) {
+            fd.setDefiningEntityId(lt.getId());
             fieldDbService.save(fd);
-            LocationTypeField ltf = new LocationTypeField()
-                    //striped id from locationType
-                    .setLocationTypeId(lte.getId())
-                    //field id from locationTypes library
-                    .setFieldId(fd.getId());
-            this.em.merge(ltf);
         }
     }
 }

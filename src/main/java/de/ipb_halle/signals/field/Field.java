@@ -140,8 +140,19 @@ public class Field {
         return id;
     }
 
+    /**
+     * Set a (new) field Id and propagate this change to
+     * <code>FieldMeasure</code>s and <code>FieldOption</code>s
+     * @param id the (new) identifier
+     */
     public void setId(String id) {
         this.id = id;
+        for(FieldMeasure measure : measures) {
+            measure.setFieldId(id);
+        }
+        for(FieldOption option : options) {
+            option.setFieldId(id);
+        }
     }
 
     public String getAttributeListEid() {

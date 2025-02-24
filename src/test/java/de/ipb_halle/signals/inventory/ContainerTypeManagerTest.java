@@ -33,6 +33,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import de.ipb_halle.signals.util.EmbeddedKeyValue;
+import de.ipb_halle.tda.DeploymentElement;
 import jakarta.inject.Inject;
 import org.apache.openejb.jee.EjbJar;
 import org.apache.openejb.junit5.RunWithApplicationComposer;
@@ -47,75 +48,32 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 
-@RunWithApplicationComposer
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(PostgresqlContainerExtension.class)
-public class ContainerTypeManagerTest {
+public abstract class ContainerTypeManagerTest {
 
     private final String TEST_RESOURCE_1 = "ContainerTypeManagerTest001.json";
     private final String TEST_KEY_1 =
             "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/types?page%5Blimit%5D=20&page%5Boffset%5D=0&entityType=container";
-    private final String TEST_CONTAINER_TYPE_ID = "b17da130-259d-4009-b99e-49e9352b3b89";
+    private final String TEST_CONTAINER_TYPE_ID = "container:b17da130-259d-4009-b99e-49e9352b3b89:ivt";
     private final String TEST_CONTAINER_TYPE_NAME = "Bottle";
     private final String TEST_CONTAINER_ATTACHMENT_ID = "7e38bb31-4860-4d6f-b481-e83ba32d27fb";
     private final String TEST_CONTAINER_ATTACHMENT_FILE_NAME = "DefaultImage_Container_Bottle.png";
-    private final String TEST_CONTAINER_FIELD_ID = "PE_INV_SYSTEM_Barcode";
+    private final String TEST_CONTAINER_FIELD_ID = "PE_INV_SYSTEM_Barcode:container:b17da130-259d-4009-b99e-49e9352b3b89:ivt";
     private final String TEST_CONTAINER_FIELD_KEY = "Barcode";
 
     @Inject
+    @DeploymentElement(mock = "de.ipb_halle.signals.rest.MockRestClient")
     private MockRestClient mockRestClient;
 
     @Inject
+    @DeploymentElement
     private ContainerTypeManager manager;
 
     @Inject
+    @DeploymentElement
     private DynEnumManager dynEnumMgr;
 
-    @Module
-    @Classes(cdi = true, value = {
-            Attachment.class,
-            AttachmentDbService.class,
-            ContainerType.class,
-            ContainerTypeEntity.class,
-            ContainerTypeAttachment.class,
-            ContainerTypeAttachmentId.class,
-            ContainerTypeField.class,
-            ContainerTypeDbService.class,
-            ContainerTypeManager.class,
-            ContainerTypeRestService.class,
-            DynEnum.class,
-            DynEnumManager.class,
-            DynEnumDbService.class,
-            EmbeddedKeyValue.class,
-            Field.class,
-            FieldDefinition.class,
-            FieldDbService.class,
-            FieldParser.class,
-            MockRestClient.class,
-            SignalsConfig.class,
-    })
-    public EjbJar app() {
-        return new EjbJar();
-    }
-
-    @Module
-    public PersistenceUnit persistence() {
-        return TestBase.persistence(
-                new String[]{
-                        ContainerType.class.getName(),
-                        ContainerTypeField.class.getName(),
-                        FieldDefinition.class.getName(),
-                        ContainerTypeAttachment.class.getName(),
-                        Attachment.class.getName(),
-                        DynEnum.class.getName(),
-                        FieldType.class.getName()
-                });
-    }
-
-    @Configuration
-    public Properties configuration() {
-        return TestBase.configuration();
-    }
 
     @BeforeAll
     public void testSetup() {

@@ -18,37 +18,22 @@
 package de.ipb_halle.signals.inventory;
 
 import de.ipb_halle.signals.PostgresqlContainerExtension;
-import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
-import de.ipb_halle.signals.attachment.Attachment;
-import de.ipb_halle.signals.attachment.AttachmentDbService;
-import de.ipb_halle.signals.dynEnum.DynEnum;
-import de.ipb_halle.signals.dynEnum.DynEnumDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
-import de.ipb_halle.signals.field.*;
 import de.ipb_halle.signals.rest.MockRestClient;
-
-import java.util.List;
-import java.util.Properties;
-
-import de.ipb_halle.signals.util.EmbeddedKeyValue;
+import de.ipb_halle.tda.DeploymentElement;
 import jakarta.inject.Inject;
-import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.junit5.RunWithApplicationComposer;
-import org.apache.openejb.testing.Classes;
-import org.apache.openejb.testing.Configuration;
-import org.apache.openejb.testing.Module;
-import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-@RunWithApplicationComposer
+import java.util.List;
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(PostgresqlContainerExtension.class)
-public class LocationTypeManagerTest {
+public abstract class LocationTypeManagerTest {
 
     private final String TEST_RESOURCE_1 = "LocationTypeManagerTest001.json";
     private final String TEST_KEY_1 =
@@ -57,55 +42,16 @@ public class LocationTypeManagerTest {
     private final String TEST_LOCATION_TYPE_NAME = "Cabinet";
 
     @Inject
+    @DeploymentElement(mock = "de.ipb_halle.signals.rest.MockRestClient")
     private MockRestClient mockRestClient;
 
     @Inject
+    @DeploymentElement
     private LocationTypeManager locationTypeManager;
 
     @Inject
+    @DeploymentElement
     private DynEnumManager dynEnumManager;
-
-    @Module
-    @Classes(cdi = true, value = {
-            Attachment.class,
-            AttachmentDbService.class,
-            DynEnum.class,
-            DynEnumManager.class,
-            DynEnumDbService.class,
-            EmbeddedKeyValue.class,
-            Field.class,
-            FieldDefinition.class,
-            FieldDbService.class,
-            FieldParser.class,
-            LocationType.class,
-            LocationTypeEntity.class,
-            LocationTypeField.class,
-            LocationTypeDbService.class,
-            LocationTypeManager.class,
-            LocationTypeRestService.class,
-            MockRestClient.class,
-            SignalsConfig.class, // RestResultIterator.class, RestService.class,
-    })
-    public EjbJar app() {
-        return new EjbJar();
-    }
-
-    @Module
-    public PersistenceUnit persistence() {
-        return TestBase.persistence(
-                new String[]{
-                        LocationType.class.getName(),
-                        LocationTypeField.class.getName(),
-                        LocationTypeEntity.class.getName(),
-                        FieldDefinition.class.getName(),
-                        FieldType.class.getName(),
-                        DynEnum.class.getName()});
-    }
-
-    @Configuration
-    public Properties configuration() {
-        return TestBase.configuration();
-    }
 
     @BeforeAll
     public void testSetup() {

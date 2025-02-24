@@ -34,8 +34,10 @@ import org.slf4j.LoggerFactory;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -44,7 +46,7 @@ import java.util.Set;
  */
 
 @Stateless
-@PersistenceElements(entities = {LocationType.class, ContainerTypeEntity.class})
+@PersistenceElements(entities = {ContainerTypeEntity.class})
 public class ContainerTypeDbService {
 
     public final static String CONTAINER_TYPE_ID = "container_type_id";
@@ -100,17 +102,9 @@ public class ContainerTypeDbService {
      * @return a list of Field for that container type
      */
     private List<Field> loadFields(String id) {
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<ContainerTypeField> criteriaQuery = builder.createQuery(ContainerTypeField.class);
-        Root<ContainerTypeField> root = criteriaQuery.from(ContainerTypeField.class);
-        criteriaQuery.select(root);
-        criteriaQuery.where(builder.equal(root.get("id").get("id"), id));
-
-        List<Field> result = new ArrayList();
-        for (ContainerTypeField fd : em.createQuery(criteriaQuery).getResultList()) {
-            result.add(fieldService.loadById(fd.getFieldId()));
-        }
-        return result;
+        Map<String, Object> cmap = new HashMap<>();
+        cmap.put(Field.DEFINING_ENTITY_ID, id);
+        return fieldService.load(cmap);
     }
 
     public void save(ContainerType ct) {
@@ -127,13 +121,8 @@ public class ContainerTypeDbService {
         }
          */
         for (Field fd : ct.getFields()) {
+            fd.setDefiningEntityId(ct.getId());
             fieldService.save(fd);
-            ContainerTypeField ctf = new ContainerTypeField()
-                    //striped id from containerType
-                    .setContainerTypeId(cte.getId())
-                    //field id from containerTypes library
-                    .setFieldId(fd.getId());
-            em.merge(ctf);
         }
     }
 }

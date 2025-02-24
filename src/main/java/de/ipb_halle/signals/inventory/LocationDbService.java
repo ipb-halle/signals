@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals.inventory;
 
+import de.ipb_halle.tda.PersistenceElements;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -27,6 +28,7 @@ import jakarta.persistence.PersistenceContext;
  */
 
 @Stateless
+@PersistenceElements(entities = {LocationEntity.class})
 public class LocationDbService {
 
     @PersistenceContext(unitName="signalsDB")

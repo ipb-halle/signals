@@ -58,7 +58,10 @@ public class ContainerTypeRestService implements RestReplyParser<ContainerType> 
         ContainerType ct = new ContainerType();
         JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
-        ct.setId(j.getAsJsonObject().getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
+        ct.setId(CONTAINER_TYPE_ENTITY_PREFIX
+                        + j.getAsJsonObject().getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString()
+                        + CONTAINER_TYPE_ENTITY_SUFFIX);
+
         ct.setDescription(attributes.getAsJsonPrimitive(RestHelper.ATTR_DESCRIPTION).getAsString());
         ct.setName(attributes.getAsJsonPrimitive(ContainerType.ATTR_NAME).getAsString());
         /*
@@ -78,8 +81,10 @@ public class ContainerTypeRestService implements RestReplyParser<ContainerType> 
         Iterator<JsonElement> iter = fields.iterator();
         while (iter.hasNext()) {
             Field field = fieldParser.parseReply(iter.next());
+            // NOTE: field ids are NOT unique within Signals Inventory
+            field.setId(field.getId() + ":" + ct.getId());
             field.setDesignation((FieldDesignation) dynEnumManager.valueOf(FieldDesignation.valueOf(FieldDesignation.CONTAINER)));
-            field.setDefiningEntityId(CONTAINER_TYPE_ENTITY_PREFIX + ct.getId() + CONTAINER_TYPE_ENTITY_SUFFIX);
+            field.setDefiningEntityId(ct.getId());
             ct.addField(field);
         }
     }
