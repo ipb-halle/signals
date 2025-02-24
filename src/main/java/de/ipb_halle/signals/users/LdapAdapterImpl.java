@@ -36,9 +36,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-/** 
+/**
  * Ldap Adapter
- * Encapsulates the concrete mechanics of connection to an 
+ * Encapsulates the concrete mechanics of connection to an
  * LDAP / AD service.
  */
 @Local

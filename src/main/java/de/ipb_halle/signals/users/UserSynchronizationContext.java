@@ -22,7 +22,7 @@ import de.ipb_halle.signals.reporting.HtmlReport;
 import java.util.Map;
 import java.util.Set;
 
-public class UserSynchronizationContext { 
+public class UserSynchronizationContext {
 
     public RuntimeConfig runtimeConfig;
     public HtmlReport report;

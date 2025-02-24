@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-/** 
+/**
  * DB service for groups
  */
 
@@ -48,7 +48,7 @@ public class GroupDbService {
     private Logger logger = LoggerFactory.getLogger(GroupDbService.class);
 
     /**
-     * @return a list of Groups 
+     * @return a list of Groups
      */
     public List<Group> load() {
         return loadBy(new HashMap<String, Object> ());
@@ -77,7 +77,7 @@ public class GroupDbService {
 
         List<Group> result = new ArrayList<> ();
         for (Group group : em.createQuery(criteriaQuery).getResultList()) {
-            result.add(group); 
+            result.add(group);
         }
         return result;
     }

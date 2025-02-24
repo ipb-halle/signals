@@ -54,15 +54,12 @@ public class TestBase {
         unit.setNonJtaDataSource("testDSNonJTA");
         unit.setProvider("org.hibernate.jpa.HibernatePersistenceProvider");
         unit.getClazz().addAll(Arrays.asList(entities));
-        unit.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
+        unit.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
 //      unit.setProperty("hibernate.show_sql", "true");
 //      unit.setProperty("hibernate.format_sql", "true");
 //      unit.setProperty("hibernate.use_sql_comments", "true");
-        unit.setProperty("hibernate.connection.driver_class", "org.hsqldb.jdbcDriver");
-        unit.setProperty("jakarta.persistence.schema-generation.database.action", "create-drop");
-        unit.setProperty("jakarta.persistence.schema-generation.create-script-source", "schema.sql");
-        unit.setProperty("jakarta.persistence.schema-generation.drop-script-source", "drop_schema.sql");
-        unit.setProperty("hibernate.hbm2ddl.import_files_sql_extractor", "org.hibernate.tool.schema.internal.script.MultiLineSqlScriptExtractor");
+        unit.setProperty("hibernate.connection.driver_class", "org.postgresql.Driver");
+        unit.setProperty("jakarta.persistence.schema-generation.database.action", "none");
 
         unit.setProperty("tomee.jpa.cdi", "false");
         return unit;

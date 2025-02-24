@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals.inventory;
 
+import de.ipb_halle.signals.PostgresqlContainerExtension;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.attachment.Attachment;
@@ -42,10 +43,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 
 @RunWithApplicationComposer
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(PostgresqlContainerExtension.class)
 public class ContainerTypeManagerTest {
 
     private final String TEST_RESOURCE_1 = "ContainerTypeManagerTest001.json";

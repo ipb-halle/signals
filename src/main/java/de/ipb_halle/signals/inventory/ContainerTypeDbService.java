@@ -21,6 +21,7 @@ import de.ipb_halle.signals.attachment.AttachmentDbService;
 import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldDbService;
 import de.ipb_halle.signals.materials.MaterialProcessorBean;
+import de.ipb_halle.tda.PersistenceElements;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -43,6 +44,7 @@ import java.util.Set;
  */
 
 @Stateless
+@PersistenceElements(entities = {LocationType.class, ContainerTypeEntity.class})
 public class ContainerTypeDbService {
 
     public final static String CONTAINER_TYPE_ID = "container_type_id";

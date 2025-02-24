@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 
 
-/** 
+/**
  * Manager for signals roles
  */
 
@@ -77,11 +77,11 @@ public class RoleManager {
      * NOTE: one cannot create or modify roles with this tool. Only
      * assigning roles to users (or removing from) is supported.
      *
-     * NOTE: it is currently not possible to remove the ldapFlag from 
+     * NOTE: it is currently not possible to remove the ldapFlag from
      * a role once it is no longer managed by LDAP
      */
     public void obtainLdapRoles(UserSynchronizationContext context) {
-        Map<String, Role> rolesByDN = new HashMap<> (); 
+        Map<String, Role> rolesByDN = new HashMap<> ();
         Set<String> roleDNs = new HashSet<> ();
         ldapClient.getMembers(new HashSet<> (), roleDNs, config.getLdapManagedRoles(), false);
         for (String dn : roleDNs) {

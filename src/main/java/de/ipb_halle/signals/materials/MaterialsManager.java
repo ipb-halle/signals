@@ -174,7 +174,7 @@ public class MaterialsManager {
      */
     private List<Field> receiveAllFieldsOfAllLibraries(Collection<String> libraryIds) {
         Map<String, Object> cmap = new HashMap<>();
-        cmap.put(Field.DEFINING_ENTITY_ID, libraryIds.stream()
+        cmap.put(Field.DEFINING_ENTITY_ID_LIST, libraryIds.stream()
                 .map(id -> Library.LIBRARY_TYPE + ":" + id)
                 .collect(Collectors.toList()));
         return fieldDbService.load(cmap);

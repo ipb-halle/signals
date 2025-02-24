@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals.users;
 
+import de.ipb_halle.signals.PostgresqlContainerExtension;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.RuntimeConfig;
@@ -29,25 +30,11 @@ import java.util.HashMap;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/*
- * no longer needed
- *
-import java.util.Properties;
-import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.junit5.RunWithApplicationComposer;
-import org.apache.openejb.testing.Classes;
-import org.apache.openejb.testing.Configuration;
-import org.apache.openejb.testing.Module;
-import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
-import org.junit.jupiter.api.TestInstance;
-*/
-
-
-//@RunWithApplicationComposer
-//@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(PostgresqlContainerExtension.class)
 public abstract class UserManagerTest {
 
     private final String TEST_RESOURCE_1 = "UserManagerTest001.json";
@@ -105,28 +92,6 @@ public abstract class UserManagerTest {
     @Inject
     @DeploymentElement
     private UserDbService userDbService;
-
-/*
-    @Module
-    @Classes(cdi = true, value = { LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class,
-        MockRestClient.class, SignalsConfig.class,
-        GroupDbService.class, GroupManager.class, GroupRestService.class,
-        RoleDbService.class, RoleManager.class, RoleRestService.class,
-        UserDbService.class, UserManager.class, UserRestService.class })
-    public EjbJar app() {
-        return new EjbJar();
-    }
-
-    @Module
-    public PersistenceUnit persistence() {
-        return TestBase.persistence(new String[]{ UserEntity.class.getName() });
-    }
-
-    @Configuration
-    public Properties configuration() {
-        return TestBase.configuration();
-    }
-*/
 
     @BeforeAll
     public void testSetup() {

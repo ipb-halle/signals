@@ -33,6 +33,7 @@ import jakarta.persistence.criteria.Root;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.print.DocFlavor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -100,15 +101,20 @@ public class FieldDbService {
                     dynEnumManager.valueOf((DynEnum) cmap.get(Field.FIELD_TYPE)).getId()));
         }
         if (cmap.containsKey(Field.DEFINING_ENTITY_ID)) {
-            List<String> definingEntityIds = (List<String>) cmap.get(Field.DEFINING_ENTITY_ID);
-            /**
+            // single defining entity Id
+            predicates.add(criteriaBuilder.equal(root.get(Field.DEFINING_ENTITY_ID), cmap.get(Field.DEFINING_ENTITY_ID)));
+        }
+        if (cmap.containsKey(Field.DEFINING_ENTITY_ID_LIST)) {
+            /*
+             * multiple defining entity Ids
              * "defining_entity_id" is a "library id" or other name is "AssetType id" from field
              * takes all field from DB for all libraries
              * translation in sql -> select * (Object Field) from field_definitions where defining_entity_id in ('definingEntityIds');
              * ToDo: eventually complication with a big number of defining entitles (e.g. experiments) by querying with IN clause -> rework later
+             *
+             * NOTE: root.get must use DEFINING_ENTITY_ID whereas cmap.get must use DEFINING_ENTITY_ID_LIST
              */
-            predicates.add(root.get(Field.DEFINING_ENTITY_ID).in(definingEntityIds));
-            //predicates.add(criteriaBuilder.equal(root.get(Field.DEFINING_ENTITY_ID), cmap.get(Field.DEFINING_ENTITY_ID)));
+            predicates.add(root.get(Field.DEFINING_ENTITY_ID).in((List<String>) cmap.get(Field.DEFINING_ENTITY_ID_LIST)));
         }
         if (cmap.containsKey(Field.FIELD_TITLE)) {
             predicates.add(criteriaBuilder.equal(root.get(Field.FIELD_TITLE), cmap.get(Field.FIELD_TITLE)));

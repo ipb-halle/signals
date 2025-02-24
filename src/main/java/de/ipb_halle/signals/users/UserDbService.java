@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  */
 
 @Stateless
-@PersistenceElements(entities={Group.class, GroupMembership.class, RoleEntity.class, RolePrivDef.class, 
+@PersistenceElements(entities={Group.class, GroupMembership.class, RoleEntity.class, RolePrivDef.class,
             RolePriv.class, UserEntity.class, UserRole.class})
 public class UserDbService {
 
@@ -66,7 +66,7 @@ public class UserDbService {
         criteriaQuery.select(root);
         criteriaQuery.where(builder.equal(root
                 .get(UserRole.USER_ROLE_ID)
-                .get(UserRoleId.USER_ID), 
+                .get(UserRoleId.USER_ID),
                 user.getId()));
 
         Set<IRole> result = new HashSet<> ();
@@ -86,7 +86,7 @@ public class UserDbService {
         criteriaQuery.select(root);
         criteriaQuery.where(builder.equal(root
                 .get(GroupMembership.GROUP_MEMBERSHIP_ID)
-                .get(GroupMembershipId.USER_ID), 
+                .get(GroupMembershipId.USER_ID),
                 user.getId()));
 
         Set<IGroup> result = new HashSet<> ();

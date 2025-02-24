@@ -1,3 +1,24 @@
+/*
+ * IPB Signals Client
+ * Copyright 2025 Leibniz-Institut f. Pflanzenbiochemie
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+\set SIGNALS_USER signals
+\set SIGNALS_DATABASE signals
+
+\connect :SIGNALS_DATABASE :SIGNALS_USER
 
 CREATE TABLE dyn_enums (
     id  SERIAL NOT NULL PRIMARY KEY,
@@ -169,6 +190,40 @@ CREATE TABLE group_memberships (
     group_id VARCHAR NOT NULL  REFERENCES groups(id) ON UPDATE CASCADE ON DELETE CASCADE,
     PRIMARY KEY (user_id, group_id)
 );
+
+CREATE TABLE usershares (
+    entity_id   VARCHAR NOT NULL REFERENCES signalsentities(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    value VARCHAR NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    can_read BOOLEAN NOT NULL DEFAULT FALSE,
+    can_write BOOLEAN NOT NULL DEFAULT FALSE,
+    is_admin BOOLEAN NOT NULL DEFAULT FALSE,
+    has_full_control BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY(entity_id, value)
+);
+
+CREATE TABLE groupshares (
+    entity_id   VARCHAR NOT NULL REFERENCES signalsentities(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    value VARCHAR NOT NULL REFERENCES groups(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    can_read BOOLEAN NOT NULL DEFAULT FALSE,
+    can_write BOOLEAN NOT NULL DEFAULT FALSE,
+    is_admin BOOLEAN NOT NULL DEFAULT FALSE,
+    has_full_control BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY(entity_id, value)
+);
+
+CREATE VIEW signalsentities_shares AS
+    SELECT entity_id, value, bool_or(can_read) AS can_read, bool_or(can_write) AS can_write,
+      bool_or(is_admin) AS is_admin, bool_or(has_full_control) AS has_full_control
+    FROM (
+        SELECT eus.entity_id, eus.value, eus.can_read AS can_read, eus.can_write AS can_write,
+          eus.is_admin AS is_admin, eus.has_full_control AS has_full_control
+        FROM usershares AS eus
+    UNION
+        SELECT egs.entity_id, gm.user_id AS value, egs.can_read AS can_read, egs.can_write AS can_write,
+          egs.is_admin AS is_admin, egs.has_full_control AS has_full_control
+        FROM groupshares AS egs JOIN group_memberships as gm ON egs.value = gm.group_id
+    ) AS shares GROUP BY shares.entity_id, shares.value;
+
 
 CREATE TABLE field_definitions (
     id VARCHAR NOT NULL PRIMARY KEY,

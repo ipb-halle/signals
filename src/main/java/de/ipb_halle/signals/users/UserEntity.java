@@ -27,7 +27,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
 
-/** 
+/**
  * SNB user entity
  */
 @Entity
@@ -132,7 +132,7 @@ public class UserEntity {
         return this;
     }
 
-    public UserEntity setAlias(String a) { 
+    public UserEntity setAlias(String a) {
         alias = a;
         return this;
     }

@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals.inventory;
 
+import de.ipb_halle.tda.PersistenceElements;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -28,11 +29,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-/** 
+/**
  * Database service for location types
  */
 
 @Stateless
+@PersistenceElements(entities = {LocationType.class})
 public class LocationTypeDbService {
 
     private final static String LOCATION_TYPE_ENTITY_PREFIX = "location:";

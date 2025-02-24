@@ -22,7 +22,7 @@ import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
-/** 
+/**
  * SNB group membership
  */
 
@@ -47,9 +47,9 @@ public class GroupMembership {
 
     @Override
     public boolean equals(Object o) {
-        if ((o == null) || (getClass() != o.getClass())) { 
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
-        } 
+        }
         GroupMembership other = (GroupMembership) o;
         return Objects.equals(getGroupId(), other.getGroupId())
             && Objects.equals(getUserId(), other.getUserId());

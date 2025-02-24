@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** 
+/**
  * SNB user DTO
  */
 public class User implements IUser {
@@ -54,7 +54,7 @@ public class User implements IUser {
     public final static String ATTR_SYSTEM_GROUPS = "systemGroups";
     public final static String ATTR_USER_ID = "userId";
     public final static String ATTR_USER_NAME = "userName";
-    
+
     private String id;
 
     private String alias;
@@ -122,10 +122,10 @@ public class User implements IUser {
         return systemGroups.add(group);
     }
 
-    /** 
-     * Apply changes from a reference user. Does NOT overwrite the 
+    /**
+     * Apply changes from a reference user. Does NOT overwrite the
      * createdAt, lastLoginAt and mutable attributes.
-     * Expects roles and system groups to be database entities and 
+     * Expects roles and system groups to be database entities and
      * not just role / group references.
      */
     public void applyChanges(User user) {
@@ -149,7 +149,7 @@ public class User implements IUser {
     }
 
     /**
-     * specifically apply changes from SNB (include 
+     * specifically apply changes from SNB (include
      * also createdAt and lastLoginAt attributes).
      */
     public void applyChangesFromSnb(User snbUser) {
@@ -159,7 +159,7 @@ public class User implements IUser {
     }
 
     public void clearRoles() {
-        this.roles.clear(); 
+        this.roles.clear();
     }
 
     public UserEntity createEntity() {
@@ -255,12 +255,12 @@ public class User implements IUser {
     }
 
     /**
-     * Compare this user to a reference user. 
+     * Compare this user to a reference user.
      *
      * NOTE: It is not possible to update email or userName via SNB REST API
      * NOTE: times must be rounded to full seconds
      *
-     * @param context the compare context: either SNB or LDAP. Creation and last login 
+     * @param context the compare context: either SNB or LDAP. Creation and last login
      * timestamps are ignored in LDAP compare type mode.
      * @param user the reference user
      * @return true if current user is modified
@@ -301,7 +301,7 @@ public class User implements IUser {
         return this;
     }
 
-    public void setAlias(String a) { 
+    public void setAlias(String a) {
         alias = a;
     }
 

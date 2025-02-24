@@ -1,6 +1,7 @@
 /*
+ *
  * IPB Signals client
- * Copyright 2022 Leibniz-Institut f. Pflanzenbiochemie
+ * Copyright 2025 Leibniz-Institut f. Pflanzenbiochemie
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +16,27 @@
  * limitations under the License.
  *
  */
-package de.ipb_halle.signals.users;
 
+package de.ipb_halle.signals.entity;
 
-/**
- * SNB user interface
- */
+import de.ipb_halle.signals.util.EmbeddedKeyValue;
+import jakarta.persistence.*;
 
-public interface IUser {
+@Entity
+@Table(name="usershares")
+public class UserShare extends Share {
 
-    public String dump();
+    public String getUserId() {
+        return getId().getValue();
+    }
 
-    public String getId();
+    public void setUserId(String userId) {
+        getId().setValue(userId);
+    }
 
-    public IUser setId(String i);
+    @Override
+    public ShareType getType() {
+        return ShareType.USER;
+    }
+
 }

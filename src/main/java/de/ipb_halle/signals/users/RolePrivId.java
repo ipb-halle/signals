@@ -21,7 +21,7 @@ import java.io.Serializable;
 import java.util.Objects;
 import jakarta.persistence.Embeddable;
 
-/** 
+/**
  * SNB role privileges
  */
 @Embeddable
@@ -45,8 +45,8 @@ public class RolePrivId implements Serializable {
             && Objects.equals(getRolePrivilege(), other.getRolePrivilege());
     }
 
-    public String getRoleId() { 
-        return role_id; 
+    public String getRoleId() {
+        return role_id;
     }
 
     public String getRolePrivilege() {

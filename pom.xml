@@ -460,5 +460,19 @@
             <version>1.7.30</version>
         </dependency>
 
+        <!-- db for testing -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>1.20.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>1.20.5</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 </project>

@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals.users;
 
+import de.ipb_halle.signals.PostgresqlContainerExtension;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.RuntimeConfig;
@@ -33,10 +34,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 
 @RunWithApplicationComposer
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(PostgresqlContainerExtension.class)
 public class GroupManagerTest {
 
     private final String TEST_RESOURCE_1 = "GroupManagerTest001.json";

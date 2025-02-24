@@ -20,6 +20,9 @@ package de.ipb_halle.signals.entity;
 import java.util.*;
 
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
+import de.ipb_halle.signals.users.Group;
+import de.ipb_halle.signals.util.EmbeddedKeyValue;
+import de.ipb_halle.tda.PersistenceElements;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -34,6 +37,8 @@ import org.slf4j.LoggerFactory;
  */
 
 @Stateless
+@PersistenceElements(entities={SignalsEntity.class, SignalsEntityChild.class,
+        Share.class, EffectiveShare.class, GroupShare.class, UserShare.class})
 public class SignalsEntityDbService {
 
     @PersistenceContext(unitName = "signalsDB")
@@ -90,13 +95,84 @@ public class SignalsEntityDbService {
         CriteriaQuery<SignalsEntityChild> criteriaQuery = builder.createQuery(SignalsEntityChild.class);
         Root<SignalsEntityChild> root = criteriaQuery.from(SignalsEntityChild.class);
         criteriaQuery.select(root);
-        criteriaQuery.where(builder.equal(root.get("id").get("id"), id));
+        criteriaQuery.where(builder.equal(root.get(EmbeddedKeyValue.ID).get("id"), id));
         for (SignalsEntityChild child : em.createQuery(criteriaQuery).getResultList()) {
             results.add(loadById(child.getChildId()));
         }
         return results;
     }
 
+    /**
+     * Load effective shares of entities (i.e. user privileges
+     * @param cmap
+     * @return
+     */
+    public List<EffectiveShare> loadEffectiveShares(Map<String, Object> cmap) {
+        List<Predicate> predicates = new ArrayList<>();
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<EffectiveShare> criteriaQuery = builder.createQuery(EffectiveShare.class);
+        Root<EffectiveShare> root = criteriaQuery.from(EffectiveShare.class);
+        criteriaQuery.select(root);
+
+        if (cmap.containsKey(Share.ENTITY_ID)) {
+            predicates.add(builder.equal(root.get("id").get(EmbeddedKeyValue.ID),
+                    cmap.get(Share.ENTITY_ID)));
+        }
+        if (cmap.containsKey(Share.USER_ID)) {
+            predicates.add(builder.equal(root.get("id").get(EmbeddedKeyValue.VALUE),
+                    cmap.get(Share.USER_ID)));
+        }
+        criteriaQuery.where(builder.and(predicates.toArray(new Predicate[0])));
+        return em.createQuery(criteriaQuery).getResultList();
+    }
+
+    /**
+     * Load effective shares of entities (i.e. user privileges
+     * @param cmap
+     * @return
+     */
+    public List<GroupShare> loadGroupShares(Map<String, Object> cmap) {
+        List<Predicate> predicates = new ArrayList<>();
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<GroupShare> criteriaQuery = builder.createQuery(GroupShare.class);
+        Root<GroupShare> root = criteriaQuery.from(GroupShare.class);
+        criteriaQuery.select(root);
+
+        if (cmap.containsKey(Share.ENTITY_ID)) {
+            predicates.add(builder.equal(root.get("id").get(EmbeddedKeyValue.ID),
+                    cmap.get(Share.ENTITY_ID)));
+        }
+        if (cmap.containsKey(Share.GROUP_ID)) {
+            predicates.add(builder.equal(root.get("id").get(EmbeddedKeyValue.VALUE),
+                    cmap.get(Share.GROUP_ID)));
+        }
+        criteriaQuery.where(builder.and(predicates.toArray(new Predicate[0])));
+        return em.createQuery(criteriaQuery).getResultList();
+    }
+
+    /**
+     * Load effective shares of entities (i.e. user privileges
+     * @param cmap
+     * @return
+     */
+    public List<UserShare> loadUserShares(Map<String, Object> cmap) {
+        List<Predicate> predicates = new ArrayList<>();
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<UserShare> criteriaQuery = builder.createQuery(UserShare.class);
+        Root<UserShare> root = criteriaQuery.from(UserShare.class);
+        criteriaQuery.select(root);
+
+        if (cmap.containsKey(Share.ENTITY_ID)) {
+            predicates.add(builder.equal(root.get("id").get(EmbeddedKeyValue.ID),
+                    cmap.get(Share.ENTITY_ID)));
+        }
+        if (cmap.containsKey(Share.USER_ID)) {
+            predicates.add(builder.equal(root.get("id").get(EmbeddedKeyValue.VALUE),
+                    cmap.get(Share.USER_ID)));
+        }
+        criteriaQuery.where(builder.and(predicates.toArray(new Predicate[0])));
+        return em.createQuery(criteriaQuery).getResultList();
+    }
 
     public void save(SignalsEntityDTO dto) {
         SignalsEntity entity = dto.createEntity();
@@ -105,11 +181,35 @@ public class SignalsEntityDbService {
         saveChildren(dto);
     }
 
-    public void saveChildren(SignalsEntityDTO dto)  {
+    private void saveChildren(SignalsEntityDTO dto)  {
         for (ISignalsEntity child : dto.getChildren()) {
             em.merge(new SignalsEntityChild(dto.getId(), child.getId()));
         }
     }
+
+    public void remove(Share share) {
+        switch (share.getType()) {
+            case GROUP:
+                this.em.remove((GroupShare) share);
+                break;
+            case USER:
+                this.em.remove((UserShare) share);
+                break;
+            default:
+                logger.warn("Illegal call to remove() for {}", share.getClass().getName());
+        }
+    }
+
+    public void save(Share share) {
+        switch(share.getType()) {
+            case GROUP:
+                this.em.merge((GroupShare) share);
+                break;
+            case USER:
+                this.em.merge((UserShare) share);
+                break;
+            default:
+                logger.warn("Illegal call to save() for {}", share.getClass().getName());
+        }
+    }
 }
-
-

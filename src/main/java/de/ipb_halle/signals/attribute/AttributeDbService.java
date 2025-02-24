@@ -18,6 +18,7 @@
 package de.ipb_halle.signals.attribute;
 
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
+import de.ipb_halle.tda.PersistenceElements;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -38,6 +39,7 @@ import java.util.List;
  */
 
 @Stateless
+@PersistenceElements(entities = {AttributeValue.class, AttributeDefinition.class})
 public class AttributeDbService {
 
     @PersistenceContext(unitName = "signalsDB")

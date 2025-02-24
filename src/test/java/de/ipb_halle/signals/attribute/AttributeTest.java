@@ -17,31 +17,23 @@
  */
 package de.ipb_halle.signals.attribute;
 
-import de.ipb_halle.signals.SignalsConfig;
+import de.ipb_halle.signals.PostgresqlContainerExtension;
 import de.ipb_halle.signals.TestBase;
-import de.ipb_halle.signals.dynEnum.DynEnum;
-import de.ipb_halle.signals.dynEnum.DynEnumDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.rest.MockRestClient;
 import de.ipb_halle.signals.rest.RestClient;
-import de.ipb_halle.signals.rest.RestReplyParser;
+import de.ipb_halle.tda.DeploymentElement;
 import jakarta.inject.Inject;
 import java.util.List;
-import java.util.Properties;
-import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
-import org.apache.openejb.junit5.RunWithApplicationComposer;
-import org.apache.openejb.testing.Classes;
-import org.apache.openejb.testing.Configuration;
-import org.apache.openejb.testing.Module;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-@RunWithApplicationComposer
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class AttributeTest {
+@ExtendWith(PostgresqlContainerExtension.class)
+public abstract class AttributeTest {
 
     // contains attribute ids 17, 48, 21 in this order
     private final String TEST_RESOURCE_1 = "AttributeTest001.json";
@@ -66,40 +58,20 @@ public class AttributeTest {
 
 
     @Inject
+    @DeploymentElement
     private AttributeDbService dbService;
 
     @Inject
+    @DeploymentElement
     private AttributeRestService restService;
 
     @Inject
+    @DeploymentElement
     private DynEnumManager dynEnumMgr;
 
     @Inject
+    @DeploymentElement(mock="de.ipb_halle.signals.rest.MockRestClient")
     private MockRestClient mockRestClient;
-
-    @Module
-    @Classes(cdi = true, value = {
-            Attribute.class, AttributeType.class, AttributeDefinition.class, AttributeValue.class,
-            AttributeDbService.class, AttributeRestService.class,
-            DynEnum.class, DynEnumDbService.class, DynEnumManager.class,
-            SignalsConfig.class,
-            RestClient.class, MockRestClient.class, RestReplyParser.class
-            })
-    public EjbJar app() {
-        return new EjbJar();
-    }
-
-    @Module
-    public PersistenceUnit persistence() {
-        return TestBase.persistence(new String[]{ AttributeDefinition.class.getName(),
-                AttributeType.class.getName(), AttributeValue.class.getName(),
-                DynEnum.class.getName()});
-    }
-
-    @Configuration
-    public Properties configuration() {
-        return TestBase.configuration();
-    }
 
     @BeforeAll
     public void setup() {

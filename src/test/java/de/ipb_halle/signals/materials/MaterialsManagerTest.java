@@ -17,39 +17,24 @@
  */
 package de.ipb_halle.signals.materials;
 
+import de.ipb_halle.signals.PostgresqlContainerExtension;
 import de.ipb_halle.signals.RuntimeConfig;
-import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
-import de.ipb_halle.signals.attachment.*;
-import de.ipb_halle.signals.config.LocalConfig;
-import de.ipb_halle.signals.config.LocalConfigDbService;
-import de.ipb_halle.signals.dynEnum.DynEnum;
-import de.ipb_halle.signals.dynEnum.DynEnumDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
-import de.ipb_halle.signals.entity.SignalsEntityDbService;
-import de.ipb_halle.signals.entity.SignalsEntityRestService;
-import de.ipb_halle.signals.field.*;
+import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.rest.MockRestClient;
-import de.ipb_halle.signals.storage.StorageService;
-import de.ipb_halle.signals.util.EmbeddedKeyValue;
+import de.ipb_halle.tda.DeploymentElement;
 import jakarta.inject.Inject;
-import java.util.Properties;
 import java.util.Set;
-import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
-import org.apache.openejb.junit5.RunWithApplicationComposer;
-import org.apache.openejb.testing.Classes;
-import org.apache.openejb.testing.Configuration;
-import org.apache.openejb.testing.Module;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-
-@RunWithApplicationComposer
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class MaterialsManagerTest {
+@ExtendWith(PostgresqlContainerExtension.class)
+public abstract class MaterialsManagerTest {
 
     private final String TEST_RESOURCE_1 = "LibraryManagerTest001.json";
     private final String TEST_KEY_1 =
@@ -62,44 +47,20 @@ public class MaterialsManagerTest {
 
 
     @Inject
+    @DeploymentElement
     private DynEnumManager dynEnumMgr;
 
     @Inject
+    @DeploymentElement(mock="de.ipb_halle.signals.rest.MockRestClient")
     private MockRestClient mockRestClient;
 
     @Inject
+    @DeploymentElement
     private LibraryDbService dbService;
 
     @Inject
+    @DeploymentElement
     private MaterialsManager manager;
-
-    @Module
-    @Classes(cdi = true, value = {MockRestClient.class, SignalsConfig.class,
-            LocalConfig.class, LocalConfigDbService.class, AttachmentRestService.class,
-            AttachmentDbService.class, StorageService.class, AttachmentEntity.class,
-            AttachmentRevision.class, AttachmentFile.class,
-            FieldDefinition.class, FieldDbService.class, FieldParser.class,
-            FieldValueEntity.class, SignalsEntityRestService.class, SignalsEntityDbService.class,
-            DynEnum.class, DynEnumDbService.class, DynEnumManager.class, MaterialProcessorBean.class,
-            Library.class, LibraryEntity.class, LibraryField.class, EmbeddedKeyValue.class, StorageService.class,
-            Material.class, MaterialEntity.class, MaterialDbService.class, MaterialRestService.class,
-            LibraryDbService.class, MaterialsManager.class, LibraryRestService.class})
-    public EjbJar app() {
-        return new EjbJar();
-    }
-
-    @Module
-    public PersistenceUnit persistence() {
-        return TestBase.persistence(new String[]{ LibraryEntity.class.getName(),  LibraryField.class.getName(),
-                LocalConfig.class.getName(),AttachmentEntity.class.getName(),
-                AttachmentRevision.class.getName(), AttachmentFile.class.getName(),
-            FieldDefinition.class.getName(), DynEnum.class.getName(), FieldType.class.getName(), MaterialEntity.class.getName() });
-    }
-
-    @Configuration
-    public Properties configuration() {
-        return TestBase.configuration();
-    }
 
     @BeforeAll
     public void testSetup() {
@@ -109,8 +70,8 @@ public class MaterialsManagerTest {
             getClass().getResourceAsStream(TEST_RESOURCE_1));
     }
 
-    private FieldDefinition getFieldDefinitionById(Set<FieldDefinition> fdSet, String id) {
-        for (FieldDefinition fd : fdSet) {
+    private Field getFieldById(Set<Field> fdSet, String id) {
+        for (Field fd : fdSet) {
             if (fd.getId().equals(id)) {
                 return fd;
             }
@@ -127,17 +88,16 @@ public class MaterialsManagerTest {
         Library lib = dbService.loadById(TEST_LIBRARY_ID);
         Assertions.assertEquals(TEST_LIBRARY_NAME, lib.getName(), "Library name mismatch");
 
-        /*
+
         // field definitions
         Assertions.assertEquals(TEST_LIBRARY_ASSET_FIELD_COUNT,
-                lib.getAssetFieldDefinitions().size(),
+                lib.getAssetFields().size(),
                 "Asset field count matches");
 
-        FieldDefinition fd = getFieldDefinitionById(
-                lib.getAssetFieldDefinitions(),
+        Field fd = getFieldById(
+                lib.getAssetFields(),
                 TEST_LIBRARY_ASSET_FIELD_ID);
         Assertions.assertEquals(TEST_LIBRARY_ASSET_FIELD_TITLE,
                 fd.getTitle(), "Asset field definition key matches");
-         */
     }
 }

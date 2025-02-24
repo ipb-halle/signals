@@ -89,7 +89,7 @@ public class LibraryDbService {
 
     public List<Field> loadFieldDefinitions(String id, FieldDesignation designation) {
         Map<String, Object> cmap = new HashMap<> ();
-        cmap.put(Field.FIELD_ID, id);
+        cmap.put(Field.DEFINING_ENTITY_ID, id);
         cmap.put(Field.FIELD_DESIGNATION, dynEnumManager.valueOf(designation));
         return fieldDbService.load(cmap);
     }
@@ -98,18 +98,14 @@ public class LibraryDbService {
         logger.trace("Store library: id={}", lib.getId());
         LibraryEntity le = lib.createEntity();
         em.merge(le);
-        saveFields(lib.getAssetFields(), le.getId());
-        saveFields(lib.getBatchFields(), le.getId());
+        saveFields(lib.getAssetFields(), lib);
+        saveFields(lib.getBatchFields(), lib);
     }
 
-    private void saveFields(Set<Field> fields, String libraryId) {
-        for (Field f : fields) {
-            fieldDbService.save(f);
-            LibraryField libFD = new LibraryField()
-                .setLibraryId(libraryId)
-                .setFieldId(f.getId());
-            em.merge(libFD);
-            logger.trace("LibraryDbService:-> Stored library field: lib={}/{} field={}", libraryId, f.getDesignation().getValue(), f.getId());
+    private void saveFields(Set<Field> fields, Library lib) {
+        for (Field field : fields) {
+            field.setDefiningEntityId(lib.getId());
+            fieldDbService.save(field);
         }
     }
 }

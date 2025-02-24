@@ -1,10 +1,11 @@
 <?xml version="1.0"?>
 <openejb>
     <Resource id="testDS" type="javax.sql.DataSource">
-        jdbcDriver = org.hsqldb.jdbcDriver
-        jdbcUrl = jdbc:hsqldb:mem:signalstest;sql.syntax_pgs=true;sql.enforce_size=false
+        jdbcDriver = org.postgresql.Driver
+        jdbcUrl = jdbc:postgresql://localhost:65432/signals?charSet=UTF-8
         jtaManaged = true
-        userName = sa
+        userName = signals
+        password = signals
     </Resource>
     <Resource id="signalsConfig" class-name="de.ipb_halle.signals.SignalsConfig">
       apiKey = Honestly+we+would+not+like+to+disclose+the+API+Key+in+our+source+code==
