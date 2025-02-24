@@ -73,26 +73,27 @@ public class ContainerTypeManagerTest {
 
     @Module
     @Classes(cdi = true, value = {
-            MockRestClient.class,
-            SignalsConfig.class,
             Attachment.class,
             AttachmentDbService.class,
-            DynEnum.class,
-            DynEnumManager.class,
-            DynEnumDbService.class,
-            Field.class,
-            FieldDefinition.class,
-            FieldDbService.class,
-            FieldParser.class,
             ContainerType.class,
             ContainerTypeEntity.class,
             ContainerTypeAttachment.class,
             ContainerTypeAttachmentId.class,
             ContainerTypeField.class,
-            EmbeddedKeyValue.class,
             ContainerTypeDbService.class,
             ContainerTypeManager.class,
-            ContainerTypeRestService.class})
+            ContainerTypeRestService.class,
+            DynEnum.class,
+            DynEnumManager.class,
+            DynEnumDbService.class,
+            EmbeddedKeyValue.class,
+            Field.class,
+            FieldDefinition.class,
+            FieldDbService.class,
+            FieldParser.class,
+            MockRestClient.class,
+            SignalsConfig.class,
+    })
     public EjbJar app() {
         return new EjbJar();
     }

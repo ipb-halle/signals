@@ -39,7 +39,9 @@ import de.ipb_halle.signals.users.RoleRestService;
 import de.ipb_halle.signals.users.UserDbService;
 import de.ipb_halle.signals.users.UserManager;
 import de.ipb_halle.signals.users.UserRestService;
+
 import java.util.Properties;
+
 import jakarta.inject.Inject;
 import org.apache.openejb.jee.EjbJar;
 import org.apache.openejb.junit5.RunWithApplicationComposer;
@@ -52,7 +54,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-
 
 @RunWithApplicationComposer
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -76,25 +77,46 @@ public class LocationManagerTest {
     private DynEnumManager dynEnumManager;
 
     @Module
-    @Classes(cdi = true, value = {LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class,
-            MockRestClient.class, SignalsConfig.class,
-            DynEnum.class, DynEnumDbService.class, DynEnumManager.class,
-            SignalsEntity.class, SignalsEntityDTO.class, SignalsEntityDbService.class,
-            GroupDbService.class, GroupManager.class, GroupRestService.class,
-            RoleDbService.class, RoleManager.class, RoleRestService.class,
-            UserDbService.class, UserManager.class, UserRestService.class,
-            LocationType.class, LocationTypeDbService.class,
-            LocationDbService.class, LocationManager.class, LocationRestService.class})
+    @Classes(cdi = true, value = {
+            LdapClient.class,
+            MockLdapAdapter.class,
+            MockLdapAdapterFactory.class,
+            MockRestClient.class,
+            SignalsConfig.class,
+            DynEnum.class,
+            DynEnumDbService.class,
+            DynEnumManager.class,
+            SignalsEntity.class,
+            SignalsEntityDTO.class,
+            SignalsEntityDbService.class,
+            GroupDbService.class,
+            GroupManager.class,
+            GroupRestService.class,
+            RoleDbService.class,
+            RoleManager.class,
+            RoleRestService.class,
+            UserDbService.class,
+            UserManager.class,
+            UserRestService.class,
+            LocationType.class,
+            LocationTypeDbService.class,
+            LocationDbService.class,
+            LocationManager.class,
+            LocationRestService.class
+    })
     public EjbJar app() {
         return new EjbJar();
     }
 
     @Module
     public PersistenceUnit persistence() {
-        return TestBase.persistence(new String[]{LocationType.class.getName(),
-                LocationEntity.class.getName(), DynEnum.class.getName(),
-                SignalsEntity.class.getName()
-        });
+        return TestBase.persistence(
+                new String[]{
+                        LocationType.class.getName(),
+                        LocationEntity.class.getName(),
+                        DynEnum.class.getName(),
+                        SignalsEntity.class.getName()
+                });
     }
 
     @Configuration

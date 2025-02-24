@@ -20,6 +20,8 @@ package de.ipb_halle.signals.inventory;
 import de.ipb_halle.signals.PostgresqlContainerExtension;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
+import de.ipb_halle.signals.attachment.Attachment;
+import de.ipb_halle.signals.attachment.AttachmentDbService;
 import de.ipb_halle.signals.dynEnum.DynEnum;
 import de.ipb_halle.signals.dynEnum.DynEnumDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
@@ -29,6 +31,7 @@ import de.ipb_halle.signals.rest.MockRestClient;
 import java.util.List;
 import java.util.Properties;
 
+import de.ipb_halle.signals.util.EmbeddedKeyValue;
 import jakarta.inject.Inject;
 import org.apache.openejb.jee.EjbJar;
 import org.apache.openejb.junit5.RunWithApplicationComposer;
@@ -64,20 +67,24 @@ public class LocationTypeManagerTest {
 
     @Module
     @Classes(cdi = true, value = {
-            MockRestClient.class,
-            SignalsConfig.class, // RestResultIterator.class, RestService.class,
+            Attachment.class,
+            AttachmentDbService.class,
             DynEnum.class,
             DynEnumManager.class,
             DynEnumDbService.class,
+            EmbeddedKeyValue.class,
             Field.class,
             FieldDefinition.class,
             FieldDbService.class,
             FieldParser.class,
             LocationType.class,
             LocationTypeEntity.class,
-            LocationTypeManager.class,
+            LocationTypeField.class,
             LocationTypeDbService.class,
-            LocationTypeRestService.class
+            LocationTypeManager.class,
+            LocationTypeRestService.class,
+            MockRestClient.class,
+            SignalsConfig.class, // RestResultIterator.class, RestService.class,
     })
     public EjbJar app() {
         return new EjbJar();
@@ -88,6 +95,7 @@ public class LocationTypeManagerTest {
         return TestBase.persistence(
                 new String[]{
                         LocationType.class.getName(),
+                        LocationTypeField.class.getName(),
                         LocationTypeEntity.class.getName(),
                         FieldDefinition.class.getName(),
                         FieldType.class.getName(),
@@ -116,5 +124,7 @@ public class LocationTypeManagerTest {
 
         LocationType lt = locationTypeManager.getDbLocationType(TEST_LOCATION_TYPE_ID);
         Assertions.assertEquals(TEST_LOCATION_TYPE_NAME, lt.getName(), "LocationType name mismatch");
+
+
     }
 }
