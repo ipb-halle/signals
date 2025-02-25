@@ -17,10 +17,14 @@
  */
 package de.ipb_halle.signals.inventory;
 
+import de.ipb_halle.signals.field.*;
 import de.ipb_halle.tda.PersistenceElements;
 import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -31,7 +35,13 @@ import jakarta.persistence.PersistenceContext;
 @PersistenceElements(entities = {ContainerEntity.class})
 public class ContainerDbService {
 
-    @PersistenceContext(unitName="signalsDB")
+    public static final Logger logger = LogManager.getLogger(ContainerDbService.class);
+
+    @Inject
+    private FieldDbService fieldDbService;
+
+
+    @PersistenceContext(unitName = "signalsDB")
     private EntityManager em;
 
 
@@ -43,8 +53,20 @@ public class ContainerDbService {
         return new Container(entity);
     }
 
-    public void save(ContainerEntity ct) {
-        this.em.merge(ct);
+    public void save(Container ct) {
+        ContainerEntity ce = ct.createEntity();
+        this.em.merge(ce);
+        for (Field f : ct.getFields()) {
+            f.setId(f.getId() + ":" + ct.getIdWithSuffixPrefix());
+            fieldDbService.save(f);
+        }
+
+        for (FieldValue fv : ct.getFieldValues()) {
+            FieldValueEntity fve = fv.createEntity();
+            fve.setEntityId(ct.getIdWithSuffixPrefix());
+            fve.setFieldDefinitionId(fv.getFieldId() + ":" + ct.getIdWithSuffixPrefix());
+            em.merge(fve);
+        }
     }
 
 }

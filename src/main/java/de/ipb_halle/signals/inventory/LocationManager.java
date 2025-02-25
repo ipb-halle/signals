@@ -17,7 +17,15 @@
  */
 package de.ipb_halle.signals.inventory;
 
-import de.ipb_halle.signals.entity.*;
+import de.ipb_halle.signals.dynEnum.DynEnumManager;
+import de.ipb_halle.signals.entity.EntityType;
+import de.ipb_halle.signals.entity.SignalsEntityDTO;
+import de.ipb_halle.signals.entity.SignalsEntityDbService;
+import de.ipb_halle.signals.entity.SignalsEntityRestService;
+import de.ipb_halle.signals.field.Field;
+import de.ipb_halle.signals.field.FieldDbService;
+import de.ipb_halle.signals.field.FieldDesignation;
+import de.ipb_halle.signals.field.FieldType;
 import de.ipb_halle.signals.users.UserManager;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
@@ -25,6 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 /**
@@ -41,13 +51,19 @@ public class LocationManager {
     private SignalsEntityDbService signalsEntityDbService;
 
     @Inject
-    private LocationDbService dbService;
+    private LocationDbService locationDbService;
 
     @Inject
-    private LocationRestService restService;
+    private LocationRestService locationRestService;
 
     @Inject
     private UserManager userManager;
+
+    @Inject
+    private DynEnumManager dynEnumManager;
+
+    @Inject
+    private FieldDbService fieldDbService;
 
     private Logger logger = LoggerFactory.getLogger(ContainerManager.class);
 
@@ -56,7 +72,7 @@ public class LocationManager {
         Set<String> locationTypeIds = locationTypeDbService.getLocationTypIds();
 
         // 2) Load (and map) all location fields for attachmentFiles
-        /*toDo: implement*/
+        Map<String, Field> attachmentFields = loadAttachmentFieldsMap();
 
         // 3) Preparing criteria map for loading signals entities by date range and type
         EntityType entityTypes[] = {EntityType.valueOf(LocationEntity.ENTITY_TYPE_LOCATION)};
@@ -73,29 +89,44 @@ public class LocationManager {
         // 5) Process locations (checked, everything is working)
         for (SignalsEntityDTO dto : locations) {
             if (!locationTypeIds.contains(dto.getId())) {
-                fetchSingleLocation(dto);
+                processLocation(dto.getId(), attachmentFields);
             }
         }
     }
 
-    public LocationEntity loadById(String id, boolean augmented) {
-        return dbService.loadById(id);
+    private Map<String, Field> loadAttachmentFieldsMap() {
+        Map<String, Object> cmap = new HashMap<>();
+        cmap.put(Field.FIELD_DESIGNATION, dynEnumManager.valueOf(FieldDesignation.valueOf(FieldDesignation.LOCATION)));
+        cmap.put(Field.FIELD_TYPE, dynEnumManager.valueOf(FieldType.valueOf(FieldType.ATTACHMENT_FILE)));
+        return fieldDbService.load(cmap)
+                .stream()
+                .collect(Collectors.toMap(Field::getId, Function.identity()));
     }
 
+
     /**
-     * fetch single location via inventory/location/EID endpoint and
-     * save the entity in the database.
+     * Fetches a location by its ID from the remote REST service and saves it
+     * into the local database.
      *
-     * @param entityDTO
-     * @return the location entity
+     * @param id the ID of location to fetch
      */
-    public LocationEntity fetchSingleLocation(SignalsEntityDTO entityDTO) {
-        LocationEntity location = restService.doGetLocation(entityDTO.getStrippedId(SignalsEntityDTO.StripIdPart.BOTH));
-        dbService.save(location);
-        return location;
+    public void processLocation(String id, Map<String, Field> attachmentFields) {
+        try {
+            Location location = locationRestService.doGetLocation(id);
+        } catch (Exception e) {
+
+        }
     }
 
     public void save(LocationEntity loc) {
-        dbService.save(loc);
+        locationDbService.save(loc);
+    }
+
+    public void save(Location loc) {
+        locationDbService.save(loc);
+    }
+
+    public LocationEntity loadById(String id, boolean augmented) {
+        return locationDbService.loadById(id);
     }
 }

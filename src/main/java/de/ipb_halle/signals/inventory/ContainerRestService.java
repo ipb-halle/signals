@@ -21,14 +21,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import de.ipb_halle.signals.attachment.Attachment;
 import de.ipb_halle.signals.attachment.AttachmentRestService;
 import de.ipb_halle.signals.attachment.AttachmentRevision;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.Unit;
-import de.ipb_halle.signals.field.Field;
-import de.ipb_halle.signals.field.FieldValue;
-import de.ipb_halle.signals.materials.Material;
+import de.ipb_halle.signals.field.*;
 import de.ipb_halle.signals.materials.MaterialReference;
 import de.ipb_halle.signals.rest.*;
 import de.ipb_halle.signals.users.UserReference;
@@ -39,7 +36,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Manager for signals containers (inventory/containers API endpoint)
@@ -59,13 +58,25 @@ public class ContainerRestService implements RestReplyParser<Container> {
     @Inject
     private AttachmentRestService attachmentRestService;
 
+    @Inject
+    private FieldParser fieldParser;
+
     private Logger logger = LoggerFactory.getLogger(ContainerRestService.class);
+
+    public Container doGetContainer(String id) {
+        JsonElement data = fetch(id);
+        if (data == null) {
+            logger.error("ContainerRestService:-> doGetContainer()-> No container found for ID={} null will be returned\n", id);
+            return null;
+        }
+        return parseReply(data);
+    }
 
     @Override
     public Container parseReply(JsonElement json) {
         JsonObject j = json.getAsJsonObject();
         JsonObject attributes = j.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
-        JsonArray jsonArray = attributes.get(RestHelper.ATTR_FIELDS).getAsJsonArray();
+        JsonArray fieldsJsonArray = attributes.get(RestHelper.ATTR_FIELDS).getAsJsonArray();
 
         Container ct = new Container();
         ct.setId(RestHelper.parseString(j, RestHelper.ATTR_ID));
@@ -86,7 +97,7 @@ public class ContainerRestService implements RestReplyParser<Container> {
         }
 
         // parseFieldValues(attributes.getAsJsonArray(RestHelper.ATTR_FIELDS), ct);
-        parseFieldValues(jsonArray, ct);
+        parseFields(fieldsJsonArray, ct);
         parseContainerContents(attributes.getAsJsonArray(ContainerEntity.ATTR_CONTENTS), ct);
 
         parseChangeRecords(j, ct);
@@ -106,23 +117,15 @@ public class ContainerRestService implements RestReplyParser<Container> {
             return jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA);
 
         } catch (UnexpectedResponseCodeException ue) {
-            logger.error("ContainerRestService:-> Unexpected code for container ID={}", id, ue);
+            logger.error("ContainerRestService: fetch() -> Unexpected code for container ID={}", id, ue);
         } catch (URISyntaxException me) {
-            logger.error("ContainerRestService:-> Malformed URL", me);
+            logger.error("ContainerRestService: fetch() -> Malformed URL", me);
         } catch (IOException ioe) {
-            logger.error("ContainerRestService:-> IOException", ioe);
+            logger.error("ContainerRestService: fetch() -> IOException", ioe);
         }
         return null;
     }
 
-    public Container doGetContainer(String id) {
-        JsonElement data = fetch(id);
-        if (data == null) {
-            logger.warn("ContainerRestService:-> No container found for ID={}", id);
-            return null;
-        }
-        return parseReply(data);
-    }
 
     private void parseChangeRecords(JsonObject json, Container ct) {
         ct.setCreatedAt(RestHelper.parseDate(json, ContainerEntity.ATTR_CREATED_AT));
@@ -136,9 +139,22 @@ public class ContainerRestService implements RestReplyParser<Container> {
     }
 
 
-    private void parseFieldValues(JsonArray jArray, Container ct) {
+    private void parseFields(JsonArray fields, Container ct) {
+        Iterator<JsonElement> iter = fields.iterator();
+        List<Field> fieldList = new ArrayList<>();
+        while (iter.hasNext()) {
+            Field field = fieldParser.parseReply(iter.next());
+            // NOTE: field ids are NOT unique within Signals Inventory
+            field.setId(field.getId());
+            field.setDesignation((FieldDesignation) dynEnumManager.valueOf(FieldDesignation.valueOf(FieldDesignation.LOCATION)));
+            field.setDefiningEntityId(ct.getIdWithSuffixPrefix());
+            fieldList.add(field);
+        }
+        ct.addFields(fieldList);
+        // Parsing of field Values
         LocationTypeFieldValuesParser svc = new LocationTypeFieldValuesParser();
-        ct.addFieldValues(svc.parseReply(jArray));
+        List<FieldValue> values = svc.parseReply(fields);
+        ct.addFieldValues(values);
     }
 
     /**

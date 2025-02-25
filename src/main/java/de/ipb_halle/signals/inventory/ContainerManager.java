@@ -17,12 +17,15 @@
  */
 package de.ipb_halle.signals.inventory;
 
-import de.ipb_halle.signals.attachment.*;
+import de.ipb_halle.signals.attachment.Attachment;
+import de.ipb_halle.signals.attachment.AttachmentDbService;
+import de.ipb_halle.signals.attachment.AttachmentFile;
+import de.ipb_halle.signals.attachment.AttachmentRevision;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.EntityType;
+import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.entity.SignalsEntityDbService;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
-import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.field.*;
 import de.ipb_halle.signals.rest.RestReply;
 import de.ipb_halle.signals.storage.StorageService;
@@ -37,7 +40,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -106,7 +108,6 @@ public class ContainerManager {
         // 1) Loads set of container type ids
         Set<String> containerTypeIds = containerTypeDbService.getContainerTypeIds();
 
-
         // 2) Load (and map) all container fields for attachmentFiles
         Map<String, Field> attachmentFields = loadAttachmentFieldsMap();
 
@@ -156,7 +157,7 @@ public class ContainerManager {
         try {
             Container container = containerRestService.doGetContainer(id);
             processContainerFields(container, attachmentFields);
-            containerDbService.save(container.createEntity());
+            containerDbService.save(container);
         } catch (IOException e) {
             logger.error("processContainer() caught an exception.", (Throwable) e);
         }
@@ -341,6 +342,6 @@ public class ContainerManager {
      * @param c the container to save
      */
     public void save(Container c) {
-        containerDbService.save(c.createEntity());
+        containerDbService.save(c);
     }
 }

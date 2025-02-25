@@ -18,6 +18,7 @@
 package de.ipb_halle.signals.inventory;
 
 import de.ipb_halle.signals.entity.Unit;
+import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.materials.IMaterial;
 import de.ipb_halle.signals.sample.Sample;
@@ -52,15 +53,16 @@ public class Container {
     private Date createdAt;
     private IUser createdBy;
     private String digest;
-    private Set<FieldValue> fieldValues;
     private ILocation location;
-    private Set<IMaterial> materials;
-    private Set<Sample> samples;
     private String name;
     private Date updatedAt;
     private IUser updatedBy;
     private Unit unit;
 
+    private Set<Field> fields;
+    private Set<FieldValue> fieldValues;
+    private Set<IMaterial> materials;
+    private Set<Sample> samples;
 
     public String dump() {
         StringBuilder sb = new StringBuilder();
@@ -74,6 +76,7 @@ public class Container {
      * default constructor
      */
     public Container() {
+        fields = new HashSet<>();
         fieldValues = new HashSet<>();
         materials = new HashSet<>();
         samples = new HashSet<>();
@@ -94,6 +97,7 @@ public class Container {
         updatedAt = ce.getUpdatedAt();
         updatedBy = new UserReference(ce.getUpdatedBy());
 
+        fields = new HashSet<>();
         fieldValues = new HashSet<>();
         materials = new HashSet<>();
         samples = new HashSet<>();
@@ -117,12 +121,16 @@ public class Container {
                 .setContainerTypeName(containerTypeName);
     }
 
-    public void addFieldValue(FieldValue v) {
-        fieldValues.add(v);
+    public String getIdWithSuffixPrefix() {
+        return CONTAINER_TYPE_ENTITY_PREFIX + id + CONTAINER_TYPE_ENTITY_SUFFIX;
+    }
+
+    public void addFields(Collection<Field> fields) {
+        this.fields.addAll(fields);
     }
 
     public void addFieldValues(Collection<FieldValue> values) {
-        fieldValues.addAll(values);
+        this.fieldValues.addAll(values);
     }
 
     public void addMaterial(IMaterial m) {
@@ -169,20 +177,12 @@ public class Container {
         return digest;
     }
 
-    public Set<FieldValue> getFieldValues() {
-        return fieldValues;
-    }
-
     public String getId() {
         return id;
     }
 
     public ILocation getLocation() {
         return location;
-    }
-
-    public Set<IMaterial> getMaterials() {
-        return materials;
     }
 
     public String getName() {
@@ -199,6 +199,18 @@ public class Container {
 
     public IUser getUpdatedBy() {
         return updatedBy;
+    }
+
+    public Set<Field> getFields() {
+        return fields;
+    }
+
+    public Set<FieldValue> getFieldValues() {
+        return fieldValues;
+    }
+
+    public Set<IMaterial> getMaterials() {
+        return materials;
     }
 
     public void setAmount(Double a) {

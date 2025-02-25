@@ -58,13 +58,16 @@ public class LocationTypeFieldValuesParser implements RestReplyParser<List<Field
             FieldValue fieldValue = new FieldValue()
                     .setLinkType(FieldValue.LinkType.FIELD_ID)
                     .setFieldId(RestHelper.parseString(jsonElement.getAsJsonObject(), RestHelper.ATTR_ID));
-            if (jsonElement.getAsJsonObject().getAsJsonObject("value") != null ) {
+            if (jsonElement.getAsJsonObject().getAsJsonObject("value") != null) {
                 fieldValue.setValue(jsonElement.getAsJsonObject().getAsJsonObject("value").toString());
             }
             if (jsonElement.getAsJsonObject().getAsJsonObject(FieldValue.ATTR_CONTENT) != null) {
-                fieldValue.setValue(jsonElement.getAsJsonObject().getAsJsonObject(FieldValue.ATTR_CONTENT).toString());
-            }else {
+                String value = jsonElement.getAsJsonObject().getAsJsonObject(FieldValue.ATTR_CONTENT).toString();
+                logger.info("LocationTypeFieldValueParser:->=========================> {}", value);
+                fieldValue.setValue(value);
+            } else {
                 fieldValue.setValue("");
+                logger.error("LocationTypeFieldValueParser:-> NOT SUITABLE PARSING OF VALUE! {}", fieldValue.getEntityId());
             }
 
             fieldValueList.add(fieldValue);
@@ -73,12 +76,6 @@ public class LocationTypeFieldValuesParser implements RestReplyParser<List<Field
     }
 
     private List<FieldValue> parseFieldValueObject(JsonObject fieldTitleValuePair) {
-        /**
-         * fieldTitleValuePair contains e.g.:
-         * {"CAS Number":{"value":"141-78-6"},"Chemical Name":{"value":"ethyl acetate"},"Description":{"value":""},"Exact Mass":{"value":"88.05243"},
-         * "Material Library Type":{"value":"Compounds"},"Materials Access":{"value":["IPB"]},"Molecular Formula":{"value":"C<sub>4</sub>H<sub>8</sub>O<sub>2</sub>"},
-         * "Molecular Weight":{"value":"88.11 g/mol"},"Name":{"value":"Compound000010"}}
-         */
         List<FieldValue> fieldValues = new ArrayList<>();
 
         for (String fieldName : fieldTitleValuePair.keySet()) {

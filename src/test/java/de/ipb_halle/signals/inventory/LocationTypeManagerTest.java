@@ -20,6 +20,7 @@ package de.ipb_halle.signals.inventory;
 import de.ipb_halle.signals.PostgresqlContainerExtension;
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
+import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.rest.MockRestClient;
 import de.ipb_halle.tda.DeploymentElement;
 import jakarta.inject.Inject;
@@ -30,6 +31,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
+import java.util.Set;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(PostgresqlContainerExtension.class)
@@ -40,6 +42,8 @@ public abstract class LocationTypeManagerTest {
             "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/types?page%5Blimit%5D=20&page%5Boffset%5D=0&entityType=location";
     private final String TEST_LOCATION_TYPE_ID = "location:017929f3-cd0e-466c-ac94-c21ce5fe8c31:ivt";
     private final String TEST_LOCATION_TYPE_NAME = "Cabinet";
+    private final String TEST_LOCATION_FIELD_ID = "PE_INV_SYSTEM_Barcode:location:017929f3-cd0e-466c-ac94-c21ce5fe8c31:ivt";
+    private final String TEST_LOCATION_FIELD_KEY = "Barcode";
 
     @Inject
     @DeploymentElement(mock = "de.ipb_halle.signals.rest.MockRestClient")
@@ -61,6 +65,15 @@ public abstract class LocationTypeManagerTest {
                 getClass().getResourceAsStream(TEST_RESOURCE_1));
     }
 
+    private Field getFieldById(Set<Field> fieldSet, String id) {
+        for (Field f : fieldSet) {
+            if (f.getId().equals(id)) {
+                return f;
+            }
+        }
+        return null;
+    }
+
     @Test
     public void locationTypeManagerTest() {
 
@@ -71,6 +84,10 @@ public abstract class LocationTypeManagerTest {
         LocationType lt = locationTypeManager.getDbLocationType(TEST_LOCATION_TYPE_ID);
         Assertions.assertEquals(TEST_LOCATION_TYPE_NAME, lt.getName(), "LocationType name mismatch");
 
-
+    // field definitions
+        Field f = getFieldById(
+                lt.getFields(),
+                TEST_LOCATION_FIELD_ID);
+        Assertions.assertEquals(TEST_LOCATION_FIELD_KEY, f.getKey(), "Field definition key matches");
     }
 }

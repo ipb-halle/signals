@@ -17,7 +17,6 @@
  */
 package de.ipb_halle.signals.inventory;
 
-import de.ipb_halle.signals.rest.RestResultIterator;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
@@ -45,7 +44,7 @@ public class LocationTypeManager {
         return dbService.loadById(id);
     }
 
-    public LocationType getDbLocationType(String id){
+    public LocationType getDbLocationType(String id) {
         return dbService.loadById(id);
     }
 

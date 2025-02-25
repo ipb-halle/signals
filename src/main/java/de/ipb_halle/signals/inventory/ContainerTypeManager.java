@@ -40,7 +40,7 @@ public class ContainerTypeManager {
     }
 
     public List<ContainerType> getSnbContainerTypes() {
-        List<ContainerType>  containerTypes = restService.doGetContainerTypes();
+        List<ContainerType> containerTypes = restService.doGetContainerTypes();
         return containerTypes;
     }
 

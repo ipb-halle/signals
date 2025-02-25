@@ -80,4 +80,12 @@ public class FieldValueEntity implements Serializable {
         value = v;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "FieldValueEntity{" +
+                "id=" + id +
+                ", value='" + value + '\'' +
+                '}';
+    }
 }

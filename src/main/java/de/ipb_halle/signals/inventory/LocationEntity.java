@@ -175,77 +175,105 @@ public class LocationEntity implements ILocation {
         return grid;
     }
 
-    public ILocation setId(String i) {
+    public LocationEntity setId(String i) {
         id = i;
         return this;
     }
 
-    public void setAncestorId(String id) {
+    public LocationEntity setAncestorId(String id) {
         ancestorId = id;
+        return this;
     }
 
-    public void setAncestorName(String n) {
+    public LocationEntity setAncestorName(String n) {
         ancestorName = n;
+        return this;
     }
 
-    public void setBarcode(String b) {
+    public LocationEntity setBarcode(String b) {
         barcode = b;
+        return this;
     }
 
-    public void setColumns(Integer col) {
+    public LocationEntity setColumns(Integer col) {
         columns = col;
         grid = true;
+        return this;
     }
 
-    public void setCreatedAt(Date d) {
+    public LocationEntity setCreatedAt(Date d) {
         createdAt = d;
+        return this;
+
     }
 
-    public void setCreatedBy(String u) {
+    public LocationEntity setCreatedBy(String u) {
         createdBy = u;
+        return this;
+
     }
 
-    public void setDescription(String d) {
+    public LocationEntity setDescription(String d) {
         description = d;
+        return this;
+
     }
 
-    public void setGrid(Boolean g) {
+    public LocationEntity setGrid(Boolean g) {
         grid = g;
+        return this;
+
     }
 
-    public void setName(String n) {
+    public LocationEntity setName(String n) {
         name = n;
+        return this;
+
     }
 
-    public void setRows(Integer r) {
+    public LocationEntity setRows(Integer r) {
         rows = r;
         grid = true;
+        return this;
+
     }
 
-    public void setType(LocationType t) {
+    public LocationEntity setType(LocationType t) {
         type = t;
         typeId = t.getId();
         typeName = t.getName();
+        return this;
+
     }
 
-    public void setTypeId(String i) {
+    public LocationEntity setTypeId(String i) {
         typeId = i;
+        return this;
+
     }
 
-    public void setTypeName(String n) {
+    public LocationEntity setTypeName(String n) {
         typeName = n;
+        return this;
+
     }
 
-    public void setUpdatedAt(Date d) {
+    public LocationEntity setUpdatedAt(Date d) {
         updatedAt = d;
+        return this;
+
     }
 
-    public void setUpdatedBy(String u) {
+    public LocationEntity setUpdatedBy(String u) {
         updatedBy = u;
+        return this;
+
     }
 
-    public void setFieldValues(Set<FieldValue> vs) {
+    public LocationEntity setFieldValues(Set<FieldValue> vs) {
         fieldValues = vs;
+        return this;
+
     }
 
 
