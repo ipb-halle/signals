@@ -28,7 +28,9 @@ import de.ipb_halle.signals.rest.*;
 import jakarta.ejb.Local;
 import jakarta.inject.Inject;
 
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -58,12 +60,36 @@ public class ContainerTypeRestService implements RestReplyParser<ContainerType> 
         ContainerType ct = new ContainerType();
         JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
-        ct.setId(CONTAINER_TYPE_ENTITY_PREFIX
-                        + j.getAsJsonObject().getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString()
-                        + CONTAINER_TYPE_ENTITY_SUFFIX);
-
+        ct.setId(CONTAINER_TYPE_ENTITY_PREFIX + j.getAsJsonObject().getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString() + CONTAINER_TYPE_ENTITY_SUFFIX);
         ct.setDescription(attributes.getAsJsonPrimitive(RestHelper.ATTR_DESCRIPTION).getAsString());
         ct.setName(attributes.getAsJsonPrimitive(ContainerType.ATTR_NAME).getAsString());
+
+        // parsing boolean values inUse and movable
+        // 1) in Use
+        JsonElement inUseEl = attributes.get(RestHelper.ATTR_IN_USE);
+        if (inUseEl != null && !inUseEl.isJsonNull()) {
+            ct.setInUse(inUseEl.getAsBoolean());
+        } else {
+            ct.setInUse(false);
+        }
+
+        // 2) movable
+        JsonElement movableEl = attributes.get(RestHelper.ATTR_MOVABLE);
+        if (movableEl != null && !movableEl.isJsonNull()) {
+            ct.setMovable(movableEl.getAsBoolean());
+        } else {
+            ct.setMovable(false);
+        }
+
+        //parsing updatedAt and createdAt
+        String createdAtStr = attributes.get(RestHelper.ATTR_CREATED_AT).getAsString();
+        String updatedAtStr = attributes.get(RestHelper.ATTR_CREATED_AT).getAsString();
+        Instant createdAt = Instant.parse(createdAtStr);
+        Instant updatedAt = Instant.parse(updatedAtStr);
+        ct.setCreatedAt(Date.from(createdAt));
+        ct.setUpdatedAt(Date.from(updatedAt));
+
+
         /*
          * We ignore the ContainerType.ATTR_ATTACHMENTS attribute,
          * which may contain e.g. a ContainerType icon (e.g. "DefaultImage_Container_Bottle.png")
@@ -74,7 +100,6 @@ public class ContainerTypeRestService implements RestReplyParser<ContainerType> 
 
         return ct;
     }
-
 
 
     private void parseFields(JsonArray fields, ContainerType ct) {

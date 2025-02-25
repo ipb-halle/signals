@@ -17,9 +17,9 @@
  */
 package de.ipb_halle.signals.inventory;
 
-import de.ipb_halle.tda.PersistenceElements;
 import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldDbService;
+import de.ipb_halle.tda.PersistenceElements;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -29,7 +29,6 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import serp.bytecode.LocalTable;
 
 import java.util.*;
 
@@ -74,7 +73,8 @@ public class LocationTypeDbService {
             }
             for (LocationTypeEntity locationType : resultList) {
                 if (locationType.getId() != null) {
-                    entityIds.add(LOCATION_TYPE_ENTITY_PREFIX + locationType.getId() + LOCATION_TYPE_ENTITY_SUFFIX);
+                    // entityIds.add(LOCATION_TYPE_ENTITY_PREFIX + locationType.getId() + LOCATION_TYPE_ENTITY_SUFFIX);
+                    entityIds.add(locationType.getId());
                 } else {
                     logger.error("LocationTypeDbService:-> Null id found for a LocationTypeEntity {}\n", locationType.getId());
                 }
@@ -92,7 +92,7 @@ public class LocationTypeDbService {
     }
 
     private List<Field> loadFields(String id) {
-        Map<String, Object> cmap = new HashMap<> ();
+        Map<String, Object> cmap = new HashMap<>();
         cmap.put(Field.DEFINING_ENTITY_ID, id);
         return fieldDbService.load(cmap);
     }

@@ -38,7 +38,7 @@ public abstract class LocationTypeManagerTest {
     private final String TEST_RESOURCE_1 = "LocationTypeManagerTest001.json";
     private final String TEST_KEY_1 =
             "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/types?page%5Blimit%5D=20&page%5Boffset%5D=0&entityType=location";
-    private final String TEST_LOCATION_TYPE_ID = "017929f3-cd0e-466c-ac94-c21ce5fe8c31";
+    private final String TEST_LOCATION_TYPE_ID = "location:017929f3-cd0e-466c-ac94-c21ce5fe8c31:ivt";
     private final String TEST_LOCATION_TYPE_NAME = "Cabinet";
 
     @Inject

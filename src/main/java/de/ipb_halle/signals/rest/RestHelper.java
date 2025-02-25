@@ -50,6 +50,10 @@ public class RestHelper {
     public final static String ATTR_SELF = "self";
     public final static String ANCESTORS = "ancestors";
     public final static String CHILDREN = "children";
+    public static final String ATTR_IN_USE = "inUse";
+    public static final String ATTR_MOVABLE = "movable";
+    public static final String ATTR_CREATED_AT ="createdAt";
+    public static final String ATTR_UPDATED_AT ="updatedAt";
 
     public static String formatDate(Date d) {
         DateFormat df = new SimpleDateFormat(SNB_DATE_FORMAT);

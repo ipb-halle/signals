@@ -32,13 +32,7 @@ import jakarta.persistence.criteria.Root;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -79,13 +73,14 @@ public class ContainerTypeDbService {
 
             for (ContainerTypeEntity cte : resultList) {
                 if (cte.getId() != null) {
-                    entityIds.add(Container.CONTAINER_TYPE_ENTITY_PREFIX + cte.getId() + Container.CONTAINER_TYPE_ENTITY_SUFFIX);
+                    //entityIds.add(Container.CONTAINER_TYPE_ENTITY_PREFIX + cte.getId() + Container.CONTAINER_TYPE_ENTITY_SUFFIX);
+                    entityIds.add(cte.getId());
                 } else {
                     logger.error("ContainerTypeDbService:-> Null ID found for a ContainerTypeEntity {}.", cte.getId());
                 }
             }
         } catch (Exception e) {
-            logger.error("ContainerTypeDbService:-> Error while fetching container type IDs: {}",  e.getMessage(), e);
+            logger.error("ContainerTypeDbService:-> Error while fetching container type IDs: {}", e.getMessage(), e);
         }
         return entityIds;
     }

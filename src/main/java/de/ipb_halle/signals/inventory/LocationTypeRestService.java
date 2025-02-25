@@ -28,10 +28,9 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.util.*;
 
 
 /**
@@ -42,7 +41,8 @@ import java.util.List;
 public class LocationTypeRestService implements RestReplyParser<LocationType> {
 
     public final String INVENTORY_TYPES_ENDPOINT = "/inventory/types";
-    private Logger logger = LoggerFactory.getLogger(LocationTypeRestService.class);
+    private final static String LOCATION_TYPE_ENTITY_PREFIX = "location:";
+    private final static String LOCATION_TYPE_ENTITY_SUFFIX = ":ivt";
 
 
     @Inject
@@ -59,9 +59,34 @@ public class LocationTypeRestService implements RestReplyParser<LocationType> {
         LocationType lt = new LocationType();
         JsonObject attributes = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
-        lt.setId(attributes.getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
+        lt.setId(LOCATION_TYPE_ENTITY_PREFIX + attributes.getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString() + LOCATION_TYPE_ENTITY_SUFFIX);
         lt.setDescription(attributes.getAsJsonPrimitive(RestHelper.ATTR_DESCRIPTION).getAsString());
         lt.setName(attributes.getAsJsonPrimitive(LocationType.ATTR_NAME).getAsString());
+
+        // parsing boolean values inUse and movable
+        // 1) in Use
+        JsonElement inUseEl = attributes.get(RestHelper.ATTR_IN_USE);
+        if (inUseEl != null && !inUseEl.isJsonNull()) {
+            lt.setInUse(inUseEl.getAsBoolean());
+        } else {
+            lt.setInUse(false);
+        }
+
+        // 2) movable
+        JsonElement movableEl = attributes.get(RestHelper.ATTR_MOVABLE);
+        if (movableEl != null && !movableEl.isJsonNull()) {
+            lt.setMovable(movableEl.getAsBoolean());
+        } else {
+            lt.setMovable(false);
+        }
+
+        //parsing updatedAt and createdAt
+        String createdAtStr = attributes.get(RestHelper.ATTR_CREATED_AT).getAsString();
+        String updatedAtStr = attributes.get(RestHelper.ATTR_CREATED_AT).getAsString();
+        Instant createdAt = Instant.parse(createdAtStr);
+        Instant updatedAt = Instant.parse(updatedAtStr);
+        lt.setCreatedAt(Date.from(createdAt));
+        lt.setUpdatedAt(Date.from(updatedAt));
 
         if (attributes.has(RestHelper.ATTR_FIELDS)) {
             parseFields(attributes.getAsJsonArray(RestHelper.ATTR_FIELDS), lt);
@@ -74,6 +99,8 @@ public class LocationTypeRestService implements RestReplyParser<LocationType> {
         Iterator<JsonElement> iter = fields.iterator();
         while (iter.hasNext()) {
             Field field = fieldParser.parseReply(iter.next());
+            // NOTE: field ids are NOT unique within Signals Inventory
+            field.setId(field.getId() + ":" + lt.getId());
             field.setDesignation((FieldDesignation) dynEnumManager.valueOf(FieldDesignation.valueOf(FieldDesignation.LOCATION)));
             field.setDefiningEntityId(lt.getSuffixPrefixId());
             lt.addField(field);

@@ -45,18 +45,6 @@ public class LocationTypeManager {
         return dbService.loadById(id);
     }
 
-    /**
-     * Fetch all location types from Signals Notebook and
-     * update the local database.
-     */
-//    public void fetchLocationTypes() {
-//        RestResultIterator<LocationType> locationTypeIterator = restService.doGetLocationTypes();
-//        while (locationTypeIterator.hasNext()) {
-//            LocationType next = locationTypeIterator.next();
-//              dbService.save(next);
-//        }
-//    }
-
     public LocationType getDbLocationType(String id){
         return dbService.loadById(id);
     }
