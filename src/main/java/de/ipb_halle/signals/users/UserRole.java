@@ -22,7 +22,7 @@ import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
-/** 
+/**
  * SNB role privileges
  */
 
@@ -47,9 +47,9 @@ public class UserRole {
 
     @Override
     public boolean equals(Object o) {
-        if ((o == null) || (getClass() != o.getClass())) { 
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
-        } 
+        }
         UserRole other = (UserRole) o;
         return Objects.equals(getRoleId(), other.getRoleId())
             && Objects.equals(getUserId(), other.getUserId());

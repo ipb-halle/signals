@@ -18,7 +18,7 @@
 package de.ipb_halle.signals.users;
 
 
-/** 
+/**
  * SNB group interface
  */
 public interface IGroup {

@@ -33,7 +33,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 
-/** 
+/**
  * DB service for roles
  */
 
@@ -126,7 +126,7 @@ public class RoleDbService {
         criteriaQuery.select(root);
         criteriaQuery.where(builder.equal(root
                 .get(RolePriv.ROLE_PRIV_ID)
-                .get(RolePrivId.ROLE_ID), 
+                .get(RolePrivId.ROLE_ID),
                 entity.getId()));
 
         Set<String> privileges = new HashSet<> ();

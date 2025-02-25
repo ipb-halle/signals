@@ -126,7 +126,7 @@ public class LocationManager {
         locationDbService.save(loc);
     }
 
-    public LocationEntity loadById(String id, boolean augmented) {
+    public LocationEntity loadById(String id, boolean augment) {
         return locationDbService.loadById(id);
     }
 }

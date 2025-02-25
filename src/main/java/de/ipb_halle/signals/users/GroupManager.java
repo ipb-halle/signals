@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-/** 
+/**
  * Manager for signals groups
  */
 
@@ -76,7 +76,7 @@ public class GroupManager {
      * associations. We therefore refrain from creating or updating
      * groups via LDAP as manual intervention would be required
      * anyway.
-     * 
+     *
      * NOTE: currently, the flag ldapGroup cannot be cleared
      */
     public void obtainLdapGroups(UserSynchronizationContext context) {

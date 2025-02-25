@@ -20,8 +20,8 @@ package de.ipb_halle.signals.users;
 import de.ipb_halle.signals.SignalsConfig;
 import jakarta.ejb.Local;
 
-/** 
- * LdapAdapterFactory encapsulates the build mechanism of 
+/**
+ * LdapAdapterFactory encapsulates the build mechanism of
  * an LdapAdapter.
  */
 

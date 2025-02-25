@@ -42,7 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-/** 
+/**
  * Signals API REST service for groups
  */
 
@@ -55,7 +55,7 @@ public class GroupRestService implements RestReplyParser<Group> {
 
     @Inject
     private RestClient restClient;
-    
+
     private Logger logger = LoggerFactory.getLogger(GroupRestService.class);
 
     /**
@@ -113,7 +113,7 @@ public class GroupRestService implements RestReplyParser<Group> {
     }
 
     /**
-     * GET group by id 
+     * GET group by id
      */
     public Group doGetGroup(String id) {
         try {
@@ -135,7 +135,7 @@ public class GroupRestService implements RestReplyParser<Group> {
     }
 
     /**
-     * GET groups -- obtain list of groups 
+     * GET groups -- obtain list of groups
      */
     public List<Group> doGetGroups() {
         restClient.reset()

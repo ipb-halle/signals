@@ -55,7 +55,7 @@ public class Role implements IRole {
     public Role(RoleEntity re) {
         id = re.getId();
         description = re.getDescription();
-        name = re.getName();    
+        name = re.getName();
         ldapRole = re.isLdapRole();
         deleted = re.isDeleted();
         privileges = new HashSet<> ();
@@ -140,7 +140,7 @@ public class Role implements IRole {
     }
 
     public boolean hasPrivilege(String p) {
-        return privileges.contains(p); 
+        return privileges.contains(p);
     }
 
     public boolean isDeleted() {

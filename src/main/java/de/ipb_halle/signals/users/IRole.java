@@ -17,7 +17,7 @@
  */
 package de.ipb_halle.signals.users;
 
-/** 
+/**
  * SNB role interface
  */
 

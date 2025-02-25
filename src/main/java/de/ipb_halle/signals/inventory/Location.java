@@ -96,10 +96,6 @@ public class Location {
                 .setUpdatedBy(updatedBy);
     }
 
-    public String getIdWithSuffixPrefix() {
-        return LOCATION_TYPE_ENTITY_PREFIX + id + LOCATION_TYPE_ENTITY_SUFFIX;
-    }
-
     public String getId() {
         return id;
     }

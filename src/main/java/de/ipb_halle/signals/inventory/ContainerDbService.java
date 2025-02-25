@@ -57,14 +57,14 @@ public class ContainerDbService {
         ContainerEntity ce = ct.createEntity();
         this.em.merge(ce);
         for (Field f : ct.getFields()) {
-            f.setId(f.getId() + ":" + ct.getIdWithSuffixPrefix());
+            f.setId(f.getId() + ":" + ct.getId());
             fieldDbService.save(f);
         }
 
         for (FieldValue fv : ct.getFieldValues()) {
             FieldValueEntity fve = fv.createEntity();
-            fve.setEntityId(ct.getIdWithSuffixPrefix());
-            fve.setFieldDefinitionId(fv.getFieldId() + ":" + ct.getIdWithSuffixPrefix());
+            fve.setEntityId(ct.getId());
+            fve.setFieldDefinitionId(fv.getFieldId() + ":" + ct.getId());
             em.merge(fve);
         }
     }

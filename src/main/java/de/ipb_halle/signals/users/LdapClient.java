@@ -46,16 +46,16 @@ import javax.naming.ldap.StartTlsResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** 
+/**
  * Ldap client reader for Signals tool.
- * The current implementation was created to fit IPB needs. It therefore 
- * depends on AD peculiarities and is not platform neutral.  It should be 
- * straightforward however, to adjust it to other flavours of LDAP. 
- * As IPB does not possess other LDAP instances for testing and has 
+ * The current implementation was created to fit IPB needs. It therefore
+ * depends on AD peculiarities and is not platform neutral.  It should be
+ * straightforward however, to adjust it to other flavours of LDAP.
+ * As IPB does not possess other LDAP instances for testing and has
  * no use case, the introduction of an abstraction layer (LdapClientImplAD, etc.)
  * is deemed unnecessary.
- * This implementation supports (and currently requires) STARTTLS. It might be 
- * necessary to provide a custom truststore, in case the LDAP server does not 
+ * This implementation supports (and currently requires) STARTTLS. It might be
+ * necessary to provide a custom truststore, in case the LDAP server does not
  * use a certificate from an officially recognized CA.
  */
 @Local
@@ -107,7 +107,7 @@ public class LdapClient {
             return group;
         } catch(Exception e) {
             logger.warn("getGroup() caught an Exception: ", (Throwable) e);
-        }                                                
+        }
         return null;
     }
 
@@ -273,14 +273,14 @@ public class LdapClient {
     /**
      * Determine expiration status of account according to account expiration date.
      *
-     * NOTE: This is an AD specific implementation, "expires never" can obviously 
+     * NOTE: This is an AD specific implementation, "expires never" can obviously
      * be represented by two values: either 2^63-1 or 0.
      *
      * @param attr LDAP attribute set
-     * @return enabled state 
+     * @return enabled state
      */
     private boolean getUserExpiration(Attributes attrs) throws Exception {
-        String value = getAttribute(attrs, 
+        String value = getAttribute(attrs,
                 signalsConfig.getLdapAttrAccountExpirationDate());
         try {
             long nanos = Long.parseLong(value);
@@ -300,7 +300,7 @@ public class LdapClient {
 
     private boolean isGroup(LdapAdapter adapter, String dn) {
         try {
-            BasicAttribute objectClassAttr = (BasicAttribute) adapter 
+            BasicAttribute objectClassAttr = (BasicAttribute) adapter
                     .getAttributes(dn)
                     .get(signalsConfig.getLdapAttrObjectClass());
 

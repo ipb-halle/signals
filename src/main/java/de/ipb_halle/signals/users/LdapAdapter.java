@@ -31,9 +31,9 @@ import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.StartTlsRequest;
 import javax.naming.ldap.StartTlsResponse;
 
-/** 
+/**
  * LdapAdapter
- * Encapsulates the concrete mechanics of connection to an 
+ * Encapsulates the concrete mechanics of connection to an
  * LDAP / AD service.
  */
 

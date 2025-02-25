@@ -20,8 +20,8 @@ package de.ipb_halle.signals.rest;
 import com.google.gson.JsonElement;
 import jakarta.ejb.Local;
 
-/** 
- * Rest service 
+/**
+ * Rest service
  */
 @Local
 public interface RestReplyParser<T> {

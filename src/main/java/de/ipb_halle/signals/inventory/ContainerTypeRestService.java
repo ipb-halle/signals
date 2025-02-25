@@ -43,8 +43,8 @@ import java.util.List;
 public class ContainerTypeRestService implements RestReplyParser<ContainerType> {
 
     public final String CONTAINER_TYPE_ENDPOINT = "/inventory/types";
-    private final static String CONTAINER_TYPE_ENTITY_PREFIX = "container:";
-    private final static String CONTAINER_TYPE_ENTITY_SUFFIX = ":ivt";
+    public final static String CONTAINER_TYPE_ENTITY_PREFIX = "container:";
+    public final static String CONTAINER_TYPE_ENTITY_SUFFIX = ":ivt";
 
 
     @Inject

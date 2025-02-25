@@ -121,10 +121,6 @@ public class Container {
                 .setContainerTypeName(containerTypeName);
     }
 
-    public String getIdWithSuffixPrefix() {
-        return CONTAINER_TYPE_ENTITY_PREFIX + id + CONTAINER_TYPE_ENTITY_SUFFIX;
-    }
-
     public void addFields(Collection<Field> fields) {
         this.fields.addAll(fields);
     }

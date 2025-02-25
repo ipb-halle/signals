@@ -275,12 +275,6 @@ CREATE TABLE container_types (
     updated_at TIMESTAMP
 );
 
-CREATE TABLE container_type_fields (
-    id VARCHAR NOT NULL REFERENCES container_types (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    value VARCHAR NOT NULL REFERENCES field_definitions (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    PRIMARY KEY (id, value)
-);
-
 CREATE TABLE libraries (
     id VARCHAR NOT NULL PRIMARY KEY,
     asset_display_name VARCHAR,
@@ -300,12 +294,6 @@ CREATE TABLE libraries (
     materials_sample_mapping VARCHAR,
     name VARCHAR,
     uniqueness VARCHAR
-);
-
-CREATE TABLE library_fields (
-    id VARCHAR NOT NULL REFERENCES libraries (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    value VARCHAR NOT NULL REFERENCES field_definitions (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    PRIMARY KEY (id, value)
 );
 
 CREATE TABLE materials (
@@ -350,12 +338,6 @@ CREATE TABLE location_types (
     in_use BOOLEAN NOT NULL DEFAULT FALSE,
     movable BOOLEAN NOT NULL DEFAULT FALSE,
     updated_at TIMESTAMP
-);
-
-CREATE TABLE location_type_fields (
-    id VARCHAR NOT NULL REFERENCES location_types (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    value VARCHAR NOT NULL REFERENCES field_definitions (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    PRIMARY KEY (id, value)
 );
 
 CREATE TABLE locations (

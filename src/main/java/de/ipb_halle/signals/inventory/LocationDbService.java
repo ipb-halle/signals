@@ -59,14 +59,14 @@ public class LocationDbService {
         this.em.merge(le);
         for (Field f : loc.getFields()) {
             logger.info("LocationDbService:-> ==================================================>{}\n", f.toString());
-            f.setId(f.getId() + ":" + loc.getIdWithSuffixPrefix());
+            f.setId(f.getId() + ":" + loc.getId());
             fieldDbService.save(f);
         }
 
         for (FieldValue fv : loc.getFieldValues()) {
             FieldValueEntity fve = fv.createEntity();
-            fve.setEntityId(loc.getIdWithSuffixPrefix());
-            fve.setFieldDefinitionId(fv.getFieldId() + ":" + loc.getIdWithSuffixPrefix());
+            fve.setEntityId(loc.getId());
+            fve.setFieldDefinitionId(fv.getFieldId() + ":" + loc.getId());
             em.merge(fve);
         }
 

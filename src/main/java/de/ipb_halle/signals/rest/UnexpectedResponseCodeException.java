@@ -17,7 +17,7 @@
  */
 package de.ipb_halle.signals.rest;
 
-/** 
+/**
  * Exception to be thrown in case of unexpected server response
  */
 

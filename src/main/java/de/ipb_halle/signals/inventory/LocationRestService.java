@@ -74,7 +74,9 @@ public class LocationRestService implements RestReplyParser<Location> {
         JsonArray fieldsJsonArray = attributes.get(RestHelper.ATTR_FIELDS).getAsJsonArray();
 
         Location loc = new Location();
-        loc.setId(RestHelper.parseString(jsonObj, RestHelper.ATTR_ID));
+        loc.setId(LocationTypeRestService.LOCATION_TYPE_ENTITY_PREFIX
+                + RestHelper.parseString(jsonObj, RestHelper.ATTR_ID)
+                + LocationTypeRestService.LOCATION_TYPE_ENTITY_SUFFIX);
         loc.setBarcode(RestHelper.parseString(attributes, LocationEntity.ATTR_BARCODE));
         loc.setCreatedAt(RestHelper.parseDate(attributes, LocationEntity.ATTR_CREATED_AT));
         loc.setName(RestHelper.parseString(attributes, LocationEntity.ATTR_NAME));
@@ -138,7 +140,7 @@ public class LocationRestService implements RestReplyParser<Location> {
             // NOTE: field ids are NOT unique within Signals Inventory
             field.setId(field.getId());
             field.setDesignation((FieldDesignation) dynEnumManager.valueOf(FieldDesignation.valueOf(FieldDesignation.LOCATION)));
-            field.setDefiningEntityId(loc.getIdWithSuffixPrefix());
+            field.setDefiningEntityId(loc.getId());
             fieldList.add(field);
         }
         loc.addFields(fieldList);

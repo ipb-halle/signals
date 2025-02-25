@@ -79,21 +79,24 @@ public class ContainerRestService implements RestReplyParser<Container> {
         JsonArray fieldsJsonArray = attributes.get(RestHelper.ATTR_FIELDS).getAsJsonArray();
 
         Container ct = new Container();
-        ct.setId(RestHelper.parseString(j, RestHelper.ATTR_ID));
+        ct.setId(ContainerTypeRestService.CONTAINER_TYPE_ENTITY_PREFIX
+                + RestHelper.parseString(j, RestHelper.ATTR_ID)
+                + ContainerTypeRestService.CONTAINER_TYPE_ENTITY_SUFFIX);
         ct.setBarcode(RestHelper.parseString(attributes, ContainerEntity.ATTR_BARCODE));
         ct.setDigest(RestHelper.parseString(attributes, RestHelper.ATTR_DIGEST));
         ct.setCreatedAt(RestHelper.parseDate(attributes, ContainerEntity.ATTR_CREATED_AT));
         ct.setContainerTypeId(RestHelper.parseString(attributes, ContainerEntity.ATTR_CONTAINER_TYPE_ID));
         ct.setContainerTypeName(RestHelper.parseString(attributes, ContainerEntity.ATTR_CONTAINER_TYPE_NAME));
         ct.setLocation(new LocationReference().setId(
-                RestHelper.parseString(
-                        RestHelper.getPrimitiveFromPath(attributes, ContainerEntity.ATTR_LOCATION_ID))));
+                LocationTypeRestService.LOCATION_TYPE_ENTITY_PREFIX
+                + RestHelper.parseString(
+                        RestHelper.getPrimitiveFromPath(attributes, ContainerEntity.ATTR_LOCATION_ID))
+                + LocationTypeRestService.LOCATION_TYPE_ENTITY_SUFFIX));
         ct.setName(RestHelper.parseString(attributes, RestHelper.ATTR_NAME));
         try {
             ct.setUnit(Unit.getUnit(RestHelper.parseString(attributes, ContainerEntity.ATTR_UNIT)));
         } catch (Exception e) {
             logger.error("ContainerRestService:-> Id of container for unit setting where error occurring is: {},", ct.getId(), e);
-
         }
 
         // parseFieldValues(attributes.getAsJsonArray(RestHelper.ATTR_FIELDS), ct);
@@ -147,7 +150,7 @@ public class ContainerRestService implements RestReplyParser<Container> {
             // NOTE: field ids are NOT unique within Signals Inventory
             field.setId(field.getId());
             field.setDesignation((FieldDesignation) dynEnumManager.valueOf(FieldDesignation.valueOf(FieldDesignation.LOCATION)));
-            field.setDefiningEntityId(ct.getIdWithSuffixPrefix());
+            field.setDefiningEntityId(ct.getId());
             fieldList.add(field);
         }
         ct.addFields(fieldList);

@@ -41,8 +41,8 @@ import java.util.*;
 public class LocationTypeRestService implements RestReplyParser<LocationType> {
 
     public final String INVENTORY_TYPES_ENDPOINT = "/inventory/types";
-    private final static String LOCATION_TYPE_ENTITY_PREFIX = "location:";
-    private final static String LOCATION_TYPE_ENTITY_SUFFIX = ":ivt";
+    public final static String LOCATION_TYPE_ENTITY_PREFIX = "location:";
+    public final static String LOCATION_TYPE_ENTITY_SUFFIX = ":ivt";
 
 
     @Inject

@@ -18,13 +18,13 @@
 package de.ipb_halle.signals.users;
 
 
-/** 
+/**
  * compare types on SNB / DB / LDAP synchronization.
- * SNB honours access times (createdAt, lastLoginAt), whereas 
+ * SNB honours access times (createdAt, lastLoginAt), whereas
  * LDAP compares ignore data differences.
  */
 
-public enum CompareType { 
+public enum CompareType {
     SNB,
     LDAP
 }

@@ -27,7 +27,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
-/** 
+/**
  * SNB role privileges
  */
 
@@ -52,9 +52,9 @@ public class RolePriv {
 
     @Override
     public boolean equals(Object o) {
-        if ((o == null) || (getClass() != o.getClass())) { 
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
-        } 
+        }
         RolePriv other = (RolePriv) o;
         return Objects.equals(getRoleId(), other.getRoleId())
             && Objects.equals(getRolePrivilege(), other.getRolePrivilege());

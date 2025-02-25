@@ -18,7 +18,7 @@
 package de.ipb_halle.signals.users;
 
 
-/** 
+/**
  * SNB user reference
  */
 public class UserReference implements IUser {

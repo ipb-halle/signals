@@ -29,7 +29,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 
-/** 
+/**
  * Iterator for rest services
  */
 
@@ -100,7 +100,7 @@ public class RestResultIterator<T> implements Iterator {
         if (paged) {
             JsonObject links = jsonResult.getAsJsonObject().getAsJsonObject("links");
             if (links.has("next")) {
-                
+
                 fetchPage(links.getAsJsonPrimitive("next").getAsString());
                 return jsonIterator.hasNext();
             }

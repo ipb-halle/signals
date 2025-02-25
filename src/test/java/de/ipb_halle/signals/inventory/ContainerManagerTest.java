@@ -20,6 +20,10 @@ package de.ipb_halle.signals.inventory;
 import de.ipb_halle.signals.PostgresqlContainerExtension;
 import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.TestBase;
+import de.ipb_halle.signals.dynEnum.DynEnumManager;
+import de.ipb_halle.signals.entity.EntityType;
+import de.ipb_halle.signals.entity.SignalsEntityDTO;
+import de.ipb_halle.signals.entity.SignalsEntityDbService;
 import de.ipb_halle.signals.rest.MockRestClient;
 import de.ipb_halle.signals.users.LdapAdapter;
 import de.ipb_halle.signals.users.LdapAdapterFactory;
@@ -41,15 +45,15 @@ public abstract class ContainerManagerTest {
 
     private final String TEST_RESOURCE_1 = "ContainerManagerTest001.json";
     private final String TEST_KEY_1 =
-        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/containers/ef16c7af-a763-49f2-b218-294ac02fc224";
-    private final String TEST_CONTAINER_ID = "ef16c7af-a763-49f2-b218-294ac02fc224";
+        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/containers/container:ef16c7af-a763-49f2-b218-294ac02fc224:ivt";
+    private final String TEST_CONTAINER_ID = "container:ef16c7af-a763-49f2-b218-294ac02fc224:ivt";
     private final String TEST_CONTAINER_BARCODE =  "0000000026";
     private final String TEST_CONTAINER_NAME = "item00000021";
     private final String TEST_USER1_ID = "116";
     private final String TEST_USER1_FIRST = "TwoFirst";
     private final String TEST_USER2_ID = "102";
     private final String TEST_USER2_FIRST = "ThreeFirst";
-    private final String TEST_LOCATION_ID = "e13620f4-4933-4275-83cc-3194a4be6607";
+    private final String TEST_LOCATION_ID = "location:e13620f4-4933-4275-83cc-3194a4be6607:ivt";
     private final String TEST_LOCATION_NAME = "Grid96Well_Test";
 
     @Inject
@@ -75,8 +79,17 @@ public abstract class ContainerManagerTest {
     @DeploymentElement
     private ContainerManager manager;
 
+    @Inject
+    @DeploymentElement
+    private DynEnumManager dynEnumManager;
+
+    @Inject
+    @DeploymentElement
+    private SignalsEntityDbService signalsEntityDbService;
+
     @BeforeAll
     public void testSetup() {
+        dynEnumManager.allowEnumDiscovery();
         TestBase.prepareRestClients(mockRestClient,
             TEST_KEY_1,
             getClass().getResourceAsStream(TEST_RESOURCE_1));
@@ -105,12 +118,24 @@ public abstract class ContainerManagerTest {
         loc.setUpdatedAt(new Date(1200000000));
         loc.setUpdatedBy(TEST_USER2_ID);
         locationManager.save(loc);
+        
+        SignalsEntityDTO dto = new SignalsEntityDTO();
+        dto.setId(TEST_CONTAINER_ID);
+        dto.setEid(TEST_CONTAINER_ID);
+        dto.setType((EntityType) dynEnumManager.valueOf(EntityType.valueOf(ContainerEntity.ENTITY_TYPE_CONTAINER)));
+        dto.setCreatedAt(new Date());
+        dto.setCreatedBy(user);
+        dto.setEditedBy(user);
+        dto.setOwner(user);
+        dto.setName("ContainerManagerTest_" + TEST_CONTAINER_ID);
+        signalsEntityDbService.save(dto);
     }
 
 
     @Test
     public void containerManagerTest() {
 
+        // String strippedId = TEST_CONTAINER_ID.split(":")[1];
         Container ct = manager.getSnbContainer(TEST_CONTAINER_ID);
         manager.save(ct);
         Assertions.assertEquals(TEST_CONTAINER_NAME, ct.getName(), "Container name mismatch");

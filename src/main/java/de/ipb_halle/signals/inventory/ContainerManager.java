@@ -318,18 +318,19 @@ public class ContainerManager {
      * Attempts to load a container by its ID from the local database.
      * If not found locally, it is fetched from the remote REST service.
      * If {@code augmented} is true, the container is augmented with user
-     * and location data.
+     * location data.
      *
      * @param id        the ID of the container
-     * @param augmented whether the container should be augmented
+     * @param augment whether the container should be augmented
      * @return the container
      */
-    public Container getContainer(String id, boolean augmented) {
+    public Container getContainer(String id, boolean augment
+    ) {
         Container ct = containerDbService.loadById(id);
         if (ct == null) {
             ct = containerRestService.doGetContainer(id);
         }
-        if (augmented) {
+        if (augment) {
             augmentContainer(ct);
         }
         return ct;
