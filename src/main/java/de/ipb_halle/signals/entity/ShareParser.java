@@ -20,6 +20,7 @@
 
 package de.ipb_halle.signals.entity;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.ipb_halle.signals.rest.RestHelper;
@@ -27,12 +28,24 @@ import de.ipb_halle.signals.rest.RestReplyParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ShareParser implements RestReplyParser<Share> {
+import java.util.ArrayList;
+import java.util.List;
+
+public class ShareParser implements RestReplyParser<List<Share>> {
 
     private Logger logger = LoggerFactory.getLogger(ShareParser.class);
 
     @Override
-    public Share parseReply(JsonElement json) throws Exception {
+    public List<Share> parseReply(JsonElement json) {
+        List<Share> shares = new ArrayList<>();
+        JsonArray jsonArray = json.getAsJsonObject().getAsJsonArray(RestHelper.ATTR_DATA);
+        for (JsonElement j : jsonArray.asList()) {
+            shares.add(parseSingleShare(j));
+        }
+        return shares;
+    }
+
+    private Share parseSingleShare(JsonElement json) {
         JsonObject jsonObj = json.getAsJsonObject();
         JsonObject attr = jsonObj.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
         Share share = parseShareType(jsonObj);

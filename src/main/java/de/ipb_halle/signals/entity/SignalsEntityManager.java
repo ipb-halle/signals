@@ -107,14 +107,8 @@ public class SignalsEntityManager {
     public void fetchSnbEntities(Map<String, Object> cmap, RuntimeConfig config) {
         RestResultIterator<SignalsEntityDTO> iter = restService.doGetEntities(cmap);
         while (iter.hasNext()) {
-            SignalsEntityDTO dto = iter.next();
-
-//            if (dto.getId().split(":")[0].equalsIgnoreCase("container")
-//                    || dto.getId().split(":")[0].equalsIgnoreCase("location")) {
-//                dto.setId(dto.getId().split(":")[1]);
-//            }
             // switch bean context to obtain a transaction boundary
-            signalsEntitiesProcessorBean.processEntity(config, dto);
+            signalsEntitiesProcessorBean.processEntity(config, iter.next());
         }
     }
 }

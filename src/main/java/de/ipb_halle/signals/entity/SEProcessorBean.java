@@ -30,6 +30,8 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 @Stateless
 @LocalBean
 public class SEProcessorBean {
@@ -45,10 +47,8 @@ public class SEProcessorBean {
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void processEntity(RuntimeConfig config, SignalsEntityDTO parentEntity) {
         try {
-            RestResultIterator<SignalsEntityDTO> iterator = restService.doGetChildren(parentEntity);
-            while (iterator.hasNext()) {
-                parentEntity.addChild(iterator.next());
-            }
+            processChildren(parentEntity);
+//            processShares(parentEntity);
             if (config.updateDb) {
                 dbService.save(parentEntity);
             }
@@ -58,5 +58,16 @@ public class SEProcessorBean {
             logger.error("Error in ProcessSingleMaterial, material {}: {}",
                     parentEntity.getId(), e.getMessage(), e);
         }
+    }
+
+    private void processChildren(SignalsEntityDTO parentEntity) throws Exception {
+        RestResultIterator<SignalsEntityDTO> iterator = restService.doGetChildren(parentEntity);
+        while (iterator.hasNext()) {
+            parentEntity.addChild(iterator.next());
+        }
+    }
+
+    private void processShares(SignalsEntityDTO parentEntity) {
+        parentEntity.addShares(restService.doGetShares(parentEntity));
     }
 }

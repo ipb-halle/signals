@@ -46,6 +46,7 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
 
     public final static String SIGNALS_ENTITY_ENDPOINT = "/entities";
     public final static String SIGNALS_ENTITY_CHILDREN_ENDPOINT = "/entities/%s/children";
+    public final static String SIGNALS_ENTITY_SHARES_ENDPOINT = "/entities/%s/shares";
     public final static String PARAMETER_INCLUDE_TYPES = "includeTypes";
     public final static String PARAMETER_START = "start";
     public final static String PARAMETER_END = "end";
@@ -120,6 +121,27 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
                         parentEntity.getStrippedId(SignalsEntityDTO.StripIdPart.SUFFIX)));
         return new RestResultIterator<SignalsEntityDTO>(restClient,
                 new SignalsChildParser(dynEnumManager), true);
+    }
+
+    public List<Share> doGetShares(SignalsEntityDTO entityDTO) {
+        try {
+            restClient.reset()
+                    .setMethod(Method.GET)
+                    .setEndpoint(String.format(SIGNALS_ENTITY_SHARES_ENDPOINT,
+                            entityDTO.getStrippedId(SignalsEntityDTO.StripIdPart.SUFFIX)))
+                    .execute();
+
+            ShareParser parser = new ShareParser();
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
+            return parser.parseReply(jsonResult);
+        } catch (UnexpectedResponseCodeException ue) {
+            logger.warn("doCreateGroup() got unexpected return code from API call");
+        } catch (URISyntaxException me) {
+            logger.warn("doCreateGroup() malformed URL");
+        } catch (IOException ioe) {
+            logger.warn("IOException", (Throwable) ioe);
+        }
+        return null;
     }
 
     private void configureEntityTypes(Map<String, Object> cmap) {

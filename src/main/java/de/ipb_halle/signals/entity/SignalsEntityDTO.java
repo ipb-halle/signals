@@ -52,12 +52,14 @@ public class SignalsEntityDTO implements IEntityRelationships, ISignalsEntity {
     private Long digest;
     private Date timeStamp;
     private Set<ISignalsEntity> children;
+    private Set<Share> shares;
 
     /**
      * default constructor
      */
     public SignalsEntityDTO() {
         children = new HashSet<>();
+        shares = new HashSet<>();
     }
 
     public SignalsEntityDTO(SignalsEntity entity, DynEnumManager dynEnumManager) {
@@ -76,6 +78,7 @@ public class SignalsEntityDTO implements IEntityRelationships, ISignalsEntity {
         this.timeStamp = entity.getTimeStamp();
         /* complex types */
         this.children = new HashSet<>();
+        this.shares = new HashSet<>();
     }
 
     public SignalsEntity createEntity() {
@@ -93,11 +96,6 @@ public class SignalsEntityDTO implements IEntityRelationships, ISignalsEntity {
         entity.setTimeStamp(timeStamp);
         entity.setType(type.getId());
         return entity;
-    }
-
-    @Override
-    public void addAllChildren(Collection<ISignalsEntity> children) {
-        //this.children.addAll(children);
     }
 
     public String dump() {
@@ -121,6 +119,14 @@ public class SignalsEntityDTO implements IEntityRelationships, ISignalsEntity {
 
     public void addChildren(Collection<ISignalsEntity> children) {
         this.children.addAll(children);
+    }
+
+    public void addShare(Share share) {
+        shares.add(share);
+    }
+
+    public void addShares(Collection<Share> shares) {
+        this.shares.addAll(shares);
     }
 
     public String getId() {
@@ -252,6 +258,14 @@ public class SignalsEntityDTO implements IEntityRelationships, ISignalsEntity {
 
     public void setChildren(Collection<ISignalsEntity> children) {
         this.children = new HashSet<> (children);
+    }
+
+    public Set<Share> getShares() {
+        return shares;
+    }
+
+    public void setShares(Collection<Share> shares) {
+        this.shares = new HashSet<> (shares);
     }
 
     @Override

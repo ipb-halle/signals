@@ -124,7 +124,7 @@ public abstract class EntitySharingTest {
         signalsEntityDbService.save(gs);
     }
 
-    private List<EffectiveShare> getShare(SignalsEntityDTO e, User u) {
+    private List<Share> getShare(SignalsEntityDTO e, User u) {
         Map<String, Object> cmap = new HashMap<>();
         cmap.put(Share.ENTITY_ID, e.getId());
         cmap.put(Share.USER_ID, u.getId());
@@ -148,7 +148,7 @@ public abstract class EntitySharingTest {
         SignalsEntityDTO e2 = createEntity("e2", u2);
         SignalsEntityDTO e3 = createEntity("e3", u2);
         createUserShare(e1, u1, true, false, false, false);
-        List<EffectiveShare> shareList = getShare(e1, u1);
+        List<Share> shareList = getShare(e1, u1);
         Assertions.assertEquals(1,shareList.size(), "List size matches");
         Assertions.assertTrue(shareList.get(0).canRead(), "canRead granted");
         Assertions.assertFalse(shareList.get(0).canWrite(), "canRead granted");

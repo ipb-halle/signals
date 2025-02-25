@@ -41,6 +41,11 @@ import org.slf4j.LoggerFactory;
         Share.class, EffectiveShare.class, GroupShare.class, UserShare.class})
 public class SignalsEntityDbService {
 
+    public record SEloadInfo(
+            boolean children,
+            boolean userGroupShares,
+            boolean effectiveShares) {}
+
     @PersistenceContext(unitName = "signalsDB")
     private EntityManager em;
 
@@ -81,10 +86,27 @@ public class SignalsEntityDbService {
     }
 
     public SignalsEntityDTO loadById(String id) {
+        return loadById(id, new SEloadInfo(true, false, false));
+    }
+
+    public SignalsEntityDTO loadById(String id, SEloadInfo what) {
         SignalsEntity entity = this.em.find(SignalsEntity.class, id);
         if (entity != null) {
             SignalsEntityDTO dto = new SignalsEntityDTO(entity, dynEnumManager);
-            dto.addChildren(loadChildren(id));
+            if (what.children) {
+                dto.addChildren(loadChildren(id));
+            }
+            if (what.userGroupShares) {
+                Map<String, Object> cmap = new HashMap<>();
+                cmap.put(Share.ENTITY_ID, id);
+                dto.addShares(loadUserShares(cmap));
+                dto.addShares(loadGroupShares(cmap));
+            }
+            if (what.effectiveShares) {
+                Map<String, Object> cmap = new HashMap<>();
+                cmap.put(Share.ENTITY_ID, id);
+                dto.addShares(loadEffectiveShares(cmap));
+            }
             return dto;
         }
         logger.error("loadById({}) returned null", id);
@@ -110,7 +132,7 @@ public class SignalsEntityDbService {
      * @param cmap
      * @return
      */
-    public List<EffectiveShare> loadEffectiveShares(Map<String, Object> cmap) {
+    public List<Share> loadEffectiveShares(Map<String, Object> cmap) {
         List<Predicate> predicates = new ArrayList<>();
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<EffectiveShare> criteriaQuery = builder.createQuery(EffectiveShare.class);
@@ -126,7 +148,11 @@ public class SignalsEntityDbService {
                     cmap.get(Share.USER_ID)));
         }
         criteriaQuery.where(builder.and(predicates.toArray(new Predicate[0])));
-        return em.createQuery(criteriaQuery).getResultList();
+        List<Share> results = new ArrayList<>();
+        for (Share share : em.createQuery(criteriaQuery).getResultList()) {
+            results.add(share);
+        }
+        return results;
     }
 
     /**
@@ -134,7 +160,7 @@ public class SignalsEntityDbService {
      * @param cmap
      * @return
      */
-    public List<GroupShare> loadGroupShares(Map<String, Object> cmap) {
+    public List<Share> loadGroupShares(Map<String, Object> cmap) {
         List<Predicate> predicates = new ArrayList<>();
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<GroupShare> criteriaQuery = builder.createQuery(GroupShare.class);
@@ -150,7 +176,11 @@ public class SignalsEntityDbService {
                     cmap.get(Share.GROUP_ID)));
         }
         criteriaQuery.where(builder.and(predicates.toArray(new Predicate[0])));
-        return em.createQuery(criteriaQuery).getResultList();
+        List<Share> results = new ArrayList<>();
+        for (Share share : em.createQuery(criteriaQuery).getResultList()) {
+            results.add(share);
+        }
+        return results;
     }
 
     /**
@@ -158,7 +188,7 @@ public class SignalsEntityDbService {
      * @param cmap
      * @return
      */
-    public List<UserShare> loadUserShares(Map<String, Object> cmap) {
+    public List<Share> loadUserShares(Map<String, Object> cmap) {
         List<Predicate> predicates = new ArrayList<>();
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<UserShare> criteriaQuery = builder.createQuery(UserShare.class);
@@ -174,13 +204,18 @@ public class SignalsEntityDbService {
                     cmap.get(Share.USER_ID)));
         }
         criteriaQuery.where(builder.and(predicates.toArray(new Predicate[0])));
-        return em.createQuery(criteriaQuery).getResultList();
+        List<Share> results = new ArrayList<>();
+        for (Share share : em.createQuery(criteriaQuery).getResultList()) {
+            results.add(share);
+        }
+        return results;
     }
 
     public void save(SignalsEntityDTO dto) {
         SignalsEntity entity = dto.createEntity();
         this.em.merge(entity);
         saveChildren(dto);
+        saveShares(dto);
     }
 
     private void saveChildren(SignalsEntityDTO dto)  {
@@ -199,6 +234,42 @@ public class SignalsEntityDbService {
                 break;
             default:
                 logger.warn("Illegal call to remove() for {}", share.getClass().getName());
+        }
+    }
+
+    public void saveShares(SignalsEntityDTO dto) {
+        Map<String, Object> cmap = new HashMap<> ();
+        cmap.put(Share.ENTITY_ID, dto.getId());
+        List<Share> dbShares = loadUserShares(cmap);
+        dbShares.addAll(loadGroupShares(cmap));
+        saveOrRemoveShares(dto, dbShares);
+    }
+
+    /**
+     * Persist share records not present in the database and
+     * remove database records, which are not present in the DTO
+     * @param dto
+     * @param dbShares
+     */
+    private void saveOrRemoveShares(SignalsEntityDTO dto, List<Share> dbShares) {
+        Set<Share> dtoShares = new HashSet<> (dto.getShares());    // set will be modified, need to make a copy
+        removeDeletedSharesAndTrim(dtoShares, dbShares);
+        for (Share share : dtoShares) {
+            save(share);
+        };
+    }
+
+    private void removeDeletedSharesAndTrim(Set<Share> dtoShares, List<Share> dbShares) {
+        for (Share dbShare : dbShares) {
+            if (dtoShares.contains(dbShare)) {
+                // dbShare exists in DB and DTO
+                // ==> trim DTO set
+                dtoShares.remove(dbShare);
+            } else {
+                // dbShare has been deleted from DTO
+                // ==> remove from DB
+                remove(dbShare);
+            }
         }
     }
 

@@ -25,7 +25,5 @@ import java.util.Set;
 
 public interface IEntityRelationships extends IObjectMetaData {
 
-    public void addAllChildren(Collection<ISignalsEntity> children);
-
     public Set<ISignalsEntity> getChildren();
 }

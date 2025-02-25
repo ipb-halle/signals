@@ -22,6 +22,8 @@ package de.ipb_halle.signals.entity;
 import de.ipb_halle.signals.util.EmbeddedKeyValue;
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 /**
  * Single signals entity (entities API endpoint)
  */
@@ -118,4 +120,16 @@ public abstract class Share {
     }
 
     public abstract ShareType getType();
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Share share)) return false;
+        return Objects.equals(id, share.id)
+                && Objects.equals(getType(), share.getType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id) + Objects.hashCode(getType());
+    }
 }
