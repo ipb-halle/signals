@@ -164,7 +164,7 @@ public class MaterialRestService implements RestReplyParser<Material> {
         JsonObject metaFieldJsonObject = RestHelper.getFromPath(fieldJsonElement, RestHelper.ATTR_META).getAsJsonObject();
         JsonObject attributes = RestHelper.getFromPath(fieldJsonElement, RestHelper.ATTR_ATTRIBUTES).getAsJsonObject();
 
-        String id = RestHelper.parseString(attributes, RestHelper.ATTR_ID);
+        String id = RestHelper.ATTR_ASSET_TYPE + RestHelper.parseString(attributes, RestHelper.ATTR_ID);
         String value = RestHelper.getAsJsonString(attributes, RestHelper.ATTR_VALUE);
         String name = RestHelper.parseString(attributes, RestHelper.ATTR_NAME);
         Field field = fieldsByLibraryId.get(id);

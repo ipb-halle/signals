@@ -39,7 +39,7 @@ public abstract class MaterialsManagerTest {
     private final String TEST_RESOURCE_1 = "LibraryManagerTest001.json";
     private final String TEST_KEY_1 =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/materials/libraries";
-    private final String TEST_LIBRARY_ID = "6215104dab0ad27bf79429ff";
+    private final String TEST_LIBRARY_ID = "assetType:6215104dab0ad27bf79429ff";
     private final String TEST_LIBRARY_NAME = "Reagents (SNB)";
     private final int TEST_LIBRARY_ASSET_FIELD_COUNT = 12;
     private final String TEST_LIBRARY_ASSET_FIELD_ID = "6215104dab0ad27bf79429f7";

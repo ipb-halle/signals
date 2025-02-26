@@ -72,13 +72,12 @@ public class MaterialProcessorBean {
      * This method will be called once per Material in order to process it in one transaction
      *
      * @param signalsEntityDTO DTO of materials (contains e.g. the id of material)
-     * @param allFields         Mapping all fields, grouped by Library-ID
+     * @param allFields        Mapping all fields, grouped by Library-ID
      */
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void processSingleMaterial(SignalsEntityDTO signalsEntityDTO,
                                       Map<String, Map<String, Field>> allFields) {
         try {
-
             //The main processing of material takes places in this method
             doProcessMaterial(signalsEntityDTO, allFields);
 
@@ -115,9 +114,7 @@ public class MaterialProcessorBean {
     }
 
     private void processMaterialFields(Map<String, Field> fieldLibrariesById, Material material) throws IOException {
-
-        List<FieldValue> fieldValues
-                = materialRestService.doGetMaterialProperties(material.getId(), fieldLibrariesById);
+        List<FieldValue> fieldValues = materialRestService.doGetMaterialProperties(material.getId(), fieldLibrariesById);
 
         for (FieldValue fieldValue : fieldValues) {
             Field field = fieldLibrariesById.get(fieldValue.getFieldId());
@@ -154,8 +151,9 @@ public class MaterialProcessorBean {
 
         if ((latestRevision == null)
                 || !latestRevision.getFileId().equals(newRevision.getFileId())) {
-            logger.info("Found new attachment for material Id={}", material.getId());
+            logger.info("MaterialProcessorBean:-> processAttachments-> Found new attachment for material Id={}", material.getId());
             List<RestReply> replies = new ArrayList<>();
+
             switch (field.getFieldType().getValue()) {
                 case FieldType.ATTACHED_FILE:
                     replies = obtainAttachment(material, field, fieldValue);
@@ -168,7 +166,7 @@ public class MaterialProcessorBean {
             }
 
             attachment.addRevision(newRevision);
-            if (! replies.isEmpty()) {
+            if (!replies.isEmpty()) {
                 storeAttachment(attachment, replies);
             }
         }
@@ -193,6 +191,7 @@ public class MaterialProcessorBean {
      * persist the downloaded attachments in the database and move
      * them from their staging location into permanent storage. Make
      * sure, not to store and move if the transaction has been aborted.
+     *
      * @param attachment the attachment with a new revision already added
      * @param files
      * @throws IOException
@@ -200,7 +199,7 @@ public class MaterialProcessorBean {
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     private void storeAttachment(Attachment attachment,
                                  Collection<RestReply> files
-                                 ) throws IOException {
+    ) throws IOException {
 
         if (transactionSynchronizationRegistry.getTransactionStatus()
                 == jakarta.transaction.Status.STATUS_MARKED_ROLLBACK) {
@@ -247,6 +246,11 @@ public class MaterialProcessorBean {
                 return attachments.get(0);
             default:
                 logger.error("MPB:-> getAttachment() found more than 1 attachment for matId = {}, fieldId = {}", material.getId(), field.getId());
+                try {
+                    throw new RuntimeException();
+                } catch (Exception e) {
+                    logger.warn("Exception", e);
+                }
                 return null;
         }
     }
