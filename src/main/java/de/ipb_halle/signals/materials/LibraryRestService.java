@@ -61,9 +61,9 @@ public class LibraryRestService implements RestReplyParser<Library> {
     public Library parseReply(JsonElement json) {
         Library lib = new Library();
         JsonObject j = json.getAsJsonObject();
-        JsonObject attributes  = j.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
+        JsonObject attributes = j.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
-        lib.setId(RestHelper.parseString(j, RestHelper.ATTR_ID));
+        lib.setId(RestHelper.ATTR_ASSET_TYPE + RestHelper.parseString(j, RestHelper.ATTR_ID));
         lib.setEnabled(RestHelper.parseBool(j, Library.ATTR_ENABLED));
 
         lib.setName(RestHelper.parseString(attributes, RestHelper.ATTR_NAME));
@@ -88,27 +88,27 @@ public class LibraryRestService implements RestReplyParser<Library> {
         JsonElement jsonResult;
         try {
             restClient.setMethod(Method.GET)
-                .setEndpoint(MATERIALS_LIBRARIES_ENDPOINT)
-                .execute();
+                    .setEndpoint(MATERIALS_LIBRARIES_ENDPOINT)
+                    .execute();
 
             jsonResult = JsonParser.parseString(restClient.getResponse().getString());
             return jsonResult.getAsJsonObject().getAsJsonArray(RestHelper.ATTR_DATA).iterator();
 
-        } catch(UnexpectedResponseCodeException ue) {
+        } catch (UnexpectedResponseCodeException ue) {
             logger.warn("LibraryRestService:-> Unexpected code", ue);
-        } catch(URISyntaxException me) {
+        } catch (URISyntaxException me) {
             logger.warn("LibraryRestService:-> Malformed URL", me);
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             logger.warn("LibraryRestService:-> IOException", ioe);
         }
         return null;
     }
 
     public List<Library> doGetLibraries() {
-        List<Library> libraries = new ArrayList<> ();
+        List<Library> libraries = new ArrayList<>();
         Iterator<JsonElement> iter = fetch();
 
-        while(iter.hasNext()) {
+        while (iter.hasNext()) {
             Library lib = parseReply(iter.next());
             libraries.add(lib);
         }
@@ -159,11 +159,11 @@ public class LibraryRestService implements RestReplyParser<Library> {
     private void parseChangeRecords(JsonObject json, Library lib) {
         lib.setCreatedAt(RestHelper.parseDate(RestHelper.getPrimitiveFromPath(json, Library.ATTR_PATH_CREATED_AT)));
         lib.setCreatedBy(new UserReference(
-                    RestHelper.parseString(
-                    RestHelper.getPrimitiveFromPath(json, Library.ATTR_PATH_CREATED_BY))));
+                RestHelper.parseString(
+                        RestHelper.getPrimitiveFromPath(json, Library.ATTR_PATH_CREATED_BY))));
         lib.setEditedAt(RestHelper.parseDate(RestHelper.getPrimitiveFromPath(json, Library.ATTR_PATH_EDITED_AT)));
         lib.setEditedBy(new UserReference(
-                    RestHelper.parseString(
-                    RestHelper.getPrimitiveFromPath(json, Library.ATTR_PATH_EDITED_BY))));
+                RestHelper.parseString(
+                        RestHelper.getPrimitiveFromPath(json, Library.ATTR_PATH_EDITED_BY))));
     }
 }

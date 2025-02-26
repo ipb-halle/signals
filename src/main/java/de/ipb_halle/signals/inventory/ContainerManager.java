@@ -207,7 +207,9 @@ public class ContainerManager {
         AttachmentRevision latestRevision = attachment.getLatestRevision();
         AttachmentRevision newRevision = new AttachmentRevision();
         containerRestService.parseAttachmentRevisionInfo(newRevision, fieldValue);
-        if (latestRevision == null) {
+        if ((latestRevision == null) ||
+                !latestRevision.getFileId().equals(newRevision.getId())) {
+            logger.info("ContainerManager:-> isNewRevision() -> found new attachment for container Id={}", fieldValue.getEntityId());
             attachment.addRevision(newRevision);
             return true;
         }
@@ -216,7 +218,7 @@ public class ContainerManager {
                 return false;
             }
         }
-        return true;
+        return false;
     }
 
     /**
@@ -320,7 +322,7 @@ public class ContainerManager {
      * If {@code augmented} is true, the container is augmented with user
      * location data.
      *
-     * @param id        the ID of the container
+     * @param id      the ID of the container
      * @param augment whether the container should be augmented
      * @return the container
      */

@@ -75,8 +75,8 @@ public class MaterialsManager {
         Material batch = null;
         // also need to load batch if material supports batches!
         Library lib = libraryDbService.loadById(mat.getLibraryId());
-        if(lib.hasBatches()){
-            Map<String, Object> cmap = new HashMap<> ();
+        if (lib.hasBatches()) {
+            Map<String, Object> cmap = new HashMap<>();
             cmap.put(MaterialDbService.MATERIAL_ID, mat.getId());
             List<Material> batches = materialDbService.load(cmap);
             if (batches.size() > 0) {
@@ -104,11 +104,11 @@ public class MaterialsManager {
      * </ul>
      *
      * @param runtimeConfig a configuration object containing runtime properties
-     * @param dateRange an array with one or two date elements:
-     *                  <ul>
-     *                      <li><b>[0]</b> start date (required)</li>
-     *                      <li><b>[1]</b> optional end date</li>
-     *                  </ul>
+     * @param dateRange     an array with one or two date elements:
+     *                      <ul>
+     *                          <li><b>[0]</b> start date (required)</li>
+     *                          <li><b>[1]</b> optional end date</li>
+     *                      </ul>
      */
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void manageMaterials(RuntimeConfig runtimeConfig, Date[] dateRange) {
@@ -124,11 +124,11 @@ public class MaterialsManager {
                 new EntityType[]{EntityType.valueOf(Material.ENTITY_TYPE_ASSET),
                         EntityType.valueOf(Material.ENTITY_TYPE_BATCH)});
 
-        // Fetch all fields of all libraries
-        Map<String, Map<String, Field>> allFields = mapFieldsByLibraryId();
-
         // Load all materials from the database
         List<SignalsEntityDTO> entityDTOs = signalsEntityDbService.load(cmap);
+
+        // Fetch all fields of all libraries
+        Map<String, Map<String, Field>> allFields = mapFieldsByLibraryId();
 
         //Parallel processing
         processMaterialsSequentially(entityDTOs, allFields);
@@ -146,16 +146,19 @@ public class MaterialsManager {
     private Map<String, Map<String, Field>> mapFieldsByLibraryId() {
         // 1) Loads all libraries
         List<Library> libraries = libraryDbService.load(new HashMap<>());
+        logger.info("Materials manager:-> loading of material libraries done");
         Set<String> libraryIds = libraries.stream().map(Library::getId).collect(Collectors.toSet());
+        logger.info("Materials manager:-> library Ids {}\n", Arrays.toString(libraryIds.toArray()));
 
-        // 2) Load all fields for the retrieved libraries
+        // 2) Load all fields for the retrieved libraries (ids without prefix)
         List<Field> allFields = receiveAllFieldsOfAllLibraries(libraryIds);
 
         // 3) Build the nested map
         Map<String, Map<String, Field>> fieldMap = new HashMap<>();
         for (Field field : allFields) {
             //removing prefix assetType-> definingEntityId='assetType:6329671b759ae07953c8117b',
-            String libraryId = field.getDefiningEntityId().split(":")[1];
+            //String libraryId = field.getDefiningEntityId().split(":")[1];
+            String libraryId = field.getDefiningEntityId();
             fieldMap.putIfAbsent(libraryId, new HashMap<>());
             fieldMap.get(libraryId).put(field.getId(), field);
         }
@@ -177,7 +180,9 @@ public class MaterialsManager {
         cmap.put(Field.DEFINING_ENTITY_ID_LIST, libraryIds.stream()
                 .map(id -> Library.LIBRARY_TYPE + ":" + id)
                 .collect(Collectors.toList()));
-        return fieldDbService.load(cmap);
+        List<Field> load = fieldDbService.load(cmap);
+        System.out.println(Arrays.toString(load.toArray()));
+        return load;
     }
 
     /**
