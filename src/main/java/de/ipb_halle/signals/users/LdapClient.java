@@ -276,7 +276,7 @@ public class LdapClient {
      * NOTE: This is an AD specific implementation, "expires never" can obviously
      * be represented by two values: either 2^63-1 or 0.
      *
-     * @param attr LDAP attribute set
+     * @param attrs LDAP attribute set
      * @return enabled state
      */
     private boolean getUserExpiration(Attributes attrs) throws Exception {

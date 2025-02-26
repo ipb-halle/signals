@@ -110,7 +110,8 @@ public class RoleManager {
     }
 
     /**
-     * @return standard user role as defined by signals config (or null if no match is found)
+     * synchronize database roles from Signals Notebook
+     * @param context context information (i.e. whether it is a dry run)
      */
     public void syncDbRolesFromSnb(UserSynchronizationContext context) {
         Map<String, Role> rolesFromDb = roleDbService.loadMappedById(new HashMap<> ());
