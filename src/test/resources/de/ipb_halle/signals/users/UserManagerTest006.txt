@@ -1,0 +1,1 @@
+DUMMY DATA for license endpoint

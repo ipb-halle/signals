@@ -31,6 +31,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 @ExtendWith(PostgresqlContainerExtension.class)
 public abstract class UserManagerTest {
@@ -54,6 +56,13 @@ public abstract class UserManagerTest {
     private final String TEST_KEY_4 =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users?page%5Blimit%5D=20&page%5Boffset%5D=0&enabled=false";
 
+    private final String TEST_RESOURCE_5 = "UserManagerTest005.json";
+    private final String TEST_KEY_5 =
+            "POST:https://endpoint.somewhere.invalid/api/rest/v1.0/users";
+    private final String TEST_RESOURCE_6 = "UserManagerTest006.txt";
+    private final String TEST_KEY_6 =
+            "PATCH:https://endpoint.somewhere.invalid/api/rest/v1.0/scim/v2/Users/user-%s";
+
     private final String TEST_USER1_ID = "102";
     private final String TEST_USER1_ALIAS = "USR3";
     private final String TEST_USER1_FIRST_NAME = "ThreeFirst";
@@ -61,12 +70,17 @@ public abstract class UserManagerTest {
     private final String TEST_USER2_ID = "122";
     private final String TEST_USER2_LAST_NAME = "ThreeLast";
     private final String TEST_USER2_FIRST_NAME = "FiveFirst";
+    private final String TEST_USER3_ID = "107";
+    private final String TEST_USER3_LAST_NAME = "FourLast";
+    private final String TEST_USER3_LAST_NAME_MOD = "FourLast_Modified_By_doCreateUserCall";
     private final String TEST_ROLE1_ID = "1";
     private final String TEST_ROLE1_NAME = "System Admin";
     private final String TEST_ROLE3_ID = "3";
     private final String TEST_ROLE3_NAME = "Standard User";
     private final String TEST_ROLE4_ID = "4";
     private final String TEST_ROLE4_NAME = "Inventory Admin";
+    private final String TEST_ROLE5_ID = "5";
+    private final String TEST_ROLE5_NAME = "Super User";
 
     @Inject
     @DeploymentElement(mock="de.ipb_halle.signals.rest.MockRestClient")
@@ -85,6 +99,10 @@ public abstract class UserManagerTest {
 
     @Inject
     @DeploymentElement
+    private UserRestService userRestService;
+
+    @Inject
+    @DeploymentElement
     private RoleDbService roleDbService;
 
     @Inject
@@ -94,23 +112,30 @@ public abstract class UserManagerTest {
     @BeforeAll
     public void testSetup() {
         TestBase.prepareRestClients((MockRestClient) mockRestClient,
-            TEST_KEY_1,
-            getClass().getResourceAsStream(TEST_RESOURCE_1));
+                TEST_KEY_1,
+                getClass().getResourceAsStream(TEST_RESOURCE_1));
         TestBase.prepareRestClients((MockRestClient) mockRestClient,
-            TEST_KEY_2,
-            getClass().getResourceAsStream(TEST_RESOURCE_2));
+                TEST_KEY_2,
+                getClass().getResourceAsStream(TEST_RESOURCE_2));
         TestBase.prepareRestClients((MockRestClient) mockRestClient,
-            TEST_KEY_3a,
-            getClass().getResourceAsStream(TEST_RESOURCE_3));
+                TEST_KEY_3a,
+                getClass().getResourceAsStream(TEST_RESOURCE_3));
         TestBase.prepareRestClients((MockRestClient) mockRestClient,
-            TEST_KEY_3b,
-            getClass().getResourceAsStream(TEST_RESOURCE_3));
+                TEST_KEY_3b,
+                getClass().getResourceAsStream(TEST_RESOURCE_3));
         TestBase.prepareRestClients((MockRestClient) mockRestClient,
-            TEST_KEY_3c,
-            getClass().getResourceAsStream(TEST_RESOURCE_3));
+                TEST_KEY_3c,
+                getClass().getResourceAsStream(TEST_RESOURCE_3));
         TestBase.prepareRestClients((MockRestClient) mockRestClient,
-            TEST_KEY_4,
-            getClass().getResourceAsStream(TEST_RESOURCE_4));
+                TEST_KEY_4,
+                getClass().getResourceAsStream(TEST_RESOURCE_4));
+        TestBase.prepareRestClients((MockRestClient) mockRestClient,
+                TEST_KEY_5,
+                getClass().getResourceAsStream(TEST_RESOURCE_5));
+        TestBase.prepareRestClients((MockRestClient) mockRestClient,
+                String.format(TEST_KEY_6, TEST_USER3_ID),
+                getClass().getResourceAsStream(TEST_RESOURCE_6));
+
 
         Role role = new Role();
         role.setId(TEST_ROLE1_ID);
@@ -123,6 +148,9 @@ public abstract class UserManagerTest {
         role = new Role();
         role.setId(TEST_ROLE4_ID);
         role.setName(TEST_ROLE4_NAME);
+        roleDbService.save(role);
+        role.setId(TEST_ROLE5_ID);
+        role.setName(TEST_ROLE5_NAME);
         roleDbService.save(role);
     }
 
@@ -151,5 +179,25 @@ public abstract class UserManagerTest {
         manager.syncUsersFromLdap(context);
         String html = context.report.render();
         Assertions.assertTrue(context.report.render().contains("ae@somewhere.invalid"), "report contains 'ae@somewhere.invalid'");
+    }
+
+    @Test
+    public void createTest() {
+        RuntimeConfig config = new RuntimeConfig(true, true, false, true, false);
+        UserSynchronizationContext context = new UserSynchronizationContext(config);
+        AccessManager.prepareReport(context, new HtmlReport());
+
+        User user = userRestService.doGetUser(TEST_USER3_ID);
+        Assertions.assertEquals(TEST_USER3_LAST_NAME, user.getLastName(), "last name matches");
+
+        // convert RoleReferences to Roles
+        Set<IRole> roles = new HashSet<>();
+        for (IRole r : user.getRoles()) {
+            roles.add(roleDbService.loadById(r.getId()));
+        }
+        user.setRoles(roles);
+
+        user = manager.doCreateUser(context, user);
+        Assertions.assertEquals(TEST_USER3_LAST_NAME_MOD, user.getLastName(), "last name was modified");
     }
 }
