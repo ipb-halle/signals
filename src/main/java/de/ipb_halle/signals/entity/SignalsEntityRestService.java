@@ -123,6 +123,11 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
                 new SignalsChildParser(dynEnumManager), true);
     }
 
+    /**
+     *
+     * @param entityDTO
+     * @return
+     */
     public List<Share> doGetShares(SignalsEntityDTO entityDTO) {
         try {
             restClient.reset()
@@ -133,7 +138,11 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
 
             ShareParser parser = new ShareParser();
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
-            return parser.parseReply(jsonResult);
+            List<Share> shares = parser.parseReply(jsonResult);
+            for (Share share : shares) {
+                share.setEntityId(entityDTO.getId());
+            }
+            return shares;
         } catch (UnexpectedResponseCodeException ue) {
             logger.warn("doCreateGroup() got unexpected return code from API call");
         } catch (URISyntaxException me) {

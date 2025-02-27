@@ -19,20 +19,18 @@ package de.ipb_halle.signals.entity;
 
 import de.ipb_halle.signals.PostgresqlContainerExtension;
 import de.ipb_halle.signals.RuntimeConfig;
-import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
-import de.ipb_halle.signals.dynEnum.DynEnum;
-import de.ipb_halle.signals.dynEnum.DynEnumDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.rest.MockRestClient;
+import de.ipb_halle.signals.users.Group;
+import de.ipb_halle.signals.users.GroupDbService;
+import de.ipb_halle.signals.users.User;
+import de.ipb_halle.signals.users.UserDbService;
+import de.ipb_halle.signals.users.UserReference;
+import de.ipb_halle.tda.DeploymentElement;
 import jakarta.inject.Inject;
-import java.util.Properties;
-import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
-import org.apache.openejb.junit5.RunWithApplicationComposer;
-import org.apache.openejb.testing.Classes;
-import org.apache.openejb.testing.Configuration;
-import org.apache.openejb.testing.Module;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -40,10 +38,9 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 
-@RunWithApplicationComposer
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(PostgresqlContainerExtension.class)
-public class SignalsEntityManagerTest {
+public abstract class SignalsEntityManagerTest {
 
     private final String TEST_MOCK_RESOURCE = "SignalsEntityManagerTestMockResources.json";
     private final String TEST_RESOURCE_1 = "SignalsEntityManagerTest001.json";
@@ -56,55 +53,84 @@ public class SignalsEntityManagerTest {
 
     private final String TEST_ENTITY_TYPE = "location";
 
+    @PersistenceContext
+    private EntityManager em;
+
     @Inject
+    @DeploymentElement(mock = "de.ipb_halle.signals.rest.MockRestClient")
     private MockRestClient mockRestClient;
 
     @Inject
+    @DeploymentElement
     private SignalsEntityManager manager;
 
     @Inject
+    @DeploymentElement
+    private SignalsEntityDbService signalsEntityDbService;
+
+    @Inject
+    @DeploymentElement
     private DynEnumManager dynEnumManager;
 
-    @Module
-    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class,
-            SignalsEntity.class, SignalsEntityDbService.class, SignalsEntityManager.class,
-            SEProcessorBean.class,
-            SignalsEntityRestService.class, DynEnum.class, DynEnumManager.class, DynEnumDbService.class,
-            SignalsEntityDTO.class, EntityType.class})
-    public EjbJar app() {
-        return new EjbJar();
+    @Inject
+    @DeploymentElement
+    private UserDbService userDbService;
+
+    @Inject
+    @DeploymentElement
+    private GroupDbService groupDbService;
+
+    private void createUser(String id, String name, Group[] groups) {
+        User u = new User();
+        u.setId(id);
+        u.setUserName("SignalsEntityManagerTest_" + name);
+        u.setEnabled(true);
+        for (Group g : groups) {
+            u.addSystemGroup(g);
+        }
+        userDbService.save(u);
     }
 
-    @Module
-    public PersistenceUnit persistence() {
-        return TestBase.persistence(new String[]{ SignalsEntity.class.getName(),
-        DynEnum.class.getName(), EntityType.class.getName()});
-    }
-
-    @Configuration
-    public Properties configuration() {
-        return TestBase.configuration();
+    private Group createGroup(String id, String name) {
+        Group g = new Group();
+        g.setId(id);
+        g.setName("Group_" + name);
+        groupDbService.save(g);
+        return g;
     }
 
     @BeforeAll
     public void testSetup() {
-//        TestBase.prepareRestClients(mockRestClient,
-//            TEST_KEY_1,
-//            getClass().getResourceAsStream(TEST_RESOURCE_1));
-//        TestBase.prepareRestClients(mockRestClient,
-//            TEST_KEY_2,
-//            getClass().getResourceAsStream(TEST_RESOURCE_2));
         TestBase.prepareRestClients(mockRestClient, this.getClass(), TEST_MOCK_RESOURCE);
+        Group g1 = createGroup("124", "alpha");
+        createUser("100", "one", new Group [0]);
+        createUser("102", "two", new Group [0]);
+        createUser("103", "three", new Group [0]);
+        createUser("104", "four", new Group [] { g1 });
     }
-
 
     @Test
     public void entityTest() {
         dynEnumManager.allowEnumDiscovery();
-        EntityType[] includedTypes = new EntityType[] { EntityType.valueOf(TEST_ENTITY_TYPE) };
+        EntityType[] includedTypes = new EntityType[]{EntityType.valueOf(TEST_ENTITY_TYPE)};
         manager.manageSignalsEntities(null, includedTypes, new RuntimeConfig());
-        SignalsEntityDTO entity = manager.getDbEntity(TEST_LOCATION_ID);
+        SignalsEntityDTO entity = signalsEntityDbService.loadById(TEST_LOCATION_ID,
+                new SignalsEntityDbService.SEloadInfo(true, true, true));
         System.out.print(entity.dump());
         Assertions.assertEquals(TEST_ENTITY_TYPE, entity.getType().getValue(), "entity type mismatch");
+
+        /* ToDo: test sharing */
+        UserReference u1 = new UserReference("100");
+        UserReference u2 = new UserReference("102");
+        UserReference u3 = new UserReference("104");
+        Assertions.assertTrue(entity.hasPermission(u1, Share.SharePermission.READ), "Sharing: 100 can read");
+        Assertions.assertFalse(entity.hasPermission(u1, Share.SharePermission.WRITE), "Sharing 100 cannot write");
+        Assertions.assertTrue(entity.hasPermission(u2, Share.SharePermission.READ), "Sharing: 102 can read");
+        Assertions.assertTrue(entity.hasPermission(u2, Share.SharePermission.WRITE), "Sharing: 102 can write");
+        Assertions.assertTrue(entity.hasPermission(u2, Share.SharePermission.FULL_CONTROL), "Sharing: 102 has full control");
+        Assertions.assertTrue(entity.hasPermission(u3, Share.SharePermission.READ), "Sharing: 104 can read via group");
+        Assertions.assertTrue(entity.hasPermission(u3, Share.SharePermission.WRITE), "Sharing: 104 can write via group");
+        Assertions.assertFalse(entity.hasPermission(u1, Share.SharePermission.WRITE), "Sharing 100 cannot write");
+        Assertions.assertFalse(entity.hasPermission(u3, Share.SharePermission.FULL_CONTROL), "Sharing: 104 can't control via group");
     }
 }

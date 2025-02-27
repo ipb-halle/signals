@@ -35,6 +35,12 @@ public class ShareParser implements RestReplyParser<List<Share>> {
 
     private Logger logger = LoggerFactory.getLogger(ShareParser.class);
 
+    /**
+     * Parse a json element into a list of Share objects (either UserShare or GroupShare).
+     * NOTE: The <code>entityId</code> property for the Share objects is NOT set.
+     * @param json
+     * @return list of parsed Share objects
+     */
     @Override
     public List<Share> parseReply(JsonElement json) {
         List<Share> shares = new ArrayList<>();
@@ -59,13 +65,13 @@ public class ShareParser implements RestReplyParser<List<Share>> {
     private Share parseShareType(JsonObject jsonObj) {
         JsonObject relations = jsonObj.getAsJsonObject(RestHelper.ATTR_RELATIONSHIPS);
         if (relations.has(Share.ATTR_GROUP)) {
-            String groupId = RestHelper.getPrimitiveFromPath(relations, Share.ATTR_GROUP_ID).toString();
+            String groupId = RestHelper.getPrimitiveFromPath(relations, Share.ATTR_GROUP_ID).getAsString();
             GroupShare g = new GroupShare();
             g.setGroupId(groupId);
             return g;
         }
         if (relations.has(Share.ATTR_USER)) {
-            String userId = RestHelper.getPrimitiveFromPath(relations, Share.ATTR_USER_ID).toString();
+            String userId = RestHelper.getPrimitiveFromPath(relations, Share.ATTR_USER_ID).getAsString();
             UserShare u = new UserShare();
             u.setUserId(userId);
             return u;

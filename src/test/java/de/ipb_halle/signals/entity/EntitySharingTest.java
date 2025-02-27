@@ -128,10 +128,7 @@ public abstract class EntitySharingTest {
         Map<String, Object> cmap = new HashMap<>();
         cmap.put(Share.ENTITY_ID, e.getId());
         cmap.put(Share.USER_ID, u.getId());
-        // this.em.flush();
-        this.em.clear();
         return signalsEntityDbService.loadEffectiveShares(cmap);
-
     }
 
     @Test

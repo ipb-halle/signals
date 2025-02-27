@@ -48,10 +48,6 @@ public class SignalsEntityManager {
 
     private Logger logger = LoggerFactory.getLogger(SignalsEntityManager.class);
 
-    public SignalsEntityDTO getDbEntity(String id) {
-        return dbService.loadById(id);
-    }
-
     /**
      * Lists entities from the database that fall within a certain date range
      * and match the specified included entity types. The results are printed
