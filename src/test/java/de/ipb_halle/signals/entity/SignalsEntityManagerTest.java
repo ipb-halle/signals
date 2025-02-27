@@ -20,6 +20,7 @@ package de.ipb_halle.signals.entity;
 import de.ipb_halle.signals.PostgresqlContainerExtension;
 import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.TestBase;
+import de.ipb_halle.signals.TestHelper;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.rest.MockRestClient;
 import de.ipb_halle.signals.users.Group;
@@ -80,33 +81,24 @@ public abstract class SignalsEntityManagerTest {
     @DeploymentElement
     private GroupDbService groupDbService;
 
-    private void createUser(String id, String name, Group[] groups) {
-        User u = new User();
-        u.setId(id);
-        u.setUserName("SignalsEntityManagerTest_" + name);
-        u.setEnabled(true);
-        for (Group g : groups) {
-            u.addSystemGroup(g);
-        }
-        userDbService.save(u);
-    }
-
-    private Group createGroup(String id, String name) {
-        Group g = new Group();
-        g.setId(id);
-        g.setName("Group_" + name);
-        groupDbService.save(g);
-        return g;
-    }
+    private TestHelper testHelper;
 
     @BeforeAll
     public void testSetup() {
         TestBase.prepareRestClients(mockRestClient, this.getClass(), TEST_MOCK_RESOURCE);
-        Group g1 = createGroup("124", "alpha");
-        createUser("100", "one", new Group [0]);
-        createUser("102", "two", new Group [0]);
-        createUser("103", "three", new Group [0]);
-        createUser("104", "four", new Group [] { g1 });
+        dynEnumManager.allowEnumDiscovery();
+        testHelper = new TestHelper()
+                .setDynEnumManager(dynEnumManager)
+                .setGroupDbService(groupDbService)
+                .setSignalsEntityDbService(signalsEntityDbService)
+                .setUserDbService(userDbService)
+                .setPrefix("");
+
+        Group g1 = testHelper.createGroup("124");
+        testHelper.createUser("100",  new Group [0]);
+        testHelper.createUser("102",  new Group [0]);
+        testHelper.createUser("103",  new Group [0]);
+        testHelper.createUser("104",  new Group [] { g1 });
     }
 
     @Test

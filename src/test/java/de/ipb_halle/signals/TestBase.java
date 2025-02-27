@@ -27,8 +27,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Properties;
+
+import de.ipb_halle.signals.users.Group;
+import de.ipb_halle.signals.users.GroupDbService;
+import de.ipb_halle.signals.users.User;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
 
 public class TestBase {

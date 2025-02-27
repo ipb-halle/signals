@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals.attachment;
 
+import de.ipb_halle.tda.PersistenceElements;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -35,6 +36,7 @@ import java.util.Set;
  */
 
 @Stateless
+@PersistenceElements(entities = {AttachmentEntity.class, AttachmentFile.class, AttachmentRevision.class})
 public class AttachmentDbService {
 
 

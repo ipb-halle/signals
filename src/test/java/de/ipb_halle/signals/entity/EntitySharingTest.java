@@ -18,6 +18,7 @@
 package de.ipb_halle.signals.entity;
 
 import de.ipb_halle.signals.PostgresqlContainerExtension;
+import de.ipb_halle.signals.TestHelper;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.users.Group;
 import de.ipb_halle.signals.users.GroupDbService;
@@ -61,46 +62,7 @@ public abstract class EntitySharingTest {
     @DeploymentElement
     private DynEnumManager dynEnumManager;
 
-    private EntityType entityType;
-
-    private Group createGroup(String id) {
-        Group group = new Group();
-        group.setId("sharing_" + id);
-        group.setName("sharing_NAME_" + id);
-        group.setDescription("sharing_DESCRIPTION_" + id);
-        group.setCreatedAt(new Date());
-        group.setEditedAt(new Date());
-        group.setSystem(true);
-        groupDbService.save(group);
-        return group;
-    }
-
-    private User createUser(Group[] groups, String id) {
-        User user = new User();
-        user.setId("sharing_" + id);
-        user.setUserName("sharing_NAME_" + id);
-        user.setEnabled(true);
-        for (Group g : groups) {
-            user.addSystemGroup(g);
-        }
-        userDbService.save(user);
-        return user;
-    }
-
-    private SignalsEntityDTO createEntity(String id, User user) {
-        SignalsEntityDTO dto = new SignalsEntityDTO();
-        dto.setId("sharing_" + id);
-        dto.setEid("sharing_" + id);
-        dto.setCreatedAt(new Date());
-        dto.setCreatedBy(user);
-        dto.setEditedAt(new Date());
-        dto.setEditedBy(user);
-        dto.setOwner(user);
-        dto.setName("sharing_NAME_" + id);
-        dto.setType(entityType);
-        signalsEntityDbService.save(dto);
-        return dto;
-    }
+    private TestHelper testHelper;
 
     private void createUserShare(SignalsEntityDTO e, User u, boolean r, boolean w, boolean a, boolean f) {
         UserShare us = new UserShare();
@@ -131,19 +93,29 @@ public abstract class EntitySharingTest {
         return signalsEntityDbService.loadEffectiveShares(cmap);
     }
 
+    private void setup() {
+        dynEnumManager.allowEnumDiscovery();
+        testHelper = new TestHelper()
+                .setDynEnumManager(dynEnumManager)
+                .setGroupDbService(groupDbService)
+                .setSignalsEntityDbService(signalsEntityDbService)
+                .setUserDbService(userDbService)
+                .setPrefix("sharing_");
+    }
+
     @Test
     public void sharingTest() {
-        dynEnumManager.allowEnumDiscovery();
-        entityType = (EntityType) dynEnumManager.valueOf(EntityType.valueOf("sharing_experiment"));
-        Group g1 = createGroup("g1");
-        Group g2 = createGroup("g2");
-        Group g3 = createGroup("g3");
-        User u1 = createUser(new Group[] {g1, g2}, "u1");
-        User u2 = createUser(new Group[] {g1}, "u2");
-        User u3 = createUser(new Group[] {g3}, "u3");
-        SignalsEntityDTO e1 = createEntity("e1", u1);
-        SignalsEntityDTO e2 = createEntity("e2", u2);
-        SignalsEntityDTO e3 = createEntity("e3", u2);
+        setup();
+        EntityType entityType = EntityType.valueOf("sharing_experiment");
+        Group g1 = testHelper.createGroup("g1");
+        Group g2 = testHelper.createGroup("g2");
+        Group g3 = testHelper.createGroup("g3");
+        User u1 = testHelper.createUser("u1", new Group[] {g1, g2});
+        User u2 = testHelper.createUser("u2", new Group[] {g1});
+        User u3 = testHelper.createUser("u3", new Group[] {g3});
+        SignalsEntityDTO e1 = testHelper.createEntity("e1", entityType, u1);
+        SignalsEntityDTO e2 = testHelper.createEntity("e2", entityType, u2);
+        SignalsEntityDTO e3 = testHelper.createEntity("e3", entityType, u2);
         createUserShare(e1, u1, true, false, false, false);
         List<Share> shareList = getShare(e1, u1);
         Assertions.assertEquals(1,shareList.size(), "List size matches");
