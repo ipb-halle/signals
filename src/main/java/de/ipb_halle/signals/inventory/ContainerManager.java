@@ -17,17 +17,13 @@
  */
 package de.ipb_halle.signals.inventory;
 
-import de.ipb_halle.signals.attachment.Attachment;
 import de.ipb_halle.signals.attachment.AttachmentDbService;
-import de.ipb_halle.signals.attachment.AttachmentFile;
-import de.ipb_halle.signals.attachment.AttachmentRevision;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.entity.SignalsEntityDbService;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
-import de.ipb_halle.signals.field.*;
-import de.ipb_halle.signals.rest.RestReply;
+import de.ipb_halle.signals.field.FieldDbService;
 import de.ipb_halle.signals.storage.StorageService;
 import de.ipb_halle.signals.users.UserManager;
 import jakarta.annotation.Resource;
@@ -39,10 +35,7 @@ import jakarta.transaction.TransactionSynchronizationRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Manager for containers. This class orchestrates fetching container
@@ -87,6 +80,9 @@ public class ContainerManager {
     @Inject
     private AttachmentDbService attachmentDbService;
 
+    @Inject
+    private ContainerProcessorBean containerProcessorBean;
+
 
     private Logger logger = LoggerFactory.getLogger(ContainerManager.class);
 
@@ -104,14 +100,14 @@ public class ContainerManager {
      * @param dateRange an array of dates; the first element is the start date,
      *                  and the second element (if present) is the end date
      */
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void manageContainers(Date[] dateRange) {
+
+
         // 1) Loads set of container type ids
         Set<String> containerTypeIds = containerTypeDbService.getContainerTypeIds();
 
-        // 2) Load (and map) all container fields for attachmentFiles
-        Map<String, Field> attachmentFields = loadAttachmentFieldsMap();
-
-        // 3) Preparing criteria map for loading signals entities by date range and type
+        // 2) Preparing criteria map for loading signals entities by date range and type
         EntityType[] entityTypes = {EntityType.valueOf(ContainerEntity.ENTITY_TYPE_CONTAINER)};
         Map<String, Object> cmap = new HashMap<>();
         cmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
@@ -120,164 +116,26 @@ public class ContainerManager {
         }
         cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, entityTypes);
 
-        // 4) Loads all containers from db (checked its working)
+        // 3) Loads all containers from db (checked its working)
         List<SignalsEntityDTO> containers = signalsEntityDbService.load(cmap);
 
-        // 5) Processes container sequentially
-        for (SignalsEntityDTO dto : containers) {
+        // 4) Processes container sequentially
+        for (SignalsEntityDTO entityDTO : containers) {
             // filter out type definitions, if signals DB put them together (checked its working)
-            if (!containerTypeIds.contains(dto.getId())) {
-                processContainer(dto.getId(), attachmentFields);
+            if (!containerTypeIds.contains(entityDTO.getId())) {
+                processContainer(entityDTO.getId());
             }
         }
     }
-
-    /**
-     * create a map of all container fields, mapped by their Id
-     *
-     * @return map of Field by Id
-     */
-    private Map<String, Field> loadAttachmentFieldsMap() {
-        Map<String, Object> cmap = new HashMap<>();
-        cmap.put(Field.FIELD_DESIGNATION, dynEnumManager.valueOf(FieldDesignation.valueOf(FieldDesignation.CONTAINER)));
-        cmap.put(Field.FIELD_TYPE, dynEnumManager.valueOf(FieldType.valueOf(FieldType.ATTACHMENT_FILE)));
-        return fieldDbService.load(cmap)
-                .stream()
-                .collect(Collectors.toMap(Field::getId, Function.identity()));
-    }
-
 
     /**
      * Fetches a container by its ID from the remote REST service and saves it
      * into the local database.
      *
-     * @param id the ID of the container to fetch
+     * @param containerId the ID of the container to fetch
      */
-    private void processContainer(String id, Map<String, Field> attachmentFields) {
-        try {
-            Container container = containerRestService.doGetContainer(id);
-            processContainerFields(container, attachmentFields);
-            containerDbService.save(container);
-        } catch (IOException e) {
-            logger.error("processContainer() caught an exception.", (Throwable) e);
-        }
-    }
-
-    private void processContainerFields(Container ct, Map<String, Field> attachmentFields) throws IOException {
-        for (FieldValue value : ct.getFieldValues()) {
-            Field field = attachmentFields.get(value.getFieldId());
-            if (field != null) {
-                obtainAttachment(ct, field, value);
-            }
-        }
-    }
-
-    /**
-     * obtain an attachment for a given attachment field and compare,
-     * whether this attachment is already known to the system.
-     *
-     * @param ct
-     * @param field
-     * @param fieldValue
-     * @throws IOException
-     */
-    private void obtainAttachment(Container ct, Field field, FieldValue fieldValue) throws IOException {
-        String mimeType = containerRestService.parseAttachmentMimeType(fieldValue);
-        RestReply tempPath = containerRestService.doGetContainerAttachment(ct, field, mimeType);
-        if (tempPath != null) {
-            Attachment attachment = getAttachment(ct, field);
-            if (isNewRevision(attachment, fieldValue, tempPath)) {
-                storeAttachment(attachment, tempPath);
-            } else {
-                storageService.removeFromStaging(tempPath);
-            }
-        }
-    }
-
-    /**
-     * check whether downloaded file is a new revision and needs to be moved
-     * to permanent storage.
-     *
-     * @param attachment
-     * @param fieldValue
-     * @param reply
-     * @return
-     */
-    private boolean isNewRevision(Attachment attachment, FieldValue fieldValue, RestReply reply) {
-        AttachmentRevision latestRevision = attachment.getLatestRevision();
-        AttachmentRevision newRevision = new AttachmentRevision();
-        containerRestService.parseAttachmentRevisionInfo(newRevision, fieldValue);
-        if ((latestRevision == null) ||
-                !latestRevision.getFileId().equals(newRevision.getId())) {
-            logger.info("ContainerManager:-> isNewRevision() -> found new attachment for container Id={}", fieldValue.getEntityId());
-            attachment.addRevision(newRevision);
-            return true;
-        }
-        for (AttachmentFile file : attachment.getFiles(latestRevision.getId())) {
-            if (reply.getDigest().equals(file.getDigest())) {
-                return false;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * persist the downloaded attachments in the database and move
-     * them from their staging location into permanent storage. Make
-     * sure, not to store and move if the transaction has been aborted.
-     *
-     * @param attachment with a new revision already added
-     * @param reply
-     * @throws IOException
-     */
-    @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    private void storeAttachment(Attachment attachment,
-                                 RestReply reply) throws IOException {
-
-        if (transactionSynchronizationRegistry.getTransactionStatus()
-                == jakarta.transaction.Status.STATUS_MARKED_ROLLBACK) {
-            logger.error("Transaction marked for rollback, skipping attachment storage.");
-            return;
-        }
-
-        AttachmentFile file = new AttachmentFile();
-        file.setDigest(reply.getDigest());
-        file.setSize(reply.getFileSize());
-        file.setMimeType(reply.getMimeType());
-        file.setTempPath(reply.getPath());
-        attachment.addFile(file);
-
-        attachmentDbService.save(attachment);
-
-        for (AttachmentFile stagedFile : attachment.getFiles(attachment.getLatestRevision().getId())) {
-            storageService.storeFile(stagedFile);
-        }
-    }
-
-    /**
-     * Loads an attachment object (if exists) or creates new one
-     */
-    private Attachment getAttachment(Container container, Field field) {
-        Map<String, Object> cmap = new HashMap<>();
-        cmap.put(Attachment.ANCESTOR_ID, container.getId());
-        cmap.put(Attachment.FIELD_ID, field.getId());
-        cmap.put(Attachment.LATEST_ONLY, Boolean.TRUE);
-        List<Attachment> attachments = attachmentDbService.load(cmap);
-
-        switch (attachments.size()) {
-            case 0:
-                Attachment attachment = new Attachment();
-                attachment.setAncestorId(Container.CONTAINER_TYPE_ENTITY_PREFIX
-                        + container.getId()
-                        + Container.CONTAINER_TYPE_ENTITY_SUFFIX);
-                attachment.setFieldId(field.getId());
-                return attachment;
-            case 1:
-                return attachments.get(0);
-            default:
-                logger.error("MPB:-> getAttachment() found more than 1 attachment for matId = {}, fieldId = {}", container.getId(), field.getId());
-                return null;
-        }
+    private void processContainer(String containerId) {
+        containerProcessorBean.processSingleContainer(containerId);
     }
 
 
@@ -314,7 +172,6 @@ public class ContainerManager {
     public Container getSnbContainer(String id) {
         return containerRestService.doGetContainer(id);
     }
-
 
     /**
      * Attempts to load a container by its ID from the local database.

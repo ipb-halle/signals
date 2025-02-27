@@ -448,7 +448,7 @@ public class MaterialRestService implements RestReplyParser<Material> {
          * ToDo: Handle Attachments including chemical drawings and
          * sequences. Include the base64 encoded attachment file data.
          */
-        switch (fieldValue.getField().getFieldType().getValue().toUpperCase()) {
+        switch (fieldValue.getField().getType().getValue().toUpperCase()) {
             case FieldType.ATTACHED_FILE:
             case FieldType.SEQUENCE_FILE:
                 obj.add(RestHelper.ATTR_VALUE, prepareAttachment(fieldValue));

@@ -63,11 +63,11 @@ public class LocationTypeFieldValuesParser implements RestReplyParser<List<Field
             }
             if (jsonElement.getAsJsonObject().getAsJsonObject(FieldValue.ATTR_CONTENT) != null) {
                 String value = jsonElement.getAsJsonObject().getAsJsonObject(FieldValue.ATTR_CONTENT).toString();
-                logger.info("LocationTypeFieldValueParser:->=========================> {}", value);
+                //  logger.info("LocationTypeFieldValueParser:->=========================> {}", value);
                 fieldValue.setValue(value);
             } else {
                 fieldValue.setValue("");
-                logger.error("LocationTypeFieldValueParser:-> NOT SUITABLE PARSING OF VALUE! {}", fieldValue.getEntityId());
+                //logger.error("LocationTypeFieldValueParser:-> NOT SUITABLE PARSING OF VALUE! {}", fieldValue.getEntityId());
             }
 
             fieldValueList.add(fieldValue);
