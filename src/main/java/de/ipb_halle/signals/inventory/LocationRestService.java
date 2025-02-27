@@ -22,6 +22,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import de.ipb_halle.signals.attachment.AttachmentRestService;
+import de.ipb_halle.signals.attachment.AttachmentRevision;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.field.*;
 import de.ipb_halle.signals.rest.*;
@@ -41,6 +42,7 @@ import java.util.*;
 @Local
 public class LocationRestService implements RestReplyParser<Location> {
 
+    private static final String LOCATION_ATTACHMENT_ENDPOINT = "/inventory/locations/%s/fields/%s/attachment";
     public final String LOCATION_ENDPOINT = "/inventory/locations/%s";
 
     @Inject
@@ -138,7 +140,7 @@ public class LocationRestService implements RestReplyParser<Location> {
         while (iterator.hasNext()) {
             Field field = fieldParser.parseReply(iterator.next());
             // NOTE: field ids are NOT unique within Signals Inventory
-            field.setId(field.getId() + ":" + loc.getId());
+            field.setId(field.getId());
             field.setDesignation((FieldDesignation) dynEnumManager.valueOf(FieldDesignation.valueOf(FieldDesignation.LOCATION)));
             field.setDefiningEntityId(loc.getId());
             fieldList.add(field);
@@ -149,5 +151,30 @@ public class LocationRestService implements RestReplyParser<Location> {
         List<FieldValue> fieldValues = svc.parseReply(fields);
         loc.addFieldValues(new HashSet<>(fieldValues));
 
+    }
+
+    /**
+     * Obtain a location attachment as an octet stream.
+     *
+     * @param location
+     * @param field
+     * @return path of the downloaded attachment in the staging area
+     */
+    public RestReply doGetLocationAttachment(Location location, Field field, String mimeType) {
+        String endpoint = String.format(LOCATION_ATTACHMENT_ENDPOINT, location.getId(), field.getStripedId());
+        return attachmentRestService.fetchAttachment(endpoint, mimeType);
+    }
+
+    public String parseAttachmentMimeType(FieldValue fieldValue) {
+        JsonElement json = JsonParser.parseString(fieldValue.getValue());
+        return RestHelper.getPrimitiveFromPath(json, Location.ATTR_ATTACHMENT_MIMETYPE).getAsString();
+    }
+
+    public void parseAttachmentRevisionInfo(AttachmentRevision newRevision, FieldValue fieldValue) {
+        JsonElement json = JsonParser.parseString(fieldValue.getValue());
+
+        newRevision.setOriginalName(RestHelper.getPrimitiveFromPath(json, Location.ATTR_ATTACHMENT_FILENAME).getAsString());
+        newRevision.setMimeType(RestHelper.getPrimitiveFromPath(json, Location.ATTR_ATTACHMENT_MIMETYPE).getAsString());
+        newRevision.setSize(RestHelper.getPrimitiveFromPath(json, Location.ATTR_ATTACHMENT_FILE_SIZE).getAsLong());
     }
 }

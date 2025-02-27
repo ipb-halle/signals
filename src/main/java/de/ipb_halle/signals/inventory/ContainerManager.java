@@ -103,7 +103,6 @@ public class ContainerManager {
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void manageContainers(Date[] dateRange) {
 
-
         // 1) Loads set of container type ids
         Set<String> containerTypeIds = containerTypeDbService.getContainerTypeIds();
 

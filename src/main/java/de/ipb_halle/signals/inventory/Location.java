@@ -29,8 +29,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Location {
-    private final static String LOCATION_TYPE_ENTITY_PREFIX = "location:";
-    private final static String LOCATION_TYPE_ENTITY_SUFFIX = ":ivt";
+    public static final String ATTR_ATTACHMENT_MIMETYPE = "attachment.mimeType";
+    public static final String ATTR_ATTACHMENT_FILENAME = "attachment.fileName";
+    public static final String ATTR_ATTACHMENT_FILE_SIZE = "attachment.fileSize";
+    public final static String LOCATION_TYPE_ENTITY_PREFIX = "location:";
+    public final static String LOCATION_TYPE_ENTITY_SUFFIX = ":ivt";
 
     private String id;
     private String name;
