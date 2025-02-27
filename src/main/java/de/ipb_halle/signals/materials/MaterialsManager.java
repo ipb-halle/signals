@@ -103,7 +103,6 @@ public class MaterialsManager {
      *     {@link #processMaterialsSequentially(List, Map)}.</li>
      * </ul>
      *
-     * @param runtimeConfig a configuration object containing runtime properties
      * @param dateRange     an array with one or two date elements:
      *                      <ul>
      *                          <li><b>[0]</b> start date (required)</li>
@@ -111,7 +110,7 @@ public class MaterialsManager {
      *                      </ul>
      */
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
-    public void manageMaterials(RuntimeConfig runtimeConfig, Date[] dateRange) {
+    public void manageMaterials( Date[] dateRange) {
         logger.debug("MM:-> START MANAGE MATERIALS");
 
         // 1) Query parameters for load
@@ -124,13 +123,13 @@ public class MaterialsManager {
                 new EntityType[]{EntityType.valueOf(Material.ENTITY_TYPE_ASSET),
                         EntityType.valueOf(Material.ENTITY_TYPE_BATCH)});
 
-        // Load all materials from the database
+        // 2) Load all materials from the database
         List<SignalsEntityDTO> entityDTOs = signalsEntityDbService.load(cmap);
 
-        // Fetch all fields of all libraries
+        // 3) Fetch all fields of all libraries
         Map<String, Map<String, Field>> allFields = mapFieldsByLibraryId();
 
-        //Parallel processing
+        // 4) Parallel processing
         processMaterialsSequentially(entityDTOs, allFields);
     }
 

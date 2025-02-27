@@ -25,10 +25,7 @@ import jakarta.persistence.criteria.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -49,6 +46,7 @@ public class AttachmentDbService {
      * @param cmap query criteria
      * @return
      */
+
     public List<Attachment> load(Map<String, Object> cmap) {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<AttachmentEntity> criteriaQuery = criteriaBuilder.createQuery(AttachmentEntity.class);
@@ -86,16 +84,6 @@ public class AttachmentDbService {
         return result;
     }
 
-    public Attachment loadLatestRevisionById(int id) {
-        AttachmentEntity entity = this.em.find(AttachmentEntity.class, id);
-        if (entity != null) {
-            Attachment attachment = new Attachment(entity);
-            attachment.addRevisions(loadRevisions(id, true));
-            attachment.addFiles(loadAttachmentFiles(attachment.getLatestRevision().getId()));
-            return attachment;
-        }
-        return null;
-    }
 
     private List<AttachmentRevision> loadRevisions(int attachmentId, boolean latestOnly) {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();

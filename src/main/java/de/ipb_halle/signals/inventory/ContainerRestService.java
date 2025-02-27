@@ -89,9 +89,9 @@ public class ContainerRestService implements RestReplyParser<Container> {
         ct.setContainerTypeName(RestHelper.parseString(attributes, ContainerEntity.ATTR_CONTAINER_TYPE_NAME));
         ct.setLocation(new LocationReference().setId(
                 LocationTypeRestService.LOCATION_TYPE_ENTITY_PREFIX
-                + RestHelper.parseString(
+                        + RestHelper.parseString(
                         RestHelper.getPrimitiveFromPath(attributes, ContainerEntity.ATTR_LOCATION_ID))
-                + LocationTypeRestService.LOCATION_TYPE_ENTITY_SUFFIX));
+                        + LocationTypeRestService.LOCATION_TYPE_ENTITY_SUFFIX));
         ct.setName(RestHelper.parseString(attributes, RestHelper.ATTR_NAME));
         try {
             ct.setUnit(Unit.getUnit(RestHelper.parseString(attributes, ContainerEntity.ATTR_UNIT)));
@@ -148,7 +148,7 @@ public class ContainerRestService implements RestReplyParser<Container> {
         while (iter.hasNext()) {
             Field field = fieldParser.parseReply(iter.next());
             // NOTE: field ids are NOT unique within Signals Inventory
-            field.setId(field.getId());
+            field.setId(field.getId() + ":" + ct.getId());
             field.setDesignation((FieldDesignation) dynEnumManager.valueOf(FieldDesignation.valueOf(FieldDesignation.LOCATION)));
             field.setDefiningEntityId(ct.getId());
             fieldList.add(field);
@@ -181,7 +181,7 @@ public class ContainerRestService implements RestReplyParser<Container> {
                     ct.addMaterial(new MaterialReference().setId(id));
                     break;
                 case ContainerEntity.CONTENT_TYPE_SAMPLE:
-                    logger.warn("Unable to assign Sample to Container with Id={}", id);
+                    logger.warn("ContainerRestService:->Unable to assign Sample to Container with Id={}", id);
                     break;
                 default:
                     throw new RuntimeException("Unknown content type for container: " + ct.getId());
@@ -197,7 +197,7 @@ public class ContainerRestService implements RestReplyParser<Container> {
      * @return path of the downloaded attachment in the staging area
      */
     public RestReply doGetContainerAttachment(Container container, Field field, String mimeType) {
-        String endpoint = String.format(CONTAINER_ATTACHMENT_ENDPOINT, container.getId(), field.getId());
+        String endpoint = String.format(CONTAINER_ATTACHMENT_ENDPOINT, container.getId(), field.getStripedId());
         return attachmentRestService.fetchAttachment(endpoint, mimeType);
     }
 
@@ -208,6 +208,15 @@ public class ContainerRestService implements RestReplyParser<Container> {
 
     public void parseAttachmentRevisionInfo(AttachmentRevision newRevision, FieldValue fieldValue) {
         JsonElement json = JsonParser.parseString(fieldValue.getValue());
+        /*
+        json element {"attachment":
+                        {"filename":"certificate.pdf",
+                        "mimeType":"application/pdf",
+                        "size":21568},
+                     "isRawValue":false,
+                     "auto":"/api/v1.0/inventory/containers/864f0a22-52bd-467d-94c5-46b3bd645032/fields/b30f5c49-75e7-44a9-a05a-f99ec4ec6618/attachments"
+                        }
+         */
         newRevision.setOriginalName(RestHelper.getPrimitiveFromPath(json, Container.ATTR_ATTACHMENT_FILENAME).getAsString());
         newRevision.setMimeType(RestHelper.getPrimitiveFromPath(json, Container.ATTR_ATTACHMENT_MIMETYPE).getAsString());
         newRevision.setSize(RestHelper.getPrimitiveFromPath(json, Container.ATTR_ATTACHMENT_FILESIZE).getAsLong());

@@ -33,7 +33,6 @@ import jakarta.persistence.criteria.Root;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.print.DocFlavor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -173,7 +172,7 @@ public class FieldDbService {
             FieldValue fv = new FieldValue(fve);
             Field field = loadById(fv.getFieldId());
             fv.setField(field);
-            switch(field.getFieldType().getValue().toUpperCase()) {
+            switch(field.getType().getValue().toUpperCase()) {
                 case FieldType.ATTACHED_FILE,
                      FieldType.CHEMICAL_DRAWING,
                      FieldType.SEQUENCE_FILE -> loadFieldAttachment(fv);

@@ -50,6 +50,7 @@ public class AttachmentRevision {
     @Column(name = "mime_type")
     private String mimeType;
 
+
     public Integer getId() {
         return id;
     }
@@ -96,5 +97,17 @@ public class AttachmentRevision {
 
     public void setMimeType(String mimeType) {
         this.mimeType = mimeType;
+    }
+
+    @Override
+    public String toString() {
+        return "AttachmentRevision{" +
+                "id=" + id +
+                ", attachmentId=" + attachmentId +
+                ", originalName='" + originalName + '\'' +
+                ", size=" + size +
+                ", fileId='" + fileId + '\'' +
+                ", mimeType='" + mimeType + '\'' +
+                '}';
     }
 }

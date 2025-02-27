@@ -73,7 +73,7 @@ public class Field {
     public Field() {
         designation = FieldDesignation.valueOf(FieldDesignation.DEFAULT); //defines if filed belongs to asset, batch or is default
         this.measures = new HashSet<>();
-        this.options = new HashSet<> ();
+        this.options = new HashSet<>();
     }
 
     public Field(FieldDefinition fieldDefinition, FieldType type, FieldDesignation designation) {
@@ -95,7 +95,7 @@ public class Field {
         this.designation = designation;
         this.fieldType = type;
         this.measures = new HashSet<>();
-        this.options = new HashSet<> ();
+        this.options = new HashSet<>();
     }
 
     public FieldDefinition createEntity() {
@@ -143,14 +143,15 @@ public class Field {
     /**
      * Set a (new) field Id and propagate this change to
      * <code>FieldMeasure</code>s and <code>FieldOption</code>s
+     *
      * @param id the (new) identifier
      */
     public void setId(String id) {
         this.id = id;
-        for(FieldMeasure measure : measures) {
+        for (FieldMeasure measure : measures) {
             measure.setFieldId(id);
         }
-        for(FieldOption option : options) {
+        for (FieldOption option : options) {
             option.setFieldId(id);
         }
     }
@@ -251,7 +252,7 @@ public class Field {
         this.userDefined = userDefined;
     }
 
-    public FieldType getFieldType() {
+    public FieldType getType() {
         return fieldType;
     }
 
@@ -323,4 +324,7 @@ public class Field {
     }
 
 
+    public String getStripedId() {
+        return id.split(":")[0];
+    }
 }

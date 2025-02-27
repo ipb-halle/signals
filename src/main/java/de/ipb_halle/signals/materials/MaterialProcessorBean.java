@@ -40,7 +40,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.time.LocalTime;
 import java.util.*;
 
 @Stateless
@@ -75,12 +74,10 @@ public class MaterialProcessorBean {
      * @param allFields        Mapping all fields, grouped by Library-ID
      */
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void processSingleMaterial(SignalsEntityDTO signalsEntityDTO,
-                                      Map<String, Map<String, Field>> allFields) {
+    public void processSingleMaterial(SignalsEntityDTO signalsEntityDTO, Map<String, Map<String, Field>> allFields) {
         try {
             //The main processing of material takes places in this method
             doProcessMaterial(signalsEntityDTO, allFields);
-
         } catch (Exception e) {
             //Transaction will be automatically rolled back if exception occurs
             logger.error("MPB:-> Error in ProcessSingleMaterial, material {}: {}",
@@ -96,7 +93,7 @@ public class MaterialProcessorBean {
             logger.error("MPB:-> Transaction is marked for rollback, skipping.");
         }
 
-        //1) Load material vie REST
+        // 1) Load material via REST
         Material material = materialRestService.doGetMaterial(signalsEntityDTO.getId());
 
         //2) Process fields
@@ -106,7 +103,6 @@ public class MaterialProcessorBean {
                     material.getLibraryId(), signalsEntityDTO.getId());
             return;
         }
-
         processMaterialFields(fieldsByLibraryId, material);
 
         //3) Save materials in database
@@ -126,9 +122,9 @@ public class MaterialProcessorBean {
                 fieldLibrariesById.put(field.getId(), field);
             }
             fieldValue.setEntityId(material.getId());
-            if (field.getFieldType().getValue().equals(FieldType.ATTACHED_FILE)
-                    || field.getFieldType().getValue().equals(FieldType.CHEMICAL_DRAWING)
-                    || field.getFieldType().getValue().equals(FieldType.SEQUENCE_FILE)) {
+            if (field.getType().getValue().equals(FieldType.ATTACHED_FILE)
+                    || field.getType().getValue().equals(FieldType.CHEMICAL_DRAWING)
+                    || field.getType().getValue().equals(FieldType.SEQUENCE_FILE)) {
                 processAttachments(material, field, fieldValue);
             }
             material.addFieldValue(fieldValue);
@@ -154,7 +150,7 @@ public class MaterialProcessorBean {
             logger.info("MaterialProcessorBean:-> processAttachments-> Found new attachment for material Id={}", material.getId());
             List<RestReply> replies = new ArrayList<>();
 
-            switch (field.getFieldType().getValue()) {
+            switch (field.getType().getValue()) {
                 case FieldType.ATTACHED_FILE:
                     replies = obtainAttachment(material, field, fieldValue);
                     break;
@@ -197,12 +193,9 @@ public class MaterialProcessorBean {
      * @throws IOException
      */
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    private void storeAttachment(Attachment attachment,
-                                 Collection<RestReply> files
-    ) throws IOException {
+    private void storeAttachment(Attachment attachment, Collection<RestReply> files) throws IOException {
 
-        if (transactionSynchronizationRegistry.getTransactionStatus()
-                == jakarta.transaction.Status.STATUS_MARKED_ROLLBACK) {
+        if (transactionSynchronizationRegistry.getTransactionStatus() == jakarta.transaction.Status.STATUS_MARKED_ROLLBACK) {
             logger.warn("MPB:-> Transaction marked for rollback, skipping attachment storage.");
             return;
         }
@@ -219,8 +212,8 @@ public class MaterialProcessorBean {
 
         attachmentDbService.save(attachment);
 
-        logger.trace("MPB:-> Persisting files for revision: {}",
-                attachment.getLatestRevision().getId());
+        logger.trace("MPB:-> Persisting files for revision: {}", attachment.getLatestRevision().getId());
+
         for (AttachmentFile file : attachment.getFiles(attachment.getLatestRevision().getId())) {
             storageService.storeFile(file);
         }

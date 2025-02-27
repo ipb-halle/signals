@@ -138,7 +138,7 @@ public class LocationRestService implements RestReplyParser<Location> {
         while (iterator.hasNext()) {
             Field field = fieldParser.parseReply(iterator.next());
             // NOTE: field ids are NOT unique within Signals Inventory
-            field.setId(field.getId());
+            field.setId(field.getId() + ":" + loc.getId());
             field.setDesignation((FieldDesignation) dynEnumManager.valueOf(FieldDesignation.valueOf(FieldDesignation.LOCATION)));
             field.setDefiningEntityId(loc.getId());
             fieldList.add(field);

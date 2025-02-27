@@ -25,6 +25,7 @@ import de.ipb_halle.signals.SignalsConfig;
 
 import java.text.ParseException;
 import java.util.Date;
+
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +75,7 @@ public class MaterialsConfig {
                 """, signalsConfig.getSnbInstanceName(), new Date().toString());
 
         materialsManager.manageLibraries(runtimeConfig);
-        materialsManager.manageMaterials(runtimeConfig, dateRange);
+        materialsManager.manageMaterials(dateRange);
     }
 
     public void importMaterials(String id) {
