@@ -105,9 +105,6 @@ CREATE TABLE synonyms (
     PRIMARY KEY (id, value)
 );
 
-
-
-
 CREATE TABLE roles (
     id VARCHAR NOT NULL PRIMARY KEY,
     name VARCHAR,

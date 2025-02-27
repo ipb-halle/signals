@@ -49,7 +49,7 @@ public class LocationTypeManager {
     }
 
     public List<LocationType> getSnbLocationTypes() {
-        List<LocationType> locationTypes = (List<LocationType>) restService.doGetLocationTypes();
+        List<LocationType> locationTypes = restService.doGetLocationTypes();
         return locationTypes;
     }
 

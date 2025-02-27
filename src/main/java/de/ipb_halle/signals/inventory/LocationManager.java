@@ -28,6 +28,8 @@ import de.ipb_halle.signals.field.FieldDesignation;
 import de.ipb_halle.signals.field.FieldType;
 import de.ipb_halle.signals.users.UserManager;
 import jakarta.ejb.Stateless;
+import jakarta.ejb.TransactionAttribute;
+import jakarta.ejb.TransactionAttributeType;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,16 +67,18 @@ public class LocationManager {
     @Inject
     private FieldDbService fieldDbService;
 
+    @Inject
+    private LocationProcessorBean locationProcessorBean;
+
     private Logger logger = LoggerFactory.getLogger(ContainerManager.class);
 
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void manageLocations(Date[] dateRange) {
+
         // 1) Loads a set of location type ids (checked -> location types are present)
         Set<String> locationTypeIds = locationTypeDbService.getLocationTypIds();
 
-        // 2) Load (and map) all location fields for attachmentFiles
-        Map<String, Field> attachmentFields = loadAttachmentFieldsMap();
-
-        // 3) Preparing criteria map for loading signals entities by date range and type
+        // 2) Preparing criteria map for loading signals entities by date range and type
         EntityType entityTypes[] = {EntityType.valueOf(LocationEntity.ENTITY_TYPE_LOCATION)};
         Map<String, Object> cmap = new HashMap<>();
         cmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
@@ -83,39 +87,25 @@ public class LocationManager {
         }
         cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, entityTypes);
 
-        // 4) Loading all locations from db (checked everything is working)
+        // 3) Loading all locations from db (checked everything is working)
         List<SignalsEntityDTO> locations = signalsEntityDbService.load(cmap);
 
-        // 5) Process locations (checked, everything is working)
+        // 4) Process locations (checked, everything is working)
         for (SignalsEntityDTO dto : locations) {
             if (!locationTypeIds.contains(dto.getId())) {
-                processLocation(dto.getId(), attachmentFields);
+                processLocation(dto.getId());
             }
         }
     }
-
-    private Map<String, Field> loadAttachmentFieldsMap() {
-        Map<String, Object> cmap = new HashMap<>();
-        cmap.put(Field.FIELD_DESIGNATION, dynEnumManager.valueOf(FieldDesignation.valueOf(FieldDesignation.LOCATION)));
-        cmap.put(Field.FIELD_TYPE, dynEnumManager.valueOf(FieldType.valueOf(FieldType.ATTACHMENT_FILE)));
-        return fieldDbService.load(cmap)
-                .stream()
-                .collect(Collectors.toMap(Field::getId, Function.identity()));
-    }
-
 
     /**
      * Fetches a location by its ID from the remote REST service and saves it
      * into the local database.
      *
-     * @param id the ID of location to fetch
+     * @param locationId the ID of location to fetch
      */
-    public void processLocation(String id, Map<String, Field> attachmentFields) {
-        try {
-            Location location = locationRestService.doGetLocation(id);
-        } catch (Exception e) {
-
-        }
+    public void processLocation(String locationId) {
+        locationProcessorBean.processSingleLocation(locationId);
     }
 
     public void save(LocationEntity loc) {

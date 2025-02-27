@@ -46,57 +46,56 @@ import java.util.Map;
 
 @Stateless
 @LocalBean
-public class ContainerProcessorBean {
+public class LocationProcessorBean {
 
     @Inject
-    ContainerRestService containerRestService;
+    private LocationRestService locationRestService;
 
     @Inject
-    ContainerDbService containerDbService;
+    private LocationDbService locationDbService;
 
     @Inject
-    AttachmentDbService attachmentDbService;
+    private AttachmentDbService attachmentDbService;
 
     @Inject
-    StorageService storageService;
+    private StorageService storageService;
 
     @Resource
     private TransactionSynchronizationRegistry transactionSynchronizationRegistry;
 
-    public static final Logger logger = LogManager.getLogger(ContainerProcessorBean.class);
+    public static final Logger logger = LogManager.getLogger(LocationProcessorBean.class);
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void processSingleContainer(String containerId) {
+    public void processSingleLocation(String locationId) {
+
         try {
-            //The main processing of container takes places in this method
-            doProcessContainer(containerId);
+            doProcessLocation(locationId);
         } catch (IOException e) {
-            logger.error("ContainerProcessorBean:-> processContainer() caught an exception.", e);
+            logger.error("LocationProcessorBean:-> processLocation() caught an exception.", e);
         }
     }
 
-    private void doProcessContainer(String containerId) throws IOException {
-
+    private void doProcessLocation(String locationId) throws IOException {
         //If transaction marked for rollback, then break it
         if (transactionSynchronizationRegistry.getTransactionStatus() == jakarta.transaction.Status.STATUS_MARKED_ROLLBACK) {
-            logger.error("ContainerProcessorBean:-> Transaction is marked for rollback, skipping.");
+            logger.error("LocationProcessorBean:-> Transaction is marked for rollback, skipping.");
         }
 
-        // 1) Load container via REST
-        Container container = containerRestService.doGetContainer(containerId);
+        // 1) Load location via REST
+        Location location = locationRestService.doGetLocation(locationId);
 
-        // 2) Process container fields
-        processContainerFields(container);
-        containerDbService.save(container);
+        // 2) Process location fields
+        processLocationFields(location);
+        locationDbService.save(location);
+
     }
 
-    private void processContainerFields(Container container) throws IOException {
-        for (Field field : container.getFields()) {
-            field.setId(field.getId() + ":" + container.getId());
-            if (field.getType().getValue().equals(FieldType.ATTACHMENT_FILE)) {
-                for (FieldValue fieldValue : container.getFieldValues()) {
-                    if (fieldValue.getFieldId().equals(field.getStripedId())) {
-                        obtainAttachment(container, field, fieldValue);
+    private void processLocationFields(Location location) throws IOException {
+        for(Field field : location.getFields()){
+            if(field.getType().getValue().equals(FieldType.ATTACHMENT_FILE)){
+                for (FieldValue fieldValue: location.getFieldValues()){
+                    if(fieldValue.getFieldId().equals(field.getStripedId())){
+                        obtainAttachment(location, field, fieldValue);
                     }
                 }
             }
@@ -107,16 +106,16 @@ public class ContainerProcessorBean {
      * obtain an attachment for a given attachment field and compare,
      * whether this attachment is already known to the system.
      *
-     * @param container
+     * @param location
      * @param field
      * @param fieldValue
      * @throws IOException
      */
-    private void obtainAttachment(Container container, Field field, FieldValue fieldValue) throws IOException {
-        String mimeType = containerRestService.parseAttachmentMimeType(fieldValue);
-        RestReply tempPath = containerRestService.doGetContainerAttachment(container, field, mimeType);
+    private void obtainAttachment(Location location, Field field, FieldValue fieldValue) throws  IOException{
+        String mimeType = locationRestService.parseAttachmentMimeType(fieldValue);
+        RestReply tempPath = locationRestService.doGetLocationAttachment(location, field, mimeType);
         if (tempPath != null) {
-            Attachment attachment = getAttachment(container, field);
+            Attachment attachment = getAttachment(location, field);
             if (isNewRevision(attachment, fieldValue, tempPath)) {
                 storeAttachment(attachment, tempPath);
             } else {
@@ -124,13 +123,12 @@ public class ContainerProcessorBean {
             }
         }
     }
-
     /**
      * Loads an attachment object (if exists) or creates new one
      */
-    private Attachment getAttachment(Container container, Field field) {
+    private Attachment getAttachment(Location location, Field field) {
         Map<String, Object> cmap = new HashMap<>();
-        cmap.put(Attachment.ANCESTOR_ID, container.getId());
+        cmap.put(Attachment.ANCESTOR_ID, location.getId());
         cmap.put(Attachment.FIELD_ID, field.getId());
         cmap.put(Attachment.LATEST_ONLY, Boolean.TRUE);
         List<Attachment> attachments = attachmentDbService.load(cmap);
@@ -138,13 +136,13 @@ public class ContainerProcessorBean {
         switch (attachments.size()) {
             case 0:
                 Attachment attachment = new Attachment();
-                attachment.setAncestorId(container.getId());
+                attachment.setAncestorId(location.getId());
                 attachment.setFieldId(field.getId());
                 return attachment;
             case 1:
                 return attachments.get(0);
             default:
-                logger.error("ContainerProcessorBean:-> getAttachment() found more than 1 attachment for matId = {}, fieldId = {}", container.getId(), field.getId());
+                logger.error("LocationProcessorBean:-> getAttachment() found more than 1 attachment for matId = {}, fieldId = {}", location.getId(), field.getId());
                 return null;
         }
     }
@@ -161,7 +159,7 @@ public class ContainerProcessorBean {
     private boolean isNewRevision(Attachment attachment, FieldValue fieldValue, RestReply reply) {
         AttachmentRevision latestRevision = attachment.getLatestRevision();
         AttachmentRevision newRevision = new AttachmentRevision();
-        containerRestService.parseAttachmentRevisionInfo(newRevision, fieldValue);
+        locationRestService.parseAttachmentRevisionInfo(newRevision, fieldValue);
         newRevision.setFileId(attachment.getAncestorId().split(":")[1] + ":" + attachment.getFieldId().split(":")[0]);
 
         if ((latestRevision == null) ||
@@ -191,7 +189,7 @@ public class ContainerProcessorBean {
 
         if (transactionSynchronizationRegistry.getTransactionStatus()
                 == jakarta.transaction.Status.STATUS_MARKED_ROLLBACK) {
-            logger.error("ContainerProcessorBean:->Transaction marked for rollback, skipping attachment storage.");
+            logger.error("LocationProcessorBean:->Transaction marked for rollback, skipping attachment storage.");
             return;
         }
 
@@ -201,11 +199,11 @@ public class ContainerProcessorBean {
         file.setMimeType(reply.getMimeType());
         file.setTempPath(reply.getPath());
         attachment.addFile(file);
-        logger.trace("ContainerProcessorBean:-> Saving attachment: {}", attachment);
+        logger.trace("LocationProcessorBean:-> Saving attachment: {}", attachment);
 
         attachmentDbService.save(attachment);
 
-        logger.trace("ContainerProcessorBean:-> Persisting files for revision: {}", attachment.getLatestRevision().getId());
+        logger.trace("LocationProcessorBean:-> Persisting files for revision: {}", attachment.getLatestRevision().getId());
 
         for (AttachmentFile stagedFile : attachment.getFiles(attachment.getLatestRevision().getId())) {
             storageService.storeFile(stagedFile);
