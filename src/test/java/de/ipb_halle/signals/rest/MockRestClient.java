@@ -18,12 +18,24 @@
 package de.ipb_halle.signals.rest;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFileAttributes;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
 
 import jakarta.ejb.LocalBean;
+
+import static org.testcontainers.shaded.org.bouncycastle.oer.its.ieee1609dot2.SignerIdentifier.digest;
 
 @LocalBean
 public class MockRestClient extends RestClientImpl {
@@ -49,7 +61,27 @@ public class MockRestClient extends RestClientImpl {
             }
             throw new NullPointerException("MockRestClient not configured for key: ".concat(key));
         }
-        setResponse(response);
+        setMockResponse(response);
         return this;
+    }
+
+    private void setMockResponse(String response) throws IOException {
+        switch(getResponseType()) {
+            case STRING:
+                setResponse(response);
+                break;
+            case STREAM:
+                try {
+                    Path p = Files.createTempFile(
+                            Path.of("/tmp"),
+                            "mock",
+                            "bin",
+                            PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-r--r--")));
+                    digest(this.getClass().getResourceAsStream(response), p);
+                    Files.delete(p);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+        }
     }
 }

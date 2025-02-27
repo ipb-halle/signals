@@ -154,9 +154,12 @@ public class RestClientImpl implements RestClient {
         String tmp = UUID.randomUUID().toString();
         HttpResponse<InputStream> httpResponse = client.send(request, BodyHandlers.ofInputStream());
         responseCode = httpResponse.statusCode();
-
         Path path = Paths.get(signalsConfig.getStoragePath(), Attachment.STAGING, tmp);
-        try (DigestInputStream digester = new DigestInputStream(httpResponse.body(), MessageDigest.getInstance(SHA256))) {
+        digest(httpResponse.body(), path);
+    }
+
+    protected void digest(InputStream stream, Path path) throws IOException {
+        try (DigestInputStream digester = new DigestInputStream(stream, MessageDigest.getInstance(SHA256))) {
             Files.copy(digester, path, StandardCopyOption.REPLACE_EXISTING);
             byte[] digest = digester.getMessageDigest().digest();
             response = new RestReply(path, HexFormat.of().formatHex(digest), contentType);
@@ -233,6 +236,10 @@ public class RestClientImpl implements RestClient {
         return this;
     }
 
+    protected String getContentType() {
+        return contentType;
+    }
+
     @Override
     public RestClient setContentType(String type) {
         contentType = type;
@@ -270,6 +277,10 @@ public class RestClientImpl implements RestClient {
     protected void setResponse(String r) {
         responseType = RestType.STRING;
         response = new RestReply(r, contentType);
+    }
+
+    protected RestType getResponseType() {
+        return responseType;
     }
 
     @Override

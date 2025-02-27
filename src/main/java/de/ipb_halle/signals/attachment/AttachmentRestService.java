@@ -64,11 +64,11 @@ public class AttachmentRestService {
             return restClient.getResponse();
         } catch (UnexpectedResponseCodeException e) {
             // attachment (drawing, image, sequence) may not be available
-            logger.debug("MRS:-> Unexpected response code {}", restClient.getResponseCode(), e);
+            logger.debug("Unexpected response code {}", restClient.getResponseCode(), e);
         } catch (IOException e) {
-            logger.warn("MRS:-> caught IOException: {}", e.getMessage(), e);
+            logger.warn("caught IOException: {}", e.getMessage(), e);
         } catch (URISyntaxException e) {
-            logger.warn("MRS:-> URISyntaxException: {}", e.getMessage(), e);
+            logger.warn("URISyntaxException: {}", e.getMessage(), e);
         }
         return null;
     }
