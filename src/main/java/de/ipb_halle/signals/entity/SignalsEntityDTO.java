@@ -260,6 +260,22 @@ public class SignalsEntityDTO implements IEntityRelationships, ISignalsEntity {
         this.children = new HashSet<> (children);
     }
 
+    public  boolean hasPermission(IUser user, Share.SharePermission perm) {
+        for (Share share : shares) {
+            if ((share.getType() == Share.ShareType.EFFECTIVE)
+                        && ((EffectiveShare) share).getUserId().equals(user.getId())
+                        && share.hasPermission(perm)) {
+                return true;
+            }
+            if ((share.getType() == Share.ShareType.USER)
+                    && ((UserShare) share).getUserId().equals(user.getId())
+                    && share.hasPermission(perm)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Set<Share> getShares() {
         return shares;
     }

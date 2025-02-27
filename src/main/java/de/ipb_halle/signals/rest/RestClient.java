@@ -53,6 +53,7 @@ public interface RestClient {
     public final String SEQUENCE_FASTA = "biosequence/fasta";
     public final String SEQUENCE_GENBANK = "biosequence/genbank";
     public final String TEXT_CSV = "text/csv";
+    public final String TEXT_PLAIN = "text/plain";
     public final String IMAGE_UNKNOWN = "image/*";
 
     public RestClient execute() throws IOException, URISyntaxException, UnexpectedResponseCodeException ;

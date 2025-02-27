@@ -49,6 +49,10 @@ public class TestBase {
      * @return configured PersistenceUnit
      */
    public static PersistenceUnit persistence(String [] entities) {
+        if (entities.length == 0) {
+            return null;
+        }
+
         PersistenceUnit unit = new PersistenceUnit("signalsDB");
         unit.setJtaDataSource("testDS");
         unit.setNonJtaDataSource("testDSNonJTA");

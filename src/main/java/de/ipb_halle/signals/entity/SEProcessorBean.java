@@ -48,7 +48,7 @@ public class SEProcessorBean {
     public void processEntity(RuntimeConfig config, SignalsEntityDTO parentEntity) {
         try {
             processChildren(parentEntity);
-//            processShares(parentEntity);
+            processShares(parentEntity);
             if (config.updateDb) {
                 dbService.save(parentEntity);
             }

@@ -27,6 +27,7 @@ import java.util.Set;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.FlushModeType;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaDelete;
@@ -170,6 +171,7 @@ public class UserDbService {
      */
     public void save(User u) {
         logger.trace("UserDbService.save() {}", u.dump());
+        this.em.setFlushMode(FlushModeType.AUTO);
         this.em.merge(u.createEntity());
         this.em.flush();        // flush() & clear are necessary
         this.em.clear();        // for the following steps

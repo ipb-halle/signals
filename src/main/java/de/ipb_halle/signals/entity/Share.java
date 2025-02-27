@@ -49,6 +49,14 @@ public abstract class Share {
         GROUP,
         USER;
     }
+
+    public enum SharePermission {
+        READ,
+        WRITE,
+        ADMIN,
+        FULL_CONTROL
+    }
+
     @EmbeddedId
     @AttributeOverrides(
         @AttributeOverride(name = "id", column = @Column(name = "entity_id"))
@@ -120,6 +128,16 @@ public abstract class Share {
     }
 
     public abstract ShareType getType();
+
+    public boolean hasPermission(SharePermission permission) {
+        switch(permission) {
+            case READ: return canRead;
+            case WRITE: return canWrite;
+            case ADMIN: return isAdmin;
+            case FULL_CONTROL: return hasFullControl;
+        }
+        return false;
+    }
 
     @Override
     public boolean equals(Object o) {
