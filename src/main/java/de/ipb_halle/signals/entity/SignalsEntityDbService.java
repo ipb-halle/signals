@@ -21,7 +21,7 @@ import java.util.*;
 
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.users.Group;
-import de.ipb_halle.signals.users.User;
+import de.ipb_halle.signals.users.UserEntity;
 import de.ipb_halle.signals.util.EmbeddedKeyValue;
 import de.ipb_halle.tda.PersistenceElements;
 import jakarta.ejb.Stateless;
@@ -301,7 +301,7 @@ public class SignalsEntityDbService {
     }
 
     private void saveUserShare(UserShare share) {
-        if (this.em.find(User.class, share.getUserId()) != null) {
+        if (this.em.find(UserEntity.class, share.getUserId()) != null) {
             this.em.merge(share);
         }
     }
