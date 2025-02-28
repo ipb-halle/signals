@@ -54,6 +54,7 @@ public class LocationDbService {
         return locationEntity;
     }
 
+
     public void save(Location loc) {
         LocationEntity le = loc.createEntity();
         this.em.merge(le);

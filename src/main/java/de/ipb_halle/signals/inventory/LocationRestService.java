@@ -26,6 +26,7 @@ import de.ipb_halle.signals.attachment.AttachmentRevision;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.field.*;
 import de.ipb_halle.signals.rest.*;
+import de.ipb_halle.signals.users.UserReference;
 import jakarta.ejb.Local;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
@@ -128,8 +129,8 @@ public class LocationRestService implements RestReplyParser<Location> {
     }
 
     private void parseChangeRecords(JsonObject json, Location loc) {
-        loc.setCreatedBy(RestHelper.parseString(
-                RestHelper.getPrimitiveFromPath(json, LocationEntity.ATTR_CREATED_BY)));
+        loc.setCreatedBy(new UserReference(RestHelper.parseString(
+                RestHelper.getPrimitiveFromPath(json, LocationEntity.ATTR_CREATED_BY))));
         loc.setUpdatedBy(RestHelper.parseString(
                 RestHelper.getPrimitiveFromPath(json, LocationEntity.ATTR_UPDATED_BY)));
     }

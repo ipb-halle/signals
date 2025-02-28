@@ -22,6 +22,8 @@ package de.ipb_halle.signals.inventory;
 
 import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldValue;
+import de.ipb_halle.signals.users.IUser;
+import de.ipb_halle.signals.users.UserReference;
 
 import java.util.Collection;
 import java.util.Date;
@@ -42,13 +44,13 @@ public class Location {
     private Integer rows;
     private Integer columns;
     private Date createdAt;
-    private String createdBy;
+    private IUser createdBy;
     private String locationTypeId;
     private String typeName;
     private String ancestorId;
     private String ancestorName;
     private Date updatedAt;
-    private String updatedBy;
+    private IUser updatedBy;
 
     private Set<Field> fields;
     private Set<FieldValue> fieldValues;
@@ -67,13 +69,13 @@ public class Location {
         this.rows = le.getRows();
         this.columns = le.getColumns();
         this.createdAt = le.getCreatedAt();
-        this.createdBy = le.getCreatedBy();
+        this.createdBy = new UserReference(le.getCreatedBy());
         this.locationTypeId = le.getTypeId();
         this.typeName = le.getTypeName();
         this.ancestorId = le.getAncestorId();
         this.ancestorName = le.getAncestorName();
         this.updatedAt = le.getUpdatedAt();
-        this.updatedBy = le.getUpdatedBy();
+        this.updatedBy = new UserReference(le.getUpdatedBy());
 
         this.fields = new HashSet<>();
         this.fieldValues = new HashSet<>();
@@ -89,13 +91,13 @@ public class Location {
                 .setRows(rows)
                 .setColumns(columns)
                 .setCreatedAt(createdAt)
-                .setCreatedBy(createdBy)
+                .setCreatedBy(createdBy.getId())
                 .setTypeId(locationTypeId)
                 .setTypeName(typeName)
                 .setAncestorId(ancestorId)
                 .setAncestorName(ancestorName)
                 .setUpdatedAt(updatedAt)
-                .setUpdatedBy(updatedBy);
+                .setUpdatedBy(updatedBy.getId());
     }
 
     public String getId() {
@@ -130,7 +132,7 @@ public class Location {
         return createdAt;
     }
 
-    public String getCreatedBy() {
+    public IUser getCreatedBy() {
         return createdBy;
     }
 
@@ -154,7 +156,7 @@ public class Location {
         return updatedAt;
     }
 
-    public String getUpdatedBy() {
+    public IUser getUpdatedBy() {
         return updatedBy;
     }
 
@@ -198,7 +200,8 @@ public class Location {
         this.createdAt = createdAt;
     }
 
-    public void setCreatedBy(String createdBy) {
+    public void setCreatedBy(IUser createdBy) {
+
         this.createdBy = createdBy;
     }
 
@@ -223,7 +226,7 @@ public class Location {
     }
 
     public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
+        this.updatedBy = new UserReference(updatedBy);
     }
 
     public void addFields(Collection<Field> fields) {
@@ -232,5 +235,28 @@ public class Location {
 
     public void addFieldValues(Collection<FieldValue> fieldValues) {
         this.fieldValues.addAll(fieldValues);
+    }
+
+    @Override
+    public String toString() {
+        return "Location{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", barcode='" + barcode + '\'' +
+                ", grid=" + grid +
+                ", rows=" + rows +
+                ", columns=" + columns +
+                ", createdAt=" + createdAt +
+                ", createdBy='" + createdBy + '\'' +
+                ", locationTypeId='" + locationTypeId + '\'' +
+                ", typeName='" + typeName + '\'' +
+                ", ancestorId='" + ancestorId + '\'' +
+                ", ancestorName='" + ancestorName + '\'' +
+                ", updatedAt=" + updatedAt +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", fields=" + fields +
+                ", fieldValues=" + fieldValues +
+                '}';
     }
 }
