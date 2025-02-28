@@ -45,9 +45,9 @@ public abstract class ContainerManagerTest {
 
     private final String TEST_RESOURCE_1 = "ContainerManagerTest001.json";
     private final String TEST_KEY_1 =
-        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/containers/container:ef16c7af-a763-49f2-b218-294ac02fc224:ivt";
+            "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/containers/container:ef16c7af-a763-49f2-b218-294ac02fc224:ivt";
     private final String TEST_CONTAINER_ID = "container:ef16c7af-a763-49f2-b218-294ac02fc224:ivt";
-    private final String TEST_CONTAINER_BARCODE =  "0000000026";
+    private final String TEST_CONTAINER_BARCODE = "0000000026";
     private final String TEST_CONTAINER_NAME = "item00000021";
     private final String TEST_USER1_ID = "116";
     private final String TEST_USER1_FIRST = "TwoFirst";
@@ -61,10 +61,10 @@ public abstract class ContainerManagerTest {
     private MockRestClient mockRestClient;
 
     @Inject
-    @DeploymentElement(mock="de.ipb_halle.signals.users.MockLdapAdapterFactory")
+    @DeploymentElement(mock = "de.ipb_halle.signals.users.MockLdapAdapterFactory")
     private LdapAdapterFactory ldapAdapterFactory;
 
-    @DeploymentElement(mock="de.ipb_halle.signals.users.MockLdapAdapter")
+    @DeploymentElement(mock = "de.ipb_halle.signals.users.MockLdapAdapter")
     private LdapAdapter ldapAdapter;
 
     @Inject
@@ -91,8 +91,8 @@ public abstract class ContainerManagerTest {
     public void testSetup() {
         dynEnumManager.allowEnumDiscovery();
         TestBase.prepareRestClients(mockRestClient,
-            TEST_KEY_1,
-            getClass().getResourceAsStream(TEST_RESOURCE_1));
+                TEST_KEY_1,
+                getClass().getResourceAsStream(TEST_RESOURCE_1));
 
         User user = new User();
         user.setEnabled(true);
@@ -110,13 +110,14 @@ public abstract class ContainerManagerTest {
         user.setEmail("user.three@someplace.invalid");
         userManager.save(new RuntimeConfig(), user);
 
-        LocationEntity loc = new LocationEntity();
+        Location loc = new Location();
         loc.setId(TEST_LOCATION_ID);
         loc.setName(TEST_LOCATION_NAME);
         loc.setCreatedAt(new Date(1000000000));
         loc.setCreatedBy(TEST_USER1_ID);
         loc.setUpdatedAt(new Date(1200000000));
         loc.setUpdatedBy(TEST_USER2_ID);
+        loc.getFieldValues().forEach(fieldValue -> fieldValue.setEntityId(TEST_LOCATION_ID));
         locationManager.save(loc);
 
         SignalsEntityDTO dto = new SignalsEntityDTO();
@@ -137,6 +138,8 @@ public abstract class ContainerManagerTest {
 
         // String strippedId = TEST_CONTAINER_ID.split(":")[1];
         Container ct = manager.getSnbContainer(TEST_CONTAINER_ID);
+        String containerId = ct.getId();
+        ct.getFieldValues().forEach(fieldValue -> fieldValue.setEntityId(containerId));
         manager.save(ct);
         Assertions.assertEquals(TEST_CONTAINER_NAME, ct.getName(), "Container name mismatch");
 
