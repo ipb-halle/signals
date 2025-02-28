@@ -131,8 +131,8 @@ public class LocationRestService implements RestReplyParser<Location> {
     private void parseChangeRecords(JsonObject json, Location loc) {
         loc.setCreatedBy(new UserReference(RestHelper.parseString(
                 RestHelper.getPrimitiveFromPath(json, LocationEntity.ATTR_CREATED_BY))));
-        loc.setUpdatedBy(RestHelper.parseString(
-                RestHelper.getPrimitiveFromPath(json, LocationEntity.ATTR_UPDATED_BY)));
+        loc.setUpdatedBy(new UserReference(RestHelper.parseString(
+                RestHelper.getPrimitiveFromPath(json, LocationEntity.ATTR_UPDATED_BY))));
     }
 
     private void parseFields(JsonArray fields, Location loc) {

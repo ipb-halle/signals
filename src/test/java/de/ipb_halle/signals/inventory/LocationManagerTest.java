@@ -132,6 +132,6 @@ public abstract class LocationManagerTest {
         Assertions.assertEquals(TEST_LOCATION_BARCODE, location.getBarcode(), "Location barcode mismatch");
         Assertions.assertEquals(TEST_USER1_FIRST, ((User) location.getCreatedBy()).getFirstName(), "Created by first name matches");
         Assertions.assertEquals(TEST_LOCATION_NAME, location.getName(), "Location name matches");
-        Assertions.assertEquals(TEST_USER2_ID, location.getUpdatedBy(), "Location updated by matches");
+        Assertions.assertEquals(TEST_USER2_ID, location.getUpdatedBy().getId(), "Location updated by matches");
     }
 }

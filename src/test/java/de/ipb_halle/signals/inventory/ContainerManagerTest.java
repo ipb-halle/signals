@@ -113,7 +113,7 @@ public abstract class ContainerManagerTest {
         loc.setCreatedAt(new Date(1000000000));
         loc.setCreatedBy(new UserReference(TEST_USER1_ID));
         loc.setUpdatedAt(new Date(1200000000));
-        loc.setUpdatedBy(TEST_USER2_ID);
+        loc.setUpdatedBy(new UserReference(TEST_USER2_ID));
         loc.getFieldValues().forEach(fieldValue -> fieldValue.setEntityId(TEST_LOCATION_ID));
         locationManager.save(loc);
 

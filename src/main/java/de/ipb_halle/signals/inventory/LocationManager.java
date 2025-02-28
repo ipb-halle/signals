@@ -161,7 +161,7 @@ public class LocationManager {
      * @param location the container to augment
      */
     public void augmentLocation(Location location) {
-        //location.setCreatedBy(userManager.getUser(location.getCreatedBy()getId()));
-        //location.setUpdatedBy(userManager.getUser(location.getUpdatedBy().getId()));
+        location.setCreatedBy(userManager.getUser(location.getCreatedBy().getId()));
+        location.setUpdatedBy(userManager.getUser(location.getUpdatedBy().getId()));
     }
 }

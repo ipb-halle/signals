@@ -201,7 +201,6 @@ public class Location {
     }
 
     public void setCreatedBy(IUser createdBy) {
-
         this.createdBy = createdBy;
     }
 
@@ -225,8 +224,8 @@ public class Location {
         this.updatedAt = updatedAt;
     }
 
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = new UserReference(updatedBy);
+    public void setUpdatedBy(IUser updatedBy) {
+        this.updatedBy = updatedBy;
     }
 
     public void addFields(Collection<Field> fields) {
