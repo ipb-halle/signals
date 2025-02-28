@@ -21,6 +21,7 @@ import java.util.*;
 
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.users.Group;
+import de.ipb_halle.signals.users.User;
 import de.ipb_halle.signals.util.EmbeddedKeyValue;
 import de.ipb_halle.tda.PersistenceElements;
 import jakarta.ejb.Stateless;
@@ -273,16 +274,35 @@ public class SignalsEntityDbService {
         }
     }
 
+    /**
+     * Save a share information. Only UserShares or GroupShares will be
+     * persisted - EffectiveShares will be ignored. <code>save</code> will
+     * safeguard against non-existing users and groups, as it is possible
+     * to delete a group, while it is still referenced by GroupShares.
+     * @param share
+     */
     public void save(Share share) {
         switch(share.getType()) {
             case GROUP:
-                this.em.merge((GroupShare) share);
+                saveGroupShare((GroupShare) share);
                 break;
             case USER:
-                this.em.merge((UserShare) share);
+                saveUserShare((UserShare) share);
                 break;
             default:
-                logger.warn("Illegal call to save() for {}", share.getClass().getName());
+                logger.debug("Save(share) ignored for {}", share.getClass().getName());
+        }
+    }
+
+    private void saveGroupShare(GroupShare share) {
+        if (this.em.find(Group.class, share.getGroupId()) != null) {
+            this.em.merge(share);
+        }
+    }
+
+    private void saveUserShare(UserShare share) {
+        if (this.em.find(User.class, share.getUserId()) != null) {
+            this.em.merge(share);
         }
     }
 }

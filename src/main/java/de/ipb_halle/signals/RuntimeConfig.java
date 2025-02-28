@@ -75,14 +75,47 @@ public class RuntimeConfig {
             .build();
 
 
+    /**
+     * Decides, whether an update of the relational database
+     * should be made. If set to false, no inserts, updates
+     * or deletes should be made, effectively putting the
+     * database into read only mode.
+     *
+     * Default: true
+     */
     public boolean updateDb;
 
+    /**
+     * Selects, whether updates to Signals notebook will be
+     * made. If set to false, no POST or PATCH calls will
+     * be made, restricting the interaction to read access.
+     *
+     * Default: true
+     */
     public boolean updateSNB;
 
+    /**
+     * Perform database update from LDAP server. Data on the
+     * LDAP server will never be updated (always read only).
+     *
+     * Default: true
+     */
     public boolean updateFromLdap;
 
+    /**
+     * Synchronize user and group database from Signals Notebook.
+     * If set to false, changes in the database (obtained e.g. from LDAP)
+     * will be propagated to Signals Notebook.
+     *
+     * Default: true
+     */
     public boolean syncDbFromSNB;
 
+    /**
+     * If true, do not send a mail on the most synchronization results
+     *
+     * Default: false
+     */
     public boolean noMail;
 
     public RuntimeConfig() {
