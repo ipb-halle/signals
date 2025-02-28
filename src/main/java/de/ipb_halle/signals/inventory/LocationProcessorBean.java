@@ -83,18 +83,24 @@ public class LocationProcessorBean {
 
         // 1) Load location via REST
         Location location = locationRestService.doGetLocation(locationId);
+        location.setLocationTypeId(LocationType.LOCATION_TYPE_ENTITY_PREFIX + location.getLocationTypeId() + LocationType.LOCATION_TYPE_ENTITY_SUFFIX);
+        location.getFields().forEach(field -> field.setId(field.getId() + ":" + location.getLocationTypeId()));
+        location.getFieldValues().forEach(fieldValue -> {
+            fieldValue.setEntityId(locationId);
+            fieldValue.setFieldId(fieldValue.getFieldId() + ":" + location.getLocationTypeId());
+        });
 
         // 2) Process location fields
         processLocationFields(location);
-        locationDbService.save(location);
+        //locationDbService.save(location);
 
     }
 
     private void processLocationFields(Location location) throws IOException {
-        for(Field field : location.getFields()){
-            if(field.getType().getValue().equals(FieldType.ATTACHMENT_FILE)){
-                for (FieldValue fieldValue: location.getFieldValues()){
-                    if(fieldValue.getFieldId().equals(field.getStripedId())){
+        for (Field field : location.getFields()) {
+            if (field.getType().getValue().equals(FieldType.ATTACHMENT_FILE)) {
+                for (FieldValue fieldValue : location.getFieldValues()) {
+                    if (fieldValue.getFieldId().equals(field.getStripedId())) {
                         obtainAttachment(location, field, fieldValue);
                     }
                 }
@@ -111,18 +117,20 @@ public class LocationProcessorBean {
      * @param fieldValue
      * @throws IOException
      */
-    private void obtainAttachment(Location location, Field field, FieldValue fieldValue) throws  IOException{
+    private void obtainAttachment(Location location, Field field, FieldValue fieldValue) throws IOException {
         String mimeType = locationRestService.parseAttachmentMimeType(fieldValue);
         RestReply tempPath = locationRestService.doGetLocationAttachment(location, field, mimeType);
         if (tempPath != null) {
             Attachment attachment = getAttachment(location, field);
             if (isNewRevision(attachment, fieldValue, tempPath)) {
+                locationDbService.save(location);
                 storeAttachment(attachment, tempPath);
             } else {
                 storageService.removeFromStaging(tempPath);
             }
         }
     }
+
     /**
      * Loads an attachment object (if exists) or creates new one
      */
@@ -160,7 +168,8 @@ public class LocationProcessorBean {
         AttachmentRevision latestRevision = attachment.getLatestRevision();
         AttachmentRevision newRevision = new AttachmentRevision();
         locationRestService.parseAttachmentRevisionInfo(newRevision, fieldValue);
-        newRevision.setFileId(attachment.getAncestorId().split(":")[1] + ":" + attachment.getFieldId().split(":")[0]);
+        //newRevision.setFileId(attachment.getAncestorId().split(":")[1] + ":" + attachment.getFieldId().split(":")[0]);
+        newRevision.setFileId(reply.getDigest());
 
         if ((latestRevision == null) ||
                 !latestRevision.getFileId().equals(newRevision.getFileId())) {

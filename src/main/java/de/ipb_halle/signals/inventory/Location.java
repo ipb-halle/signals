@@ -32,8 +32,7 @@ public class Location {
     public static final String ATTR_ATTACHMENT_MIMETYPE = "attachment.mimeType";
     public static final String ATTR_ATTACHMENT_FILENAME = "attachment.fileName";
     public static final String ATTR_ATTACHMENT_FILE_SIZE = "attachment.fileSize";
-    public final static String LOCATION_TYPE_ENTITY_PREFIX = "location:";
-    public final static String LOCATION_TYPE_ENTITY_SUFFIX = ":ivt";
+
 
     private String id;
     private String name;
@@ -44,7 +43,7 @@ public class Location {
     private Integer columns;
     private Date createdAt;
     private String createdBy;
-    private String typeId;
+    private String locationTypeId;
     private String typeName;
     private String ancestorId;
     private String ancestorName;
@@ -69,7 +68,7 @@ public class Location {
         this.columns = le.getColumns();
         this.createdAt = le.getCreatedAt();
         this.createdBy = le.getCreatedBy();
-        this.typeId = le.getTypeId();
+        this.locationTypeId = le.getTypeId();
         this.typeName = le.getTypeName();
         this.ancestorId = le.getAncestorId();
         this.ancestorName = le.getAncestorName();
@@ -91,7 +90,7 @@ public class Location {
                 .setColumns(columns)
                 .setCreatedAt(createdAt)
                 .setCreatedBy(createdBy)
-                .setTypeId(typeId)
+                .setTypeId(locationTypeId)
                 .setTypeName(typeName)
                 .setAncestorId(ancestorId)
                 .setAncestorName(ancestorName)
@@ -135,8 +134,8 @@ public class Location {
         return createdBy;
     }
 
-    public String getTypeId() {
-        return typeId;
+    public String getLocationTypeId() {
+        return locationTypeId;
     }
 
     public String getTypeName() {
@@ -203,8 +202,8 @@ public class Location {
         this.createdBy = createdBy;
     }
 
-    public void setTypeId(String typeId) {
-        this.typeId = typeId;
+    public void setLocationTypeId(String locationTypeId) {
+        this.locationTypeId = locationTypeId;
     }
 
     public void setTypeName(String typeName) {

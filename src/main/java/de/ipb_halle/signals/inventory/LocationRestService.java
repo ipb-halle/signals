@@ -84,7 +84,7 @@ public class LocationRestService implements RestReplyParser<Location> {
         loc.setName(RestHelper.parseString(attributes, LocationEntity.ATTR_NAME));
         loc.setDescription(RestHelper.parseString(attributes, RestHelper.ATTR_DESCRIPTION));
         loc.setGrid(RestHelper.parseBool(attributes, LocationEntity.ATTR_GRID));
-        loc.setTypeId(RestHelper.parseString(attributes, LocationEntity.ATTR_TYPE_ID));
+        loc.setLocationTypeId(RestHelper.parseString(attributes, LocationEntity.ATTR_TYPE_ID));
         loc.setTypeName(RestHelper.parseString(attributes, LocationEntity.ATTR_TYPE_NAME));
         loc.setUpdatedAt(RestHelper.parseDate(attributes, LocationEntity.ATTR_UPDATED_AT));
 
