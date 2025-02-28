@@ -39,6 +39,7 @@
       snbInstanceName = Unit Test
       standardUserRoleName = Standard User
       userAttrCountry = Germany
+      userAttrLicenses = dummyLicense
       userAttrOrganization = testOrg
     </Resource>
 </openejb>
