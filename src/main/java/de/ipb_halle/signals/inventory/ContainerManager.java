@@ -182,8 +182,7 @@ public class ContainerManager {
      * @param augment whether the container should be augmented
      * @return the container
      */
-    public Container getContainer(String id, boolean augment
-    ) {
+    public Container getContainer(String id, boolean augment) {
         Container ct = containerDbService.loadById(id);
         if (ct == null) {
             ct = containerRestService.doGetContainer(id);

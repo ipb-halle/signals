@@ -148,6 +148,7 @@ public class ContainerRestService implements RestReplyParser<Container> {
         while (iter.hasNext()) {
             Field field = fieldParser.parseReply(iter.next());
             // NOTE: field ids are NOT unique within Signals Inventory
+            //field.setId(field.getId()+":"+ ct.getId());
             field.setId(field.getId());
             field.setDesignation((FieldDesignation) dynEnumManager.valueOf(FieldDesignation.valueOf(FieldDesignation.LOCATION)));
             field.setDefiningEntityId(ct.getId());

@@ -54,19 +54,16 @@ public class LocationDbService {
         return locationEntity;
     }
 
+
     public void save(Location loc) {
         LocationEntity le = loc.createEntity();
         this.em.merge(le);
         for (Field f : loc.getFields()) {
-            logger.info("LocationDbService:-> ==================================================>{}\n", f.toString());
-            f.setId(f.getId() + ":" + loc.getId());
             fieldDbService.save(f);
         }
 
         for (FieldValue fv : loc.getFieldValues()) {
             FieldValueEntity fve = fv.createEntity();
-            fve.setEntityId(loc.getId());
-            fve.setFieldDefinitionId(fv.getFieldId() + ":" + loc.getId());
             em.merge(fve);
         }
 

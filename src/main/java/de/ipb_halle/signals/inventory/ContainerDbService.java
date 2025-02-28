@@ -53,18 +53,15 @@ public class ContainerDbService {
         return new Container(entity);
     }
 
-    public void save(Container ct) {
-        ContainerEntity ce = ct.createEntity();
+    public void save(Container container) {
+        ContainerEntity ce = container.createEntity();
         this.em.merge(ce);
-        for (Field f : ct.getFields()) {
-            f.setId(f.getId() + ":" + ct.getId());
+        for (Field f : container.getFields()) {
             fieldDbService.save(f);
         }
 
-        for (FieldValue fv : ct.getFieldValues()) {
+        for (FieldValue fv : container.getFieldValues()) {
             FieldValueEntity fve = fv.createEntity();
-            fve.setEntityId(ct.getId());
-            fve.setFieldDefinitionId(fv.getFieldId() + ":" + ct.getId());
             em.merge(fve);
         }
     }

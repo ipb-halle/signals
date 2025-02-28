@@ -84,18 +84,24 @@ public class ContainerProcessorBean {
 
         // 1) Load container via REST
         Container container = containerRestService.doGetContainer(containerId);
+        container.setContainerTypeId(ContainerType.CONTAINER_TYPE_ENTITY_PREFIX + container.getContainerTypeId() + ContainerType.CONTAINER_TYPE_ENTITY_SUFFIX);
+        container.getFields().forEach(field -> field.setId(field.getId() + ":" + container.getContainerTypeId()));
+        container.getFieldValues().forEach(fieldValue -> {
+            fieldValue.setEntityId(containerId);
+            fieldValue.setFieldId(fieldValue.getFieldId() + ":" + container.getContainerTypeId());
+        });
+
 
         // 2) Process container fields
         processContainerFields(container);
-        containerDbService.save(container);
+        //containerDbService.save(container);
     }
 
     private void processContainerFields(Container container) throws IOException {
         for (Field field : container.getFields()) {
-            field.setId(field.getId() + ":" + container.getId());
             if (field.getType().getValue().equals(FieldType.ATTACHMENT_FILE)) {
                 for (FieldValue fieldValue : container.getFieldValues()) {
-                    if (fieldValue.getFieldId().equals(field.getStripedId())) {
+                    if (fieldValue.getFieldId().equals(field.getId())) {
                         obtainAttachment(container, field, fieldValue);
                     }
                 }
@@ -118,6 +124,7 @@ public class ContainerProcessorBean {
         if (tempPath != null) {
             Attachment attachment = getAttachment(container, field);
             if (isNewRevision(attachment, fieldValue, tempPath)) {
+                containerDbService.save(container);
                 storeAttachment(attachment, tempPath);
             } else {
                 storageService.removeFromStaging(tempPath);
@@ -162,7 +169,8 @@ public class ContainerProcessorBean {
         AttachmentRevision latestRevision = attachment.getLatestRevision();
         AttachmentRevision newRevision = new AttachmentRevision();
         containerRestService.parseAttachmentRevisionInfo(newRevision, fieldValue);
-        newRevision.setFileId(attachment.getAncestorId().split(":")[1] + ":" + attachment.getFieldId().split(":")[0]);
+        //newRevision.setFileId(attachment.getAncestorId().split(":")[1] + ":" + attachment.getFieldId().split(":")[0]);
+        newRevision.setFileId(reply.getDigest());
 
         if ((latestRevision == null) ||
                 !latestRevision.getFileId().equals(newRevision.getFileId())) {
@@ -202,6 +210,7 @@ public class ContainerProcessorBean {
         file.setTempPath(reply.getPath());
         attachment.addFile(file);
         logger.trace("ContainerProcessorBean:-> Saving attachment: {}", attachment);
+
 
         attachmentDbService.save(attachment);
 

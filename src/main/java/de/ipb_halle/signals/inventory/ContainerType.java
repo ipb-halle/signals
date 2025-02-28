@@ -31,8 +31,8 @@ import java.util.*;
  */
 
 public class ContainerType {
-    private final static String CONTAINER_TYPE_ENTITY_PREFIX = "container:";
-    private final static String CONTAINER_TYPE_ENTITY_SUFFIX = ":ivt";
+    public final static String CONTAINER_TYPE_ENTITY_PREFIX = "container:";
+    public final static String CONTAINER_TYPE_ENTITY_SUFFIX = ":ivt";
     public final static String ATTR_ATTACHMENTS = "attachments";
     public final static String ATTR_CREATED_AT = "createdAt";
     public final static String ATTR_IN_USE = "inUse";

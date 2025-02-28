@@ -116,7 +116,52 @@ public class LocationManager {
         locationDbService.save(loc);
     }
 
-    public LocationEntity loadById(String id, boolean augment) {
+    public ILocation loadById(String id, boolean augment) {
         return locationDbService.loadById(id);
+    }
+
+    /**
+     * Fetches a location by its ID from the remote REST service (without
+     * saving it locally).
+     *
+     * @param id the ID of the location
+     * @return the location from the remote system
+     */
+    public Location getSnbLocation(String id) {
+        return locationRestService.doGetLocation(id);
+    }
+
+    /**
+     * Attempts to load a location by its ID from the local database.
+     * If not found locally, it is fetched from the remote REST service.
+     * If {@code augmented} is true, the location is augmented with user
+     * location data.
+     *
+     * @param id      the ID of the location
+     * @param augment whether the location should be augmented
+     * @return the location
+     */
+    public Location getLocation(String id, boolean augment) {
+        LocationEntity locationEntity = locationDbService.loadById(id);
+        Location location = new Location(locationEntity);
+        if (location == null) {
+            location = locationRestService.doGetLocation(id);
+        }
+        if (augment) {
+            augmentLocation(location);
+        }
+        return location;
+    }
+
+    /**
+     * Augments a {@link Container} with user and location data. Replaces
+     * the simple references to {@code createdBy}, {@code updatedBy}, and
+     * {@code location} with fully loaded objects from the local database.
+     *
+     * @param location the container to augment
+     */
+    public void augmentLocation(Location location) {
+        location.setCreatedBy(userManager.getUser(location.getCreatedBy().getId()));
+        location.setUpdatedBy(userManager.getUser(location.getUpdatedBy().getId()));
     }
 }

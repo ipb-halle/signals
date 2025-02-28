@@ -35,8 +35,8 @@ import java.util.*;
 public class LocationType {
 
     public final static String ATTR_NAME = "name";
-    private final static String LOCATION_TYPE_ENTITY_PREFIX = "location:";
-    private final static String LOCATION_TYPE_ENTITY_SUFFIX = ":ivt";
+    public final static String LOCATION_TYPE_ENTITY_PREFIX = "location:";
+    public final static String LOCATION_TYPE_ENTITY_SUFFIX = ":ivt";
 
     private String id;
     private String name;
