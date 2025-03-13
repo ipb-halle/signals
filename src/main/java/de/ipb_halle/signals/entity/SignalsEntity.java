@@ -70,6 +70,9 @@ public class SignalsEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date timeStamp;
 
+    @Column
+    private boolean template;
+
 /*
     @ElementCollection
     @CollectionTable(name = "signalsentities_children", joinColumns = @JoinColumn(name = "signals_entity_id"))
@@ -83,6 +86,7 @@ public class SignalsEntity {
 */
 
     public SignalsEntity() {
+        template = false;
     }
 
     public String dump() {
@@ -187,6 +191,13 @@ public class SignalsEntity {
         this.timeStamp = timeStamp;
     }
 
+    public boolean isTemplate() {
+        return template;
+    }
+
+    public void setTemplate(boolean template) {
+        this.template = template;
+    }
 /*
     public List<String> getChildren() {
         return children;

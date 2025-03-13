@@ -1,0 +1,1 @@
+{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/entities?includeTypes=location&includeOptions=nontemplate&page[offset]=0&page[limit]=20","first":"https://endpoint.somewhere.invalid/api/rest/v1.0/entities?includeTypes=location&includeOptions=nontemplate&page[offset]=0&page[limit]=20"},"data": []}

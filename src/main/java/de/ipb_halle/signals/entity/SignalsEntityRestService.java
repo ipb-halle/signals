@@ -17,7 +17,6 @@
  */
 package de.ipb_halle.signals.entity;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -48,6 +47,7 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
     public final static String SIGNALS_ENTITY_CHILDREN_ENDPOINT = "/entities/%s/children";
     public final static String SIGNALS_ENTITY_SHARES_ENDPOINT = "/entities/%s/shares";
     public final static String PARAMETER_INCLUDE_TYPES = "includeTypes";
+    public final static String PARAMETER_INCLUDE_OPTIONS = "includeOptions";
     public final static String PARAMETER_START = "start";
     public final static String PARAMETER_END = "end";
 
@@ -98,6 +98,7 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
                 .setEndpoint(SIGNALS_ENTITY_ENDPOINT);
 
         configureEntityTypes(cmap);
+        configureEntityOptions(cmap);
         if (cmap.containsKey(PARAMETER_START)) {
             restClient.putUriParameter(PARAMETER_START,
                     dateFormat.format((Date) cmap.get(PARAMETER_START)));
@@ -162,6 +163,13 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
                 sb.append(et.getValue());
             }
             restClient.putUriParameter(PARAMETER_INCLUDE_TYPES, sb.toString());
+        }
+    }
+
+    private void configureEntityOptions(Map<String, Object> cmap) {
+        if (cmap.containsKey(PARAMETER_INCLUDE_OPTIONS)) {
+            restClient.putUriParameter(PARAMETER_INCLUDE_OPTIONS,
+                    (String) cmap.get(PARAMETER_INCLUDE_OPTIONS));
         }
     }
 }

@@ -71,7 +71,8 @@ CREATE TABLE signalsentities (
     edited_at TIMESTAMP,
     edited_by VARCHAR,
     digest BIGINT,
-    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    template BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 /*

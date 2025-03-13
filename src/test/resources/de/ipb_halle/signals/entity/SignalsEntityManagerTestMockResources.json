@@ -1,5 +1,6 @@
 [
-{"resource":"SignalsEntityManagerTest001.json", "key":"GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities?includeTypes=location&page%5Blimit%5D=20&page%5Boffset%5D=0"},
+{"resource":"SignalsEntityManagerTest001.json", "key":"GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities?includeTypes=location&page%5Blimit%5D=20&includeOptions=template&page%5Boffset%5D=0"},
+{"resource":"SignalsEntityManagerTest003.json", "key":"GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities?includeTypes=location&page%5Blimit%5D=20&includeOptions=nontemplate&page%5Boffset%5D=0"},
 
 {"resource":"81ff1644-2a27-4fb1-a597-5d83e1920c0d.json", "key":"GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/location:81ff1644-2a27-4fb1-a597-5d83e1920c0d/children?page%5Blimit%5D=20&page%5Boffset%5D=0"},
 {"resource":"44ab8051-81fe-4f48-b251-8f629a89ddf4.json", "key":"GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/location:44ab8051-81fe-4f48-b251-8f629a89ddf4/children?page%5Blimit%5D=20&page%5Boffset%5D=0"},
@@ -22,7 +23,7 @@
 {"resource":"43452cb8-5aa3-4ef5-b5e2-9b2ca4803af5.json", "key":"GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/location:43452cb8-5aa3-4ef5-b5e2-9b2ca4803af5/children?page%5Blimit%5D=20&page%5Boffset%5D=0"},
 {"resource":"e13620f4-4933-4275-83cc-3194a4be6607.json", "key":"GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/location:e13620f4-4933-4275-83cc-3194a4be6607/children?page%5Blimit%5D=20&page%5Boffset%5D=0"},
 
-{"resource":"SignalsEntityManagerTest002.json", "key":"GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities?includeTypes=location&page[offset]=20&page[limit]=20"},
+{"resource":"SignalsEntityManagerTest002.json", "key":"GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities?includeTypes=location&includeOptions=template&page[offset]=20&page[limit]=20"},
 
 {"resource":"2af549e1-e596-44d9-b800-a63e258a58e0.json", "key":"GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/location:2af549e1-e596-44d9-b800-a63e258a58e0/children?page%5Blimit%5D=20&page%5Boffset%5D=0"},
 {"resource":"cfa1802a-6470-42b3-8c8b-9fe025c82717.json", "key":"GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/location:cfa1802a-6470-42b3-8c8b-9fe025c82717/children?page%5Blimit%5D=20&page%5Boffset%5D=0"},

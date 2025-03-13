@@ -83,7 +83,12 @@ public class SignalsEntityManager {
         Map<String, Object> cmap = buildQueryParameters(dateRange, includeTypes);
 
         // 2) Fetch snbEntities including children from remote
-        fetchSnbEntities(cmap, config);
+        cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_OPTIONS, "template");
+        fetchSnbEntities(cmap, config, true);
+
+        // 3) Fetch non-template entities
+        cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_OPTIONS, "nontemplate");
+        fetchSnbEntities(cmap, config, false);
     }
 
     private static Map<String, Object> buildQueryParameters(Date[] dateRange, EntityType[] includeTypes) {
@@ -100,11 +105,13 @@ public class SignalsEntityManager {
         return cmap;
     }
 
-    public void fetchSnbEntities(Map<String, Object> cmap, RuntimeConfig config) {
+    public void fetchSnbEntities(Map<String, Object> cmap, RuntimeConfig config, boolean template) {
         RestResultIterator<SignalsEntityDTO> iter = restService.doGetEntities(cmap);
         while (iter.hasNext()) {
             // switch bean context to obtain a transaction boundary
-            signalsEntitiesProcessorBean.processEntity(config, iter.next());
+            SignalsEntityDTO dto  = iter.next();
+            dto.setTemplate(template);
+            signalsEntitiesProcessorBean.processEntity(config, dto);
         }
     }
 }

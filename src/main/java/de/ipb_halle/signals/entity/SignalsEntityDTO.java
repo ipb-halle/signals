@@ -53,6 +53,7 @@ public class SignalsEntityDTO implements IEntityRelationships, ISignalsEntity {
     private Date timeStamp;
     private Set<ISignalsEntity> children;
     private Set<Share> shares;
+    private boolean template;
 
     /**
      * default constructor
@@ -60,6 +61,7 @@ public class SignalsEntityDTO implements IEntityRelationships, ISignalsEntity {
     public SignalsEntityDTO() {
         children = new HashSet<>();
         shares = new HashSet<>();
+        template = false;
     }
 
     public SignalsEntityDTO(SignalsEntity entity, DynEnumManager dynEnumManager) {
@@ -76,6 +78,7 @@ public class SignalsEntityDTO implements IEntityRelationships, ISignalsEntity {
         this.editedBy = new UserReference(entity.getEditedBy());
         this.digest = entity.getDigest();
         this.timeStamp = entity.getTimeStamp();
+        this.template = entity.isTemplate();
         /* complex types */
         this.children = new HashSet<>();
         this.shares = new HashSet<>();
@@ -95,6 +98,7 @@ public class SignalsEntityDTO implements IEntityRelationships, ISignalsEntity {
         entity.setOwner(owner.getId());
         entity.setTimeStamp(timeStamp);
         entity.setType(type.getId());
+        entity.setTemplate(template);
         return entity;
     }
 
@@ -241,6 +245,14 @@ public class SignalsEntityDTO implements IEntityRelationships, ISignalsEntity {
 
     public void setDigest(Long digest) {
         this.digest = digest;
+    }
+
+    public boolean isTemplate() {
+        return template;
+    }
+
+    public void setTemplate(boolean template) {
+        this.template = template;
     }
 
     public Date getTimeStamp() {

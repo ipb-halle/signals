@@ -44,12 +44,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public abstract class SignalsEntityManagerTest {
 
     private final String TEST_MOCK_RESOURCE = "SignalsEntityManagerTestMockResources.json";
-    private final String TEST_RESOURCE_1 = "SignalsEntityManagerTest001.json";
-    private final String TEST_KEY_1 =
-        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities?includeTypes=location&page%5Blimit%5D=20&page%5Boffset%5D=0";
-    private final String TEST_RESOURCE_2 = "SignalsEntityManagerTest002.json";
-    private final String TEST_KEY_2 =
-        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities?includeTypes=location&page[offset]=20&page[limit]=20";
+
     private final String TEST_LOCATION_ID = "location:cfa1802a-6470-42b3-8c8b-9fe025c82717:ivt";
 
     private final String TEST_ENTITY_TYPE = "location";
