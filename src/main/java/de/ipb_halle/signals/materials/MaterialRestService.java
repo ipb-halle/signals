@@ -95,7 +95,7 @@ public class MaterialRestService implements RestReplyParser<Material> {
         material.setName(RestHelper.parseString(attributes, RestHelper.ATTR_NAME));
         material.setDescription(RestHelper.parseString(attributes, RestHelper.ATTR_DESCRIPTION));
         material.setDigest(RestHelper.parseLong(attributes, RestHelper.ATTR_DIGEST));
-        material.setLibraryId(RestHelper.parseString(attributes, Material.ATTR_ASSET_TYPE_ID));
+        material.setLibraryId(RestHelper.ATTR_ASSET_TYPE + RestHelper.parseString(attributes, Material.ATTR_ASSET_TYPE_ID));
 
         SignalsEntityRestService.parseTimestamps(attributes, material);
         SignalsEntityRestService.parseRelationships(materialJson, material);
@@ -164,7 +164,7 @@ public class MaterialRestService implements RestReplyParser<Material> {
         JsonObject metaFieldJsonObject = RestHelper.getFromPath(fieldJsonElement, RestHelper.ATTR_META).getAsJsonObject();
         JsonObject attributes = RestHelper.getFromPath(fieldJsonElement, RestHelper.ATTR_ATTRIBUTES).getAsJsonObject();
 
-        String id = RestHelper.ATTR_ASSET_TYPE + RestHelper.parseString(attributes, RestHelper.ATTR_ID);
+        String id = RestHelper.parseString(attributes, RestHelper.ATTR_ID);
         String value = RestHelper.getAsJsonString(attributes, RestHelper.ATTR_VALUE);
         String name = RestHelper.parseString(attributes, RestHelper.ATTR_NAME);
         Field field = fieldsByLibraryId.get(id);
