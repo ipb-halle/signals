@@ -145,9 +145,7 @@ public class MaterialsManager {
     private Map<String, Map<String, Field>> mapFieldsByLibraryId() {
         // 1) Loads all libraries
         List<Library> libraries = libraryDbService.load(new HashMap<>());
-        logger.info("Materials manager:-> loading of material libraries done");
         Set<String> libraryIds = libraries.stream().map(Library::getId).collect(Collectors.toSet());
-        logger.info("Materials manager:-> library Ids {}\n", Arrays.toString(libraryIds.toArray()));
 
         // 2) Load all fields for the retrieved libraries (ids without prefix)
         List<Field> allFields = receiveAllFieldsOfAllLibraries(libraryIds);
@@ -176,12 +174,10 @@ public class MaterialsManager {
      */
     private List<Field> receiveAllFieldsOfAllLibraries(Collection<String> libraryIds) {
         Map<String, Object> cmap = new HashMap<>();
-        cmap.put(Field.DEFINING_ENTITY_ID_LIST, libraryIds.stream()
-                .map(id -> Library.LIBRARY_TYPE + ":" + id)
-                .collect(Collectors.toList()));
-        List<Field> load = fieldDbService.load(cmap);
-        System.out.println(Arrays.toString(load.toArray()));
-        return load;
+
+        cmap.put(Field.DEFINING_ENTITY_IDS, libraryIds);
+        List<Field> fieldList = fieldDbService.load(cmap);
+        return fieldList;
     }
 
     /**

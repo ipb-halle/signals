@@ -48,7 +48,6 @@ import java.util.Map;
 public class FieldDbService {
 
 
-
     @PersistenceContext(unitName = "signalsDB")
     private EntityManager em;
 
@@ -103,7 +102,7 @@ public class FieldDbService {
             // single defining entity Id
             predicates.add(criteriaBuilder.equal(root.get(Field.DEFINING_ENTITY_ID), cmap.get(Field.DEFINING_ENTITY_ID)));
         }
-        if (cmap.containsKey(Field.DEFINING_ENTITY_ID_LIST)) {
+        if (cmap.containsKey(Field.DEFINING_ENTITY_IDS)) {
             /*
              * multiple defining entity Ids
              * "defining_entity_id" is a "library id" or other name is "AssetType id" from field
@@ -113,7 +112,7 @@ public class FieldDbService {
              *
              * NOTE: root.get must use DEFINING_ENTITY_ID whereas cmap.get must use DEFINING_ENTITY_ID_LIST
              */
-            predicates.add(root.get(Field.DEFINING_ENTITY_ID).in((List<String>) cmap.get(Field.DEFINING_ENTITY_ID_LIST)));
+            predicates.add(root.get(Field.DEFINING_ENTITY_ID).in((Collection<String>) cmap.get(Field.DEFINING_ENTITY_IDS)));
         }
         if (cmap.containsKey(Field.FIELD_TITLE)) {
             predicates.add(criteriaBuilder.equal(root.get(Field.FIELD_TITLE), cmap.get(Field.FIELD_TITLE)));
@@ -172,7 +171,7 @@ public class FieldDbService {
             FieldValue fv = new FieldValue(fve);
             Field field = loadById(fv.getFieldId());
             fv.setField(field);
-            switch(field.getType().getValue().toUpperCase()) {
+            switch (field.getType().getValue().toUpperCase()) {
                 case FieldType.ATTACHED_FILE,
                      FieldType.CHEMICAL_DRAWING,
                      FieldType.SEQUENCE_FILE -> loadFieldAttachment(fv);
@@ -187,7 +186,7 @@ public class FieldDbService {
         cmap.put(Attachment.FIELD_ID, fieldValue.getFieldId());
         cmap.put(Attachment.ANCESTOR_ID, fieldValue.getEntityId());
         List<Attachment> attachments = attachmentDbService.load(cmap);
-        if (! attachments.isEmpty()) {
+        if (!attachments.isEmpty()) {
             fieldValue.setAttachment(attachments.get(0));
         }
     }

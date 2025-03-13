@@ -47,7 +47,7 @@ public class Field {
     public final static String FIELD_TYPE = "fieldType";
     public final static String ENTITY_ID = "entityId";
     public final static String DEFINING_ENTITY_ID = "definingEntityId";
-    public final static String DEFINING_ENTITY_ID_LIST = "definingEntityIdList";
+    public final static String DEFINING_ENTITY_IDS = "definingEntityIds";
     public final static String FIELD_ID = "fieldId";
     public final static String FIELD_DESIGNATION = "fieldDesignation";
 
