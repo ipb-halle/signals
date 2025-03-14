@@ -169,36 +169,36 @@ CREATE TABLE group_memberships (
 
 CREATE TABLE usershares (
     entity_id   VARCHAR NOT NULL REFERENCES signalsentities(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    value VARCHAR NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    user_id VARCHAR NOT NULL REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
     can_read BOOLEAN NOT NULL DEFAULT FALSE,
     can_write BOOLEAN NOT NULL DEFAULT FALSE,
     is_admin BOOLEAN NOT NULL DEFAULT FALSE,
     has_full_control BOOLEAN NOT NULL DEFAULT FALSE,
-    PRIMARY KEY(entity_id, value)
+    PRIMARY KEY(entity_id, user_id)
 );
 
 CREATE TABLE groupshares (
     entity_id   VARCHAR NOT NULL REFERENCES signalsentities(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    value VARCHAR NOT NULL REFERENCES groups(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    group_id VARCHAR NOT NULL REFERENCES groups(id) ON UPDATE CASCADE ON DELETE CASCADE,
     can_read BOOLEAN NOT NULL DEFAULT FALSE,
     can_write BOOLEAN NOT NULL DEFAULT FALSE,
     is_admin BOOLEAN NOT NULL DEFAULT FALSE,
     has_full_control BOOLEAN NOT NULL DEFAULT FALSE,
-    PRIMARY KEY(entity_id, value)
+    PRIMARY KEY(entity_id, group_id)
 );
 
 CREATE VIEW signalsentities_shares AS
-    SELECT entity_id, value, bool_or(can_read) AS can_read, bool_or(can_write) AS can_write,
+    SELECT entity_id, user_id, bool_or(can_read) AS can_read, bool_or(can_write) AS can_write,
       bool_or(is_admin) AS is_admin, bool_or(has_full_control) AS has_full_control
     FROM (
-        SELECT eus.entity_id, eus.value, eus.can_read AS can_read, eus.can_write AS can_write,
+        SELECT eus.entity_id, eus.user_id, eus.can_read AS can_read, eus.can_write AS can_write,
           eus.is_admin AS is_admin, eus.has_full_control AS has_full_control
         FROM usershares AS eus
     UNION
-        SELECT egs.entity_id, gm.user_id AS value, egs.can_read AS can_read, egs.can_write AS can_write,
+        SELECT egs.entity_id, gm.user_id AS user_id, egs.can_read AS can_read, egs.can_write AS can_write,
           egs.is_admin AS is_admin, egs.has_full_control AS has_full_control
-        FROM groupshares AS egs JOIN group_memberships as gm ON egs.value = gm.group_id
-    ) AS shares GROUP BY shares.entity_id, shares.value;
+        FROM groupshares AS egs JOIN group_memberships as gm ON egs.group_id = gm.group_id
+    ) AS shares GROUP BY shares.entity_id, shares.user_id;
 
 
 CREATE TABLE field_definitions (

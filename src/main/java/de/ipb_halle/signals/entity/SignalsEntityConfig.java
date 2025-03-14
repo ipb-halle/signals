@@ -108,9 +108,9 @@ public class SignalsEntityConfig {
          * because attributes cannot be fetched together with other entities
          */
         includedTypes = new EntityType[]{
-                EntityType.valueOf("asset"),
+                // EntityType.valueOf("asset"),
                 EntityType.valueOf("assetType"),
-                EntityType.valueOf("batch"),
+                // EntityType.valueOf("batch"),
                 EntityType.valueOf("container"),
                 EntityType.valueOf("experiment"),
                 EntityType.valueOf("journal"),

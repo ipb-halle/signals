@@ -44,30 +44,30 @@ public class SEProcessorBean {
 
     private static final Logger logger = LoggerFactory.getLogger(SEProcessorBean.class);
 
+    /*
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void processEntity(RuntimeConfig config, SignalsEntityDTO parentEntity) {
         try {
-            processChildren(parentEntity);
-            processShares(parentEntity);
-            if (config.updateDb) {
-                dbService.save(parentEntity);
+            SignalsEntityDTO dto = dbService.loadById(parentEntity.getId());
+            if ((dto == null) || (! dto.getDigest().equals(parentEntity.getDigest()))) {
+                processChildren(config, parentEntity);
+                processShares(parentEntity);
+                if (config.updateDb) {
+                    dbService.save(parentEntity);
+                }
+                logger.trace(parentEntity.dump());
             }
-            logger.trace(parentEntity.dump());
         } catch (Exception e) {
             //Transaction will be automatically rolled back if exception occurs
-            logger.error("Error in ProcessSingleMaterial, material {}: {}",
+            logger.error("processEntity({}) caught an exception: {}",
                     parentEntity.getId(), e.getMessage(), e);
         }
     }
+    */
 
-    private void processChildren(SignalsEntityDTO parentEntity) throws Exception {
-        RestResultIterator<SignalsEntityDTO> iterator = restService.doGetChildren(parentEntity);
-        while (iterator.hasNext()) {
-            parentEntity.addChild(iterator.next());
-        }
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public void saveEntity(SignalsEntityDTO dto) {
+        dbService.save(dto);
     }
 
-    private void processShares(SignalsEntityDTO parentEntity) {
-        parentEntity.addShares(restService.doGetShares(parentEntity));
-    }
 }

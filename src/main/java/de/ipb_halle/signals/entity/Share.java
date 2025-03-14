@@ -27,13 +27,11 @@ import java.util.Objects;
 /**
  * Single signals entity (entities API endpoint)
  */
-@Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class Share {
+public interface Share {
 
-    public final static String ENTITY_ID = "entity_id";
-    public final static String USER_ID = "user_id";
-    public final static String GROUP_ID = "group_id";
+    public final static String ENTITY_ID = "entityId";
+    public final static String USER_ID = "userId";
+    public final static String GROUP_ID = "groupId";
 
     public final static String ATTR_CAN_READ = "canRead";
     public final static String ATTR_CAN_WRITE = "canWrite";
@@ -57,97 +55,35 @@ public abstract class Share {
         FULL_CONTROL
     }
 
-    @EmbeddedId
-    @AttributeOverrides(
-        @AttributeOverride(name = "id", column = @Column(name = "entity_id"))
-    )
-    private EmbeddedKeyValue id;
+    public String getEntityId();
 
-    @Column(name="can_read")
-    private boolean canRead;
+    public void setEntityId(String entityId);
 
-    @Column(name="can_write")
-    private boolean canWrite;
+    public boolean canRead();
 
-    @Column(name="is_admin")
-    private boolean isAdmin;
+    public void setCanRead(boolean canRead);
 
-    @Column(name="has_full_control")
-    private boolean hasFullControl;
+    public boolean canWrite();
 
-    public Share() {
-        id = new EmbeddedKeyValue();
-    }
+    public void setCanWrite(boolean canWrite);
 
-    public EmbeddedKeyValue getId() {
-        return id;
-    }
+    public boolean isAdmin();
 
-    public void setId(EmbeddedKeyValue id) {
-        this.id = id;
-    }
+    public void setIsAdmin(boolean admin);
 
-    public String getEntityId() {
-        return getId().getId();
-    }
+    public boolean hasFullControl();
 
-    public void setEntityId(String entityId) {
-        getId().setId(entityId);
-    }
+    public void setHasFullControl(boolean hasFullControl);
 
-    public boolean canRead() {
-        return canRead;
-    }
+    public  ShareType getType();
 
-    public void setCanRead(boolean canRead) {
-        this.canRead = canRead;
-    }
-
-    public boolean canWrite() {
-        return canWrite;
-    }
-
-    public void setCanWrite(boolean canWrite) {
-        this.canWrite = canWrite;
-    }
-
-    public boolean isAdmin() {
-        return isAdmin;
-    }
-
-    public void setIsAdmin(boolean admin) {
-        isAdmin = admin;
-    }
-
-    public boolean hasFullControl() {
-        return hasFullControl;
-    }
-
-    public void setHasFullControl(boolean hasFullControl) {
-        this.hasFullControl = hasFullControl;
-    }
-
-    public abstract ShareType getType();
-
-    public boolean hasPermission(SharePermission permission) {
+    default boolean hasPermission(SharePermission permission) {
         switch(permission) {
-            case READ: return canRead;
-            case WRITE: return canWrite;
-            case ADMIN: return isAdmin;
-            case FULL_CONTROL: return hasFullControl;
+            case READ: return canRead();
+            case WRITE: return canWrite();
+            case ADMIN: return isAdmin();
+            case FULL_CONTROL: return hasFullControl();
         }
         return false;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Share share)) return false;
-        return Objects.equals(id, share.id)
-                && Objects.equals(getType(), share.getType());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id) + Objects.hashCode(getType());
     }
 }

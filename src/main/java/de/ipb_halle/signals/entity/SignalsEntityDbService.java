@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 
 @Stateless
 @PersistenceElements(entities={SignalsEntity.class, SignalsEntityChild.class,
-        Share.class, EffectiveShare.class, GroupShare.class, UserShare.class})
+        EffectiveShare.class, GroupShare.class, UserShare.class})
 public class SignalsEntityDbService {
 
     public record SEloadInfo(
@@ -141,11 +141,11 @@ public class SignalsEntityDbService {
         criteriaQuery.select(root);
 
         if (cmap.containsKey(Share.ENTITY_ID)) {
-            predicates.add(builder.equal(root.get("id").get(EmbeddedKeyValue.ID),
+            predicates.add(builder.equal(root.get(Share.ENTITY_ID),
                     cmap.get(Share.ENTITY_ID)));
         }
         if (cmap.containsKey(Share.USER_ID)) {
-            predicates.add(builder.equal(root.get("id").get(EmbeddedKeyValue.VALUE),
+            predicates.add(builder.equal(root.get(Share.USER_ID),
                     cmap.get(Share.USER_ID)));
         }
         criteriaQuery.where(builder.and(predicates.toArray(new Predicate[0])));
@@ -169,11 +169,11 @@ public class SignalsEntityDbService {
         criteriaQuery.select(root);
 
         if (cmap.containsKey(Share.ENTITY_ID)) {
-            predicates.add(builder.equal(root.get("id").get(EmbeddedKeyValue.ID),
+            predicates.add(builder.equal(root.get(Share.ENTITY_ID),
                     cmap.get(Share.ENTITY_ID)));
         }
         if (cmap.containsKey(Share.GROUP_ID)) {
-            predicates.add(builder.equal(root.get("id").get(EmbeddedKeyValue.VALUE),
+            predicates.add(builder.equal(root.get(Share.GROUP_ID),
                     cmap.get(Share.GROUP_ID)));
         }
         criteriaQuery.where(builder.and(predicates.toArray(new Predicate[0])));
@@ -197,11 +197,11 @@ public class SignalsEntityDbService {
         criteriaQuery.select(root);
 
         if (cmap.containsKey(Share.ENTITY_ID)) {
-            predicates.add(builder.equal(root.get("id").get(EmbeddedKeyValue.ID),
+            predicates.add(builder.equal(root.get(Share.ENTITY_ID),
                     cmap.get(Share.ENTITY_ID)));
         }
         if (cmap.containsKey(Share.USER_ID)) {
-            predicates.add(builder.equal(root.get("id").get(EmbeddedKeyValue.VALUE),
+            predicates.add(builder.equal(root.get(Share.USER_ID),
                     cmap.get(Share.USER_ID)));
         }
         criteriaQuery.where(builder.and(predicates.toArray(new Predicate[0])));

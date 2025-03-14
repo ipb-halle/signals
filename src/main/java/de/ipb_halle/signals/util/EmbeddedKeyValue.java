@@ -54,4 +54,8 @@ public class EmbeddedKeyValue {
     public void setValue(String v) {
         this.value = v;
     }
+
+    public String toString() {
+        return String.format("EmbeddedKeyValue(%s, %s)", id, value);
+    }
 }

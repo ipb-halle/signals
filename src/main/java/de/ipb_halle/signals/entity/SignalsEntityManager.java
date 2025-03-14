@@ -105,13 +105,42 @@ public class SignalsEntityManager {
         return cmap;
     }
 
-    public void fetchSnbEntities(Map<String, Object> cmap, RuntimeConfig config, boolean template) {
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+    private void fetchSnbEntities(Map<String, Object> cmap, RuntimeConfig config, boolean template) {
         RestResultIterator<SignalsEntityDTO> iter = restService.doGetEntities(cmap);
         while (iter.hasNext()) {
-            // switch bean context to obtain a transaction boundary
-            SignalsEntityDTO dto  = iter.next();
+            SignalsEntityDTO dto = iter.next();
             dto.setTemplate(template);
+
+            SignalsEntityDTO dbEntity = dbService.loadById(dto.getId());
+            if ((dbEntity == null) || (! dto.getDigest().equals(dbEntity.getDigest()))) {
+                processChildren(config, dto);
+                processShares(dto);
+                if (config.updateDb) {
+                    // switch bean context to obtain a transaction boundary
+                    signalsEntitiesProcessorBean.saveEntity(dto);
+                }
+            }
+            /*
             signalsEntitiesProcessorBean.processEntity(config, dto);
+             */
         }
+    }
+
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+    private void processChildren(RuntimeConfig config, SignalsEntityDTO parentEntity) {
+        RestResultIterator<SignalsEntityDTO> iterator = restService.doGetChildren(parentEntity);
+        while (iterator.hasNext()) {
+            SignalsEntityDTO child = iterator.next();
+            processChildren(config, child);
+            if (config.updateDb) {
+                signalsEntitiesProcessorBean.saveEntity(child);
+            }
+            parentEntity.addChild(child);
+        }
+    }
+
+    public void processShares(SignalsEntityDTO parentEntity) {
+        parentEntity.addShares(restService.doGetShares(parentEntity));
     }
 }

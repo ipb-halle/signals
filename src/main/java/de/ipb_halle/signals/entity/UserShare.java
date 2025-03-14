@@ -22,16 +22,89 @@ package de.ipb_halle.signals.entity;
 import de.ipb_halle.signals.util.EmbeddedKeyValue;
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity
 @Table(name="usershares")
-public class UserShare extends Share {
+@IdClass(UserShare.class)
+public class UserShare implements Share {
+    @Id
+    @Column(name="entity_id")
+    private String entityId;
+
+    @Id
+    @Column(name="user_id")
+    private String userId;
+
+    @Column(name="can_read")
+    private boolean canRead;
+
+    @Column(name="can_write")
+    private boolean canWrite;
+
+    @Column(name="is_admin")
+    private boolean isAdmin;
+
+    @Column(name="has_full_control")
+    private boolean hasFullControl;
+
 
     public String getUserId() {
-        return getId().getValue();
+        return userId;
     }
 
     public void setUserId(String userId) {
-        getId().setValue(userId);
+        this.userId = userId;
+    }
+
+    @Override
+    public String getEntityId() {
+        return entityId;
+    }
+
+    @Override
+    public void setEntityId(String entityId) {
+        this.entityId = entityId;
+    }
+
+    @Override
+    public boolean canRead() {
+        return canRead;
+    }
+
+    @Override
+    public void setCanRead(boolean canRead) {
+        this.canRead = canRead;
+    }
+
+    @Override
+    public boolean canWrite() {
+        return canWrite;
+    }
+
+    @Override
+    public void setCanWrite(boolean canWrite) {
+        this.canWrite = canWrite;
+    }
+
+    @Override
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    @Override
+    public void setIsAdmin(boolean admin) {
+        isAdmin = admin;
+    }
+
+    @Override
+    public boolean hasFullControl() {
+        return hasFullControl;
+    }
+
+    @Override
+    public void setHasFullControl(boolean hasFullControl) {
+        this.hasFullControl = hasFullControl;
     }
 
     @Override
@@ -39,4 +112,15 @@ public class UserShare extends Share {
         return ShareType.USER;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof UserShare that)) return false;
+        return Objects.equals(entityId, that.entityId)
+                && Objects.equals(userId, that.userId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(entityId, userId, getType());
+    }
 }

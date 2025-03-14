@@ -55,6 +55,7 @@ public class SignalsChildParser implements RestReplyParser<SignalsEntityDTO> {
         dto.setType((EntityType) dynEnumManager.valueOf(EntityType.valueOf(RestHelper.parseString(jsonAttributes, RestHelper.ATTR_TYPE))));
         dto.setDigest(RestHelper.parseLong(jsonAttributes, RestHelper.ATTR_DIGEST));
         SignalsEntityRestService.parseTimestamps(jsonAttributes, dto);
+        SignalsEntityRestService.parseRelationships(json.getAsJsonObject(), dto);
         return dto;
     }
 }
