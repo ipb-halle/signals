@@ -40,6 +40,29 @@ import java.util.*;
  */
 
 @Stateless
+
+/**
+ * Manages locations in the Signals inventory system.
+ * <p>
+ * This class handles the import and synchronization of locations between the
+ * Signals REST API and the local database.
+ * </p>
+ *
+ * <ul>
+ *   <li>{@link #importLocation(RuntimeConfig, String)} - Imports a location from the local database into the Signals REST API.</li>
+ *   <li>{@link #manageLocations(Date[])} - Fetches locations from the Signals REST API and saves them into the local database.</li>
+ * </ul>
+ *
+ * <p>Additional functionalities include:</p>
+ * <ul>
+ *   <li>Loading and saving locations</li>
+ *   <li>Augmenting location data with user information</li>
+ *   <li>Processing individual locations</li>
+ * </ul>
+ *
+ * @author [Your Name]
+ * @version 1.0
+ */
 public class LocationManager {
 
     @Inject

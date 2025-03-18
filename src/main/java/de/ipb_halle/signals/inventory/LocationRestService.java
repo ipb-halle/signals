@@ -204,13 +204,13 @@ public class LocationRestService implements RestReplyParser<Location> {
     private JsonObject prepareLocation(LocationType locationType, Location location) {
         JsonObject resultingJson = new JsonObject();
         JsonObject data = new JsonObject();
-        data.addProperty(RestHelper.ATTR_TYPE, "inventoryLocation");
+        data.addProperty(RestHelper.ATTR_TYPE, InventoryType.inventoryLocation.toString());
         data.add(RestHelper.ATTR_ATTRIBUTES, prepareAttributes(locationType, location));
         resultingJson.add(RestHelper.ATTR_DATA, data);
         return resultingJson;
    }
 
-   //creat gridBox as Example
+   //create gridBox as Example
     private JsonObject prepareAttributes(LocationType locationType, Location location) {
         JsonObject attributes = new JsonObject();
         attributes.addProperty(RestHelper.ATTR_NAME, location.getName());
