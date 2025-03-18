@@ -30,6 +30,8 @@ import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.rest.*;
 import de.ipb_halle.signals.storage.StorageService;
 import jakarta.ejb.Local;
+import jakarta.ejb.TransactionAttribute;
+import jakarta.ejb.TransactionAttributeType;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -314,6 +316,7 @@ public class MaterialRestService implements RestReplyParser<Material> {
         return parseReply(fetch(MATERIAL_ENDPOINT, id));
     }
 
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public Material doCreateMaterial(Library lib, Material mat, Material batch) {
         JsonObject request;
         String endpoint;

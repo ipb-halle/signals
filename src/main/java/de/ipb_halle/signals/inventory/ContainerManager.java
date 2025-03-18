@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals.inventory;
 
+import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.attachment.AttachmentDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.EntityType;
@@ -83,8 +84,23 @@ public class ContainerManager {
     @Inject
     private ContainerProcessorBean containerProcessorBean;
 
-
     private Logger logger = LoggerFactory.getLogger(ContainerManager.class);
+
+
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+    public void importContainer(RuntimeConfig runtimeConfig, String id) {
+        //loads container from local DB to be imported into Signals
+        Container container = containerDbService.loadContainerById(id);
+
+        //loads containerType from local DB
+        ContainerType containerType = containerTypeDbService.loadById(container.getContainerTypeId());
+
+        if (runtimeConfig.updateSNB) {
+            containerRestService.doCreateContainer(containerType, container);
+        }
+
+    }
+
 
     /**
      * Fetches containers created/updated within a specified date range
@@ -158,7 +174,7 @@ public class ContainerManager {
      * @return the loaded container, or {@code null} if not found
      */
     public Container loadById(String id) {
-        return containerDbService.loadById(id);
+        return containerDbService.loadContainerById(id);
     }
 
     /**
@@ -183,7 +199,7 @@ public class ContainerManager {
      * @return the container
      */
     public Container getContainer(String id, boolean augment) {
-        Container ct = containerDbService.loadById(id);
+        Container ct = containerDbService.loadContainerById(id);
         if (ct == null) {
             ct = containerRestService.doGetContainer(id);
         }
@@ -199,7 +215,9 @@ public class ContainerManager {
      *
      * @param c the container to save
      */
-    public void save(Container c) {
-        containerDbService.save(c);
+    public void saveContainer(Container c) {
+        logger.info("Container MANAGER:-> container getDescription={}\n", c.getDescription());
+
+        containerDbService.saveContainer(c);
     }
 }

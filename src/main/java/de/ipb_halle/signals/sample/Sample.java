@@ -21,5 +21,18 @@
 package de.ipb_halle.signals.sample;
 
 public class Sample {
+    public String id;
 
+    public Sample() {
+    }
+
+    public String getId() {
+        return this.id;
+    }
+
+    
+    public Sample setId(String id) {
+        this.id=id;
+        return this;
+    }
 }

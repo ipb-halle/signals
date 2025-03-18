@@ -26,6 +26,10 @@ import jakarta.persistence.PersistenceContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 /**
  * Database service for containers
@@ -45,15 +49,20 @@ public class ContainerDbService {
     private EntityManager em;
 
 
-    public Container loadById(String id) {
-        ContainerEntity entity = this.em.find(ContainerEntity.class, id);
-        if (entity == null) {
-            return null;
-        }
-        return new Container(entity);
+    public Container loadContainerById(String id) {
+        ContainerEntity containerEntity = this.em.find(ContainerEntity.class, id);
+        loadFieldValues(containerEntity, id);
+        return new Container(containerEntity);
     }
 
-    public void save(Container container) {
+    private void loadFieldValues(ContainerEntity containerEntity, String id) {
+        Map<String, Object> cmap = new HashMap<>();
+        cmap.put(FieldValue.ENTITY_ID, id);
+        List<FieldValue> fieldValues = fieldDbService.loadFieldValues(cmap);
+        containerEntity.addAllFieldValues(fieldValues);
+    }
+
+    public void saveContainer(Container container) {
         ContainerEntity ce = container.createEntity();
         this.em.merge(ce);
         for (Field f : container.getFields()) {

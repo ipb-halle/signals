@@ -95,6 +95,8 @@ public class ContainerProcessorBean {
 
         // 2) Process container fields
         processContainerFields(container);
+        logger.info(container.getId());
+        logger.info("CONATINER CONTENT CPB:-> container.material_id={}\n", container.getMaterial().getId());
         containerDbService.saveContainer(container);
     }
 

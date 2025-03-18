@@ -17,12 +17,16 @@
  */
 package de.ipb_halle.signals.inventory;
 
+import de.ipb_halle.signals.field.FieldValue;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Container entity
@@ -54,6 +58,9 @@ public class ContainerEntity {
     @Id
     private String id;
 
+    @Column(name = "description")
+    private String description;
+
     @Column
     private Double amount;
 
@@ -81,6 +88,9 @@ public class ContainerEntity {
     @Column(name = "location_id")
     private String locationId;
 
+    @Column(name = "material_id")
+    private String materialId;
+
     @Column
     private String name;
 
@@ -96,6 +106,26 @@ public class ContainerEntity {
     @Column(name = "type_name")
     private String containerTypeName;
 
+    private transient Set<FieldValue> fieldValues;
+
+    public ContainerEntity() {
+
+        fieldValues = new HashSet<>();
+    }
+
+    public String dump() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("Container(%s): name=%s\n", id, name));
+        return sb.toString();
+    }
+
+    public void addAllFieldValues(List<FieldValue> fieldValues) {
+        this.fieldValues.addAll(fieldValues);
+    }
+
+    public String getDescription() {
+        return description;
+    }
 
     public Double getAmount() {
         return amount;
@@ -137,6 +167,10 @@ public class ContainerEntity {
         return locationId;
     }
 
+    public String getMaterialId() {
+        return materialId;
+    }
+
     public String getName() {
         return name;
     }
@@ -155,6 +189,15 @@ public class ContainerEntity {
 
     public String getContainerTypeName() {
         return containerTypeName;
+    }
+
+    public Set<FieldValue> getFieldValues() {
+        return fieldValues;
+    }
+
+    public ContainerEntity setDescription(String description) {
+        this.description = description;
+        return this;
     }
 
     public ContainerEntity setAmount(Double a) {
@@ -207,6 +250,11 @@ public class ContainerEntity {
         return this;
     }
 
+    public ContainerEntity setMaterialId(String materialId) {
+        this.materialId = materialId;
+        return this;
+    }
+
     public ContainerEntity setName(String n) {
         name = n;
         return this;
@@ -232,6 +280,11 @@ public class ContainerEntity {
         return this;
     }
 
+    public ContainerEntity setFieldValues(Set<FieldValue> fieldValues) {
+        this.fieldValues.addAll(fieldValues);
+        return this;
+    }
+
     @Override
     public String toString() {
         return "ContainerEntity{" +
@@ -252,4 +305,6 @@ public class ContainerEntity {
                 ", containerTypeName='" + containerTypeName + '\'' +
                 '}';
     }
+
+
 }

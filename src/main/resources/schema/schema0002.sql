@@ -325,7 +325,8 @@ CREATE TABLE containers (
     type_name VARCHAR,
     updated_at TIMESTAMP,
     updated_by VARCHAR /* REFERENCES users(id) */,
-    unit VARCHAR
+    unit VARCHAR,
+    description VARCHAR
 );
 
 CREATE TABLE location_types (

@@ -28,8 +28,11 @@ import de.ipb_halle.signals.entity.Unit;
 import de.ipb_halle.signals.field.*;
 import de.ipb_halle.signals.materials.MaterialReference;
 import de.ipb_halle.signals.rest.*;
+import de.ipb_halle.signals.sample.Sample;
 import de.ipb_halle.signals.users.UserReference;
 import jakarta.ejb.Local;
+import jakarta.ejb.TransactionAttribute;
+import jakarta.ejb.TransactionAttributeType;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,8 +50,9 @@ import java.util.List;
 @Local
 public class ContainerRestService implements RestReplyParser<Container> {
 
-    public final String CONTAINER_ENDPOINT = "/inventory/containers/%s";
     public final String CONTAINER_ATTACHMENT_ENDPOINT = "/inventory/containers/%s/fields/%s/attachment";
+    public final String CONTAINER_ENDPOINT = "/inventory/containers/%s";
+    private static final String CONTAINER_CREATE_ENDPOINT = "/inventory/containers";
     @Inject
     private RestClient restClient;
 
@@ -82,6 +86,7 @@ public class ContainerRestService implements RestReplyParser<Container> {
         ct.setId(ContainerTypeRestService.CONTAINER_TYPE_ENTITY_PREFIX
                 + RestHelper.parseString(j, RestHelper.ATTR_ID)
                 + ContainerTypeRestService.CONTAINER_TYPE_ENTITY_SUFFIX);
+        ct.setDescription(RestHelper.parseString(attributes, RestHelper.ATTR_DESCRIPTION));
         ct.setBarcode(RestHelper.parseString(attributes, ContainerEntity.ATTR_BARCODE));
         ct.setDigest(RestHelper.parseString(attributes, RestHelper.ATTR_DIGEST));
         ct.setCreatedAt(RestHelper.parseDate(attributes, ContainerEntity.ATTR_CREATED_AT));
@@ -176,13 +181,15 @@ public class ContainerRestService implements RestReplyParser<Container> {
             String id = RestHelper.parseString(RestHelper.getPrimitiveFromPath(json, ContainerEntity.ATTR_CONTENT_ID));
             switch (type) {
                 case ContainerEntity.CONTENT_TYPE_ASSET:
-                    ct.addMaterial(new MaterialReference().setId(id));
+                    ct.setMaterial(new MaterialReference().setId(id));
                     break;
                 case ContainerEntity.CONTENT_TYPE_BATCH:
-                    ct.addMaterial(new MaterialReference().setId(id));
+                    ct.setMaterial(new MaterialReference().setId(id));
                     break;
                 case ContainerEntity.CONTENT_TYPE_SAMPLE:
-                    logger.warn("ContainerRestService:->Unable to assign Sample to Container with Id={}", id);
+                    //ToDo: implement SAMPLE!!!
+                    ct.setMaterial(new MaterialReference().setId(id));
+                   // logger.warn("ContainerRestService:->Unable to assign Sample to Container with Id={}", id);
                     break;
                 default:
                     throw new RuntimeException("Unknown content type for container: " + ct.getId());
@@ -221,5 +228,52 @@ public class ContainerRestService implements RestReplyParser<Container> {
         newRevision.setOriginalName(RestHelper.getPrimitiveFromPath(json, Container.ATTR_ATTACHMENT_FILENAME).getAsString());
         newRevision.setMimeType(RestHelper.getPrimitiveFromPath(json, Container.ATTR_ATTACHMENT_MIMETYPE).getAsString());
         newRevision.setSize(RestHelper.getPrimitiveFromPath(json, Container.ATTR_ATTACHMENT_FILESIZE).getAsLong());
+    }
+
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public void doCreateContainer(ContainerType containerType, Container container) {
+
+        JsonObject request = prepareContainer(containerType, container);
+
+        try {
+            restClient.reset()
+                    .setMethod(Method.POST)
+                    .setEndpoint(CONTAINER_CREATE_ENDPOINT)
+                    .setRequestData(request.toString())
+                    .execute(RestClient.HTTP_CREATED);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getLocalizedMessage());
+        }
+    }
+
+    private JsonObject prepareContainer(ContainerType containerType, Container container) {
+        JsonObject resultingJson = new JsonObject();
+        JsonObject data = new JsonObject();
+        data.addProperty(RestHelper.ATTR_TYPE, InventoryType.inventoryContainer.toString());
+        data.add(RestHelper.ATTR_ATTRIBUTES, prepareAttributes(containerType, container));
+
+
+        return null;
+    }
+
+    private JsonObject prepareAttributes(ContainerType containerType, Container container) {
+        JsonObject attributes = new JsonObject();
+        attributes.addProperty(RestHelper.ATTR_NAME, container.getName());
+        attributes.addProperty(RestHelper.ATTR_DESCRIPTION, container.getDescription());
+        attributes.addProperty(RestHelper.ATTR_TYPE_ID, containerType.getId().split(":")[1]);
+        attributes.addProperty(LocationEntity.ATTR_GRID, true);
+        attributes.addProperty(LocationEntity.ATTR_ROWS, 8);
+        attributes.addProperty(LocationEntity.ATTR_COLUMNS, 12);
+        attributes.add(LocationEntity.ATTR_ANCESTORS, prepareAncestors(container));
+        attributes.add(RestHelper.ATTR_FIELDS, prepareFields(container));
+        return attributes;
+    }
+
+    private JsonElement prepareFields(Container container) {
+        return null;
+    }
+
+    private JsonElement prepareAncestors(Container container) {
+        return null;
     }
 }
