@@ -121,9 +121,6 @@ public class SignalsEntityManager {
                     signalsEntitiesProcessorBean.saveEntity(dto);
                 }
             }
-            /*
-            signalsEntitiesProcessorBean.processEntity(config, dto);
-             */
         }
     }
 

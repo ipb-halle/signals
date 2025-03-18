@@ -475,6 +475,13 @@
             <version>1.7.30</version>
         </dependency>
 
+        <!-- RTF ParserKit for InhouseDB import -->
+        <dependency>
+            <groupId>com.github.joniles</groupId>
+            <artifactId>rtfparserkit</artifactId>
+            <version>1.15.0</version>
+        </dependency>
+
         <!-- db for testing -->
         <dependency>
             <groupId>org.testcontainers</groupId>

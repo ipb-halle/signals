@@ -39,31 +39,7 @@ public class SEProcessorBean {
     @Inject
     private SignalsEntityDbService dbService;
 
-    @Inject
-    private SignalsEntityRestService restService;
-
     private static final Logger logger = LoggerFactory.getLogger(SEProcessorBean.class);
-
-    /*
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void processEntity(RuntimeConfig config, SignalsEntityDTO parentEntity) {
-        try {
-            SignalsEntityDTO dto = dbService.loadById(parentEntity.getId());
-            if ((dto == null) || (! dto.getDigest().equals(parentEntity.getDigest()))) {
-                processChildren(config, parentEntity);
-                processShares(parentEntity);
-                if (config.updateDb) {
-                    dbService.save(parentEntity);
-                }
-                logger.trace(parentEntity.dump());
-            }
-        } catch (Exception e) {
-            //Transaction will be automatically rolled back if exception occurs
-            logger.error("processEntity({}) caught an exception: {}",
-                    parentEntity.getId(), e.getMessage(), e);
-        }
-    }
-    */
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void saveEntity(SignalsEntityDTO dto) {
