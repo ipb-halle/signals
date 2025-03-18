@@ -91,7 +91,7 @@ public class LibraryDbService {
         Map<String, Object> cmap = new HashMap<> ();
         cmap.put(Field.DEFINING_ENTITY_ID, id);
         cmap.put(Field.FIELD_DESIGNATION, dynEnumManager.valueOf(designation));
-        return fieldDbService.load(cmap);
+        return fieldDbService.loadFields(cmap);
     }
 
     public void save(Library lib) {

@@ -194,6 +194,10 @@ public class Signals {
         return materialsConfig;
     }
 
+    public InventoryConfig getInventoryConfig(){
+        return inventoryConfig;
+    }
+
     public void manageElements(Date[] dateRange) {
         elementConfig.manageElements(dateRange);
     }

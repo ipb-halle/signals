@@ -99,7 +99,7 @@ public class ContainerTypeDbService {
     private List<Field> loadFields(String id) {
         Map<String, Object> cmap = new HashMap<>();
         cmap.put(Field.DEFINING_ENTITY_ID, id);
-        return fieldService.load(cmap);
+        return fieldService.loadFields(cmap);
     }
 
     public void save(ContainerType ct) {

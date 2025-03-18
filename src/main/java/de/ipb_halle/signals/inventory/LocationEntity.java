@@ -23,15 +23,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Location entity (/inventory/locations/ API endpoint)
  */
 
 @Entity
-@Table(name="locations")
+@Table(name = "locations")
 public class LocationEntity implements ILocation {
 
     public final static String ATTR_ANCESTORS = "ancestors";
@@ -48,6 +47,8 @@ public class LocationEntity implements ILocation {
     public final static String ATTR_UPDATED_BY = "relationships.updatedBy.data.id";
 
     public final static String ENTITY_TYPE_LOCATION = "location";
+    public static final String ATTR_ROWS = "rows";
+    public static final String ATTR_COLUMNS = "columns";
 
     @Id
     private String id;
@@ -64,34 +65,34 @@ public class LocationEntity implements ILocation {
     @Column
     private boolean grid;
 
-    @Column(name="grid_rows")
+    @Column(name = "grid_rows")
     private Integer rows;
 
-    @Column(name="grid_columns")
+    @Column(name = "grid_columns")
     private Integer columns;
 
-    @Column(name="created_at")
+    @Column(name = "created_at")
     private Date createdAt;
 
-    @Column(name="created_by")
+    @Column(name = "created_by")
     private String createdBy;
 
-    @Column(name="type_id")
+    @Column(name = "type_id")
     private String typeId;
 
-    @Column(name="type_name")
+    @Column(name = "type_name")
     private String typeName;
 
-    @Column(name="ancestor_id")
+    @Column(name = "ancestor_id")
     private String ancestorId;
 
-    @Column(name="ancestor_name")
+    @Column(name = "ancestor_name")
     private String ancestorName;
 
-    @Column(name="updated_at")
+    @Column(name = "updated_at")
     private Date updatedAt;
 
-    @Column(name="updated_by")
+    @Column(name = "updated_by")
     private String updatedBy;
 
     private transient LocationType type;
@@ -103,12 +104,17 @@ public class LocationEntity implements ILocation {
      */
     public LocationEntity() {
         grid = false;
+        fieldValues = new HashSet<>();
     }
 
     public String dump() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("Location(%s): name=%s\n",id, name));
+        sb.append(String.format("Location(%s): name=%s\n", id, name));
         return sb.toString();
+    }
+
+    public void addAllFieldValues(List<FieldValue> fieldValues) {
+        this.fieldValues.addAll(fieldValues);
     }
 
     public String getId() {
@@ -277,7 +283,6 @@ public class LocationEntity implements ILocation {
     }
 
 
-
     @Override
     public String toString() {
         return "LocationEntity{" +
@@ -298,6 +303,9 @@ public class LocationEntity implements ILocation {
                 ", updatedBy='" + updatedBy + '\'' +
                 ", type=" + type +
                 ", ancestor=" + ancestor +
+                ", fieldValues=" + fieldValues +
                 '}';
     }
+
+
 }

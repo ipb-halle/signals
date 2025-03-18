@@ -44,14 +44,20 @@ public class InventoryConfig {
                     from SNB to DB. Date interval can be specified optionally, see --entitiesSync for details.""")
             .build();
 
-
-    public InventoryConfig() {
-    }
+    @SuppressWarnings("static-access")
+    private static final Option locationImportOpt = Option.builder("li")
+            .longOpt("locationImport")
+            .hasArgs()
+            .argName("ENTITY_ID")
+            .optionalArg(false)
+            .desc("\nImport a single location from DB into SNB (i.e. create new location in SNB).")
+            .build();
 
     private InventoryManager inventoryManager;
     private RuntimeConfig runtimeConfig;
     private SignalsConfig signalsConfig;
     private Logger logger;
+
 
     public InventoryConfig(SignalsConfig signalsConfig, RuntimeConfig runtimeConfig, InventoryManager inventoryManager) {
         this.logger = LoggerFactory.getLogger(InventoryConfig.class);
@@ -73,8 +79,22 @@ public class InventoryConfig {
         inventoryManager.manageInventory(dateRange);
     }
 
+    public void importLocations(String id) {
+        logger.info("""
+
+                ******************************************************
+                *
+                * Import single Location
+                * {} / {}
+                *
+                ******************************************************
+                """, signalsConfig.getSnbInstanceName(), id);
+        inventoryManager.importLocation(runtimeConfig, id);
+    }
+
     public static void registerOptions(Options options) {
         options.addOption(inventorySyncOpt);
+        options.addOption(locationImportOpt);
     }
 
     /**
@@ -89,6 +109,11 @@ public class InventoryConfig {
         if (cmdline.hasOption(inventorySyncOpt.getOpt())) {
             String[] dateRangeArgs = cmdline.getOptionValues(inventorySyncOpt.getOpt());
             signals.manageInventory(DateRangeParser.parseDateRange(dateRangeArgs));
+        }
+
+        if (cmdline.hasOption(locationImportOpt.getOpt())) {
+            signals.getInventoryConfig().importLocations(
+                    cmdline.getOptionValue(locationImportOpt.getOpt()));
         }
     }
 }

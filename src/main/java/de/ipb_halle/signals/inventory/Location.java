@@ -79,6 +79,7 @@ public class Location {
 
         this.fields = new HashSet<>();
         this.fieldValues = new HashSet<>();
+        fieldValues.addAll(le.getFieldValues());
     }
 
     public LocationEntity createEntity() {

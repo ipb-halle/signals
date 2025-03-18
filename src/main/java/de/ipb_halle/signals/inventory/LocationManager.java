@@ -17,15 +17,13 @@
  */
 package de.ipb_halle.signals.inventory;
 
+import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.entity.SignalsEntityDbService;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
-import de.ipb_halle.signals.field.Field;
-import de.ipb_halle.signals.field.FieldDbService;
-import de.ipb_halle.signals.field.FieldDesignation;
-import de.ipb_halle.signals.field.FieldType;
+import de.ipb_halle.signals.field.*;
 import de.ipb_halle.signals.users.UserManager;
 import jakarta.ejb.Stateless;
 import jakarta.ejb.TransactionAttribute;
@@ -35,8 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 
 /**
@@ -44,6 +40,29 @@ import java.util.stream.Collectors;
  */
 
 @Stateless
+
+/**
+ * Manages locations in the Signals inventory system.
+ * <p>
+ * This class handles the import and synchronization of locations between the
+ * Signals REST API and the local database.
+ * </p>
+ *
+ * <ul>
+ *   <li>{@link #importLocation(RuntimeConfig, String)} - Imports a location from the local database into the Signals REST API.</li>
+ *   <li>{@link #manageLocations(Date[])} - Fetches locations from the Signals REST API and saves them into the local database.</li>
+ * </ul>
+ *
+ * <p>Additional functionalities include:</p>
+ * <ul>
+ *   <li>Loading and saving locations</li>
+ *   <li>Augmenting location data with user information</li>
+ *   <li>Processing individual locations</li>
+ * </ul>
+ *
+ * @author [Your Name]
+ * @version 1.0
+ */
 public class LocationManager {
 
     @Inject
@@ -71,6 +90,22 @@ public class LocationManager {
     private LocationProcessorBean locationProcessorBean;
 
     private Logger logger = LoggerFactory.getLogger(ContainerManager.class);
+
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+    public void importLocation(RuntimeConfig runtimeConfig, String id) {
+        LocationEntity locationEntity = locationDbService.loadLocationById(id);
+        Location location = new Location(locationEntity);
+
+
+        logger.info("Location Manager:-> importLocation-> location={}\n", location.getId());
+        LocationType locationType = locationTypeDbService.loadById(location.getLocationTypeId());
+        logger.info("Location Manager:-> importLocation-> locationType={}\n", location.getLocationTypeId());
+
+
+        if (runtimeConfig.updateSNB) {
+            locationRestService.doCreateLocation(locationType, location);
+        }
+    }
 
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void manageLocations(Date[] dateRange) {
@@ -117,7 +152,7 @@ public class LocationManager {
     }
 
     public ILocation loadById(String id, boolean augment) {
-        return locationDbService.loadById(id);
+        return locationDbService.loadLocationById(id);
     }
 
     /**
@@ -142,7 +177,7 @@ public class LocationManager {
      * @return the location
      */
     public Location getLocation(String id, boolean augment) {
-        LocationEntity locationEntity = locationDbService.loadById(id);
+        LocationEntity locationEntity = locationDbService.loadLocationById(id);
         Location location = new Location(locationEntity);
         if (location == null) {
             location = locationRestService.doGetLocation(id);

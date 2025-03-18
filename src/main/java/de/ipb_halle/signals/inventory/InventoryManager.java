@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals.inventory;
 
+import de.ipb_halle.signals.RuntimeConfig;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
@@ -65,6 +66,7 @@ public class InventoryManager {
         fetchLocations(dateRange);
         fetchContainers(dateRange);
     }
+
     public void fetchLocationTypes() {
         locationTypeManager.save(locationTypeManager.getSnbLocationTypes());
     }
@@ -79,6 +81,10 @@ public class InventoryManager {
 
     public void fetchContainers(Date[] dateRange) {
         containerManager.manageContainers(dateRange);
+    }
+
+    public void importLocation(RuntimeConfig runtimeConfig, String id) {
+        locationManager.importLocation(runtimeConfig, id);
     }
 
 }

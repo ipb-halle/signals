@@ -80,7 +80,7 @@ public class FieldDbService {
         return null;
     }
 
-    public List<Field> load(Map<String, Object> cmap) {
+    public List<Field> loadFields(Map<String, Object> cmap) {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<FieldDefinition> criteriaQuery = criteriaBuilder.createQuery(FieldDefinition.class);
         Root<FieldDefinition> root = criteriaQuery.from(FieldDefinition.class);
