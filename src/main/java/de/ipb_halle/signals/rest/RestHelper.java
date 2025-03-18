@@ -43,8 +43,10 @@ public class RestHelper {
     public final static String ATTR_ID = "id";
     public final static String ATTR_NAME = "name";
     public final static String ATTR_TYPE = "type";
+    public final static String ATTR_TYPE_ID = "typeId";
     public final static String ATTR_LIBRARY = "library";
     public final static String ATTR_CHILDREN = "children";
+    public final static String ATTR_CONTENT = "content";
     public final static String ATTR_META = "meta";
     public final static String ATTR_VALUE = "value";
     public final static String ATTR_LINKS = "links";

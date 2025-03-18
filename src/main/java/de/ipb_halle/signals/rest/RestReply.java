@@ -72,4 +72,16 @@ public class RestReply {
     public void setFileSize(Long fileSize) {
         this.fileSize = fileSize;
     }
+
+    @Override
+    public String toString() {
+        return "RestReply{" +
+                "string='" + string + '\'' +
+                ", path=" + path +
+                ", digest='" + digest + '\'' +
+                ", mimeType='" + mimeType + '\'' +
+                ", fileSize=" + fileSize +
+                ", type=" + type +
+                '}';
+    }
 }

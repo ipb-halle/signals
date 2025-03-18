@@ -17,15 +17,13 @@
  */
 package de.ipb_halle.signals.inventory;
 
+import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.entity.SignalsEntityDbService;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
-import de.ipb_halle.signals.field.Field;
-import de.ipb_halle.signals.field.FieldDbService;
-import de.ipb_halle.signals.field.FieldDesignation;
-import de.ipb_halle.signals.field.FieldType;
+import de.ipb_halle.signals.field.*;
 import de.ipb_halle.signals.users.UserManager;
 import jakarta.ejb.Stateless;
 import jakarta.ejb.TransactionAttribute;
@@ -35,8 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 
 /**
@@ -71,6 +67,22 @@ public class LocationManager {
     private LocationProcessorBean locationProcessorBean;
 
     private Logger logger = LoggerFactory.getLogger(ContainerManager.class);
+
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+    public void importLocation(RuntimeConfig runtimeConfig, String id) {
+        LocationEntity locationEntity = locationDbService.loadLocationById(id);
+        Location location = new Location(locationEntity);
+
+
+        logger.info("Location Manager:-> importLocation-> location={}\n", location.getId());
+        LocationType locationType = locationTypeDbService.loadById(location.getLocationTypeId());
+        logger.info("Location Manager:-> importLocation-> locationType={}\n", location.getLocationTypeId());
+
+
+        if (runtimeConfig.updateSNB) {
+            locationRestService.doCreateLocation(locationType, location);
+        }
+    }
 
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void manageLocations(Date[] dateRange) {
@@ -117,7 +129,7 @@ public class LocationManager {
     }
 
     public ILocation loadById(String id, boolean augment) {
-        return locationDbService.loadById(id);
+        return locationDbService.loadLocationById(id);
     }
 
     /**
@@ -142,7 +154,7 @@ public class LocationManager {
      * @return the location
      */
     public Location getLocation(String id, boolean augment) {
-        LocationEntity locationEntity = locationDbService.loadById(id);
+        LocationEntity locationEntity = locationDbService.loadLocationById(id);
         Location location = new Location(locationEntity);
         if (location == null) {
             location = locationRestService.doGetLocation(id);

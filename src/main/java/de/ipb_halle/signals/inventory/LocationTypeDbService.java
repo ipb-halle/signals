@@ -94,7 +94,7 @@ public class LocationTypeDbService {
     private List<Field> loadFields(String id) {
         Map<String, Object> cmap = new HashMap<>();
         cmap.put(Field.DEFINING_ENTITY_ID, id);
-        return fieldDbService.load(cmap);
+        return fieldDbService.loadFields(cmap);
     }
 
     public void save(LocationType lt) {

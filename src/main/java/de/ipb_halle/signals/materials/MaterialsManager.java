@@ -176,8 +176,7 @@ public class MaterialsManager {
         Map<String, Object> cmap = new HashMap<>();
 
         cmap.put(Field.DEFINING_ENTITY_IDS, libraryIds);
-        List<Field> fieldList = fieldDbService.load(cmap);
-        return fieldList;
+        return fieldDbService.loadFields(cmap);
     }
 
     /**

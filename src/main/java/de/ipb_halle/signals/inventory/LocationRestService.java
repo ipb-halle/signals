@@ -45,6 +45,7 @@ public class LocationRestService implements RestReplyParser<Location> {
 
     private static final String LOCATION_ATTACHMENT_ENDPOINT = "/inventory/locations/%s/fields/%s/attachment";
     public final String LOCATION_ENDPOINT = "/inventory/locations/%s";
+    public final String LOCATION_CREATE_ENDPOINT = "/inventory/locations";
 
     @Inject
     private RestClient restClient;
@@ -57,6 +58,9 @@ public class LocationRestService implements RestReplyParser<Location> {
 
     @Inject
     private FieldParser fieldParser;
+
+    @Inject
+    private LocationDbService locationDbService;
 
     private Logger logger = LoggerFactory.getLogger(LocationRestService.class);
 
@@ -177,5 +181,80 @@ public class LocationRestService implements RestReplyParser<Location> {
         newRevision.setOriginalName(RestHelper.getPrimitiveFromPath(json, Location.ATTR_ATTACHMENT_FILENAME).getAsString());
         newRevision.setMimeType(RestHelper.getPrimitiveFromPath(json, Location.ATTR_ATTACHMENT_MIMETYPE).getAsString());
         newRevision.setSize(RestHelper.getPrimitiveFromPath(json, Location.ATTR_ATTACHMENT_FILE_SIZE).getAsLong());
+    }
+
+    public void doCreateLocation(LocationType locationType, Location location) {
+
+        String endpoint = LOCATION_CREATE_ENDPOINT;
+        JsonObject request = prepareLocation(locationType, location);
+
+        logger.info("RESULTING JSON -> {}", request.toString());
+
+        try {
+            restClient.reset()
+                    .setMethod(Method.POST)
+                    .setEndpoint(endpoint)
+                    .setRequestData(request.toString())
+                    .execute(RestClient.HTTP_CREATED);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getLocalizedMessage());
+        }
+    }
+
+    private JsonObject prepareLocation(LocationType locationType, Location location) {
+        JsonObject resultingJson = new JsonObject();
+        JsonObject data = new JsonObject();
+        data.addProperty(RestHelper.ATTR_TYPE, "inventoryLocation");
+        data.add(RestHelper.ATTR_ATTRIBUTES, prepareAttributes(locationType, location));
+        resultingJson.add(RestHelper.ATTR_DATA, data);
+        return resultingJson;
+   }
+
+   //creat gridBox as Example
+    private JsonObject prepareAttributes(LocationType locationType, Location location) {
+        JsonObject attributes = new JsonObject();
+        attributes.addProperty(RestHelper.ATTR_NAME, location.getName());
+        attributes.addProperty(RestHelper.ATTR_DESCRIPTION, location.getDescription());
+        attributes.addProperty(RestHelper.ATTR_TYPE_ID, locationType.getId().split(":")[1]);
+        attributes.addProperty(LocationEntity.ATTR_GRID, true);
+        attributes.addProperty(LocationEntity.ATTR_ROWS, 8);
+        attributes.addProperty(LocationEntity.ATTR_COLUMNS, 12);
+        attributes.add(LocationEntity.ATTR_ANCESTORS, prepareAncestors(location));
+        attributes.add(RestHelper.ATTR_FIELDS, prepareFields(location));
+        return attributes;
+    }
+
+    private JsonElement prepareAncestors(Location location) {
+        JsonArray ancestors = new JsonArray();
+        ancestors.add(processAncestorsOfLocation(location));
+
+        return ancestors;
+    }
+
+    private JsonElement processAncestorsOfLocation(Location location) {
+        JsonObject ancestor = new JsonObject();
+        ancestor.addProperty(LocationEntity.ATTR_ANCESTOR_ID, location.getAncestorId());
+        return ancestor;
+    }
+
+    private JsonElement prepareFields(Location location) {
+        JsonArray fields = new JsonArray();
+        for (FieldValue fieldValue : location.getFieldValues()) {
+            if (fieldValue.getField().getRequired()
+                    || ((!fieldValue.getField().getCalculated())
+                    && (!fieldValue.getField().getReadOnly()))) {
+                fields.add(prepareFieldValue(fieldValue));
+            }
+        }
+        return fields;
+    }
+
+    private JsonElement prepareFieldValue(FieldValue fieldValue) {
+        JsonObject field = new JsonObject();
+        field.addProperty(RestHelper.ATTR_ID, fieldValue.getFieldId().split(":")[0]);
+        JsonObject content = new JsonObject();
+        content.addProperty(RestHelper.ATTR_VALUE, fieldValue.getValue());
+        field.add(RestHelper.ATTR_CONTENT, content);
+        return field;
     }
 }

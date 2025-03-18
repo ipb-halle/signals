@@ -29,6 +29,8 @@ import jakarta.persistence.PersistenceContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.*;
+
 
 /**
  * Database service for locations
@@ -46,12 +48,17 @@ public class LocationDbService {
     @Inject
     private FieldDbService fieldDbService;
 
-    public LocationEntity loadById(String id) {
+    public LocationEntity loadLocationById(String id) {
         LocationEntity locationEntity = this.em.find(LocationEntity.class, id);
-        if (locationEntity == null) {
-            return null;
-        }
+        loadFieldValues(locationEntity, id);
         return locationEntity;
+    }
+
+    private void loadFieldValues(LocationEntity locationEntity, String id) {
+        Map<String, Object> cmap = new HashMap<>();
+        cmap.put(FieldValue.ENTITY_ID, id);
+        List<FieldValue> fieldValues = fieldDbService.loadFieldValues(cmap);
+        locationEntity.addAllFieldValues(fieldValues);
     }
 
 
@@ -68,6 +75,7 @@ public class LocationDbService {
         }
 
     }
+
 
     public void save(LocationEntity loc) {
         this.em.merge(loc);
