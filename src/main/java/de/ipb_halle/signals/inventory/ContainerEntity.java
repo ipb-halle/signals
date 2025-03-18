@@ -54,6 +54,14 @@ public class ContainerEntity {
     public final static String CONTENT_TYPE_BATCH = "batch";
     public final static String CONTENT_TYPE_SAMPLE = "sample";
     public final static String ENTITY_TYPE_CONTAINER = "container";
+    public static final String ATTR_LOCATION = "location";
+    public static final String ATTR_HOME_LOCATION = "homeLocation";
+    public static final String ATTR_STATUS = "status";
+    public static final String ATTR_STATE = "state";
+    public static final String ATTR_TOTAL_CAPACITY = "totalCapacity";
+    public static final String ATTR_AVAILABLE_CAPACITY = "availableCapacity";
+    public static final String ATTR_HOME_LOCATION_COORDINATE_X = "homeLocationCoordinateX";
+    public static final String ATTR_HOME_LOCATION_COORDINATE_Y = "homeLocationCoordinateY";
 
     @Id
     private String id;

@@ -49,10 +49,10 @@ public class ContainerDbService {
     private EntityManager em;
 
 
-    public Container loadContainerById(String id) {
+    public ContainerEntity loadContainerById(String id) {
         ContainerEntity containerEntity = this.em.find(ContainerEntity.class, id);
         loadFieldValues(containerEntity, id);
-        return new Container(containerEntity);
+        return containerEntity;
     }
 
     private void loadFieldValues(ContainerEntity containerEntity, String id) {
@@ -64,6 +64,8 @@ public class ContainerDbService {
 
     public void saveContainer(Container container) {
         ContainerEntity ce = container.createEntity();
+        logger.info("Container Processor Bean:-> typeId={}, typeName={}", ce.getContainerTypeId(), ce.getContainerTypeName());
+
         this.em.merge(ce);
         for (Field f : container.getFields()) {
             fieldDbService.save(f);

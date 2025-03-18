@@ -90,11 +90,13 @@ public class ContainerManager {
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void importContainer(RuntimeConfig runtimeConfig, String id) {
         //loads container from local DB to be imported into Signals
-        Container container = containerDbService.loadContainerById(id);
+        ContainerEntity containerEntity = containerDbService.loadContainerById(id);
+        Container container = new Container(containerEntity);
 
+        logger.info(container.getContainerTypeId());
         //loads containerType from local DB
         ContainerType containerType = containerTypeDbService.loadById(container.getContainerTypeId());
-
+        logger.info(containerType.getId());
         if (runtimeConfig.updateSNB) {
             containerRestService.doCreateContainer(containerType, container);
         }
@@ -174,7 +176,8 @@ public class ContainerManager {
      * @return the loaded container, or {@code null} if not found
      */
     public Container loadById(String id) {
-        return containerDbService.loadContainerById(id);
+        ContainerEntity containerEntity = containerDbService.loadContainerById(id);
+        return new Container(containerEntity);
     }
 
     /**
@@ -199,7 +202,8 @@ public class ContainerManager {
      * @return the container
      */
     public Container getContainer(String id, boolean augment) {
-        Container ct = containerDbService.loadContainerById(id);
+        ContainerEntity containerEntity = containerDbService.loadContainerById(id);
+        Container ct = new Container(containerEntity);
         if (ct == null) {
             ct = containerRestService.doGetContainer(id);
         }

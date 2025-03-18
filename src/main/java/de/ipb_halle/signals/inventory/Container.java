@@ -91,6 +91,8 @@ public class Container {
         description = ce.getDescription();
         amount = ce.getAmount();
         barcode = ce.getBarcode();
+        containerTypeId = ce.getContainerTypeId();
+        containerTypeName = ce.getContainerTypeName();
         coordinateX = ce.getCoordinateX();
         coordinateY = ce.getCoordinateY();
         createdAt = ce.getCreatedAt();
@@ -122,6 +124,7 @@ public class Container {
                 .setDigest(digest)
                 .setLocationId(location.getId())
                 .setMaterialId(material.getId())
+                .setContainerTypeId(containerTypeId)
                 .setName(name)
                 .setUnit(unit.getUnit())
                 .setUpdatedAt(updatedAt)

@@ -85,6 +85,7 @@ public class ContainerProcessorBean {
         // 1) Load container via REST
         Container container = containerRestService.doGetContainer(containerId);
 
+
         container.setContainerTypeId(ContainerType.CONTAINER_TYPE_ENTITY_PREFIX + container.getContainerTypeId() + ContainerType.CONTAINER_TYPE_ENTITY_SUFFIX);
         container.getFields().forEach(field -> field.setId(field.getId() + ":" + container.getContainerTypeId()));
         container.getFieldValues().forEach(fieldValue -> {
@@ -96,7 +97,6 @@ public class ContainerProcessorBean {
         // 2) Process container fields
         processContainerFields(container);
         logger.info(container.getId());
-        logger.info("CONATINER CONTENT CPB:-> container.material_id={}\n", container.getMaterial().getId());
         containerDbService.saveContainer(container);
     }
 

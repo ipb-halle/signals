@@ -48,7 +48,7 @@ public class InventoryConfig {
     private static final Option locationImportOpt = Option.builder("li")
             .longOpt("locationImport")
             .hasArgs()
-            .argName("LOCATION_ID")
+            .argName("ENTITY_ID")
             .optionalArg(false)
             .desc("\nImport a single location from DB into SNB (i.e. create new location in SNB).")
             .build();
@@ -57,7 +57,7 @@ public class InventoryConfig {
     private static final Option containerImportOpt = Option.builder("ci")
             .longOpt("containerImport")
             .hasArgs()
-            .argName("CONTAINER_ID")
+            .argName("ENTITY_ID")
             .optionalArg(false)
             .desc("\nImport a single container from DB into SNB (i.e. create new container in SNB).")
             .build();

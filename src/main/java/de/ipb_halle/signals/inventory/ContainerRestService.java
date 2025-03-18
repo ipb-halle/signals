@@ -28,7 +28,6 @@ import de.ipb_halle.signals.entity.Unit;
 import de.ipb_halle.signals.field.*;
 import de.ipb_halle.signals.materials.MaterialReference;
 import de.ipb_halle.signals.rest.*;
-import de.ipb_halle.signals.sample.Sample;
 import de.ipb_halle.signals.users.UserReference;
 import jakarta.ejb.Local;
 import jakarta.ejb.TransactionAttribute;
@@ -61,6 +60,9 @@ public class ContainerRestService implements RestReplyParser<Container> {
 
     @Inject
     private AttachmentRestService attachmentRestService;
+
+    @Inject
+    private LocationDbService locationDbService;
 
     @Inject
     private FieldParser fieldParser;
@@ -189,7 +191,7 @@ public class ContainerRestService implements RestReplyParser<Container> {
                 case ContainerEntity.CONTENT_TYPE_SAMPLE:
                     //ToDo: implement SAMPLE!!!
                     ct.setMaterial(new MaterialReference().setId(id));
-                   // logger.warn("ContainerRestService:->Unable to assign Sample to Container with Id={}", id);
+                    // logger.warn("ContainerRestService:->Unable to assign Sample to Container with Id={}", id);
                     break;
                 default:
                     throw new RuntimeException("Unknown content type for container: " + ct.getId());
@@ -251,29 +253,68 @@ public class ContainerRestService implements RestReplyParser<Container> {
         JsonObject data = new JsonObject();
         data.addProperty(RestHelper.ATTR_TYPE, InventoryType.inventoryContainer.toString());
         data.add(RestHelper.ATTR_ATTRIBUTES, prepareAttributes(containerType, container));
-
-
-        return null;
+        resultingJson.add(RestHelper.ATTR_DATA, data);
+        return resultingJson;
     }
 
     private JsonObject prepareAttributes(ContainerType containerType, Container container) {
         JsonObject attributes = new JsonObject();
-        attributes.addProperty(RestHelper.ATTR_NAME, container.getName());
-        attributes.addProperty(RestHelper.ATTR_DESCRIPTION, container.getDescription());
+
         attributes.addProperty(RestHelper.ATTR_TYPE_ID, containerType.getId().split(":")[1]);
-        attributes.addProperty(LocationEntity.ATTR_GRID, true);
-        attributes.addProperty(LocationEntity.ATTR_ROWS, 8);
-        attributes.addProperty(LocationEntity.ATTR_COLUMNS, 12);
-        attributes.add(LocationEntity.ATTR_ANCESTORS, prepareAncestors(container));
+        attributes.addProperty(RestHelper.ATTR_DESCRIPTION, container.getDescription());
+        attributes.addProperty(ContainerEntity.ATTR_CONTAINER_TYPE_NAME, containerType.getName());
+
+        attributes.addProperty(ContainerEntity.ATTR_TOTAL_CAPACITY, 1000000);
+
+        attributes.add(ContainerEntity.ATTR_LOCATION, prepareLocation(container));
+        attributes.add(ContainerEntity.ATTR_HOME_LOCATION, prepareLocation(container));
+        attributes.addProperty(ContainerEntity.ATTR_AMOUNT, 100);
+
+        attributes.add(ContainerEntity.ATTR_CONTENTS, prepareContents(container));
+
+        attributes.addProperty(ContainerEntity.ATTR_COORDINATE_X, 5);
+        attributes.addProperty(ContainerEntity.ATTR_COORDINATE_Y, 6);
+        attributes.addProperty(ContainerEntity.ATTR_HOME_LOCATION_COORDINATE_X, 5);
+        attributes.addProperty(ContainerEntity.ATTR_HOME_LOCATION_COORDINATE_Y, 6);
+
         attributes.add(RestHelper.ATTR_FIELDS, prepareFields(container));
         return attributes;
     }
 
-    private JsonElement prepareFields(Container container) {
-        return null;
+    private JsonElement prepareLocation(Container container) {
+        JsonObject location = new JsonObject();
+        location.addProperty(RestHelper.ATTR_ID, container.getLocation().getId().split(":")[1]);
+        return location;
     }
 
-    private JsonElement prepareAncestors(Container container) {
-        return null;
+    private JsonElement prepareContents(Container container) {
+        JsonArray contents = new JsonArray();
+        JsonObject object = new JsonObject();
+        object.addProperty(ContainerEntity.ATTR_CONTENT_ID, container.getMaterial().getId());
+        contents.add(object);
+        return contents;
     }
+
+    private JsonElement prepareFields(Container container) {
+        JsonArray fields = new JsonArray();
+
+        for (FieldValue fieldValue : container.getFieldValues()) {
+            if (fieldValue.getField().getRequired()
+                    || ((!fieldValue.getField().getCalculated())
+                    && (!fieldValue.getField().getReadOnly()))) {
+                fields.add(prepareFieldValue(fieldValue));
+            }
+        }
+        return fields;
+    }
+
+    private JsonElement prepareFieldValue(FieldValue fieldValue) {
+        JsonObject field = new JsonObject();
+        field.addProperty(RestHelper.ATTR_ID, fieldValue.getFieldId().split(":")[0]);
+        JsonObject content = new JsonObject();
+        content.addProperty(RestHelper.ATTR_VALUE, fieldValue.getValue());
+        field.add(RestHelper.ATTR_CONTENT, content);
+        return field;
+    }
+
 }
