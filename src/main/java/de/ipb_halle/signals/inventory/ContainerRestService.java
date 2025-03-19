@@ -269,13 +269,14 @@ public class ContainerRestService implements RestReplyParser<Container> {
         attributes.add(ContainerEntity.ATTR_LOCATION, prepareLocation(container));
         attributes.add(ContainerEntity.ATTR_HOME_LOCATION, prepareLocation(container));
         attributes.addProperty(ContainerEntity.ATTR_AMOUNT, 100);
+        attributes.addProperty(ContainerEntity.ATTR_UNIT, container.getUnit().toString());
 
         attributes.add(ContainerEntity.ATTR_CONTENTS, prepareContents(container));
 
-        attributes.addProperty(ContainerEntity.ATTR_COORDINATE_X, 5);
-        attributes.addProperty(ContainerEntity.ATTR_COORDINATE_Y, 6);
-        attributes.addProperty(ContainerEntity.ATTR_HOME_LOCATION_COORDINATE_X, 5);
-        attributes.addProperty(ContainerEntity.ATTR_HOME_LOCATION_COORDINATE_Y, 6);
+        attributes.addProperty(ContainerEntity.ATTR_COORDINATE_X, container.getCoordinateX());
+        attributes.addProperty(ContainerEntity.ATTR_COORDINATE_Y, container.getCoordinateY());
+        attributes.addProperty(ContainerEntity.ATTR_HOME_LOCATION_COORDINATE_X, container.getCoordinateX());
+        attributes.addProperty(ContainerEntity.ATTR_HOME_LOCATION_COORDINATE_Y, container.getCoordinateY());
 
         attributes.add(RestHelper.ATTR_FIELDS, prepareFields(container));
         return attributes;
