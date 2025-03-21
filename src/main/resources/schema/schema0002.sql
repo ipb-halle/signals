@@ -356,3 +356,21 @@ CREATE TABLE locations (
     updated_at DATE,
     updated_by VARCHAR /* REFERENCES users(id) */
 );
+
+CREATE TABLE samples (
+    id VARCHAR PRIMARY KEY,  -- Unique identifier
+    name VARCHAR NOT NULL,  -- Sample name (mandatory)
+    description TEXT,  -- Optional description
+    type INTEGER,  -- Type of sample (could be a reference to another table)
+    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,  -- When sample was created
+    edited_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,  -- When sample was last edited
+    created_by VARCHAR,  -- User ID of the creator
+    edited_by VARCHAR,  -- User ID of the last editor
+    owner VARCHAR,
+    digest BIGINT NOT NULL,  -- Unique digest identifier (mandatory)
+    stoicRef_id VARCHAR,  -- Reference to stoichiometry data
+    stoicRef_row_id VARCHAR,  -- Reference to a specific row in stoichiometry data
+    parent_container_id VARCHAR NULL,  -- This field MUST ALLOW NULL values
+    CONSTRAINT fk_parent_container FOREIGN KEY (parent_container_id) REFERENCES containers(id) ON DELETE SET NULL
+);
+

@@ -123,7 +123,7 @@ public class LocationManager {
         cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, entityTypes);
 
         // 3) Loading all locations from db (checked everything is working)
-        List<SignalsEntityDTO> locations = signalsEntityDbService.load(cmap);
+        List<SignalsEntityDTO> locations = signalsEntityDbService.loadSE(cmap);
 
         // 4) Process locations (checked, everything is working)
         for (SignalsEntityDTO dto : locations) {

@@ -39,6 +39,7 @@ public class RestHelper {
     public final static String ATTR_DATA = "data";
     public final static String ATTR_DESCRIPTION = "description";
     public final static String ATTR_DIGEST = "digest";
+    public final static String ATTR_EDITED_AT ="editedAt";
     public final static String ATTR_FIELDS = "fields";
     public final static String ATTR_ID = "id";
     public final static String ATTR_NAME = "name";
@@ -51,12 +52,13 @@ public class RestHelper {
     public final static String ATTR_VALUE = "value";
     public final static String ATTR_LINKS = "links";
     public final static String ATTR_SELF = "self";
-    public final static String ANCESTORS = "ancestors";
+    public final static String ATTR_ANCESTORS = "ancestors";
     public final static String CHILDREN = "children";
     public static final String ATTR_IN_USE = "inUse";
     public static final String ATTR_MOVABLE = "movable";
     public static final String ATTR_CREATED_AT ="createdAt";
     public static final String ATTR_UPDATED_AT ="updatedAt";
+
 
     public static String formatDate(Date d) {
         DateFormat df = new SimpleDateFormat(SNB_DATE_FORMAT);

@@ -55,7 +55,7 @@ public class SignalsEntityDbService {
 
     private static final Logger logger = LoggerFactory.getLogger(SignalsEntityDbService.class);
 
-    public List<SignalsEntityDTO> load(Map<String, Object> cmap) {
+    public List<SignalsEntityDTO> loadSE(Map<String, Object> cmap) {
         List<SignalsEntityDTO> results = new ArrayList<>();
         List<Predicate> predicates = new ArrayList<>();
         CriteriaBuilder builder = em.getCriteriaBuilder();

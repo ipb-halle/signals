@@ -134,7 +134,7 @@ public class ContainerManager {
         cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, entityTypes);
 
         // 3) Loads all containers from db (checked its working)
-        List<SignalsEntityDTO> containers = signalsEntityDbService.load(cmap);
+        List<SignalsEntityDTO> containers = signalsEntityDbService.loadSE(cmap);
 
         // 4) Processes container sequentially
         for (SignalsEntityDTO entityDTO : containers) {

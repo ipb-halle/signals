@@ -97,14 +97,12 @@ public class MaterialRestService implements RestReplyParser<Material> {
         material.setName(RestHelper.parseString(attributes, RestHelper.ATTR_NAME));
         material.setDescription(RestHelper.parseString(attributes, RestHelper.ATTR_DESCRIPTION));
         material.setDigest(RestHelper.parseLong(attributes, RestHelper.ATTR_DIGEST));
-        material.setLibraryId(RestHelper.ATTR_ASSET_TYPE
-                + RestHelper.parseString(attributes, Material.ATTR_ASSET_TYPE_ID));
+        material.setLibraryId(RestHelper.ATTR_ASSET_TYPE + RestHelper.parseString(attributes, Material.ATTR_ASSET_TYPE_ID));
 
         SignalsEntityRestService.parseTimestamps(attributes, material);
         SignalsEntityRestService.parseRelationships(materialJson, material);
 
-        EntityType entityType = (EntityType) dynEnumManager.valueOf(
-                EntityType.valueOf(RestHelper.parseString(attributes, RestHelper.ATTR_TYPE)));
+        EntityType entityType = (EntityType) dynEnumManager.valueOf(EntityType.valueOf(RestHelper.parseString(attributes, RestHelper.ATTR_TYPE)));
         material.setEntityType(entityType);
         if (entityType.equals(EntityType.valueOf(Material.ENTITY_TYPE_BATCH))) {
             parseMaterialId(attributes, material);

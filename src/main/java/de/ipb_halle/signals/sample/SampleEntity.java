@@ -20,25 +20,179 @@
 
 package de.ipb_halle.signals.sample;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import de.ipb_halle.signals.entity.EntityType;
+import de.ipb_halle.signals.users.UserReference;
+import jakarta.persistence.*;
+
+import java.util.Date;
 
 @Entity
 @Table(name = "samples")
 public class SampleEntity {
 
+    public static final String ENTITY_TYPE_SAMPLE = "sample";
     @Id
-    private Long id;
+    private String id;
 
-    @Column(name="sample_id")
-    private String sampleId;
+    @Column
+    private String name;
 
-    @Column(name = "ancestor_id")
-    private String ancestor_id;
+    @Column
+    private String description;
+
+    @Column
+    private Integer type;
+
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+
+    @Column(name = "edited_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date editedAt;
+
+    @Column(name = "created_by")
+    private String createdBy;
+
+    @Column(name = "edited_by")
+    private String editedBy;
+
+    @Column
+    private String owner;
+
+    @Column(name = "digest", nullable = false, columnDefinition = "BIGINT")
+    private Long digest;
+
+    @Column(name = "stoicRef_id")
+    private String stoicRefId;
+
+    @Column(name = "stoicRef_row_id")
+    private String stoicRefRowId;
+
+    @Column(name = "parent_container_id")
+    private String parentContainerId;
 
     //Empty constructor for JPA
     public SampleEntity() {
+    }
+
+    //getter
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public Date getEditedAt() {
+        return editedAt;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public String getEditedBy() {
+        return editedBy;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public Long getDigest() {
+        return digest;
+    }
+
+    public String getStoicRefId() {
+        return stoicRefId;
+    }
+
+    public String getStoicRefRowId() {
+        return stoicRefRowId;
+    }
+
+    public String getParentContainerId() {
+        return parentContainerId;
+    }
+
+    //Setter
+
+    public SampleEntity setId(String id) {
+        this.id = id;
+        return this;
+    }
+
+    public SampleEntity setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public SampleEntity setDescription(String description) {
+        this.description = description;
+        return this;
+    }
+
+    public SampleEntity setType(Integer type) {
+        this.type = type;
+        return this;
+    }
+
+    public SampleEntity setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+        return this;
+    }
+
+    public SampleEntity setEditedAt(Date editedAt) {
+        this.editedAt = editedAt;
+        return this;
+    }
+
+    public SampleEntity setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+        return this;
+    }
+
+    public SampleEntity setEditedBy(String editedBy) {
+        this.editedBy = editedBy;
+        return this;
+    }
+
+    public SampleEntity setOwner(String owner) {
+        this.owner = owner;
+        return this;
+    }
+
+    public SampleEntity setDigest(Long digest) {
+        this.digest = digest;
+        return this;
+    }
+
+    public SampleEntity setStoicRefId(String stoicRefId) {
+        this.stoicRefId = stoicRefId;
+        return this;
+    }
+
+    public SampleEntity setStoicRefRowId(String stoicRefRowId) {
+        this.stoicRefRowId = stoicRefRowId;
+        return this;
+    }
+
+    public SampleEntity setParentContainerId(String parentContainerId) {
+        this.parentContainerId = parentContainerId;
+        return this;
     }
 }

@@ -92,7 +92,7 @@ public class LocationProcessorBean {
 
         // 2) Process location fields
         processLocationFields(location);
-        //locationDbService.save(location);
+        locationDbService.save(location);
 
     }
 

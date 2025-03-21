@@ -78,7 +78,7 @@ public class MaterialsManager {
         if (lib.hasBatches()) {
             Map<String, Object> cmap = new HashMap<>();
             cmap.put(MaterialDbService.MATERIAL_ID, mat.getId());
-            List<Material> batches = materialDbService.load(cmap);
+            List<Material> batches = materialDbService.loadMaterials(cmap);
             if (batches.size() > 0) {
                 batch = batches.get(0);
             } else {
@@ -124,7 +124,7 @@ public class MaterialsManager {
                         EntityType.valueOf(Material.ENTITY_TYPE_BATCH)});
 
         // 2) Load all materials from the database
-        List<SignalsEntityDTO> entityDTOs = signalsEntityDbService.load(cmap);
+        List<SignalsEntityDTO> entityDTOs = signalsEntityDbService.loadSE(cmap);
 
         // 3) Fetch all fields of all libraries
         Map<String, Map<String, Field>> allFields = mapFieldsByLibraryId();
