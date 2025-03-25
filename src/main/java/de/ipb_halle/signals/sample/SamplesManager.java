@@ -60,7 +60,7 @@ public class SamplesManager {
 
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void manageSamples(Date[] dateRange) {
-        logger.debug("MM:-> START MANAGE SAMPLES");
+        logger.debug("MS:-> START MANAGE SAMPLES");
 
         // 1) Query parameters for load
         EntityType entityTypes[] = {EntityType.valueOf(SampleEntity.ENTITY_TYPE_SAMPLE)};
@@ -76,7 +76,6 @@ public class SamplesManager {
 
         // 3) Process samples
         for (SignalsEntityDTO dto : samples) {
-            logger.info("SamplesManager:-> dto.getId()={}\n", dto.getId());
             processSample(dto.getId());
         }
 

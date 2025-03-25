@@ -359,18 +359,31 @@ CREATE TABLE locations (
 
 CREATE TABLE samples (
     id VARCHAR PRIMARY KEY,  -- Unique identifier
-    name VARCHAR NOT NULL,  -- Sample name (mandatory)
-    description TEXT,  -- Optional description
-    type INTEGER,  -- Type of sample (could be a reference to another table)
-    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,  -- When sample was created
-    edited_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,  -- When sample was last edited
-    created_by VARCHAR,  -- User ID of the creator
-    edited_by VARCHAR,  -- User ID of the last editor
+    name VARCHAR NOT NULL,
+    description TEXT,
+    type INTEGER,
+    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    edited_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR,
+    edited_by VARCHAR,
     owner VARCHAR,
-    digest BIGINT NOT NULL,  -- Unique digest identifier (mandatory)
-    stoicRef_id VARCHAR,  -- Reference to stoichiometry data
-    stoicRef_row_id VARCHAR,  -- Reference to a specific row in stoichiometry data
-    parent_container_id VARCHAR NULL,  -- This field MUST ALLOW NULL values
+    digest BIGINT NOT NULL,
+    ancestor_id VARCHAR,
+    stoicRef_id VARCHAR,
+    stoicRef_row_id VARCHAR,
+    parent_container_id VARCHAR NULL,
     CONSTRAINT fk_parent_container FOREIGN KEY (parent_container_id) REFERENCES containers(id) ON DELETE SET NULL
+);
+
+CREATE TABLE sample_properties(
+    id SERIAL PRIMARY KEY,
+    name VARCHAR,
+    type VARCHAR,
+    property_value VARCHAR,
+    property_key VARCHAR,
+    sample_id VARCHAR NOT NULL,
+
+    CONSTRAINT fk_sample FOREIGN KEY (sample_id) REFERENCES samples(id) ON DELETE CASCADE
+
 );
 

@@ -63,6 +63,9 @@ public class SampleEntity {
     @Column(name = "digest", nullable = false, columnDefinition = "BIGINT")
     private Long digest;
 
+    @Column(name = "ancestor_id")
+    private String ancestorId;
+
     @Column(name = "stoicRef_id")
     private String stoicRefId;
 
@@ -115,6 +118,10 @@ public class SampleEntity {
 
     public Long getDigest() {
         return digest;
+    }
+
+    public String getAncestorId() {
+        return ancestorId;
     }
 
     public String getStoicRefId() {
@@ -178,6 +185,11 @@ public class SampleEntity {
 
     public SampleEntity setDigest(Long digest) {
         this.digest = digest;
+        return this;
+    }
+
+    public SampleEntity setAncestorId(String ancestorId) {
+        this.ancestorId = ancestorId;
         return this;
     }
 

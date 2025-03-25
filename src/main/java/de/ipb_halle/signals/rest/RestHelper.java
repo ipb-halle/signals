@@ -58,6 +58,13 @@ public class RestHelper {
     public static final String ATTR_MOVABLE = "movable";
     public static final String ATTR_CREATED_AT ="createdAt";
     public static final String ATTR_UPDATED_AT ="updatedAt";
+    public static final String ATTR_DEFINITION = "definition";
+    public static final String ATTR_OPTIONS = "options";
+    public static final String ATTR_ATTRIBUTE = "attribute";
+    public static final String ATTR_KEY = "key";
+    public static final String ATTR_OWNER = "owner";
+    public static final String ATTR_TITLE = "title";
+    public static final String ATTR_SAMPLE = "sample";
 
 
     public static String formatDate(Date d) {

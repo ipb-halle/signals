@@ -48,6 +48,10 @@ public class SampleDbService {
 
     public void save(Sample sample) {
         SampleEntity se = sample.createEntity();
+        for (SampleProperty sp : sample.getProperties()) {
+            SamplePropertyEntity spe = sp.createEntity();
+            this.em.merge(spe);
+        }
         this.em.merge(se);
     }
 }

@@ -468,7 +468,6 @@ public class MaterialRestService implements RestReplyParser<Material> {
                 // probably won't work if fieldValue contains array, number, measurement
                 // or otherwise complex value.
                 obj.addProperty(RestHelper.ATTR_VALUE, fieldValue.getValue());
-                ;
         }
         return obj;
     }

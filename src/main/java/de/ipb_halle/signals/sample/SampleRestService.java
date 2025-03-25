@@ -37,11 +37,12 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Iterator;
+import java.util.*;
 
 public class SampleRestService implements RestReplyParser<Sample> {
 
-    private static final String SAMPLE_ENDPOINT = "/entities/%s";
+    private static final String RECIEVE_SAMPLE_ENDPOINT = "/entities/%s";
+    private static final String SAMPLE_GET_PROPERTIES_ENDPOINT = "/samples/%s/properties";
 
     @Inject
     private RestClient restClient;
@@ -55,14 +56,14 @@ public class SampleRestService implements RestReplyParser<Sample> {
     private static final Logger logger = LogManager.getLogger(SampleRestService.class);
 
     public Sample doGetSample(String sampleId) throws Exception {
-        JsonElement data = fetch(sampleId);
+        JsonElement data = fetch(RECIEVE_SAMPLE_ENDPOINT, sampleId);
         return parseReply(data);
     }
 
-    private JsonElement fetch(String sampleId) {
+    private JsonElement fetch(String endpoint, String sampleId) {
         try {
             restClient.setMethod(Method.GET)
-                    .setEndpoint(String.format(SAMPLE_ENDPOINT, sampleId))
+                    .setEndpoint(String.format(endpoint, sampleId))
                     .execute();
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
@@ -122,14 +123,19 @@ public class SampleRestService implements RestReplyParser<Sample> {
     }
 
     private void parseAncestors(JsonObject relationships, Sample sample) throws Exception {
-        JsonObject ancestors = relationships.get(RestHelper.ATTR_ANCESTORS).getAsJsonObject();
-        JsonArray dataArray = ancestors.get(RestHelper.ATTR_DATA).getAsJsonArray();
-        Iterator<JsonElement> iter = dataArray.iterator();
-        while (iter.hasNext()) {
-            JsonObject object = iter.next().getAsJsonObject();
-            JsonElement seJson = fetch(RestHelper.parseString(object, RestHelper.ATTR_ID));
+        JsonArray dataArray = relationships
+                .getAsJsonObject(RestHelper.ATTR_ANCESTORS)
+                .getAsJsonArray(RestHelper.ATTR_DATA);
+        List<SignalsEntity> entities = new ArrayList<>();
+        for (JsonElement element : dataArray) {
+            String id = RestHelper.parseString(element.getAsJsonObject(), RestHelper.ATTR_ID);
+            JsonElement seJson = fetch(RECIEVE_SAMPLE_ENDPOINT, id);
             SignalsEntity se = signalsEntityRestService.parseReply(seJson).createEntity();
+            entities.add(se);
             sample.addAncestor(se);
+        }
+        if (!entities.isEmpty()) {
+            sample.setAncestorId(entities.get(entities.size() - 1).getId());
         }
     }
 
@@ -139,9 +145,55 @@ public class SampleRestService implements RestReplyParser<Sample> {
         Iterator<JsonElement> iter = dataArray.iterator();
         while (iter.hasNext()) {
             JsonObject object = iter.next().getAsJsonObject();
-            JsonElement seJson = fetch(RestHelper.parseString(object, RestHelper.ATTR_ID));
+            JsonElement seJson = fetch(RECIEVE_SAMPLE_ENDPOINT, RestHelper.parseString(object, RestHelper.ATTR_ID));
             SignalsEntity se = signalsEntityRestService.parseReply(seJson).createEntity();
             sample.addChild(se);
         }
     }
+
+
+    public void doGetSampleProperties(Sample sample) {
+        JsonElement dataArray = fetch(SAMPLE_GET_PROPERTIES_ENDPOINT, sample.getId());
+
+        logger.info("DO GET SAMPLE PROPERTIES:-> dataArray of sample with id = {}\n dataArray={}\n", sample.getId(), dataArray);
+
+        Iterator<JsonElement> iter = dataArray.getAsJsonArray().iterator();
+        while (iter.hasNext()) {
+            JsonElement samplesPropertyObject = iter.next();
+            SampleProperty sampleProperty = parseSampleProperties(samplesPropertyObject);
+            sample.addProperty(sampleProperty);
+        }
+
+    }
+
+    private SampleProperty parseSampleProperties(JsonElement samplesPropertyObject) {
+        JsonObject propertiesObject = samplesPropertyObject.getAsJsonObject();
+        JsonObject definition = propertiesObject.get(RestHelper.ATTR_META).getAsJsonObject().get(RestHelper.ATTR_DEFINITION).getAsJsonObject();
+        JsonObject attributes = propertiesObject.get(RestHelper.ATTR_ATTRIBUTES).getAsJsonObject();
+        JsonObject data = propertiesObject
+                .get(RestHelper.ATTR_RELATIONSHIPS).getAsJsonObject()
+                .get(RestHelper.ATTR_SAMPLE).getAsJsonObject()
+                .get(RestHelper.ATTR_DATA).getAsJsonObject();
+
+        logger.info("property {}\n", propertiesObject);
+
+        SampleProperty sampleProperty = new SampleProperty();
+
+        if (definition.has(RestHelper.ATTR_TITLE)) {
+            sampleProperty.setName(definition.get(RestHelper.ATTR_TITLE).getAsString());
+        }
+        sampleProperty.setType(definition.get(RestHelper.ATTR_TYPE).getAsString());
+        if (definition.has(RestHelper.ATTR_KEY)) {
+            sampleProperty.setKey(definition.get(RestHelper.ATTR_KEY).getAsString());
+        }
+        sampleProperty.setSampleId(data.get(RestHelper.ATTR_ID).getAsString());
+
+        if (attributes.has(RestHelper.ATTR_CONTENT)) {
+            sampleProperty.setValue(attributes.get(RestHelper.ATTR_CONTENT).getAsJsonObject().get(RestHelper.ATTR_VALUE).getAsString());
+        }
+
+
+        return sampleProperty;
+    }
+
 }

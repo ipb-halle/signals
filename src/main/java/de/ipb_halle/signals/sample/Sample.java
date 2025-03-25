@@ -24,6 +24,7 @@ import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntity;
 import de.ipb_halle.signals.field.Field;
+import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.inventory.ContainerDbService;
 import de.ipb_halle.signals.inventory.ContainerEntity;
 import de.ipb_halle.signals.users.IUser;
@@ -56,18 +57,23 @@ public class Sample {
     private IUser editedBy;
     private IUser owner;
     private Long digest;
+    private String ancestorId;
     private StoicRef stoicRef;
     private String parentContainerId;
 
 
     private Set<Field> fields;
+    private Set<FieldValue> fieldValues;
     private Set<SignalsEntity> ancestors;
     private Set<SignalsEntity> children;
+    private Set<SampleProperty> properties;
 
     public Sample() {
         fields = new HashSet<>();
+        fieldValues = new HashSet<>();
         ancestors = new HashSet<>();
         children = new HashSet<>();
+        properties = new HashSet<>();
     }
 
     public Sample(SampleEntity sampleEntity, DynEnumManager dynEnumManager) {
@@ -81,10 +87,15 @@ public class Sample {
         this.editedBy = new UserReference(sampleEntity.getEditedBy());
         this.owner = new UserReference(sampleEntity.getOwner());
         this.digest = sampleEntity.getDigest();
+        this.ancestorId = sampleEntity.getAncestorId();
         this.stoicRef = new StoicRef().setEid(sampleEntity.getStoicRefId()).setRowId(sampleEntity.getStoicRefRowId());
-        this.fields = new HashSet<>();
+
         this.ancestors = new HashSet<>();
         this.children = new HashSet<>();
+
+        this.fields = new HashSet<>();
+        this.fieldValues = new HashSet<>();
+        this.properties = new HashSet<>();
 
     }
 
@@ -99,8 +110,9 @@ public class Sample {
                 .setEditedAt(editedAt)
                 .setCreatedBy(createdBy.toString())
                 .setEditedBy(editedBy.toString())
-                .setOwner(owner.toString())
+                .setOwner(owner.getId())
                 .setDigest(digest)
+                .setAncestorId(ancestorId)
                 .setParentContainerId(parentContainerId);
 
         if (stoicRef != null) {
@@ -169,6 +181,10 @@ public class Sample {
         return digest;
     }
 
+    public String getAncestorId() {
+        return ancestorId;
+    }
+
     public StoicRef getStoicRef() {
         return stoicRef;
     }
@@ -181,12 +197,20 @@ public class Sample {
         return fields;
     }
 
+    public Set<FieldValue> getFieldValues() {
+        return fieldValues;
+    }
+
     public Set<SignalsEntity> getAncestors() {
         return ancestors;
     }
 
     public Set<SignalsEntity> getChildren() {
         return children;
+    }
+
+    public Set<SampleProperty> getProperties() {
+        return properties;
     }
 
     //setter
@@ -235,6 +259,11 @@ public class Sample {
         this.digest = digest;
     }
 
+    public Sample setAncestorId(String ancestorId) {
+        this.ancestorId = ancestorId;
+        return this;
+    }
+
     public void setStoicRef(StoicRef stoicRef) {
         this.stoicRef = stoicRef;
     }
@@ -247,6 +276,14 @@ public class Sample {
         this.fields = fields;
     }
 
+    public void addFieldValues(Collection<FieldValue> fieldValues) {
+        this.fieldValues.addAll(fieldValues);
+    }
+
+    public void setProperties(Set<SampleProperty> properties) {
+        this.properties.addAll(properties);
+    }
+
     public void setAncestors(Set<SignalsEntity> ancestors) {
         this.ancestors = ancestors;
     }
@@ -254,6 +291,7 @@ public class Sample {
     public void setChildren(Set<SignalsEntity> children) {
         this.children = children;
     }
+
 
     //equals and hashcode
 
@@ -285,10 +323,15 @@ public class Sample {
                 ", editedBy=" + editedBy +
                 ", owner=" + owner +
                 ", digest=" + digest +
+                ", ancestorId=" + ancestorId +
                 ", parentContainerId='" + parentContainerId + '\'' +
                 ", fields=" + Arrays.toString(fields.toArray()) +
                 ", ancestors=" + ancestors +
                 ", children=" + children +
                 '}';
+    }
+
+    public void addProperty(SampleProperty property) {
+        properties.add(property);
     }
 }

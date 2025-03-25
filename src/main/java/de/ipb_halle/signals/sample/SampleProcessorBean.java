@@ -70,6 +70,9 @@ public class SampleProcessorBean {
             Sample sample = sampleRestService.doGetSample(sampleId);
             sample.setParentContainerId(loadContainerIdForSample(sampleId));
 
+            //receive properties (attachments and fields)
+            sampleRestService.doGetSampleProperties(sample);
+
             sampleDbService.save(sample);
 
         } catch (Exception e) {

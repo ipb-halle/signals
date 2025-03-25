@@ -28,6 +28,9 @@ import de.ipb_halle.signals.entity.Unit;
 import de.ipb_halle.signals.field.*;
 import de.ipb_halle.signals.materials.MaterialReference;
 import de.ipb_halle.signals.rest.*;
+import de.ipb_halle.signals.sample.SampleDbService;
+import de.ipb_halle.signals.sample.SampleProcessorBean;
+import de.ipb_halle.signals.sample.SamplesManager;
 import de.ipb_halle.signals.users.UserReference;
 import jakarta.ejb.Local;
 import jakarta.ejb.TransactionAttribute;
@@ -66,6 +69,10 @@ public class ContainerRestService implements RestReplyParser<Container> {
 
     @Inject
     private FieldParser fieldParser;
+
+    @Inject
+    private SampleProcessorBean sampleProcessorBean;
+
 
     private Logger logger = LoggerFactory.getLogger(ContainerRestService.class);
 
@@ -190,6 +197,7 @@ public class ContainerRestService implements RestReplyParser<Container> {
                     break;
                 case ContainerEntity.CONTENT_TYPE_SAMPLE:
                     //ToDo: implement SAMPLE!!!
+                    sampleProcessorBean.processSingleSample(id);
                     ct.setMaterial(new MaterialReference().setId(id));
                     // logger.warn("ContainerRestService:->Unable to assign Sample to Container with Id={}", id);
                     break;
