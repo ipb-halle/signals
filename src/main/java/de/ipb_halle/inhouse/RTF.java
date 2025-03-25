@@ -21,17 +21,14 @@ import com.rtfparserkit.parser.RtfListenerAdaptor;
 import com.rtfparserkit.parser.RtfStringSource;
 import com.rtfparserkit.parser.raw.RawRtfParser;
 import com.rtfparserkit.rtf.Command;
-//import de.ipb_halle.lbac.material.common.entity.index.MaterialIndexEntryEntity;
-//import de.ipb_halle.lbac.search.lang.SqlInsertBuilder;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -116,15 +113,14 @@ public class RTF extends RtfListenerAdaptor {
 
     public void readCompoundSynonym(String fileName) throws Exception {
         System.out.println("Importing compound names");
-/*
-        SqlQuery.execute("DROP TABLE IF EXISTS tmp_names", null);
-        SqlQuery.execute("CREATE TABLE tmp_names (rowid SERIAL, name_id INTEGER, legacy_molid INTEGER, "
-          + "name VARCHAR, prio INTEGER, PRIMARY KEY(name, legacy_molid))", null);
-*/
         int lineMode = 0;
         String line = "";
         BufferedReader reader = new BufferedReader(new FileReader(fileName));
         reader.readLine(); // discard header
+
+        Pattern pattern = Pattern.compile("^(\\d+);(\\d+);(.*);([NY])$");
+        Pattern quotePattern = Pattern.compile("^\"(.*)\"$");
+
         while (reader.ready()) {
             String st = reader.readLine();
 
@@ -138,33 +134,41 @@ public class RTF extends RtfListenerAdaptor {
                     .replaceAll("\\\\f2\\\\''ec", "&micro;");
 
             line += st;
+/*
             if (st.matches("^[0-9]+;[0-9]+;'\\{\\\\rtf1.*")) {
                 // System.out.println("RTF MODE");
                 lineMode = 1;
             }
             if ((lineMode == 1) && (st.matches("^';'Y'$") || st.matches("^';'N'$"))) {
                 lineMode = 0;
-                String a = line.replaceAll("^([0-9]+;[0-9]+;')(.*)(';'[NY]')$", "$1");
-                String b = line.replaceAll("^([0-9]+;[0-9]+;')(.*)(';'[NY]')$", "$2");
-                String c = line.replaceAll("^([0-9]+;[0-9]+;')(.*)(';'[NY]')$", "$3");
-                b = b.replaceAll("''", "'");
+                String nameId = line.replaceAll("^([0-9]+;[0-9]+;')(.*)(';'[NY]')$", "$1");
+                String molId = line.replaceAll("^([0-9]+;[0-9]+;')(.*)(';'[NY]')$", "$2");
+                String synonym = line.replaceAll("^([0-9]+;[0-9]+;')(.*)(';'[NY]')$", "$3");
+                molId = molId.replaceAll("''", "'");
                 // System.out.printf("DEBUG: %s\n", b);
-                b = readRTF(b).replaceAll("'", "''");
-                line = a + b + c;
+                molId = readRTF(molId).replaceAll("'", "''");
+                line = nameId + molId + synonym;
 
             }
-            if (line.matches("[0-9]+;[0-9]+;.*;'[NY]'")) {
-                int a = Integer.parseInt(line.replaceAll("^([0-9]+);([0-9]+);(.*);('[NY]')$", "$1"));
-                int b = Integer.parseInt(line.replaceAll("^([0-9]+);([0-9]+);(.*);('[NY]')$", "$2"));
-                String n = line.replaceAll("^([0-9]+);([0-9]+);(.*);('[NY]')$", "$3");
-                boolean p = line.replaceAll("^([0-9]+);([0-9]+);(.*);('[NY]')$", "$4")
-                        .matches("'Y'");
-
-                if (n.equals("")) {
-                    n = String.format("AUTO_molId%d", b);
+ */
+            Matcher matcher = pattern.matcher(line);
+            if (matcher.matches()) {
+                int nameId = Integer.parseInt(matcher.group(1));
+                int molId = Integer.parseInt(matcher.group(2));
+                String synonym = matcher.group(3);
+                Matcher quoteMatcher = quotePattern.matcher(synonym);
+                if (quoteMatcher.matches()) {
+                    synonym = quoteMatcher.group(1);
                 }
-                update(a, b, n, p);
+                boolean priority = matcher.group(4).matches("Y");
+
+                if (synonym.equals("")) {
+                    synonym = String.format("AUTO_molId%d", molId);
+                }
+                update(nameId, molId, synonym, priority);
                 line = "";
+            } else {
+                System.out.printf("Line didn't match: %s\n", line);
             }
         }
         reader.close();
@@ -179,46 +183,27 @@ public class RTF extends RtfListenerAdaptor {
 
     /**
      * @param name_id  name record primary key in the inhouse database (ignored)
-     * @param mol_id   reference id to structure
-     * @param name     the quoted name (quotes are stripped)
+     * @param molId   reference id to structure
+     * @param synonym     the quoted name (quotes are stripped)
      * @param prioFlag priority name
      * @throws Exception
      */
-    private void update(int name_id, int mol_id, String name, boolean prioFlag) throws Exception {
+    private void update(int name_id, int molId, String synonym, boolean prioFlag) throws Exception {
         showProgress();
-/*        PreparedStatement statement = this.inhouseDB.getConnection().prepareStatement(
-                "SELECT new_id FROM tmp_import WHERE old_id=? AND type=?");
-        statement.setInt(1, mol_id);
-        statement.setString(2, Compounds.TMP_MatId_MolId);
-        ResultSet result = statement.executeQuery();
-        if (! result.next()) {
-            System.out.printf("Material for mol_id=%d not found in table 'tmp_import'\n", mol_id);
-            return;
+        InhouseDbService dbService = inhouseDB.getInhouseDbService();
+
+        if (prioFlag) {
+            // set the primary name to the compound priority name
+            InhouseCompound compound = dbService.loadCompoundByMolId(molId);
+            if (compound == null) {
+                return;
+            }
+            compound.setName(synonym);
+            dbService.save(compound);
         }
-        int id = result.getInt(1);
-*/
-/*
-        MaterialIndexEntryEntity entity = new MaterialIndexEntryEntity();
-        entity.setLanguage(MATERIAL_NAME_DEFAULT_LANG);
-        entity.setRank(prioFlag ? 0 : 1);
-        entity.setTypeid(this.inhouseDB.getMaterialIndexType(InhouseDB.MATERIAL_INDEX_NAME));
-        entity.setValue(name.replaceAll("^'(.*)'$", "$1"));
-        entity.setMaterialid(id);
-        this.inhouseDB.getBuilder(entity.getClass().getName())
-                .insert(this.inhouseDB.getConnection(), entity);
-*/
-        /*
-        String sql = "INSERT INTO material_indices (materialid, typeid, value, language, rank) "
-                + "SELECT new_id AS materialid, ? AS typeid, ? AS value, ? AS language, ? AS rank) "
-                + "FROM tmp_import WHERE ? = old_id";
-        PreparedStatement statement = this.inhouseDB.getConnection().prepareStatement(sql);
-        statement.setInt(1, this.inhouseDB.getMaterialIndexType(InhouseDB.MATERIAL_INDEX_NAME));
-        statement.setString(2, name.replaceAll("^'(.*)'$", "$1"));
-        statement.setString(3, MATERIAL_NAME_DEFAULT_LANG);
-        statement.setInt(4, prioFlag ? 0 : 1);
-        statement.setInt(5, mol_id);
-        statement.execute();
-        */
+        dbService.save(new InhouseCompoundSynonym()
+                .setSynonym(synonym)
+                .setMolId(molId));
     }
 
     /*

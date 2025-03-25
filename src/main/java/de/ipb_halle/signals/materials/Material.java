@@ -134,6 +134,10 @@ public class Material implements IMaterial, IObjectMetaData {
         synonyms.add(synonym);
     }
 
+    public void addSynonym(String synonym) {
+        synonyms.add(new Synonym(getId(), synonym));
+    }
+
     public String getId() {
         return id;
     }

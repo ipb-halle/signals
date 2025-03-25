@@ -379,7 +379,8 @@ public class MaterialRestService implements RestReplyParser<Material> {
         }
 
         JsonObject data = new JsonObject();
-        data.addProperty(RestHelper.ATTR_ID, mat.getStrippedId());
+        //data.addProperty(RestHelper.ATTR_ID, mat.getStrippedId());
+        data.addProperty(RestHelper.ATTR_ID, mat.getName());
         data.addProperty(RestHelper.ATTR_TYPE, mat.getEntityType().getValue());
         data.add(RestHelper.ATTR_ATTRIBUTES, attr);
 

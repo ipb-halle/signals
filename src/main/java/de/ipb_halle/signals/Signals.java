@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals;
 
+import de.ipb_halle.inhouse.InhouseDB;
 import de.ipb_halle.signals.element.ElementConfig;
 import de.ipb_halle.signals.element.ElementManager;
 import de.ipb_halle.signals.attribute.AttributeManager;
@@ -75,6 +76,9 @@ public class Signals {
 
     @Inject
     private AccessManager accessManager;
+
+    @Inject
+    private InhouseDB inhouseDB;
 
     @Inject
     private InventoryManager inventoryManager;
@@ -194,6 +198,10 @@ public class Signals {
         return materialsConfig;
     }
 
+    public InhouseDB getInhouseDB() {
+        return inhouseDB;
+    }
+
     public InventoryConfig getInventoryConfig(){
         return inventoryConfig;
     }
@@ -270,6 +278,7 @@ public class Signals {
             MaterialsConfig.processCommandLine(cmdline, options, signals);
             InventoryConfig.processCommandLine(cmdline, options, signals);
             ElementConfig.processCommandLine(cmdline,options,signals);
+            InhouseDB.processCommandLine(cmdline, options, signals);
 
         } catch (MissingArgumentException mae) {
             printHelp("ERROR: " + mae.getMessage(), options);
@@ -293,6 +302,7 @@ public class Signals {
         MaterialsConfig.registerOptions(options);
         ElementConfig.registerOptions(options);
         InventoryConfig.registerOptions(options);
+        InhouseDB.registerOptions(options);
         processCommandLine(argv, options);
     }
 }

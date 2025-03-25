@@ -62,8 +62,8 @@ public class Synonym {
 
     @Override
     public String toString() {
-        return "Synonym{" +
-                "id=" + id +
+        return "Synonym{"
+                 + id +
                 '}';
     }
 }

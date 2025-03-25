@@ -26,41 +26,15 @@ import de.ipb_halle.lbac.search.lang.EntityGraph;
 import de.ipb_halle.lbac.search.lang.SqlInsertBuilder;
 */
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
+import de.ipb_halle.signals.materials.Library;
+import de.ipb_halle.signals.materials.LibraryDbService;
+import de.ipb_halle.signals.materials.Material;
+
+import java.io.*;
 import java.util.List;
-import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-/*
-import org.openscience.cdk.DefaultChemObjectBuilder;
-import org.openscience.cdk.aromaticity.Kekulization;
-import org.openscience.cdk.atomtype.CDKAtomTypeMatcher;
-import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.interfaces.IAtom;
-
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IChemObjectBuilder;
-import org.openscience.cdk.interfaces.IMolecularFormula;
-import org.openscience.cdk.io.IChemObjectWriter;
-import org.openscience.cdk.io.MDLV2000Writer;
-import org.openscience.cdk.io.MDLV3000Writer;
-import org.openscience.cdk.io.iterator.IteratingSDFReader;
-import org.openscience.cdk.tools.CDKHydrogenAdder;
-import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
-import org.openscience.cdk.tools.manipulator.MolecularFormulaManipulator;
-*/
 
 /**
  * Migration tool for the InhouseDB
@@ -68,161 +42,119 @@ import org.openscience.cdk.tools.manipulator.MolecularFormulaManipulator;
  * @author fbroda
  */
 public class Compounds {
-/*
-    public final static String INPUT_STRUCTURE_NAMES = "INPUT_STRUCTURE_NAMES";
-    public final static String INPUT_STRUCTURES = "INPUT_STRUCTURES";
 
-    public final static String MOLECULE_MATERIAL_TYPE_ID = "MOLECULE_MATERIAL_TYPE_ID";
+    public final static String COMPOUNDS_ACCESS = "compounds.access";
+    public final static String COMPOUNDS_BATCH_NAME = "compounds.batchName";
+    public final static String COMPOUNDS_CHEMICAL_DRAWING = "compounds.chemicalDrawing";
+    public final static String COMPOUNDS_FILENAME = "compounds.filename";
+    public final static String COMPOUNDS_LIBRARY_ID = "compounds.libraryId";
+    public final static String COMPOUNDS_OWNER = "compounds.owner";
+    public final static String COMPOUNDS_REJECTFILE = "compounds.rejectfile";
+    public final static String COMPOUNDS_SYNONYMS = "compounds.synonyms";
+    public final static String COMPOUNDS_FIELD_ACCESS = "compounds.fields.access";
+    public final static String COMPOUNDS_FIELD_ASSET_NAME = "compounds.fields.assetName";
+    public final static String COMPOUNDS_FIELD_BATCH_NAME = "compounds.fields.batchName";
+    public final static String COMPOUNDS_FIELD_CASRN = "compounds.fields.casrn";
+    public final static String COMPOUNDS_FIELD_CHEMICAL_DRAWING = "compounds.fields.chemicalDrawing";
+    public final static String COMPOUNDS_FIELD_IPBCODE = "compounds.fields.ipbcode";
+    public final static String COMPOUNDS_FIELD_MOLID = "compounds.fields.molid";
 
-    public final static String TMP_MatId_MolId = "TMP_MatId_MolId";
-
-    private InhouseDB inhouseDB;
-
-    public Compounds(InhouseDB inhouseDB) throws Exception {
-        this.inhouseDB = inhouseDB;
-        addInsertBuilders();
-    }
-
-    private void addInsertBuilders() {
-        this.inhouseDB.addInsertBuilder(MaterialEntity.class.getName(),
-                new SqlInsertBuilder(new EntityGraph(MaterialEntity.class)));
-        this.inhouseDB.addInsertBuilder(MaterialIndexEntryEntity.class.getName(),
-                new SqlInsertBuilder(new EntityGraph(MaterialIndexEntryEntity.class)));
-        this.inhouseDB.addInsertBuilder(StructureEntity.class.getName(),
-                new SqlInsertBuilder(new EntityGraph(StructureEntity.class)));
-        this.inhouseDB.addInsertBuilder(MoleculeEntity.class.getName(),
-                new SqlInsertBuilder(new EntityGraph(MoleculeEntity.class)));
-    }
-*/
     /**
      *
-     * @param cdkMolecule
-     * @return
+     * @param inhouseDB
+     * @throws Exception
      */
-/*
-    private boolean cleanMolecule(IAtomContainer cdkMolecule) throws CDKException {
-        List<IAtom> atomsToRemove = new ArrayList<> ();
-        int nAtoms = 0;
-        for (IAtom atom : cdkMolecule.atoms()) {
-            nAtoms++;
-            if (atom.getAtomicNumber().equals(0)) {
-                atomsToRemove.add(atom);
-            }
-        }
-        for(IAtom atom : atomsToRemove) {
-            cdkMolecule.removeAtom(atom);
-            nAtoms--;
-        }
-        return (nAtoms > 0);
-    }
-
-    private void importCompounds(String fileName) throws Exception {
+    private void importCompounds(InhouseDB inhouseDB) throws Exception {
         System.out.println("Importing compounds");
 
-        IChemObjectBuilder builder = DefaultChemObjectBuilder.getInstance();
+        // 01 Structure                 -> ignored
+        // 02 SciFinderDoneAt
+        // 03 CAS-RN                    -> Field CAS/RN
+        // 04 StructureCheckedAt
+        // 05 StructureCheckedBy
+        // 06 Correction
+        // 07 MolTableRemarks           -> Description
+        // 08 IPBCode                   -> Field IPB-Code
+        // 09 MolWeight
+        // 10 Formula
+        // 11 HighResolutionMS
+        // 12 Reliability
+        // 13 Date
+        // 14 Mol_ID                    -> Field Mol_ID; Pointer to CDXML file
+        // 15 temporary mark
+        // 16 modelling
 
-        IteratingSDFReader sdfReader = new IteratingSDFReader(
-                new FileInputStream(fileName), builder);
+        // O=C1C=CN(C2=CC=CC=C2)N=C1C(NC3=CC=CC=C3)=O;01.01.1001;;;;no;"Do NOT edit or delete!!";
+        // IPB002897;291,31;C17H13N3O2;1.234567000000000;sure;18.11.2020;62;<o>;25.05.2007
+        // 19.07.2004;710298-89-8;;;;;;;;;;24.11.2005;63;;25.05.2007
 
-        int counter = 0;
-        while (sdfReader.hasNext()) {
-            try {
-                IAtomContainer cdkMolecule = sdfReader.next();
 
-                IMolecularFormula cdkFormula = MolecularFormulaManipulator.getMolecularFormula(cdkMolecule);
+        String linePattern = "^([^;]*);"         //  1 Structure (SMILES)
+                + "([^;]*)?;"                    //  2 SciFinderDoneAt
+                + "([^;]*)?;"                    //  3 CAS-RN
+                + "([^;]*)?;"                    //  4 StructureCheckedAt
+                + "([^;]*)?;"                    //  5 StructureCheckedBy
+                + "([^;]*)?;"                    //  6 Correction
+                + "\"?([^\";]*)?\"?;"            //  7 MolTableRemarks
+                + "(IPB\\d+)?;"                  //  8 IPBCode
+                + "(\\d+(,\\d+)?)?;"             //  9 MolWeight
+                + "([^;]*)?;"                    // 10 Formula
+                + "([^;]*)?;"                    // 11 HighResolutionMS
+                + "([^;]*)?;"                    // 12 Reliability
+                + "([^;]*)?;"                    // 13 Date
+                + "(\\d+);"                      // 14 Mol_ID
+                + "([^;]*)?;"                    // 15 temporary mark
+                + "([^;]*)?$";                   // 16 modelling
 
-                AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(cdkMolecule);
-                CDKHydrogenAdder.getInstance(builder).addImplicitHydrogens(cdkMolecule);
-                Kekulization.kekulize(cdkMolecule);
+        Pattern pat = Pattern.compile(linePattern);
+        BufferedReader reader = new BufferedReader(new FileReader(inhouseDB.getConfigString(COMPOUNDS_FILENAME)));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(inhouseDB.getConfigString(COMPOUNDS_REJECTFILE)));
+        reader.readLine(); // discard header
+        while(reader.ready()) {
+            String st = reader.readLine();
+            Matcher matcher = pat.matcher(st);
+            if (matcher.matches()) {
+                InhouseCompound compound = new InhouseCompound()
+                        .setMolId(Integer.parseInt(matcher.group(15)))
+                        .setCasrn(matcher.group(3))
+                        .setRemarks(matcher.group(7))
+                        .setIpbCode(matcher.group(8))
+                        .setName(String.format("AUTO molId %s", matcher.group(15)));
+                inhouseDB.getInhouseDbService().save(compound);
 
-                String molFormula = MolecularFormulaManipulator.getString(cdkFormula);
-                double molMass = MolecularFormulaManipulator.getMass(cdkFormula,
-                        MolecularFormulaManipulator.MolWeight);
-                double exactMass = MolecularFormulaManipulator.getMass(cdkFormula,
-                        MolecularFormulaManipulator.MonoIsotopic);
-                importSingleCompound(cdkMolecule, molFormula, molMass, exactMass);
-                counter++;
-                if ((counter % 250) == 0) {
-                    System.out.printf("imported %d structures\n", counter);
-                }
-            } catch(Exception e) {
-                System.out.printf("WARN: Import failed for structure %d\n", counter);
-                e.printStackTrace();
-                counter++;
+            } else {
+                // write non-accepted line to error log
+                writer.append(st);
+                writer.newLine();
             }
         }
+        writer.close();
+      }
+
+    private void importCompoundNames(InhouseDB inhouseDB) throws Exception {
+        RTF rtf = new RTF(inhouseDB);
+        rtf.readCompoundSynonym(inhouseDB.getConfigString(COMPOUNDS_SYNONYMS));
+
     }
 
-    private void importCompoundNames(String fileName) throws Exception {
-        RTF rtf = new RTF(this.inhouseDB);
-        rtf.readCompoundSynonym(fileName);
+    public void importData(InhouseDB inhouseDB) throws Exception {
+        // importCompounds(inhouseDB);
+        // importCompoundNames(inhouseDB);
 
-    }
+        Library library = inhouseDB.getLibraryDbService().loadById(
+                inhouseDB.getConfigString(COMPOUNDS_LIBRARY_ID));
+        List<InhouseCompound> compounds = inhouseDB.getInhouseDbService().loadCompounds();
 
-    public void importData() throws Exception {
-        importCompounds(inhouseDB.getConfigString(INPUT_STRUCTURES));
-        importCompoundNames(inhouseDB.getConfigString(INPUT_STRUCTURE_NAMES));
-    }
-
-    private void importSingleCompound(IAtomContainer cdkMolecule,
-            String molFormula,
-            Double molMass,
-            Double exactMass) throws Exception {
-        MaterialEntity mat = new MaterialEntity();
-        mat.setACList(inhouseDB.getACList());
-        mat.setCtime(new Date());
-        mat.setMaterialtypeid(inhouseDB.getConfigInt(MOLECULE_MATERIAL_TYPE_ID));
-        mat.setOwner(inhouseDB.getOwner());
-        mat.setProjectid(inhouseDB.getProject());
-
-        mat = (MaterialEntity) this.inhouseDB.getBuilder(mat.getClass().getName())
-                .insert(this.inhouseDB.getConnection(), mat);
-
-        StructureEntity struc = new StructureEntity();
-        if (cleanMolecule(cdkMolecule)) {
-            MoleculeEntity mol = new MoleculeEntity();
-            saveMolString(mol, cdkMolecule);
-            mol = (MoleculeEntity) this.inhouseDB.getBuilder(mol.getClass().getName())
-                    .insert(this.inhouseDB.getConnection(), mol);
-
-            struc.setMolarmass(molMass);
-            struc.setExactmolarmass(exactMass);
-            struc.setSumformula(molFormula);
-            struc.setMoleculeid(mol.getId());
-        }
-        struc.setId(mat.getMaterialid());
-        this.inhouseDB.getBuilder(struc.getClass().getName())
-                .insert(this.inhouseDB.getConnection(), struc);
-        saveMolProperties(cdkMolecule, mat.getMaterialid());
-    }
-
-    private void saveMolProperties(IAtomContainer cdkMolecule, Integer id)
-            throws Exception {
-        String sql = "INSERT INTO material_indices (materialid, typeid, value) VALUES (?,?,?)";
-        String sql2 = "INSERT INTO tmp_import (old_id, new_id, type) VALUES (?, ?, ?)";
-        for( Map.Entry<String, Integer> entry : this.inhouseDB.getMaterialIndexTypes().entrySet()) {
-            String key = entry.getKey();
-            String propValue = cdkMolecule.getProperty(key);
-            if (propValue != null) {
-                inhouseDB.saveTriple(sql, id, entry.getValue(), propValue);
-                if (key.equals("Mol_ID")) {
-                    inhouseDB.saveTriple(sql2, Integer.valueOf(propValue), id, TMP_MatId_MolId);
-                }
-            }
+        // sublist(x,y) - restrict to a limited number of records for testing
+        for (InhouseCompound compound : compounds.subList(2,5)) {
+            Material asset = compound.createAsset(inhouseDB);
+            Material batch = compound.createBatch(inhouseDB);
+//            Material mat = inhouseDB.getMaterialRestService().doCreateMaterial(
+//                    library,
+//                    asset,
+//                    batch);
+            System.out.printf("ASSET %s", asset.toString());
+            System.out.printf("BATCH %s", batch.toString());
         }
     }
-
-    private void saveMolString(MoleculeEntity mol, IAtomContainer cdkMolecule) throws CDKException, IOException {
-        ByteArrayOutputStream molStream = new ByteArrayOutputStream();
-        IChemObjectWriter cdkWriter;
-        if (cdkMolecule.getAtomCount() > 900) {
-            cdkWriter = new MDLV3000Writer(molStream);
-        } else {
-            cdkWriter = new MDLV2000Writer(molStream);
-        }
-        cdkWriter.write(cdkMolecule);
-        cdkWriter.close();
-        mol.setMolecule(molStream.toString());
-    }
-*/
 }

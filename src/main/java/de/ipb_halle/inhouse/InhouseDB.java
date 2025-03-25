@@ -22,6 +22,20 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import de.ipb_halle.signals.DateRangeParser;
+import de.ipb_halle.signals.Signals;
+import de.ipb_halle.signals.materials.Library;
+import de.ipb_halle.signals.materials.LibraryDbService;
+import de.ipb_halle.signals.materials.MaterialRestService;
+import de.ipb_halle.signals.rest.RestHelper;
+import jakarta.ejb.Local;
+import jakarta.inject.Inject;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.MissingArgumentException;
+import org.apache.commons.cli.MissingOptionException;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.UnrecognizedOptionException;
 
 /*
 import de.ipb_halle.lbac.material.common.entity.MaterialEntity;
@@ -42,6 +56,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -81,158 +96,74 @@ import java.util.Map;
  *
  * @author fbroda
  */
+@Local
 public class InhouseDB {
-    /*
-        public final static String ACLIST_ID = "ACLIST_ID";
-        public final static String DATABASE_URL = "DATABASE_URL";
-        public final static String INITIAL_SQL = "INITIAL_SQL";
-        public final static String MATERIAL_INDEX_NAME = "name";
-        public final static String OWNER_ID = "OWNER_ID";
-        public final static String PROJECT_ID = "PROJECT_ID";
 
-        public final static String UNKNOWN_COMPOUND_ID = "UNKNOWN_COMPOUND_ID";
+    @Inject
+    private InhouseDbService inhouseDbService;
+
+    @Inject
+    private LibraryDbService libraryDbService;
+
+    @Inject
+    private MaterialRestService materialRestService;
+
+    @SuppressWarnings("static-access")
+    private static final Option inhouseOpt = Option.builder("inhouse")
+            .longOpt("importInhouse")
+            .hasArgs()
+            .argName("inhouseConfig")
+            .desc("\nImport data from InhouseDB.")
+            .build();
+
+    private JsonObject jsonConfig;
+
+    public Integer getConfigInt(String path) {
+        return RestHelper.getPrimitiveFromPath(jsonConfig, path).getAsInt();
+    }
+
+    public String getConfigString(String path) {
+        return RestHelper.getPrimitiveFromPath(jsonConfig, path).getAsString();
+    }
+
+    public InhouseDbService getInhouseDbService() {
+        return inhouseDbService;
+    }
+
+    public LibraryDbService getLibraryDbService() {
+        return libraryDbService;
+    }
+
+    public MaterialRestService getMaterialRestService() {
+        return materialRestService;
+    }
+
+    private void importData(String configFile) throws Exception {
+        readConfig(configFile);
+        Compounds compounds = new Compounds();
+        compounds.importData(this);
+
+//        Taxonomy taxonomy = new Taxonomy(this);
+//        Experiments experiments = new Experiments(this);
+//        Correlation correlation = new Correlation(this);
+//        Samples samples = new Samples(this);
+
+//        taxonomy.importData();
+//        experiments.importData();
+//        correlation.importData();
+//        samples.importData();
+    }
 
 
-        private final Connection connection;
-        private final Map<String, SqlInsertBuilder> builderMap;
-        private final Map<String, Integer> materialIndexTypes;
-        private int aclist;
-        private int owner;
-        private int project;
-        private int unknownCompoundId;
-
-        private JsonObject jsonConfig;
-
-        private InhouseDB(String configFileName) throws Exception {
-            readConfig(configFileName);
-            this.connection = DriverManager.getConnection(getConfigString(DATABASE_URL));
-            this.builderMap = new HashMap<> ();
-            this.materialIndexTypes = new HashMap<> ();
-        }
-
-        public void addInsertBuilder(String name, SqlInsertBuilder builder) {
-                this.builderMap.put(name, builder);
-        }
-
-        private void addMaterialIndexTypes() throws Exception {
-            PreparedStatement stmnt = this.connection.prepareStatement("SELECT id, name FROM indextypes");
-            ResultSet result = stmnt.executeQuery();
-            while(result.next()) {
-                this.materialIndexTypes.put(result.getString(2), result.getInt(1));
-            }
-            this.materialIndexTypes.put("CAS-RN", this.materialIndexTypes.get("CAS/RN"));
-        }
-
-        private void close() throws SQLException {
-            this.connection.close();
-        }
-
-        public int getACList() {
-            return aclist;
-        }
-
-        public SqlInsertBuilder getBuilder(String name) {
-            return this.builderMap.get(name);
-        }
-
-        public Integer getConfigInt(String key) {
-            JsonPrimitive value = this.jsonConfig.getAsJsonPrimitive(key);
-            if (value != null) {
-                return Integer.valueOf(value.getAsInt());
-            }
-            throw new NullPointerException("getConfigInt(" + key + ") returned null");
-        }
-
-        public String getConfigString(String key) {
-            JsonPrimitive value = this.jsonConfig.getAsJsonPrimitive(key);
-            if (value != null) {
-                return value.getAsString();
-            }
-            throw new NullPointerException("getConfigInt(" + key + ") returned null");
-        }
-
-        public Connection getConnection() {
-            return this.connection;
-        }
-
-        public Integer getMaterialIndexType(String name) {
-            return this.materialIndexTypes.get(name);
-        }
-
-        public Map<String, Integer> getMaterialIndexTypes() {
-            return this.materialIndexTypes;
-        }
-
-        public int getOwner() {
-            return this.owner;
-        }
-
-        public int getProject() {
-            return this.project;
-        }
-
-        public int getUnknownCompoundId() {
-            return this.unknownCompoundId;
-        }
-
-        private void importData() throws Exception {
-            init();
-            Compounds compounds = new Compounds(this);
-            Taxonomy taxonomy = new Taxonomy(this);
-            Experiments experiments = new Experiments(this);
-            Correlation correlation = new Correlation(this);
-            Samples samples = new Samples(this);
-
-            runInitial();
-            addMaterialIndexTypes();
-
-            compounds.importData();
-            taxonomy.importData();
-            experiments.importData();
-            correlation.importData();
-
-            samples.importData();
-        }
-
-        private void init() {
-            this.aclist = getConfigInt(ACLIST_ID);
-            this.owner = getConfigInt(OWNER_ID);
-            this.project = getConfigInt(PROJECT_ID);
-            this.unknownCompoundId = getConfigInt(UNKNOWN_COMPOUND_ID);
-        }
-
-        public int loadRefId(String sql, int id, String refKey) throws Exception {
-            PreparedStatement stmnt = this.connection.prepareStatement(sql);
-            stmnt.setInt(1, id);
-            stmnt.setString(2, refKey);
-            ResultSet result = stmnt.executeQuery();
-            if (result.next()) {
-                return result.getInt(1);
-            }
-            System.out.printf("No reference found: %s-%d\n", refKey, id);
-            return 0;
-        }
-
-        private void readConfig(String fileName) throws Exception {
-            JsonElement element = JsonParser.parseReader(
+    private void readConfig(String fileName) throws Exception {
+        JsonElement element = JsonParser.parseReader(
                 new FileReader(fileName));
-            if (! element.isJsonObject()) {
-                throw new Exception("readConfig() could not parse Json object");
-            }
-            this.jsonConfig = element.getAsJsonObject();
+        if (!element.isJsonObject()) {
+            throw new Exception("readConfig() could not parse Json object");
         }
+        this.jsonConfig = element.getAsJsonObject();
+    }
 
-        private void runInitial() throws Exception {
-            JsonArray array = this.jsonConfig.getAsJsonArray(INITIAL_SQL);
-            if (array != null) {
-                Iterator<JsonElement> iter = array.iterator();
-                while (iter.hasNext()) {
-                    String sql = iter.next().getAsString();
-                    this.connection.prepareStatement(sql).execute();
-                }
-            }
-        }
-    */
     public void saveTriple(String sql, Integer id, Integer other, String value) throws SQLException {
 /*
         PreparedStatement statement = this.connection.prepareStatement(sql);
@@ -242,4 +173,30 @@ public class InhouseDB {
         statement.execute();
 */
     }
+
+    public static void registerOptions(Options options) {
+        options.addOption(inhouseOpt);
+    }
+
+    /**
+     * process the command line and perform requested jobs.
+     *
+     * @param cmdline the parsed command line
+     * @param options the defined options
+     * @param signals the current Signals instance
+     */
+    public static void processCommandLine(CommandLine cmdline, Options options, Signals signals)
+            throws MissingArgumentException, MissingOptionException, UnrecognizedOptionException, ParseException {
+
+        if (cmdline.hasOption(inhouseOpt.getOpt())) {
+            String configFile = cmdline.getOptionValue(inhouseOpt.getOpt());
+            try {
+                signals.getInhouseDB().importData(configFile);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
 }
