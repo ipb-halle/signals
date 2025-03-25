@@ -69,7 +69,7 @@ public class SignalsEntityManager {
         cmap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
         cmap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
         cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, includedTypes);
-        List<SignalsEntityDTO> results = dbService.load(cmap);
+        List<SignalsEntityDTO> results = dbService.loadSE(cmap);
         for (SignalsEntityDTO dto : results) {
             System.out.println(dto.dump());
         }

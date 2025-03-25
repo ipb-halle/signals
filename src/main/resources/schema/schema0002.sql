@@ -325,7 +325,8 @@ CREATE TABLE containers (
     type_name VARCHAR,
     updated_at TIMESTAMP,
     updated_by VARCHAR /* REFERENCES users(id) */,
-    unit VARCHAR
+    unit VARCHAR,
+    description VARCHAR
 );
 
 CREATE TABLE location_types (
@@ -355,3 +356,34 @@ CREATE TABLE locations (
     updated_at DATE,
     updated_by VARCHAR /* REFERENCES users(id) */
 );
+
+CREATE TABLE samples (
+    id VARCHAR PRIMARY KEY,  -- Unique identifier
+    name VARCHAR NOT NULL,
+    description TEXT,
+    type INTEGER,
+    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    edited_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR,
+    edited_by VARCHAR,
+    owner VARCHAR,
+    digest BIGINT NOT NULL,
+    ancestor_id VARCHAR,
+    stoicRef_id VARCHAR,
+    stoicRef_row_id VARCHAR,
+    parent_container_id VARCHAR NULL,
+    CONSTRAINT fk_parent_container FOREIGN KEY (parent_container_id) REFERENCES containers(id) ON DELETE SET NULL
+);
+
+CREATE TABLE sample_properties(
+    id SERIAL PRIMARY KEY,
+    name VARCHAR,
+    type VARCHAR,
+    property_value VARCHAR,
+    property_key VARCHAR,
+    sample_id VARCHAR NOT NULL,
+
+    CONSTRAINT fk_sample FOREIGN KEY (sample_id) REFERENCES samples(id) ON DELETE CASCADE
+
+);
+

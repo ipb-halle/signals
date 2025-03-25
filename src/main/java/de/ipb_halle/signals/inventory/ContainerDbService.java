@@ -23,8 +23,18 @@ import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -45,16 +55,47 @@ public class ContainerDbService {
     private EntityManager em;
 
 
-    public Container loadById(String id) {
-        ContainerEntity entity = this.em.find(ContainerEntity.class, id);
-        if (entity == null) {
-            return null;
-        }
-        return new Container(entity);
+    public ContainerEntity loadContainerById(String id) {
+        ContainerEntity containerEntity = this.em.find(ContainerEntity.class, id);
+        loadFieldValues(containerEntity, id);
+        return containerEntity;
     }
 
-    public void save(Container container) {
+    public List<ContainerEntity> loadAllContainersWithMaterialIdSample() {
+        List<ContainerEntity> containerEntities = new ArrayList<>();
+
+        // 1) create a criteria builder
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+
+        // 2) create a criteria query for container entity
+        CriteriaQuery<ContainerEntity> criteriaQuery = builder.createQuery(ContainerEntity.class);
+
+        // 3) define the root table
+        Root<ContainerEntity> root = criteriaQuery.from(ContainerEntity.class);
+
+        // 4) condition: WHERE material_id like 'sample:%'
+        Predicate materialLike = builder.like(root.get("materialId"), "sample:%");
+
+        // 5) set condition in query
+        criteriaQuery.where(materialLike);
+
+        // 6) process the query call
+        TypedQuery<ContainerEntity> query = em.createQuery(criteriaQuery);
+        return query.getResultList();
+
+    }
+
+    private void loadFieldValues(ContainerEntity containerEntity, String id) {
+        Map<String, Object> cmap = new HashMap<>();
+        cmap.put(FieldValue.ENTITY_ID, id);
+        List<FieldValue> fieldValues = fieldDbService.loadFieldValues(cmap);
+        containerEntity.addAllFieldValues(fieldValues);
+    }
+
+    public void saveContainer(Container container) {
         ContainerEntity ce = container.createEntity();
+        logger.info("Container Processor Bean:-> typeId={}, typeName={}", ce.getContainerTypeId(), ce.getContainerTypeName());
+
         this.em.merge(ce);
         for (Field f : container.getFields()) {
             fieldDbService.save(f);

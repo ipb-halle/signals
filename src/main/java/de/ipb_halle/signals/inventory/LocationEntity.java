@@ -277,7 +277,7 @@ public class LocationEntity implements ILocation {
     }
 
     public LocationEntity setFieldValues(Set<FieldValue> vs) {
-        fieldValues = vs;
+        fieldValues.addAll(vs);
         return this;
 
     }

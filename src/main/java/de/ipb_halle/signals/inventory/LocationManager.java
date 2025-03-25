@@ -23,7 +23,7 @@ import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.entity.SignalsEntityDbService;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
-import de.ipb_halle.signals.field.*;
+import de.ipb_halle.signals.field.FieldDbService;
 import de.ipb_halle.signals.users.UserManager;
 import jakarta.ejb.Stateless;
 import jakarta.ejb.TransactionAttribute;
@@ -123,7 +123,7 @@ public class LocationManager {
         cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, entityTypes);
 
         // 3) Loading all locations from db (checked everything is working)
-        List<SignalsEntityDTO> locations = signalsEntityDbService.load(cmap);
+        List<SignalsEntityDTO> locations = signalsEntityDbService.loadSE(cmap);
 
         // 4) Process locations (checked, everything is working)
         for (SignalsEntityDTO dto : locations) {
@@ -199,4 +199,5 @@ public class LocationManager {
         location.setCreatedBy(userManager.getUser(location.getCreatedBy().getId()));
         location.setUpdatedBy(userManager.getUser(location.getUpdatedBy().getId()));
     }
+
 }

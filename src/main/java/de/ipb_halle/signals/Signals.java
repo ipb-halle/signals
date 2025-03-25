@@ -22,37 +22,32 @@ import de.ipb_halle.signals.element.ElementConfig;
 import de.ipb_halle.signals.element.ElementManager;
 import de.ipb_halle.signals.attribute.AttributeManager;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
+import de.ipb_halle.signals.element.ElementConfig;
+import de.ipb_halle.signals.element.ElementManager;
 import de.ipb_halle.signals.entity.SignalsEntityConfig;
 import de.ipb_halle.signals.entity.SignalsEntityManager;
 import de.ipb_halle.signals.inventory.InventoryConfig;
 import de.ipb_halle.signals.inventory.InventoryManager;
-import de.ipb_halle.signals.materials.MaterialsManager;
 import de.ipb_halle.signals.materials.MaterialsConfig;
+import de.ipb_halle.signals.materials.MaterialsManager;
+import de.ipb_halle.signals.sample.SamplesConfig;
+import de.ipb_halle.signals.sample.SamplesManager;
 import de.ipb_halle.signals.users.AccessConfig;
 import de.ipb_halle.signals.users.AccessManager;
 import de.ipb_halle.signals.users.LdapClient;
-
-import java.util.*;
-
 import jakarta.annotation.Resource;
 import jakarta.ejb.embeddable.EJBContainer;
 import jakarta.inject.Inject;
-
-import javax.naming.Context;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.MissingArgumentException;
-import org.apache.commons.cli.MissingOptionException;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.UnrecognizedOptionException;
+import org.apache.commons.cli.*;
 import org.apache.openejb.api.LocalClient;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.naming.Context;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * IPB Signals client is a tool for data import and export
@@ -87,6 +82,9 @@ public class Signals {
     private MaterialsManager materialsManager;
 
     @Inject
+    private SamplesManager samplesManager;
+
+    @Inject
     private LdapClient ldapClient;
 
     @Inject
@@ -99,8 +97,9 @@ public class Signals {
     private ElementManager elementManager;
 
     private AccessConfig accessConfig;
-    private InventoryConfig inventoryConfig;
     private MaterialsConfig materialsConfig;
+    private InventoryConfig inventoryConfig;
+    private SamplesConfig samplesConfig;
     private ElementConfig elementConfig;
     private RuntimeConfig runtimeConfig;
     private SignalsEntityConfig signalsEntityConfig;
@@ -144,6 +143,7 @@ public class Signals {
         signalsEntityConfig = new SignalsEntityConfig(signalsConfig,
                 runtimeConfig, attributeManager, signalsEntityManager);
         elementConfig = new ElementConfig(signalsConfig, runtimeConfig, elementManager);
+        samplesConfig = new SamplesConfig(samplesManager, runtimeConfig, signalsConfig);
     }
 
     public void dumpEntities(Date[] dateRange) {
@@ -189,6 +189,10 @@ public class Signals {
         inventoryConfig.manageInventory(dateRange);
     }
 
+    public void manageSamples(Date[] dates) {
+        samplesConfig.manageSamples(dates);
+    }
+
     @Deprecated // use getMaterialsConfig() instead
     public void manageMaterials(Date[] dateRange) {
         materialsConfig.manageMaterials(dateRange);
@@ -202,8 +206,12 @@ public class Signals {
         return inhouseDB;
     }
 
-    public InventoryConfig getInventoryConfig(){
+    public InventoryConfig getInventoryConfig() {
         return inventoryConfig;
+    }
+
+    public SamplesConfig getSamplesConfig() {
+        return samplesConfig;
     }
 
     public void manageElements(Date[] dateRange) {
@@ -277,8 +285,9 @@ public class Signals {
             SignalsEntityConfig.processCommandLine(cmdline, options, signals);
             MaterialsConfig.processCommandLine(cmdline, options, signals);
             InventoryConfig.processCommandLine(cmdline, options, signals);
-            ElementConfig.processCommandLine(cmdline,options,signals);
             InhouseDB.processCommandLine(cmdline, options, signals);
+            ElementConfig.processCommandLine(cmdline, options, signals);
+            SamplesConfig.processCommandLine(cmdline, options, signals);
 
         } catch (MissingArgumentException mae) {
             printHelp("ERROR: " + mae.getMessage(), options);
@@ -303,8 +312,11 @@ public class Signals {
         ElementConfig.registerOptions(options);
         InventoryConfig.registerOptions(options);
         InhouseDB.registerOptions(options);
+        SamplesConfig.registerOptions(options);
         processCommandLine(argv, options);
     }
+
+
 }
 
 

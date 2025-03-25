@@ -21,6 +21,7 @@ import de.ipb_halle.signals.entity.Unit;
 import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.materials.IMaterial;
+import de.ipb_halle.signals.materials.MaterialReference;
 import de.ipb_halle.signals.sample.Sample;
 import de.ipb_halle.signals.users.IUser;
 import de.ipb_halle.signals.users.UserReference;
@@ -43,6 +44,7 @@ public class Container {
     public final static String CONTAINER_TYPE_ENTITY_SUFFIX = ":ivt";
 
     private String id;
+    private String description;
     private Double amount;
     private String barcode;
     private ContainerType containerType;
@@ -54,6 +56,7 @@ public class Container {
     private IUser createdBy;
     private String digest;
     private ILocation location;
+    private IMaterial material;
     private String name;
     private Date updatedAt;
     private IUser updatedBy;
@@ -85,13 +88,17 @@ public class Container {
     // entity constructor
     public Container(ContainerEntity ce) {
         id = ce.getId();
+        description = ce.getDescription();
         amount = ce.getAmount();
         barcode = ce.getBarcode();
+        containerTypeId = ce.getContainerTypeId();
+        containerTypeName = ce.getContainerTypeName();
         coordinateX = ce.getCoordinateX();
         coordinateY = ce.getCoordinateY();
         createdAt = ce.getCreatedAt();
         createdBy = new UserReference(ce.getCreatedBy());
         location = new LocationReference().setId(ce.getLocationId());
+        material = new MaterialReference().setId(ce.getMaterialId());
         name = ce.getName();
         unit = Unit.getUnit(ce.getUnit());
         updatedAt = ce.getUpdatedAt();
@@ -99,6 +106,7 @@ public class Container {
 
         fields = new HashSet<>();
         fieldValues = new HashSet<>();
+        fieldValues.addAll(ce.getFieldValues());
         materials = new HashSet<>();
         samples = new HashSet<>();
     }
@@ -106,6 +114,7 @@ public class Container {
     public ContainerEntity createEntity() {
         return new ContainerEntity()
                 .setId(id)
+                .setDescription(description)
                 .setAmount(amount)
                 .setBarcode(barcode)
                 .setCoordinateX(coordinateX)
@@ -114,6 +123,8 @@ public class Container {
                 .setCreatedBy(createdBy.getId())
                 .setDigest(digest)
                 .setLocationId(location.getId())
+                .setMaterialId(material.getId())
+                .setContainerTypeId(containerTypeId)
                 .setName(name)
                 .setUnit(unit.getUnit())
                 .setUpdatedAt(updatedAt)
@@ -129,8 +140,16 @@ public class Container {
         this.fieldValues.addAll(values);
     }
 
+    public Set<Sample> getSamples() {
+        return samples;
+    }
+
     public void addMaterial(IMaterial m) {
         materials.add(m);
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public Double getAmount() {
@@ -181,6 +200,10 @@ public class Container {
         return location;
     }
 
+    public IMaterial getMaterial() {
+        return material;
+    }
+
     public String getName() {
         return name;
     }
@@ -207,6 +230,10 @@ public class Container {
 
     public Set<IMaterial> getMaterials() {
         return materials;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public void setAmount(Double a) {
@@ -261,6 +288,10 @@ public class Container {
         location = l;
     }
 
+    public void setMaterial(IMaterial material) {
+        this.material = material;
+    }
+
     public void setMaterials(Set<IMaterial> ms) {
         materials = ms;
     }
@@ -279,5 +310,17 @@ public class Container {
 
     public void setUpdatedBy(IUser u) {
         updatedBy = u;
+    }
+
+    public void setFields(Set<Field> fields) {
+        this.fields = fields;
+    }
+
+    public void setSamples(Set<Sample> samples) {
+        this.samples = samples;
+    }
+
+    public void addSamples(Sample sample) {
+        samples.add( sample);
     }
 }

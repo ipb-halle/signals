@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals.inventory;
 
+import de.ipb_halle.signals.RuntimeConfig;
 import de.ipb_halle.signals.attachment.AttachmentDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.EntityType;
@@ -83,8 +84,25 @@ public class ContainerManager {
     @Inject
     private ContainerProcessorBean containerProcessorBean;
 
-
     private Logger logger = LoggerFactory.getLogger(ContainerManager.class);
+
+
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+    public void importContainer(RuntimeConfig runtimeConfig, String id) {
+        //loads container from local DB to be imported into Signals
+        ContainerEntity containerEntity = containerDbService.loadContainerById(id);
+        Container container = new Container(containerEntity);
+
+        logger.info(container.getContainerTypeId());
+        //loads containerType from local DB
+        ContainerType containerType = containerTypeDbService.loadById(container.getContainerTypeId());
+        logger.info(containerType.getId());
+        if (runtimeConfig.updateSNB) {
+            containerRestService.doCreateContainer(containerType, container);
+        }
+
+    }
+
 
     /**
      * Fetches containers created/updated within a specified date range
@@ -116,7 +134,7 @@ public class ContainerManager {
         cmap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, entityTypes);
 
         // 3) Loads all containers from db (checked its working)
-        List<SignalsEntityDTO> containers = signalsEntityDbService.load(cmap);
+        List<SignalsEntityDTO> containers = signalsEntityDbService.loadSE(cmap);
 
         // 4) Processes container sequentially
         for (SignalsEntityDTO entityDTO : containers) {
@@ -158,7 +176,8 @@ public class ContainerManager {
      * @return the loaded container, or {@code null} if not found
      */
     public Container loadById(String id) {
-        return containerDbService.loadById(id);
+        ContainerEntity containerEntity = containerDbService.loadContainerById(id);
+        return new Container(containerEntity);
     }
 
     /**
@@ -183,7 +202,8 @@ public class ContainerManager {
      * @return the container
      */
     public Container getContainer(String id, boolean augment) {
-        Container ct = containerDbService.loadById(id);
+        ContainerEntity containerEntity = containerDbService.loadContainerById(id);
+        Container ct = new Container(containerEntity);
         if (ct == null) {
             ct = containerRestService.doGetContainer(id);
         }
@@ -199,7 +219,9 @@ public class ContainerManager {
      *
      * @param c the container to save
      */
-    public void save(Container c) {
-        containerDbService.save(c);
+    public void saveContainer(Container c) {
+        logger.info("Container MANAGER:-> container getDescription={}\n", c.getDescription());
+
+        containerDbService.saveContainer(c);
     }
 }

@@ -28,6 +28,8 @@ import de.ipb_halle.signals.field.*;
 import de.ipb_halle.signals.rest.*;
 import de.ipb_halle.signals.users.UserReference;
 import jakarta.ejb.Local;
+import jakarta.ejb.TransactionAttribute;
+import jakarta.ejb.TransactionAttributeType;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -183,17 +185,16 @@ public class LocationRestService implements RestReplyParser<Location> {
         newRevision.setSize(RestHelper.getPrimitiveFromPath(json, Location.ATTR_ATTACHMENT_FILE_SIZE).getAsLong());
     }
 
+    //toDo consider whether to return a new object or not
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void doCreateLocation(LocationType locationType, Location location) {
 
-        String endpoint = LOCATION_CREATE_ENDPOINT;
         JsonObject request = prepareLocation(locationType, location);
-
-        logger.info("RESULTING JSON -> {}", request.toString());
 
         try {
             restClient.reset()
                     .setMethod(Method.POST)
-                    .setEndpoint(endpoint)
+                    .setEndpoint(LOCATION_CREATE_ENDPOINT)
                     .setRequestData(request.toString())
                     .execute(RestClient.HTTP_CREATED);
         } catch (Exception e) {
@@ -208,9 +209,9 @@ public class LocationRestService implements RestReplyParser<Location> {
         data.add(RestHelper.ATTR_ATTRIBUTES, prepareAttributes(locationType, location));
         resultingJson.add(RestHelper.ATTR_DATA, data);
         return resultingJson;
-   }
+    }
 
-   //create gridBox as Example
+    //creates gridBox as Example
     private JsonObject prepareAttributes(LocationType locationType, Location location) {
         JsonObject attributes = new JsonObject();
         attributes.addProperty(RestHelper.ATTR_NAME, location.getName());

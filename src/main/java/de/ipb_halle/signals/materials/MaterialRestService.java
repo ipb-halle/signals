@@ -30,6 +30,8 @@ import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.rest.*;
 import de.ipb_halle.signals.storage.StorageService;
 import jakarta.ejb.Local;
+import jakarta.ejb.TransactionAttribute;
+import jakarta.ejb.TransactionAttributeType;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,14 +97,12 @@ public class MaterialRestService implements RestReplyParser<Material> {
         material.setName(RestHelper.parseString(attributes, RestHelper.ATTR_NAME));
         material.setDescription(RestHelper.parseString(attributes, RestHelper.ATTR_DESCRIPTION));
         material.setDigest(RestHelper.parseLong(attributes, RestHelper.ATTR_DIGEST));
-        material.setLibraryId(RestHelper.ATTR_ASSET_TYPE
-                + RestHelper.parseString(attributes, Material.ATTR_ASSET_TYPE_ID));
+        material.setLibraryId(RestHelper.ATTR_ASSET_TYPE + RestHelper.parseString(attributes, Material.ATTR_ASSET_TYPE_ID));
 
         SignalsEntityRestService.parseTimestamps(attributes, material);
         SignalsEntityRestService.parseRelationships(materialJson, material);
 
-        EntityType entityType = (EntityType) dynEnumManager.valueOf(
-                EntityType.valueOf(RestHelper.parseString(attributes, RestHelper.ATTR_TYPE)));
+        EntityType entityType = (EntityType) dynEnumManager.valueOf(EntityType.valueOf(RestHelper.parseString(attributes, RestHelper.ATTR_TYPE)));
         material.setEntityType(entityType);
         if (entityType.equals(EntityType.valueOf(Material.ENTITY_TYPE_BATCH))) {
             parseMaterialId(attributes, material);
@@ -314,6 +314,7 @@ public class MaterialRestService implements RestReplyParser<Material> {
         return parseReply(fetch(MATERIAL_ENDPOINT, id));
     }
 
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public Material doCreateMaterial(Library lib, Material mat, Material batch) {
         JsonObject request;
         String endpoint;
@@ -468,7 +469,6 @@ public class MaterialRestService implements RestReplyParser<Material> {
                 // probably won't work if fieldValue contains array, number, measurement
                 // or otherwise complex value.
                 obj.addProperty(RestHelper.ATTR_VALUE, fieldValue.getValue());
-                ;
         }
         return obj;
     }

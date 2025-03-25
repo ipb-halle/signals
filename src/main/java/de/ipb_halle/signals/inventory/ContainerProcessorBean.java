@@ -84,6 +84,8 @@ public class ContainerProcessorBean {
 
         // 1) Load container via REST
         Container container = containerRestService.doGetContainer(containerId);
+
+
         container.setContainerTypeId(ContainerType.CONTAINER_TYPE_ENTITY_PREFIX + container.getContainerTypeId() + ContainerType.CONTAINER_TYPE_ENTITY_SUFFIX);
         container.getFields().forEach(field -> field.setId(field.getId() + ":" + container.getContainerTypeId()));
         container.getFieldValues().forEach(fieldValue -> {
@@ -94,7 +96,8 @@ public class ContainerProcessorBean {
 
         // 2) Process container fields
         processContainerFields(container);
-        //containerDbService.save(container);
+        logger.info(container.getId());
+        containerDbService.saveContainer(container);
     }
 
     private void processContainerFields(Container container) throws IOException {
@@ -124,7 +127,7 @@ public class ContainerProcessorBean {
         if (tempPath != null) {
             Attachment attachment = getAttachment(container, field);
             if (isNewRevision(attachment, fieldValue, tempPath)) {
-                containerDbService.save(container);
+                containerDbService.saveContainer(container);
                 storeAttachment(attachment, tempPath);
             } else {
                 storageService.removeFromStaging(tempPath);

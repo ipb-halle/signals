@@ -87,4 +87,7 @@ public class InventoryManager {
         locationManager.importLocation(runtimeConfig, id);
     }
 
+    public void importContainer(RuntimeConfig runtimeConfig, String id) {
+        containerManager.importContainer(runtimeConfig, id);
+    }
 }

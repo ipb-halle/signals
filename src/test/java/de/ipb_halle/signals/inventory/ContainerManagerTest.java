@@ -137,7 +137,7 @@ public abstract class ContainerManagerTest {
         Container ct = manager.getSnbContainer(TEST_CONTAINER_ID);
         String containerId = ct.getId();
         ct.getFieldValues().forEach(fieldValue -> fieldValue.setEntityId(containerId));
-        manager.save(ct);
+        manager.saveContainer(ct);
         Assertions.assertEquals(TEST_CONTAINER_NAME, ct.getName(), "Container name mismatch");
 
         ct = manager.getContainer(TEST_CONTAINER_ID, true);

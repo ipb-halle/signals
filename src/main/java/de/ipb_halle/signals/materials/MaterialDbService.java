@@ -17,14 +17,9 @@
  */
 package de.ipb_halle.signals.materials;
 
-import de.ipb_halle.signals.attachment.AttachmentType;
-import de.ipb_halle.signals.attribute.AttributeType;
-import de.ipb_halle.signals.dynEnum.DynEnum;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.EntityType;
-import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldDbService;
-import de.ipb_halle.signals.field.FieldDefinition;
 import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.tda.PersistenceElements;
 import jakarta.ejb.Stateless;
@@ -63,7 +58,7 @@ public class MaterialDbService {
     /**
      * Obtain a list of materials matching given criteria
      */
-    public List<Material> load(Map<String, Object> cmap) {
+    public List<Material> loadMaterials(Map<String, Object> cmap) {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<MaterialEntity> criteriaQuery = criteriaBuilder.createQuery(MaterialEntity.class);
         Root<MaterialEntity> root = criteriaQuery.from(MaterialEntity.class);

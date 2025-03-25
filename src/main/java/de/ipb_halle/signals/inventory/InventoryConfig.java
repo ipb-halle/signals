@@ -53,6 +53,15 @@ public class InventoryConfig {
             .desc("\nImport a single location from DB into SNB (i.e. create new location in SNB).")
             .build();
 
+    @SuppressWarnings("static-access")
+    private static final Option containerImportOpt = Option.builder("ci")
+            .longOpt("containerImport")
+            .hasArgs()
+            .argName("ENTITY_ID")
+            .optionalArg(false)
+            .desc("\nImport a single container from DB into SNB (i.e. create new container in SNB).")
+            .build();
+
     private InventoryManager inventoryManager;
     private RuntimeConfig runtimeConfig;
     private SignalsConfig signalsConfig;
@@ -92,9 +101,23 @@ public class InventoryConfig {
         inventoryManager.importLocation(runtimeConfig, id);
     }
 
+    public void importContainers(String id) {
+        logger.info("""
+
+                ******************************************************
+                *
+                * Import single Container
+                * {} / {}
+                *
+                ******************************************************
+                """, signalsConfig.getSnbInstanceName(), id);
+        inventoryManager.importContainer(runtimeConfig, id);
+    }
+
     public static void registerOptions(Options options) {
         options.addOption(inventorySyncOpt);
         options.addOption(locationImportOpt);
+        options.addOption(containerImportOpt);
     }
 
     /**
@@ -114,6 +137,11 @@ public class InventoryConfig {
         if (cmdline.hasOption(locationImportOpt.getOpt())) {
             signals.getInventoryConfig().importLocations(
                     cmdline.getOptionValue(locationImportOpt.getOpt()));
+        }
+
+        if (cmdline.hasOption(containerImportOpt.getOpt())) {
+            signals.getInventoryConfig().importContainers(
+                    cmdline.getOptionValue(containerImportOpt.getOpt()));
         }
     }
 }

@@ -194,7 +194,7 @@ public class Unit implements Serializable {
         Unit u = unitsByUnit.get(unit);
         if (u == null) {
             if (unit.equalsIgnoreCase("mul") || unit.equalsIgnoreCase("µL")) {
-                logger.debug("unit is {}, set to µl\n", unit);
+                //logger.debug("unit is {}, set to µl\n", unit);
                 u = unitsByUnit.get("µl");
             } else {
                 logger.error("Unit:-> getUnit() attempt to fetch unknown unit {}", unit);
