@@ -2,6 +2,7 @@
 <scan>
     <classes/>
     <packages>
+        <package>de.ipb_halle.inhouse</package>
         <package>de.ipb_halle.signals</package>
         <package>de.ipb_halle.signals.attribute</package>
         <package>de.ipb_halle.signals.config</package>

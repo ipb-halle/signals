@@ -17,6 +17,9 @@
  */
 package de.ipb_halle.signals;
 
+import de.ipb_halle.inhouse.InhouseDB;
+import de.ipb_halle.signals.element.ElementConfig;
+import de.ipb_halle.signals.element.ElementManager;
 import de.ipb_halle.signals.attribute.AttributeManager;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.element.ElementConfig;
@@ -68,6 +71,9 @@ public class Signals {
 
     @Inject
     private AccessManager accessManager;
+
+    @Inject
+    private InhouseDB inhouseDB;
 
     @Inject
     private InventoryManager inventoryManager;
@@ -196,6 +202,10 @@ public class Signals {
         return materialsConfig;
     }
 
+    public InhouseDB getInhouseDB() {
+        return inhouseDB;
+    }
+
     public InventoryConfig getInventoryConfig() {
         return inventoryConfig;
     }
@@ -275,6 +285,7 @@ public class Signals {
             SignalsEntityConfig.processCommandLine(cmdline, options, signals);
             MaterialsConfig.processCommandLine(cmdline, options, signals);
             InventoryConfig.processCommandLine(cmdline, options, signals);
+            InhouseDB.processCommandLine(cmdline, options, signals);
             ElementConfig.processCommandLine(cmdline, options, signals);
             SamplesConfig.processCommandLine(cmdline, options, signals);
 
@@ -300,6 +311,7 @@ public class Signals {
         MaterialsConfig.registerOptions(options);
         ElementConfig.registerOptions(options);
         InventoryConfig.registerOptions(options);
+        InhouseDB.registerOptions(options);
         SamplesConfig.registerOptions(options);
         processCommandLine(argv, options);
     }
