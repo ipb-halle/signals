@@ -76,7 +76,7 @@ public class SampleProcessorBean {
             sampleRestService.doGetSampleProperties(sample);
 
             // 4) fetch each property explicitly for given sample in order to process attachments using received property keys
-            sampleRestService.doGetEachPropertyExplicitly(sample);
+            //sampleRestService.doGetEachPropertyExplicitly(sample);
 
 
             sampleDbService.save(sample);

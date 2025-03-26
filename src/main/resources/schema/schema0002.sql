@@ -358,7 +358,7 @@ CREATE TABLE locations (
 );
 
 CREATE TABLE samples (
-    id VARCHAR PRIMARY KEY,  -- Unique identifier
+    id VARCHAR PRIMARY KEY REFERENCES sample_properties(sample_id),
     name VARCHAR NOT NULL,
     description TEXT,
     type INTEGER,
@@ -372,8 +372,7 @@ CREATE TABLE samples (
     stoicRef_id VARCHAR,
     stoicRef_row_id VARCHAR,
     parent_container_id VARCHAR NOT NULL,
-    template_id VARCHAR,
-    CONSTRAINT fk_parent_container FOREIGN KEY (parent_container_id) REFERENCES containers(id) ON DELETE SET NULL
+    template_id VARCHAR
 );
 
 CREATE TABLE sample_properties(
@@ -382,9 +381,6 @@ CREATE TABLE sample_properties(
     type VARCHAR,
     property_value VARCHAR,
     property_key VARCHAR,
-    sample_id VARCHAR NOT NULL,
-
-    CONSTRAINT fk_sample FOREIGN KEY (sample_id) REFERENCES samples(id) ON DELETE CASCADE
-
+    sample_id VARCHAR NOT NULL
 );
 

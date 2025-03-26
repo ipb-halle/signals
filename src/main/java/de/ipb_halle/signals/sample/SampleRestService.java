@@ -117,9 +117,12 @@ public class SampleRestService implements RestReplyParser<Sample> {
         if (relationships.has(RestHelper.ATTR_CHILDREN)) {
             parseChildren(relationships, sample);
         }
-
+        if (relationships.has(RestHelper.ATTR_TEMPLATE)) {
+            paresTemplateId(relationships, sample);
+        }
         return sample;
     }
+
 
     private void parseRelationships(JsonObject relationships, Sample sample) {
         sample.setCreatedBy(new UserReference(RestHelper.parseString(RestHelper.getPrimitiveFromPath(relationships, SignalsEntityDTO.ATTR_CREATED_BY), null)));
@@ -165,6 +168,14 @@ public class SampleRestService implements RestReplyParser<Sample> {
     }
 
 
+    private void paresTemplateId(JsonObject relationships, Sample sample) {
+        JsonObject templateData = relationships
+                .get(RestHelper.ATTR_TEMPLATE).getAsJsonObject()
+                .get(RestHelper.ATTR_DATA).getAsJsonObject();
+        sample.setTemplateId(templateData.get(RestHelper.ATTR_ID).getAsString());
+    }
+
+
     public void doGetSampleProperties(Sample sample) {
         JsonElement dataArray = fetch(SAMPLE_GET_PROPERTIES_ENDPOINT, sample.getId());
         Iterator<JsonElement> iter = dataArray.getAsJsonArray().iterator();
@@ -207,7 +218,7 @@ public class SampleRestService implements RestReplyParser<Sample> {
     public void doGetEachPropertyExplicitly(Sample sample) {
         for (SampleProperty sampleProperty : sample.getProperties()) {
             JsonElement propertyDataObject = fetchProperty(SAMPLE_GET_PROPERTY_EXPLICITLY_ENDPOINT, sample.getId(), sampleProperty.getKey());
-            logger.info("DO GET PROPERTY EXPLICITLY sampleId={}\n, samplePropertyKey={}\n, dataObject={}\n", sample.getId(), sampleProperty.getKey(), propertyDataObject);
+            //logger.info("DO GET PROPERTY EXPLICITLY sampleId={}\n, samplePropertyKey={}\n, dataObject={}\n", sample.getId(), sampleProperty.getKey(), propertyDataObject);
         }
 
 
