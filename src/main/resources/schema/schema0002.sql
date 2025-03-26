@@ -371,7 +371,8 @@ CREATE TABLE samples (
     ancestor_id VARCHAR,
     stoicRef_id VARCHAR,
     stoicRef_row_id VARCHAR,
-    parent_container_id VARCHAR NULL,
+    parent_container_id VARCHAR NOT NULL,
+    template_id VARCHAR,
     CONSTRAINT fk_parent_container FOREIGN KEY (parent_container_id) REFERENCES containers(id) ON DELETE SET NULL
 );
 

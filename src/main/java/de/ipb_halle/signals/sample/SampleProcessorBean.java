@@ -65,13 +65,19 @@ public class SampleProcessorBean {
             logger.error("LocationProcessorBean:-> Transaction is marked for rollback, skipping.");
         }
 
-        // 1) Load sample via REST
         try {
+            // 1) Load sample via REST
             Sample sample = sampleRestService.doGetSample(sampleId);
+
+            // 2) set parent container id
             sample.setParentContainerId(loadContainerIdForSample(sampleId));
 
-            //receive properties (attachments and fields)
+            // 3) receive property keys for each sample
             sampleRestService.doGetSampleProperties(sample);
+
+            // 4) fetch each property explicitly for given sample in order to process attachments using received property keys
+            sampleRestService.doGetEachPropertyExplicitly(sample);
+
 
             sampleDbService.save(sample);
 

@@ -60,6 +60,7 @@ public class Sample {
     private String ancestorId;
     private StoicRef stoicRef;
     private String parentContainerId;
+    private String templateId;
 
 
     private Set<Field> fields;
@@ -89,6 +90,7 @@ public class Sample {
         this.digest = sampleEntity.getDigest();
         this.ancestorId = sampleEntity.getAncestorId();
         this.stoicRef = new StoicRef().setEid(sampleEntity.getStoicRefId()).setRowId(sampleEntity.getStoicRefRowId());
+        this.templateId = sampleEntity.getTemplateId();
 
         this.ancestors = new HashSet<>();
         this.children = new HashSet<>();
@@ -113,7 +115,8 @@ public class Sample {
                 .setOwner(owner.getId())
                 .setDigest(digest)
                 .setAncestorId(ancestorId)
-                .setParentContainerId(parentContainerId);
+                .setParentContainerId(parentContainerId)
+                .setTemplateId(templateId);
 
         if (stoicRef != null) {
             se.setStoicRefId(this.stoicRef.getEid());
@@ -213,6 +216,9 @@ public class Sample {
         return properties;
     }
 
+    public String getTemplateId() {
+        return templateId;
+    }
     //setter
 
     public void setContainerDbService(ContainerDbService containerDbService) {
@@ -292,6 +298,13 @@ public class Sample {
         this.children = children;
     }
 
+    public void addProperty(SampleProperty property) {
+        properties.add(property);
+    }
+
+    public void setTemplateId(String templateId) {
+        this.templateId = templateId;
+    }
 
     //equals and hashcode
 
@@ -308,30 +321,6 @@ public class Sample {
         return Objects.hash(containerDbService, logger, id, name, description, type, createdAt, editedAt, createdBy, editedBy, digest, stoicRef, parentContainerId, fields, ancestors, children);
     }
 
-    @Override
-    public String toString() {
-        return "Sample{" +
-                "containerDbService=" + containerDbService +
-                ", logger=" + logger +
-                ", id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", type=" + type +
-                ", createdAt=" + createdAt +
-                ", editedAt=" + editedAt +
-                ", createdBy=" + createdBy +
-                ", editedBy=" + editedBy +
-                ", owner=" + owner +
-                ", digest=" + digest +
-                ", ancestorId=" + ancestorId +
-                ", parentContainerId='" + parentContainerId + '\'' +
-                ", fields=" + Arrays.toString(fields.toArray()) +
-                ", ancestors=" + ancestors +
-                ", children=" + children +
-                '}';
-    }
 
-    public void addProperty(SampleProperty property) {
-        properties.add(property);
-    }
+
 }

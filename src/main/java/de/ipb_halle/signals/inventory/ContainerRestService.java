@@ -199,7 +199,7 @@ public class ContainerRestService implements RestReplyParser<Container> {
                     //ToDo: implement SAMPLE!!!
                     sampleProcessorBean.processSingleSample(id);
                     ct.setMaterial(new MaterialReference().setId(id));
-                    // logger.warn("ContainerRestService:->Unable to assign Sample to Container with Id={}", id);
+                    logger.info("ContainerRestService:->processing Sample from Container with Id={}", id);
                     break;
                 default:
                     throw new RuntimeException("Unknown content type for container: " + ct.getId());
