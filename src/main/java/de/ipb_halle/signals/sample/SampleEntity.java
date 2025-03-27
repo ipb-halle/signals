@@ -75,6 +75,9 @@ public class SampleEntity {
     @Column(name = "parent_container_id")
     private String parentContainerId;
 
+    @Column(name="template_id")
+    private String templateId;
+
     //Empty constructor for JPA
     public SampleEntity() {
     }
@@ -134,6 +137,10 @@ public class SampleEntity {
 
     public String getParentContainerId() {
         return parentContainerId;
+    }
+
+    public String getTemplateId() {
+        return templateId;
     }
 
     //Setter
@@ -205,6 +212,11 @@ public class SampleEntity {
 
     public SampleEntity setParentContainerId(String parentContainerId) {
         this.parentContainerId = parentContainerId;
+        return this;
+    }
+
+    public SampleEntity setTemplateId(String templateId) {
+        this.templateId = templateId;
         return this;
     }
 }

@@ -41,8 +41,9 @@ import java.util.*;
 
 public class SampleRestService implements RestReplyParser<Sample> {
 
-    private static final String RECIEVE_SAMPLE_ENDPOINT = "/entities/%s";
+    private static final String RECEIVE_SAMPLE_ENDPOINT = "/entities/%s";
     private static final String SAMPLE_GET_PROPERTIES_ENDPOINT = "/samples/%s/properties";
+    private static final String SAMPLE_GET_PROPERTY_EXPLICITLY_ENDPOINT = "/samples/%s/properties/%s";
 
     @Inject
     private RestClient restClient;
@@ -56,7 +57,7 @@ public class SampleRestService implements RestReplyParser<Sample> {
     private static final Logger logger = LogManager.getLogger(SampleRestService.class);
 
     public Sample doGetSample(String sampleId) throws Exception {
-        JsonElement data = fetch(RECIEVE_SAMPLE_ENDPOINT, sampleId);
+        JsonElement data = fetch(RECEIVE_SAMPLE_ENDPOINT, sampleId);
         return parseReply(data);
     }
 
@@ -68,6 +69,19 @@ public class SampleRestService implements RestReplyParser<Sample> {
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
             return jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA);
+
+        } catch (UnexpectedResponseCodeException | IOException | URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private JsonElement fetchProperty(String endpoint, String sampleId, String samplePropertyKey) {
+        try {
+            restClient.setMethod(Method.GET)
+                    .setEndpoint(String.format(endpoint, sampleId, samplePropertyKey))
+                    .execute();
+
+            return JsonParser.parseString(restClient.getResponse().getString());
 
         } catch (UnexpectedResponseCodeException | IOException | URISyntaxException e) {
             throw new RuntimeException(e);
@@ -103,9 +117,12 @@ public class SampleRestService implements RestReplyParser<Sample> {
         if (relationships.has(RestHelper.ATTR_CHILDREN)) {
             parseChildren(relationships, sample);
         }
-
+        if (relationships.has(RestHelper.ATTR_TEMPLATE)) {
+            paresTemplateId(relationships, sample);
+        }
         return sample;
     }
+
 
     private void parseRelationships(JsonObject relationships, Sample sample) {
         sample.setCreatedBy(new UserReference(RestHelper.parseString(RestHelper.getPrimitiveFromPath(relationships, SignalsEntityDTO.ATTR_CREATED_BY), null)));
@@ -119,7 +136,6 @@ public class SampleRestService implements RestReplyParser<Sample> {
                 .setEid(stoicRef.get(StoicRef.ATTR_EID).getAsString())
                 .setRowId(stoicRef.get(StoicRef.ATTR_ROW_ID).getAsString())
         );
-        logger.info("SampleRestService:->parseStoicRef sample_stoic_id={}\n", sample.getStoicRef().getEid());
     }
 
     private void parseAncestors(JsonObject relationships, Sample sample) throws Exception {
@@ -129,7 +145,7 @@ public class SampleRestService implements RestReplyParser<Sample> {
         List<SignalsEntity> entities = new ArrayList<>();
         for (JsonElement element : dataArray) {
             String id = RestHelper.parseString(element.getAsJsonObject(), RestHelper.ATTR_ID);
-            JsonElement seJson = fetch(RECIEVE_SAMPLE_ENDPOINT, id);
+            JsonElement seJson = fetch(RECEIVE_SAMPLE_ENDPOINT, id);
             SignalsEntity se = signalsEntityRestService.parseReply(seJson).createEntity();
             entities.add(se);
             sample.addAncestor(se);
@@ -145,18 +161,23 @@ public class SampleRestService implements RestReplyParser<Sample> {
         Iterator<JsonElement> iter = dataArray.iterator();
         while (iter.hasNext()) {
             JsonObject object = iter.next().getAsJsonObject();
-            JsonElement seJson = fetch(RECIEVE_SAMPLE_ENDPOINT, RestHelper.parseString(object, RestHelper.ATTR_ID));
+            JsonElement seJson = fetch(RECEIVE_SAMPLE_ENDPOINT, RestHelper.parseString(object, RestHelper.ATTR_ID));
             SignalsEntity se = signalsEntityRestService.parseReply(seJson).createEntity();
             sample.addChild(se);
         }
     }
 
 
+    private void paresTemplateId(JsonObject relationships, Sample sample) {
+        JsonObject templateData = relationships
+                .get(RestHelper.ATTR_TEMPLATE).getAsJsonObject()
+                .get(RestHelper.ATTR_DATA).getAsJsonObject();
+        sample.setTemplateId(templateData.get(RestHelper.ATTR_ID).getAsString());
+    }
+
+
     public void doGetSampleProperties(Sample sample) {
         JsonElement dataArray = fetch(SAMPLE_GET_PROPERTIES_ENDPOINT, sample.getId());
-
-        logger.info("DO GET SAMPLE PROPERTIES:-> dataArray of sample with id = {}\n dataArray={}\n", sample.getId(), dataArray);
-
         Iterator<JsonElement> iter = dataArray.getAsJsonArray().iterator();
         while (iter.hasNext()) {
             JsonElement samplesPropertyObject = iter.next();
@@ -174,8 +195,6 @@ public class SampleRestService implements RestReplyParser<Sample> {
                 .get(RestHelper.ATTR_RELATIONSHIPS).getAsJsonObject()
                 .get(RestHelper.ATTR_SAMPLE).getAsJsonObject()
                 .get(RestHelper.ATTR_DATA).getAsJsonObject();
-
-        logger.info("property {}\n", propertiesObject);
 
         SampleProperty sampleProperty = new SampleProperty();
 
@@ -196,4 +215,12 @@ public class SampleRestService implements RestReplyParser<Sample> {
         return sampleProperty;
     }
 
+    public void doGetEachPropertyExplicitly(Sample sample) {
+        for (SampleProperty sampleProperty : sample.getProperties()) {
+            JsonElement propertyDataObject = fetchProperty(SAMPLE_GET_PROPERTY_EXPLICITLY_ENDPOINT, sample.getId(), sampleProperty.getKey());
+            //logger.info("DO GET PROPERTY EXPLICITLY sampleId={}\n, samplePropertyKey={}\n, dataObject={}\n", sample.getId(), sampleProperty.getKey(), propertyDataObject);
+        }
+
+
+    }
 }
