@@ -11,6 +11,7 @@
 
         <class>de.ipb_halle.inhouse.InhouseCompound</class>
         <class>de.ipb_halle.inhouse.InhouseCompoundSynonym</class>
+        <class>de.ipb_halle.inhouse.InhouseExperiment</class>
         <class>de.ipb_halle.signals.attachment.Attachment</class>
         <class>de.ipb_halle.signals.attachment.AttachmentRevision</class>
         <class>de.ipb_halle.signals.attachment.AttachmentFile</class>

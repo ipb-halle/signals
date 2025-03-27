@@ -79,4 +79,8 @@ public class InhouseDbService {
     public void save(InhouseCompoundSynonym synonym) {
         this.em.merge(synonym);
     }
+
+    public void save(InhouseExperiment experiment) {
+        this.em.merge(experiment);
+    }
 }

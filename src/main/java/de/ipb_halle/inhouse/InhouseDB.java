@@ -141,15 +141,17 @@ public class InhouseDB {
     private void importData(String configFile) throws Exception {
         readConfig(configFile);
         Compounds compounds = new Compounds();
-        compounds.importData(this);
-
+        Experiments experiments = new Experiments();
 //        Taxonomy taxonomy = new Taxonomy(this);
-//        Experiments experiments = new Experiments(this);
 //        Correlation correlation = new Correlation(this);
 //        Samples samples = new Samples(this);
 
+
+
+//        compounds.importData(this);
+        experiments.importData(this);
+
 //        taxonomy.importData();
-//        experiments.importData();
 //        correlation.importData();
 //        samples.importData();
     }

@@ -89,13 +89,13 @@ public class Compounds {
         // 19.07.2004;710298-89-8;;;;;;;;;;24.11.2005;63;;25.05.2007
 
 
-        String linePattern = "^([^;]*);"         //  1 Structure (SMILES)
+        Pattern pattern = Pattern.compile("^([^;]*);"         //  1 Structure (SMILES)
                 + "([^;]*)?;"                    //  2 SciFinderDoneAt
                 + "([^;]*)?;"                    //  3 CAS-RN
                 + "([^;]*)?;"                    //  4 StructureCheckedAt
                 + "([^;]*)?;"                    //  5 StructureCheckedBy
                 + "([^;]*)?;"                    //  6 Correction
-                + "\"?([^\";]*)?\"?;"            //  7 MolTableRemarks
+                + "([^;]*)?;"                  //  7 MolTableRemarks
                 + "(IPB\\d+)?;"                  //  8 IPBCode
                 + "(\\d+(,\\d+)?)?;"             //  9 MolWeight
                 + "([^;]*)?;"                    // 10 Formula
@@ -104,22 +104,27 @@ public class Compounds {
                 + "([^;]*)?;"                    // 13 Date
                 + "(\\d+);"                      // 14 Mol_ID
                 + "([^;]*)?;"                    // 15 temporary mark
-                + "([^;]*)?$";                   // 16 modelling
-
-        Pattern pat = Pattern.compile(linePattern);
+                + "([^;]*)?$");                  // 16 modelling
+        Pattern quotePattern = Pattern.compile("^\"(.*)\"$");
         BufferedReader reader = new BufferedReader(new FileReader(inhouseDB.getConfigString(COMPOUNDS_FILENAME)));
         BufferedWriter writer = new BufferedWriter(new FileWriter(inhouseDB.getConfigString(COMPOUNDS_REJECTFILE)));
         reader.readLine(); // discard header
         while(reader.ready()) {
             String st = reader.readLine();
-            Matcher matcher = pat.matcher(st);
+            Matcher matcher = pattern.matcher(st);
             if (matcher.matches()) {
                 InhouseCompound compound = new InhouseCompound()
                         .setMolId(Integer.parseInt(matcher.group(15)))
                         .setCasrn(matcher.group(3))
-                        .setRemarks(matcher.group(7))
                         .setIpbCode(matcher.group(8))
                         .setName(String.format("AUTO molId %s", matcher.group(15)));
+                Matcher remarkMatcher = quotePattern.matcher(matcher.group(7));
+                // strip quotes from remarks
+                if (remarkMatcher.matches()) {
+                    compound.setRemarks(remarkMatcher.group(1));
+                } else {
+                    compound.setRemarks(matcher.group(7));
+                }
                 inhouseDB.getInhouseDbService().save(compound);
 
             } else {
@@ -149,10 +154,12 @@ public class Compounds {
         for (InhouseCompound compound : compounds.subList(2,5)) {
             Material asset = compound.createAsset(inhouseDB);
             Material batch = compound.createBatch(inhouseDB);
-//            Material mat = inhouseDB.getMaterialRestService().doCreateMaterial(
-//                    library,
-//                    asset,
-//                    batch);
+            Material mat = inhouseDB.getMaterialRestService().doCreateMaterial(
+                    library,
+                    asset,
+                    batch);
+            compound.setEid(mat.getId());
+            inhouseDB.getInhouseDbService().save(compound);
             System.out.printf("ASSET %s", asset.toString());
             System.out.printf("BATCH %s", batch.toString());
         }

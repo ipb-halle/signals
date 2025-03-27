@@ -17,32 +17,14 @@
  */
 package de.ipb_halle.inhouse;
 
-/*
-import de.ipb_halle.lbac.exp.ExperimentEntity;
-import de.ipb_halle.lbac.exp.ExpRecordEntity;
-import de.ipb_halle.lbac.exp.ExpRecordType;
-import de.ipb_halle.lbac.exp.text.TextEntity;
-import de.ipb_halle.lbac.search.lang.EntityGraph;
-import de.ipb_halle.lbac.search.lang.SqlInsertBuilder;
-*/
-
 import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.BufferedWriter;
 import java.io.FileReader;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
+import java.io.FileWriter;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Migration tool for the InhouseDB
@@ -53,151 +35,74 @@ import java.util.Map;
  */
 public class Experiments {
 
-    public final static String INPUT_EXPERIMENTS = "INPUT_EXPERIMENTS";
-    public final static String EXPERIMENT_FOLDER_ID = "EXPERIMENT_FOLDER_ID";
-    public final static String TMP_Procedure = "Procedure";
-/*
+    public final static String EXPERIMENTS_FILENAME = "experiments.filename";
+    public final static String EXPERIMENTS_REJECTFILE = "experiments.rejectfile";
 
-    private InhouseDB inhouseDB;
-    private int folderId;
-
-    public Experiments(InhouseDB inhouseDB) throws Exception {
-        this.inhouseDB = inhouseDB;
-        this.folderId = inhouseDB.getConfigInt(EXPERIMENT_FOLDER_ID);
-        addInsertBuilders();
-    }
-
-    private void addInsertBuilders() {
-        this.inhouseDB.addInsertBuilder(ExperimentEntity.class.getName(),
-                new SqlInsertBuilder(new EntityGraph(ExperimentEntity.class)));
-        this.inhouseDB.addInsertBuilder(ExpRecordEntity.class.getName(),
-                new SqlInsertBuilder(new EntityGraph(ExpRecordEntity.class)));
-        this.inhouseDB.addInsertBuilder(TextEntity.class.getName(),
-                new SqlInsertBuilder(new EntityGraph(TextEntity.class)));
-    }
-
-    private void importExperiments(String fileName) throws Exception {
+    private void importExperiments(InhouseDB inhouseDB) throws Exception {
         System.out.println("Importing experiments");
+/*
+        // pattern of 2014 export
+        Pattern pattern = Pattern.compile("^'([A-Z]{2,3})';"    // 'RefProducerID';
+                + "'([0-9]{3}[^']*)';"                          // 'IndividualCode';
+                + "'(.*)';"                                     // 'LabJournal';
+                + "([0-9]+);"                                   // ProcedureID;
+                + "([0-9]*);"                                   // RefMol_ID;
+                + ";"                                           // RefOrganismID;
+                + ";"                                           // TransferDate;
+                + "(\\d+\\.\\d+\\.\\d+ 00:00:00)?;"             // Date;
+                + "('(.*)')?;"                                  // ProcedureRemarks;
+                + ";"                                           // TLC;
+                + "('(.*)')?$");                                // FileNamePublication
 
-        String pattern = "^'([A-Z]{2,3})';"             // 'RefProducerID';
-            + "'([0-9]{3}[^']*)';"                      // 'IndividualCode';
-            + "'(.*)';"                                 // 'LabJournal';
-            + "([0-9]+);"                               // ProcedureID;
-            + "([0-9]*);"                               // RefMol_ID;
-            + ";"                                       // RefOrganismID;
-            + ";"                                       // TransferDate;
-            + "(\\d+\\.\\d+\\.\\d+ 00:00:00)?;"         // Date;
-            + "('(.*)')?;"                              // ProcedureRemarks;
-            + ";"                                       // TLC;
-            + "('(.*)')?$";                             // FileNamePublication
+        // date column got disconnected in 2015 / 2015 upon refactoring of ChemFinder form
+        // for ChemFinder 2015ff
+        Pattern datePattern = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+) (\\d+):(\\d+):(\\d+)");
+*/
+        // LabJournal;RefProducerID;IndividualCode;FileNamePublication;ProcedureRemarks;ProcedureID
+        Pattern pattern = Pattern.compile("^(.*);"    // 1 LabJournal
+                + "(.*);"                                   // 2 RefProducerId (=ThreeLC)
+                + "(.*);"                                   // 3 IndividualCode (number)
+                + "(.*);"                                   // 4 FileNamePublication (never used)
+                + "(.*);"                                   // 5 ProcedureRemarks
+                + "(.*)$");                                 // 6 Procedure
 
-        String datePattern = "(\\d+)\\.(\\d+)\\.(\\d+) (\\d+):(\\d+):(\\d+)";
-
-        BufferedReader reader = new BufferedReader(new FileReader(fileName));
+        Pattern quotePattern = Pattern.compile("\"(.*)\"");
+        BufferedReader reader = new BufferedReader(new FileReader(inhouseDB.getConfigString(EXPERIMENTS_FILENAME)));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(inhouseDB.getConfigString(EXPERIMENTS_REJECTFILE)));
         reader.readLine(); // discard header
         int line = 1;
-        while(reader.ready()) {
-                String st = reader.readLine();
-                line++;
-
-                String threeLC = st.replaceAll(pattern, "$1");
-                String code = st.replaceAll(pattern, "$2");
-                String journal = st.replaceAll(pattern, "$3");
-                String proc = st.replaceAll(pattern, "$4");
-
-                int procId = Integer.parseInt(proc);
-
-                String dateStr = st.replaceAll(pattern, "$6");
-                Date date = new Date();
-                if (! dateStr.isEmpty()) {
-                    int year = Integer.parseInt(dateStr.replaceAll(datePattern, "$3"));
-                    int month = Integer.parseInt(dateStr.replaceAll(datePattern, "$2"));
-                    int day = Integer.parseInt(dateStr.replaceAll(datePattern, "$1"));
-                    if ((day > 0) && (day < 32) && (year > 1980) && (year < 2030) && (month > 0) && (month < 13)) {
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.clear();
-                        calendar.set(year, month - 1, day);
-                        date = calendar.getTime();
-                    }
+        while (reader.ready()) {
+            String st = reader.readLine();
+            line++;
+            Matcher matcher = pattern.matcher(st);
+            if (matcher.matches()) {
+                Matcher remarkMatcher = quotePattern.matcher(matcher.group(5));
+                InhouseExperiment exp = new InhouseExperiment()
+                        .setJournal(matcher.group(1))
+                        .setThreelc(matcher.group(2))
+                        .setCode(matcher.group(3))
+                        // file name never used
+                        .setProcId(Integer.parseInt(matcher.group(6)));
+                if (remarkMatcher.matches()) {
+                    exp.setRemarks(remarkMatcher.group(1));
+                } else {
+                    exp.setRemarks(matcher.group(5));
                 }
-
-                String remarks = st.replaceAll(pattern, "$8");
-
-//              if (! remarks.isEmpty()) {
-//                  System.out.printf("%d \t %s  \t%s  \t%s  \t%s  \t%s\n", procId, threeLC, code, journal, date.toString(), remarks);
-//              }
-                try {
-                    save(threeLC, code, journal, procId, date, remarks);
-                    if ((line % 1000) == 0) {
-                        System.out.printf("imported %d experiments\n", line);
-                    }
-                } catch(Exception e) {
-                    System.out.printf("Error in line %d\n", line);
-                    throw e;
-                }
+                inhouseDB.getInhouseDbService().save(exp);
+            } else {
+                writer.append(st);
+                writer.newLine();
+            }
+            if ((line % 1000) == 0) {
+                System.out.printf("imported %d experiments\n", line);
+            }
         }
         reader.close();
-
+        writer.close();
     }
 
-    public void importData() throws Exception {
-        importExperiments(inhouseDB.getConfigString(INPUT_EXPERIMENTS));
+    public void importData(InhouseDB inhouseDB) throws Exception {
+        importExperiments(inhouseDB);
     }
 
-    private void save(String threeLC, String code, String journal, int procId, Date date, String remarks) throws Exception {
-        ExperimentEntity exp = new ExperimentEntity();
-        exp.setCode(threeLC + code);
-        exp.setCtime(date);
-        exp.setDescription("Imported from NWC InhouseDB (IPB Halle)");
-        exp.setFolderId(this.folderId);
-        exp.setProjectid(this.inhouseDB.getProject());
-        exp.setOwner(this.inhouseDB.getOwner());
-        exp.setACList(this.inhouseDB.getACList());
-
-        // save exp
-        exp = (ExperimentEntity) this.inhouseDB.getBuilder(exp.getClass().getName())
-                .insert(this.inhouseDB.getConnection(), exp);
-
-        ExpRecordEntity rec = new ExpRecordEntity();
-        rec.setExperimentId(exp.getExperimentId());
-        rec.setChangeTime(date);
-        rec.setCreationTime(date);
-        rec.setNext(null);
-        rec.setRevision(1);
-        rec.setType(ExpRecordType.TEXT);
-
-        // save rec
-        rec = (ExpRecordEntity) this.inhouseDB.getBuilder(rec.getClass().getName())
-                .insert(this.inhouseDB.getConnection(), rec);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("<p>");
-        sb.append("<b>Experiment:</b> ");
-        sb.append(threeLC);
-        sb.append(code);
-        sb.append("<br/>");
-        sb.append("<b>Lab journal (volume, page):</b> ");
-        sb.append(journal);
-        sb.append("<br/>");
-        sb.append("<b>Remarks:</b> ");
-        sb.append(remarks);
-        sb.append("<br/>");
-        sb.append("<b>Linked compounds:</b> ##LINKED_COMPOUNDS##<br/>");
-        sb.append("<b>Linked samples:</b> ##LINKED_SAMPLES##<br/>");
-        sb.append("<b>Linked organisms:</b> ##LINKED_ORGANISMS##<br/>");
-        sb.append("</p>");
-
-        TextEntity text = new TextEntity();
-        text.setExpRecordId(rec.getExpRecordId());
-        text.setText(sb.toString());
-
-        // save text
-        this.inhouseDB.getBuilder(text.getClass().getName())
-                .insert(this.inhouseDB.getConnection(), text);
-
-        // save reference
-        String sql = "INSERT INTO tmp_import (old_id, new_id, type) VALUES (?, ?, ?)";
-        this.inhouseDB.saveTriple(sql, procId, rec.getExpRecordId().intValue(), TMP_Procedure);
-    }
-*/
 }

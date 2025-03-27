@@ -158,7 +158,7 @@ public class Correlation {
     }
 
     private void saveOrgProc(int correlationId, int organismId, int experimentId) throws Exception {
-
+/*
         String sql = "INSERT INTO tmp_import (old_id, new_id, type) SELECT ? AS old_id, new_id AS new_id, '"
                 + CORRELATION_ORGPROCMAT
                 + "' FROM tmp_import WHERE old_id=? AND type=?";
@@ -168,5 +168,6 @@ public class Correlation {
                 + CORRELATION_ORGPROCEXP
                 + "' FROM tmp_import WHERE old_id=? AND type=?";
         this.inhouseDB.saveTriple(sql, correlationId, experimentId, Experiments.TMP_Procedure);
+*/
     }
 }
