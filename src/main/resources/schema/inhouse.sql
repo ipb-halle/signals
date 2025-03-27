@@ -19,3 +19,15 @@ CREATE TABLE inhouse_compound_synonyms (
     synonym VARCHAR
 );
 
+CREATE TABLE inhouse_experiments (
+    id SERIAL NOT NULL PRIMARY KEY,
+    eid VARCHAR,
+    threelc VARCHAR,
+    code VARCHAR,
+    journal VARCHAR,
+    proc_id INTEGER,
+    remarks VARCHAR,
+    UNIQUE(threelc,code),
+    UNIQUE(proc_id)
+);
+
