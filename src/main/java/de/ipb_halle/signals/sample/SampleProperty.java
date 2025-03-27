@@ -24,7 +24,6 @@ public class SampleProperty {
     private String propertyId;
     private String propertyName;
     private String propertyType;
-    private String templateId;
 
     public SampleProperty() {
     }
@@ -33,7 +32,6 @@ public class SampleProperty {
         this.propertyId = spe.getPropertyId();
         this.propertyName = spe.getPropertyName();
         this.propertyType = spe.getPropertyType();
-        this.templateId = spe.getTemplate() != null ? spe.getTemplate().getTemplateId() : null;
     }
 
     public SamplePropertyEntity createEntity() {
@@ -41,13 +39,6 @@ public class SampleProperty {
                 .setPropertyId(propertyId)
                 .setPropertyName(propertyName)
                 .setPropertyType(propertyType);
-
-        if (templateId != null) {
-            SampleTemplateEntity template = new SampleTemplateEntity()
-                    .setTemplateId(templateId);
-            entity.setTemplate(template);
-        }
-
         return entity;
     }
 
@@ -61,9 +52,7 @@ public class SampleProperty {
     public String getPropertyId() {
         return propertyId;
     }
-    public String getTemplateId() {
-        return templateId;
-    }
+
 
     //setter
     public SampleProperty setPropertyId(String propertyId) {
@@ -78,9 +67,6 @@ public class SampleProperty {
         this.propertyType = propertyType;
         return this;
     }
-    public SampleProperty setTemplateId(String templateId) {
-        this.templateId = templateId;
-        return this;
-    }
+
 
 }

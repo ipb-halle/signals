@@ -56,21 +56,31 @@ public class SampleDbService {
 
 
     public void save(Sample sample) {
-        SampleEntity se = sample.createEntity();
-        for (SampleProperty sp : sample.getProperties()) {
-            SamplePropertyEntity spe = sp.createEntity();
-            this.em.merge(spe);
+        SampleEntity sampleEntity = sample.createEntity();
+
+        em.merge(sampleEntity);
+
+        for (SampleProperty sampleProperty : sample.getProperties()) {
+            if (sampleProperty.getPropertyId() == null || sampleProperty.getPropertyId().isBlank()) {
+                logger.warn("Skipping property with null or blank ID: {}", sampleProperty.getPropertyName());
+                continue;
+            }
+            SamplePropertyEntity samplePropertyEntity = sampleProperty.createEntity(); // no template version
+            em.merge(samplePropertyEntity);
         }
-        for (SamplePropertyValue spv : sample.getPropertyValues()) {
-            SamplePropertyValueEntity spve = spv.createEntity();
-            this.em.merge(spve);
+
+        for (SamplePropertyValue samplePropertyValue : sample.getPropertyValues()) {
+            if (samplePropertyValue.getPropertyId() == null || samplePropertyValue.getPropertyId().isBlank()) {
+                logger.warn("Skipping SamplePropertyValue with null or blank propertyId: sampleId={}", samplePropertyValue.getSampleId());
+                continue;
+            }
+            SamplePropertyValueEntity samplePropertyValueEntity = samplePropertyValue.createEntity();
+            if (samplePropertyValueEntity != null) {
+                em.merge(samplePropertyValueEntity);
+            }
         }
-        SampleTemplateEntity sampleTemplateEntity = new SampleTemplateEntity()
-                .setTemplateId(sample.getTemplateId())
-                .setTemplateName(sample.getTemplateName());
-        this.em.merge(sampleTemplateEntity);
-        this.em.merge(se);
     }
+
 
     public SampleEntity loadSampleEntityById(String id) {
         return em.find(SampleEntity.class, id);
@@ -112,18 +122,5 @@ public class SampleDbService {
         }
     }
 
-    public void loadTemplate (Sample  sample){
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<SampleTemplateEntity> query = cb.createQuery(SampleTemplateEntity.class);
-        Root<SampleTemplateEntity> root = query.from(SampleTemplateEntity.class);
 
-        Subquery<String> usedTemplateIds = query.subquery(String.class);
-        Root<SampleEntity> sampleRoot = usedTemplateIds.from(SampleEntity.class);
-        usedTemplateIds.select(sampleRoot.get("template").get("id"));
-
-        query.select(root).where(root.get("id").in(usedTemplateIds));
-
-        List<SampleTemplateEntity> templatesUsed = em.createQuery(query).getResultList();
-        logger.info(Arrays.toString(templatesUsed.toArray()));
-    }
 }

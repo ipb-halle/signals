@@ -68,7 +68,6 @@ public class SamplesManager {
         Sample sample = new Sample(sampleEntity, dynEnumManager);
         sampleDbService.loadSamplePropertyValues(sample);
         sampleDbService.loadSampleProperties(sample);
-        sampleDbService.loadTemplate(sample);
 
         sampleRestService.createNewSample(sample);
     }

@@ -75,9 +75,9 @@ public class SampleEntity {
     @Column(name = "parent_container_id")
     private String parentContainerId;
 
-    @ManyToOne
-    @JoinColumn(name = "template_id", referencedColumnName = "template_id")
-    private SampleTemplateEntity template;
+    @Column(name="template_id")
+    private String templateId;
+
     public String getId() {
         return id;
     }
@@ -204,16 +204,12 @@ public class SampleEntity {
         return this;
     }
 
-    public SampleTemplateEntity getTemplate() {
-        return template;
-    }
-
-    public SampleEntity setTemplate(SampleTemplateEntity template) {
-        this.template = template;
-        return this;
-    }
-
     public String getTemplateId() {
-        return template != null ? template.getTemplateId() : null;
+        return templateId;
+    }
+
+    public SampleEntity setTemplateId(String templateId) {
+        this.templateId = templateId;
+        return this;
     }
 }

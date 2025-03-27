@@ -36,7 +36,6 @@
         <class>de.ipb_halle.signals.sample.SampleEntity</class>
         <class>de.ipb_halle.signals.sample.SamplePropertyEntity</class>
         <class>de.ipb_halle.signals.sample.SamplePropertyValueEntity</class>
-        <class>de.ipb_halle.signals.sample.SampleTemplateEntity</class>
         <class>de.ipb_halle.signals.users.Group</class>
         <class>de.ipb_halle.signals.users.GroupMembership</class>
         <class>de.ipb_halle.signals.users.Role</class>

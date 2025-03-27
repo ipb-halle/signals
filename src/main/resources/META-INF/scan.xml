@@ -5,13 +5,20 @@
         <package>de.ipb_halle.inhouse</package>
         <package>de.ipb_halle.signals</package>
         <package>de.ipb_halle.signals.attribute</package>
+        <package>de.ipb_halle.signals.attachment</package>
         <package>de.ipb_halle.signals.config</package>
         <package>de.ipb_halle.signals.dynEnum</package>
+        <package>de.ipb_halle.signals.element</package>
         <package>de.ipb_halle.signals.entity</package>
         <package>de.ipb_halle.signals.field</package>
         <package>de.ipb_halle.signals.inventory</package>
         <package>de.ipb_halle.signals.materials</package>
+        <package>de.ipb_halle.signals.reporting</package>
+        <package>de.ipb_halle.signals.rest</package>
+        <package>de.ipb_halle.signals.sample</package>
+        <package>de.ipb_halle.signals.storage</package>
         <package>de.ipb_halle.signals.users</package>
+        <package>de.ipb_halle.signals.util</package>
     </packages>
 </scan>
 

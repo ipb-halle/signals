@@ -372,14 +372,13 @@ CREATE TABLE samples (
     stoicRef_id VARCHAR,
     stoicRef_row_id VARCHAR,
     parent_container_id VARCHAR,
-    template_id VARCHAR REFERENCES sample_templates(template_id)
+    template_id VARCHAR
 );
 
 CREATE TABLE sample_properties (
     property_id VARCHAR PRIMARY KEY,
     property_name VARCHAR,
     property_type VARCHAR,
-    template_id VARCHAR NOT NULL REFERENCES sample_templates(template_id)
 );
 
 CREATE TABLE sample_property_values (
@@ -388,9 +387,3 @@ CREATE TABLE sample_property_values (
     property_value VARCHAR,
     PRIMARY KEY (sample_id, property_id)
 );
-
-CREATE TABLE sample_templates (
-    template_id VARCHAR PRIMARY KEY,
-    template_name VARCHAR
-);
-

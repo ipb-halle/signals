@@ -57,7 +57,7 @@ public class Sample {
     private String ancestorId;
     private StoicRef stoicRef;
     private String parentContainerId;
-    private SampleTemplate template;
+    private String templateId;
 
 
     private Set<SignalsEntity> ancestors;
@@ -71,7 +71,6 @@ public class Sample {
         children = new HashSet<>();
         properties = new HashSet<>();
         propertyValues = new HashSet<>();
-        template= new SampleTemplate();
     }
 
     public Sample(SampleEntity sampleEntity, DynEnumManager dynEnumManager) {
@@ -88,8 +87,7 @@ public class Sample {
         this.digest = sampleEntity.getDigest();
         this.ancestorId = sampleEntity.getAncestorId();
         this.stoicRef = new StoicRef().setEid(sampleEntity.getStoicRefId()).setRowId(sampleEntity.getStoicRefRowId());
-        this.template = new SampleTemplate();
-        this.template.setTemplateId(sampleEntity.getTemplateId());
+        this.templateId = sampleEntity.getTemplateId();
 
         this.ancestors = new HashSet<>();
         this.children = new HashSet<>();
@@ -114,7 +112,7 @@ public class Sample {
                 .setDigest(digest)
                 .setAncestorId(ancestorId)
                 .setParentContainerId(parentContainerId)
-                .setTemplate(template.createEntity());
+                .setTemplateId(templateId);
 
         if (stoicRef != null) {
             se.setStoicRefId(this.stoicRef.getEid());
@@ -191,10 +189,6 @@ public class Sample {
         return parentContainerId;
     }
 
-    public String getTemplateName() {
-        return template.getTemplateName();
-    }
-
     public Set<SamplePropertyValue> getPropertyValues() {
         return propertyValues;
     }
@@ -212,7 +206,7 @@ public class Sample {
     }
 
     public String getTemplateId() {
-        return template.getTemplateId();
+        return templateId;
     }
     //setter
 
@@ -290,14 +284,10 @@ public class Sample {
     }
 
     public void setTemplateId(String templateId) {
-        this.template.setTemplateId(templateId);
+        this.templateId=templateId;
     }
 
     public void addPropertyValue(SamplePropertyValue samplePropertyValue) {
         this.propertyValues.add(samplePropertyValue);
-    }
-
-    public void setTemplateName(String templateName) {
-        this.template.setTemplateName(templateName);
     }
 }

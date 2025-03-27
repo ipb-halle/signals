@@ -210,7 +210,7 @@ public class SampleRestService implements RestReplyParser<Sample> {
             parseChildren(relationships, sample);
         }
         if (relationships.has(RestHelper.ATTR_TEMPLATE)) {
-            paresTemplate(included, sample);
+            paresTemplate(relationships, sample);
         }
         return sample;
     }
@@ -260,16 +260,20 @@ public class SampleRestService implements RestReplyParser<Sample> {
     }
 
 
-    private void paresTemplate(JsonElement included, Sample sample) {
-        JsonObject includedObject = included.getAsJsonArray().get(0).getAsJsonObject();
-        JsonObject attributes = includedObject.get(RestHelper.ATTR_ATTRIBUTES).getAsJsonObject();
-        sample.setTemplateId(attributes.get(RestHelper.ATTR_ID).getAsString());
-        sample.setTemplateName(attributes.get(RestHelper.ATTR_NAME).getAsString());
+    private void paresTemplate(JsonElement relationships, Sample sample) {
+        JsonObject data = relationships.getAsJsonObject()
+                .getAsJsonObject(RestHelper.ATTR_TEMPLATE)
+                .getAsJsonObject(RestHelper.ATTR_DATA);
+        //JsonObject attributes = includedObject.get(RestHelper.ATTR_ATTRIBUTES).getAsJsonObject();
+        sample.setTemplateId(data.get(RestHelper.ATTR_ID).getAsString());
+        //sample.setTemplateName(attributes.get(RestHelper.ATTR_NAME).getAsString());
     }
 
 
     public void doGetSampleProperties(Sample sample) {
-        JsonElement dataArray = fetchSample(SAMPLE_GET_PROPERTIES_ENDPOINT, sample.getId());
+        JsonElement json = fetchSample(SAMPLE_GET_PROPERTIES_ENDPOINT, sample.getId());
+        JsonArray dataArray = json.getAsJsonObject().getAsJsonArray(RestHelper.ATTR_DATA);
+
         Iterator<JsonElement> iter = dataArray.getAsJsonArray().iterator();
         while (iter.hasNext()) {
             JsonElement samplesPropertyObject = iter.next();
@@ -304,7 +308,7 @@ public class SampleRestService implements RestReplyParser<Sample> {
         sampleProperty.setPropertyType(definition.get(RestHelper.ATTR_TYPE).getAsString());
 
         //get property template id
-        sampleProperty.setTemplateId(data.get(RestHelper.ATTR_ID).getAsString());
+        //sampleProperty.setTemplateId(data.get(RestHelper.ATTR_ID).getAsString());
 
         //get property value
         if (attributes.has(RestHelper.ATTR_CONTENT)) {

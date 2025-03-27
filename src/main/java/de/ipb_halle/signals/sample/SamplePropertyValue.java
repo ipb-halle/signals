@@ -20,30 +20,42 @@
 
 package de.ipb_halle.signals.sample;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class SamplePropertyValue {
 
     private String sampleId;
     private String propertyId;
     private String propertyValue;
+    public static final Logger logger = LogManager.getLogger(SamplePropertyValue.class);
 
     public SamplePropertyValue() {
     }
 
-    public SamplePropertyValue(SamplePropertyValueEntity spev) {
-        this.sampleId = spev.getId().getSampleId();
-        this.propertyId = spev.getId().getPropertyId();
-        this.propertyValue = spev.getPropertyValue();
+    public SamplePropertyValue(SamplePropertyValueEntity entity) {
+        this.sampleId = entity.getId().getSampleId();
+        if (entity.getId().getPropertyId() == null) {
+            logger.warn("SamplePropertyValueEntity has null propertyId: sampleId = {}", entity.getId().getSampleId());
+        }
+
+        this.propertyValue = entity.getPropertyValue();
     }
 
     public SamplePropertyValueEntity createEntity() {
-        SamplePropertyValueId samplePropertyValueId = new SamplePropertyValueId();
-        samplePropertyValueId
-                .setSampleId(sampleId)
-                .setSampleId(propertyId);
-        return new SamplePropertyValueEntity()
-                .setId(samplePropertyValueId)
-                .setPropertyValue(propertyValue);
+     if (sampleId == null || propertyId == null) {
+        logger.warn("Skipping SamplePropertyValueEntity creation: sampleId={}, propertyId={}", sampleId, propertyId);
+        return null;
     }
+
+    SamplePropertyValueId samplePropertyValueId = new SamplePropertyValueId();
+    samplePropertyValueId
+        .setSampleId(sampleId)
+        .setPropertyId(propertyId);
+
+    return new SamplePropertyValueEntity()
+        .setId(samplePropertyValueId)
+        .setPropertyValue(propertyValue); }
 
     //getter
     public String getSampleId() {

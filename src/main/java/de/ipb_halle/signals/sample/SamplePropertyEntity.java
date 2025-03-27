@@ -36,9 +36,6 @@ public class SamplePropertyEntity {
     @Column(name = "property_type")
     private String propertyType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "template_id", referencedColumnName = "template_id", nullable = false)
-    private SampleTemplateEntity template;
 
     public SamplePropertyEntity() {
     }
@@ -57,16 +54,7 @@ public class SamplePropertyEntity {
         return propertyName;
     }
 
-    public SampleTemplateEntity getTemplate() {
-        return template;
-    }
-
-    public String getTemplateId() {
-        return template != null ? template.getTemplateId() : null;
-    }
-
     // ——— Setters ——— //
-
     public SamplePropertyEntity setPropertyId(String propertyId) {
         this.propertyId = propertyId;
         return this;
@@ -82,9 +70,5 @@ public class SamplePropertyEntity {
         return this;
     }
 
-    public SamplePropertyEntity setTemplate(SampleTemplateEntity template) {
-        this.template = template;
-        return this;
-    }
 
 }

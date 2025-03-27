@@ -60,9 +60,10 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
     public SignalsEntityDTO parseReply(JsonElement json) {
         SignalsEntityDTO dto = new SignalsEntityDTO();
         JsonObject jsonObj = json.getAsJsonObject();
-        JsonObject jsonAttributes = jsonObj.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
+        JsonObject data = jsonObj.getAsJsonObject(RestHelper.ATTR_DATA);
+        JsonObject jsonAttributes = data.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
-        dto.setId(json.getAsJsonObject().getAsJsonPrimitive(RestHelper.ATTR_ID).getAsString());
+        dto.setId(data.get(RestHelper.ATTR_ID).getAsString());
         dto.setType((EntityType) dynEnumManager.valueOf(EntityType.valueOf(RestHelper.parseString(jsonAttributes, RestHelper.ATTR_TYPE))));
         dto.setEid(RestHelper.parseString(jsonAttributes, SignalsEntityDTO.ATTR_EID));
         dto.setName(RestHelper.parseString(jsonAttributes, RestHelper.ATTR_NAME));
@@ -70,7 +71,7 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
         dto.setDigest(RestHelper.parseLong(jsonAttributes, RestHelper.ATTR_DIGEST));
 
         parseTimestamps(jsonAttributes, dto);
-        parseRelationships(jsonObj, dto);
+        parseRelationships(data, dto);
         return dto;
     }
 
