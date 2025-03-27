@@ -358,7 +358,7 @@ CREATE TABLE locations (
 );
 
 CREATE TABLE samples (
-    id VARCHAR PRIMARY KEY REFERENCES sample_properties(sample_id),
+    id VARCHAR PRIMARY KEY,
     name VARCHAR NOT NULL,
     description TEXT,
     type INTEGER,
@@ -371,16 +371,26 @@ CREATE TABLE samples (
     ancestor_id VARCHAR,
     stoicRef_id VARCHAR,
     stoicRef_row_id VARCHAR,
-    parent_container_id VARCHAR NOT NULL,
-    template_id VARCHAR
+    parent_container_id VARCHAR,
+    template_id VARCHAR REFERENCES sample_templates(template_id)
 );
 
-CREATE TABLE sample_properties(
-    id SERIAL PRIMARY KEY,
-    name VARCHAR,
-    type VARCHAR,
+CREATE TABLE sample_properties (
+    property_id VARCHAR PRIMARY KEY,
+    property_name VARCHAR,
+    property_type VARCHAR,
+    template_id VARCHAR NOT NULL REFERENCES sample_templates(template_id)
+);
+
+CREATE TABLE sample_property_values (
+    sample_id VARCHAR NOT NULL REFERENCES samples(id) ON DELETE CASCADE,
+    property_id VARCHAR NOT NULL REFERENCES sample_properties(property_id) ON DELETE CASCADE,
     property_value VARCHAR,
-    property_key VARCHAR,
-    sample_id VARCHAR NOT NULL
+    PRIMARY KEY (sample_id, property_id)
+);
+
+CREATE TABLE sample_templates (
+    template_id VARCHAR PRIMARY KEY,
+    template_name VARCHAR
 );
 

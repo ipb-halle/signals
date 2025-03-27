@@ -20,9 +20,12 @@
 
 package de.ipb_halle.signals.sample;
 
+import com.google.gson.JsonObject;
 import de.ipb_halle.signals.inventory.ContainerDbService;
 import de.ipb_halle.signals.inventory.ContainerEntity;
 import de.ipb_halle.signals.inventory.LocationProcessorBean;
+import de.ipb_halle.signals.rest.Method;
+import de.ipb_halle.signals.rest.RestClient;
 import jakarta.annotation.Resource;
 import jakarta.ejb.LocalBean;
 import jakarta.ejb.Stateless;
@@ -49,10 +52,14 @@ public class SampleProcessorBean {
     @Inject
     private ContainerDbService containerDbService;
 
+
+
     @Resource
     private TransactionSynchronizationRegistry transactionSynchronizationRegistry;
 
     public static final Logger logger = LogManager.getLogger(LocationProcessorBean.class);
+
+
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void processSingleSample(String sampleId) {
@@ -98,4 +105,6 @@ public class SampleProcessorBean {
         logger.warn("Warning! Where is no container for this sample = {}!!", sampleId);
         return null;
     }
+
+
 }

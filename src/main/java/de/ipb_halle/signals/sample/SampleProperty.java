@@ -20,95 +20,66 @@
 
 package de.ipb_halle.signals.sample;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
 public class SampleProperty {
-    private Long id;
-    private String type;
-    private String name;
-    private String value;
-    private String key;
-    private String sampleId;
+    private String propertyId;
+    private String propertyName;
+    private String propertyType;
+    private String templateId;
 
     public SampleProperty() {
     }
 
     public SampleProperty(SamplePropertyEntity spe) {
-        this.id = spe.getId();
-        this.type = spe.getType();
-        this.name = spe.getName();
-        this.value = spe.getValue();
-        this.key = spe.getKey();
-        this.sampleId = spe.getSampleId();
-
+        this.propertyId = spe.getPropertyId();
+        this.propertyName = spe.getPropertyName();
+        this.propertyType = spe.getPropertyType();
+        this.templateId = spe.getTemplate() != null ? spe.getTemplate().getTemplateId() : null;
     }
 
     public SamplePropertyEntity createEntity() {
-        return new SamplePropertyEntity()
-                .setId(id)
-                .setName(name)
-                .setType(type)
-                .setValue(value)
-                .setKey(key)
-                .setSampleId(sampleId);
+        SamplePropertyEntity entity = new SamplePropertyEntity()
+                .setPropertyId(propertyId)
+                .setPropertyName(propertyName)
+                .setPropertyType(propertyType);
+
+        if (templateId != null) {
+            SampleTemplateEntity template = new SampleTemplateEntity()
+                    .setTemplateId(templateId);
+            entity.setTemplate(template);
+        }
+
+        return entity;
     }
 
     //getter
-    public Long getId() {
-        return id;
+    public String getPropertyType() {
+        return propertyType;
     }
-
-    public String getType() {
-        return type;
+    public String getPropertyName() {
+        return propertyName;
     }
-
-    public String getName() {
-        return name;
+    public String getPropertyId() {
+        return propertyId;
     }
-
-    public String getValue() {
-        return value;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public String getSampleId() {
-        return sampleId;
+    public String getTemplateId() {
+        return templateId;
     }
 
     //setter
-
-    public SampleProperty setId(Long id) {
-        this.id = id;
+    public SampleProperty setPropertyId(String propertyId) {
+        this.propertyId = propertyId;
         return this;
     }
-
-    public SampleProperty setType(String type) {
-        this.type = type;
+    public SampleProperty setPropertyName(String propertyName) {
+        this.propertyName = propertyName;
         return this;
     }
-
-    public SampleProperty setName(String name) {
-        this.name = name;
+    public SampleProperty setPropertyType(String propertyType) {
+        this.propertyType = propertyType;
         return this;
     }
-
-    public SampleProperty setValue(String value) {
-        this.value = value;
-        return this;
-    }
-
-    public SampleProperty setKey(String key) {
-        this.key = key;
-        return this;
-    }
-
-    public SampleProperty setSampleId(String sampleId) {
-        this.sampleId = sampleId;
+    public SampleProperty setTemplateId(String templateId) {
+        this.templateId = templateId;
         return this;
     }
 

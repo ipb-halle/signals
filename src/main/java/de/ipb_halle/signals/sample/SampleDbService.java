@@ -27,8 +27,17 @@ import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 @Stateless
 @PersistenceElements(entities = {SampleEntity.class})
@@ -52,6 +61,69 @@ public class SampleDbService {
             SamplePropertyEntity spe = sp.createEntity();
             this.em.merge(spe);
         }
+        for (SamplePropertyValue spv : sample.getPropertyValues()) {
+            SamplePropertyValueEntity spve = spv.createEntity();
+            this.em.merge(spve);
+        }
+        SampleTemplateEntity sampleTemplateEntity = new SampleTemplateEntity()
+                .setTemplateId(sample.getTemplateId())
+                .setTemplateName(sample.getTemplateName());
+        this.em.merge(sampleTemplateEntity);
         this.em.merge(se);
+    }
+
+    public SampleEntity loadSampleEntityById(String id) {
+        return em.find(SampleEntity.class, id);
+    }
+
+    public void loadSampleProperties(Sample sample) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<SamplePropertyEntity> query = cb.createQuery(SamplePropertyEntity.class);
+        Root<SamplePropertyEntity> root = query.from(SamplePropertyEntity.class);
+
+        // WHERE sp.template.templateId = :templateId
+        query.select(root)
+                .where(cb.equal(root.get("template").get("templateId"), sample.getTemplateId()));
+
+        List<SamplePropertyEntity> results = em.createQuery(query).getResultList();
+
+        for (SamplePropertyEntity propertyEntity : results) {
+            SampleProperty sampleProperty = new SampleProperty(propertyEntity);
+            sample.addProperty(sampleProperty);
+        }
+
+
+    }
+
+    public void loadSamplePropertyValues(Sample sample) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<SamplePropertyValueEntity> query = cb.createQuery(SamplePropertyValueEntity.class);
+        Root<SamplePropertyValueEntity> root = query.from(SamplePropertyValueEntity.class);
+
+        // WHERE id.sampleId = :sampleId
+        query.select(root)
+                .where(cb.equal(root.get("id").get("sampleId"), sample.getId()));
+
+        List<SamplePropertyValueEntity> results = em.createQuery(query).getResultList();
+
+        for (SamplePropertyValueEntity valueEntity : results) {
+            SamplePropertyValue value = new SamplePropertyValue(valueEntity);
+            sample.addPropertyValue(value);
+        }
+    }
+
+    public void loadTemplate (Sample  sample){
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<SampleTemplateEntity> query = cb.createQuery(SampleTemplateEntity.class);
+        Root<SampleTemplateEntity> root = query.from(SampleTemplateEntity.class);
+
+        Subquery<String> usedTemplateIds = query.subquery(String.class);
+        Root<SampleEntity> sampleRoot = usedTemplateIds.from(SampleEntity.class);
+        usedTemplateIds.select(sampleRoot.get("template").get("id"));
+
+        query.select(root).where(root.get("id").in(usedTemplateIds));
+
+        List<SampleTemplateEntity> templatesUsed = em.createQuery(query).getResultList();
+        logger.info(Arrays.toString(templatesUsed.toArray()));
     }
 }

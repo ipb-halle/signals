@@ -66,6 +66,7 @@ public class RestHelper {
     public static final String ATTR_TITLE = "title";
     public static final String ATTR_SAMPLE = "sample";
     public static final String ATTR_TEMPLATE = "template";
+    public static final String ATTR_INCLUDED = "included";
 
 
     public static String formatDate(Date d) {

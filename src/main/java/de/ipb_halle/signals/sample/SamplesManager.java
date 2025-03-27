@@ -21,12 +21,12 @@
 package de.ipb_halle.signals.sample;
 
 import de.ipb_halle.signals.RuntimeConfig;
+import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.entity.SignalsEntityDbService;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
 import de.ipb_halle.signals.field.FieldDbService;
-import de.ipb_halle.signals.materials.Material;
 import jakarta.ejb.TransactionAttribute;
 import jakarta.ejb.TransactionAttributeType;
 import jakarta.inject.Inject;
@@ -52,9 +52,25 @@ public class SamplesManager {
     @Inject
     private SampleProcessorBean sampleProcessorBean;
 
+    @Inject
+    private DynEnumManager dynEnumManager;
+
+    @Inject
+    private SampleRestService sampleRestService;
+
+
     private final Logger logger = LogManager.getLogger(SamplesManager.class);
 
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void importSample(RuntimeConfig runtimeConfig, String id) {
+        //loads samples from local DB to be imported into Signals
+        SampleEntity sampleEntity = sampleDbService.loadSampleEntityById(id);
+        Sample sample = new Sample(sampleEntity, dynEnumManager);
+        sampleDbService.loadSamplePropertyValues(sample);
+        sampleDbService.loadSampleProperties(sample);
+        sampleDbService.loadTemplate(sample);
+
+        sampleRestService.createNewSample(sample);
     }
 
 

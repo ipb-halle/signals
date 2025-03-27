@@ -27,86 +27,63 @@ import jakarta.persistence.*;
 public class SamplePropertyEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "property_id")
+    private String propertyId;
 
-    @Column
-    private String type;
+    @Column(name = "property_name")
+    private String propertyName;
 
-    @Column
-    private String name;
+    @Column(name = "property_type")
+    private String propertyType;
 
-    @Column(name = "property_value")
-    private String value;
-
-    @Column(name = "property_key")
-    private String key;
-
-    @Column(name = "sample_id")
-    private String sampleId;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "template_id", referencedColumnName = "template_id", nullable = false)
+    private SampleTemplateEntity template;
 
     public SamplePropertyEntity() {
     }
 
-    //getter
+    // ——— getters ——— //
 
-
-    public Long getId() {
-        return id;
+    public String getPropertyId() {
+        return propertyId;
     }
 
-    public String getType() {
-        return type;
+    public String getPropertyType() {
+        return propertyType;
     }
 
-    public String getName() {
-        return name;
+    public String getPropertyName() {
+        return propertyName;
     }
 
-    public String getValue() {
-        return value;
+    public SampleTemplateEntity getTemplate() {
+        return template;
     }
 
-    public String getKey() {
-        return key;
+    public String getTemplateId() {
+        return template != null ? template.getTemplateId() : null;
     }
 
-    public String getSampleId() {
-        return sampleId;
-    }
+    // ——— Setters ——— //
 
-
-    //setter
-
-
-    public SamplePropertyEntity setId(Long id) {
-        this.id = id;
+    public SamplePropertyEntity setPropertyId(String propertyId) {
+        this.propertyId = propertyId;
         return this;
     }
 
-    public SamplePropertyEntity setType(String type) {
-        this.type = type;
+    public SamplePropertyEntity setPropertyName(String propertyName) {
+        this.propertyName = propertyName;
         return this;
     }
 
-    public SamplePropertyEntity setName(String name) {
-        this.name = name;
+    public SamplePropertyEntity setPropertyType(String propertyType) {
+        this.propertyType = propertyType;
         return this;
     }
 
-    public SamplePropertyEntity setValue(String value) {
-        this.value = value;
-        return this;
-    }
-
-    public SamplePropertyEntity setKey(String key) {
-        this.key = key;
-        return this;
-    }
-
-    public SamplePropertyEntity setSampleId(String sampleId) {
-        this.sampleId = sampleId;
+    public SamplePropertyEntity setTemplate(SampleTemplateEntity template) {
+        this.template = template;
         return this;
     }
 

@@ -75,79 +75,20 @@ public class SampleEntity {
     @Column(name = "parent_container_id")
     private String parentContainerId;
 
-    @Column(name="template_id")
-    private String templateId;
-
-    //Empty constructor for JPA
-    public SampleEntity() {
-    }
-
-    //getter
+    @ManyToOne
+    @JoinColumn(name = "template_id", referencedColumnName = "template_id")
+    private SampleTemplateEntity template;
     public String getId() {
         return id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public Date getEditedAt() {
-        return editedAt;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public String getEditedBy() {
-        return editedBy;
-    }
-
-    public String getOwner() {
-        return owner;
-    }
-
-    public Long getDigest() {
-        return digest;
-    }
-
-    public String getAncestorId() {
-        return ancestorId;
-    }
-
-    public String getStoicRefId() {
-        return stoicRefId;
-    }
-
-    public String getStoicRefRowId() {
-        return stoicRefRowId;
-    }
-
-    public String getParentContainerId() {
-        return parentContainerId;
-    }
-
-    public String getTemplateId() {
-        return templateId;
-    }
-
-    //Setter
-
     public SampleEntity setId(String id) {
         this.id = id;
         return this;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public SampleEntity setName(String name) {
@@ -155,9 +96,17 @@ public class SampleEntity {
         return this;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     public SampleEntity setDescription(String description) {
         this.description = description;
         return this;
+    }
+
+    public Integer getType() {
+        return type;
     }
 
     public SampleEntity setType(Integer type) {
@@ -165,9 +114,17 @@ public class SampleEntity {
         return this;
     }
 
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
     public SampleEntity setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
         return this;
+    }
+
+    public Date getEditedAt() {
+        return editedAt;
     }
 
     public SampleEntity setEditedAt(Date editedAt) {
@@ -175,9 +132,17 @@ public class SampleEntity {
         return this;
     }
 
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
     public SampleEntity setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
         return this;
+    }
+
+    public String getEditedBy() {
+        return editedBy;
     }
 
     public SampleEntity setEditedBy(String editedBy) {
@@ -185,9 +150,17 @@ public class SampleEntity {
         return this;
     }
 
+    public String getOwner() {
+        return owner;
+    }
+
     public SampleEntity setOwner(String owner) {
         this.owner = owner;
         return this;
+    }
+
+    public Long getDigest() {
+        return digest;
     }
 
     public SampleEntity setDigest(Long digest) {
@@ -195,9 +168,17 @@ public class SampleEntity {
         return this;
     }
 
+    public String getAncestorId() {
+        return ancestorId;
+    }
+
     public SampleEntity setAncestorId(String ancestorId) {
         this.ancestorId = ancestorId;
         return this;
+    }
+
+    public String getStoicRefId() {
+        return stoicRefId;
     }
 
     public SampleEntity setStoicRefId(String stoicRefId) {
@@ -205,9 +186,17 @@ public class SampleEntity {
         return this;
     }
 
+    public String getStoicRefRowId() {
+        return stoicRefRowId;
+    }
+
     public SampleEntity setStoicRefRowId(String stoicRefRowId) {
         this.stoicRefRowId = stoicRefRowId;
         return this;
+    }
+
+    public String getParentContainerId() {
+        return parentContainerId;
     }
 
     public SampleEntity setParentContainerId(String parentContainerId) {
@@ -215,8 +204,16 @@ public class SampleEntity {
         return this;
     }
 
-    public SampleEntity setTemplateId(String templateId) {
-        this.templateId = templateId;
+    public SampleTemplateEntity getTemplate() {
+        return template;
+    }
+
+    public SampleEntity setTemplate(SampleTemplateEntity template) {
+        this.template = template;
         return this;
+    }
+
+    public String getTemplateId() {
+        return template != null ? template.getTemplateId() : null;
     }
 }
