@@ -39,7 +39,7 @@ public class SampleDbService {
     @PersistenceContext(unitName = "signalsDB")
     private EntityManager em;
 
-    private static final Logger logger = LogManager.getLogger(SampleManager.class);
+    private static final Logger logger = LogManager.getLogger(SampleDbService.class);
 
     public void save(Sample sample) {
         SampleEntity sampleEntity = sample.createEntity();
@@ -72,14 +72,14 @@ public class SampleDbService {
         return em.find(SampleEntity.class, id);
     }
 
+    //ToDO:method needs to be refactored, doesnt load property values
     public void loadSampleProperties(Sample sample) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<SamplePropertyEntity> query = cb.createQuery(SamplePropertyEntity.class);
         Root<SamplePropertyEntity> root = query.from(SamplePropertyEntity.class);
 
         // WHERE sp.template.templateId = :templateId
-        query.select(root)
-                .where(cb.equal(root.get("template").get("templateId"), sample.getTemplateId()));
+        query.select(root);
 
         List<SamplePropertyEntity> results = em.createQuery(query).getResultList();
 

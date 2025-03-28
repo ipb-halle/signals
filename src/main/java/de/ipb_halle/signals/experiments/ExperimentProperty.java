@@ -34,6 +34,13 @@ public class ExperimentProperty {
         this.propertyType = experimentPropertyEntity.getPropertyType();
     }
 
+    public ExperimentPropertyEntity createEntity() {
+        return new ExperimentPropertyEntity()
+                .setPropertyId(propertyId)
+                .setPropertyName(propertyName)
+                .setPropertyType(propertyType);
+    }
+
     public String getPropertyId() {
         return propertyId;
     }

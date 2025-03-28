@@ -378,7 +378,7 @@ CREATE TABLE samples (
 CREATE TABLE sample_properties (
     property_id VARCHAR PRIMARY KEY,
     property_name VARCHAR,
-    property_type VARCHAR,
+    property_type VARCHAR
 );
 
 CREATE TABLE sample_property_values (
@@ -401,4 +401,17 @@ CREATE TABLE experiments (
     digest BIGINT NOT NULL,
     ancestor_id VARCHAR,
     template_id VARCHAR
+);
+
+CREATE TABLE experiment_properties (
+    property_id VARCHAR PRIMARY KEY,
+    property_name VARCHAR,
+    property_type VARCHAR
+);
+
+CREATE TABLE experiment_property_values (
+    experiment_id VARCHAR NOT NULL REFERENCES experiments(id) ON DELETE CASCADE,
+    property_id VARCHAR NOT NULL REFERENCES experiment_properties(property_id) ON DELETE CASCADE,
+    property_value VARCHAR,
+    PRIMARY KEY (experiment_id, property_id)
 );

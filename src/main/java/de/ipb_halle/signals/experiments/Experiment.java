@@ -34,6 +34,7 @@ import java.util.Set;
 
 public class Experiment {
     public static final Logger logger = LogManager.getLogger(Experiment.class);
+    public static final String ATTR_TYPE_EXPERIMENT = "experiment";
 
     private String id;
     private String name;
@@ -233,5 +234,13 @@ public class Experiment {
 
     public void addChild(SignalsEntity se) {
         this.children.add(se);
+    }
+
+    public void addProperty(ExperimentProperty experimentProperty) {
+        properties.add(experimentProperty);
+    }
+
+    public void addPropertyValue(ExperimentPropertyValue experimentPropertyValue) {
+        propertyValues.add(experimentPropertyValue);
     }
 }

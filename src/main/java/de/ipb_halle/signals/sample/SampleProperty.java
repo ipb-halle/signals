@@ -35,20 +35,21 @@ public class SampleProperty {
     }
 
     public SamplePropertyEntity createEntity() {
-        SamplePropertyEntity entity = new SamplePropertyEntity()
+        return new SamplePropertyEntity()
                 .setPropertyId(propertyId)
                 .setPropertyName(propertyName)
                 .setPropertyType(propertyType);
-        return entity;
     }
 
     //getter
     public String getPropertyType() {
         return propertyType;
     }
+
     public String getPropertyName() {
         return propertyName;
     }
+
     public String getPropertyId() {
         return propertyId;
     }
@@ -59,10 +60,12 @@ public class SampleProperty {
         this.propertyId = propertyId;
         return this;
     }
+
     public SampleProperty setPropertyName(String propertyName) {
         this.propertyName = propertyName;
         return this;
     }
+
     public SampleProperty setPropertyType(String propertyType) {
         this.propertyType = propertyType;
         return this;

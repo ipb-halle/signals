@@ -122,11 +122,13 @@ public class SampleRestService implements RestReplyParser<Sample> {
         return attributes;
     }
 
+    //toDo method doesn't load sample property values needs to be refactored
     private JsonArray prepareFields(Sample sample) {
         JsonArray fields = new JsonArray();
         for (SampleProperty sampleProperty : sample.getProperties()) {
             for (SamplePropertyValue samplePropertyValue : sample.getPropertyValues()) {
-                if (samplePropertyValue.getPropertyId().equalsIgnoreCase(sampleProperty.getPropertyId())) {
+                if (samplePropertyValue.getPropertyId() != null &&
+                        samplePropertyValue.getPropertyId().equalsIgnoreCase(sampleProperty.getPropertyId())) {
                     fields.add(prepareField(sampleProperty, samplePropertyValue));
                 }
             }
@@ -306,9 +308,6 @@ public class SampleRestService implements RestReplyParser<Sample> {
         //get property type
         sampleProperty.setPropertyType(definition.get(RestHelper.ATTR_TYPE).getAsString());
 
-        //get property template id
-        //sampleProperty.setTemplateId(data.get(RestHelper.ATTR_ID).getAsString());
-
         //get property value
         if (attributes.has(RestHelper.ATTR_CONTENT)) {
             samplePropertyValue.setPropertyValue(attributes.get(RestHelper.ATTR_CONTENT).getAsJsonObject().get(RestHelper.ATTR_VALUE).getAsString());
@@ -317,6 +316,7 @@ public class SampleRestService implements RestReplyParser<Sample> {
         sample.addPropertyValue(samplePropertyValue);
     }
 
+    //toDo implement or delete, depends on proposal
     public void doGetEachPropertyExplicitly(Sample sample) {
         for (SampleProperty sampleProperty : sample.getProperties()) {
             JsonElement propertyDataObject = fetchProperty(SAMPLE_GET_PROPERTY_EXPLICITLY_ENDPOINT, sample.getId(), sampleProperty.getPropertyId());

@@ -24,6 +24,8 @@ import de.ipb_halle.tda.PersistenceElements;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Stateless
 @PersistenceElements(entities = {ExperimentEntity.class})
@@ -31,6 +33,8 @@ public class ExperimentDbService {
 
     @PersistenceContext(unitName = "signalsDB")
     private EntityManager entityManager;
+
+    private static final Logger logger = LogManager.getLogger(ExperimentDbService.class);
 
     public ExperimentEntity loadExperimentById(String id) {
         return entityManager.find(ExperimentEntity.class, id);
@@ -40,5 +44,25 @@ public class ExperimentDbService {
         ExperimentEntity experimentEntity = experiment.createEntity();
 
         entityManager.merge(experimentEntity);
+
+        for (ExperimentProperty experimentProperty : experiment.getProperties()) {
+            if (experimentProperty.getPropertyId() == null || experimentProperty.getPropertyId().isBlank()) {
+                logger.warn("Skipping property with null or blank ID: {}", experimentProperty.getPropertyName());
+                continue;
+            }
+            ExperimentPropertyEntity experimentPropertyEntity = experimentProperty.createEntity(); // no template version
+            entityManager.merge(experimentPropertyEntity);
+        }
+
+        for (ExperimentPropertyValue experimentPropertyValue : experiment.getPropertyValues()) {
+            if (experimentPropertyValue.getPropertyId() == null || experimentPropertyValue.getPropertyId().isBlank()) {
+                logger.warn("Skipping SamplePropertyValue with null or blank propertyId: experimentId={}", experimentPropertyValue.getExperimentId());
+                continue;
+            }
+            ExperimentPropertyValueEntity experimentPropertyValueEntity = experimentPropertyValue.createEntity();
+            if (experimentPropertyValueEntity != null) {
+                entityManager.merge(experimentPropertyValueEntity);
+            }
+        }
     }
 }
