@@ -387,3 +387,18 @@ CREATE TABLE sample_property_values (
     property_value VARCHAR,
     PRIMARY KEY (sample_id, property_id)
 );
+
+CREATE TABLE experiments (
+    id VARCHAR PRIMARY KEY,
+    name VARCHAR NOT NULL,
+    description TEXT,
+    type INTEGER,
+    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    edited_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR,
+    edited_by VARCHAR,
+    owner VARCHAR,
+    digest BIGINT NOT NULL,
+    ancestor_id VARCHAR,
+    template_id VARCHAR
+);

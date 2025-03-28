@@ -20,24 +20,17 @@
 
 package de.ipb_halle.signals.sample;
 
-import de.ipb_halle.signals.dynEnum.DynEnumManager;
-import de.ipb_halle.signals.field.FieldDbService;
 import de.ipb_halle.tda.PersistenceElements;
 import jakarta.ejb.Stateless;
-import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
-import jakarta.persistence.criteria.Subquery;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 @Stateless
 @PersistenceElements(entities = {SampleEntity.class})
@@ -46,14 +39,7 @@ public class SampleDbService {
     @PersistenceContext(unitName = "signalsDB")
     private EntityManager em;
 
-    @Inject
-    private DynEnumManager dynEnumManager;
-
-    @Inject
-    private FieldDbService fieldDbService;
-
-    private static final Logger logger = LogManager.getLogger(SamplesManager.class);
-
+    private static final Logger logger = LogManager.getLogger(SampleManager.class);
 
     public void save(Sample sample) {
         SampleEntity sampleEntity = sample.createEntity();

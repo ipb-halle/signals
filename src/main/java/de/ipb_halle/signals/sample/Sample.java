@@ -74,7 +74,6 @@ public class Sample {
     }
 
     public Sample(SampleEntity sampleEntity, DynEnumManager dynEnumManager) {
-        logger.info(sampleEntity.getTemplateId());
         this.id = sampleEntity.getId();
         this.name = sampleEntity.getName();
         this.description = sampleEntity.getDescription();
@@ -86,6 +85,7 @@ public class Sample {
         this.owner = new UserReference(sampleEntity.getOwner());
         this.digest = sampleEntity.getDigest();
         this.ancestorId = sampleEntity.getAncestorId();
+        this.parentContainerId = sampleEntity.getParentContainerId();
         this.stoicRef = new StoicRef().setEid(sampleEntity.getStoicRefId()).setRowId(sampleEntity.getStoicRefRowId());
         this.templateId = sampleEntity.getTemplateId();
 

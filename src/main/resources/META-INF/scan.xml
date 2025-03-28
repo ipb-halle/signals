@@ -10,6 +10,7 @@
         <package>de.ipb_halle.signals.dynEnum</package>
         <package>de.ipb_halle.signals.element</package>
         <package>de.ipb_halle.signals.entity</package>
+        <package>de.ipb_halle.signals.experiments</package>
         <package>de.ipb_halle.signals.field</package>
         <package>de.ipb_halle.signals.inventory</package>
         <package>de.ipb_halle.signals.materials</package>

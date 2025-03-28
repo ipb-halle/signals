@@ -38,7 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SamplesManager {
+public class SampleManager {
 
     @Inject
     private SignalsEntityDbService signalsEntityDbService;
@@ -59,7 +59,7 @@ public class SamplesManager {
     private SampleRestService sampleRestService;
 
 
-    private final Logger logger = LogManager.getLogger(SamplesManager.class);
+    private final Logger logger = LogManager.getLogger(SampleManager.class);
 
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void importSample(RuntimeConfig runtimeConfig, String id) {
@@ -75,7 +75,7 @@ public class SamplesManager {
 
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void manageSamples(Date[] dateRange) {
-        logger.debug("MS:-> START MANAGE SAMPLES");
+        logger.debug("Sample Manager:-> START MANAGE SAMPLES");
 
         // 1) Query parameters for load
         EntityType entityTypes[] = {EntityType.valueOf(SampleEntity.ENTITY_TYPE_SAMPLE)};

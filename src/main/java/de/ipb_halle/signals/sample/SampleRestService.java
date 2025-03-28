@@ -184,7 +184,6 @@ public class SampleRestService implements RestReplyParser<Sample> {
         JsonObject dataObject = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_DATA);
         JsonObject attributes = dataObject.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
         JsonObject relationships = dataObject.getAsJsonObject(RestHelper.ATTR_RELATIONSHIPS);
-        JsonArray included = j.getAsJsonObject().getAsJsonArray(RestHelper.ATTR_INCLUDED);
 
         Sample sample = new Sample();
 

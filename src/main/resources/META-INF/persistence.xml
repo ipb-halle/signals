@@ -21,6 +21,9 @@
         <class>de.ipb_halle.signals.entity.EntityType</class>
         <class>de.ipb_halle.signals.entity.SignalsEntity</class>
         <class>de.ipb_halle.signals.entity.SignalsEntityChild</class>
+        <class>de.ipb_halle.signals.experiments.ExperimentEntity</class>
+        <class>de.ipb_halle.signals.experiments.ExperimentPropertyEntity</class>
+        <class>de.ipb_halle.signals.experiments.ExperimentPropertyValueEntity</class>
         <class>de.ipb_halle.signals.field.FieldDefinition</class>
         <class>de.ipb_halle.signals.field.FieldMeasure</class>
         <class>de.ipb_halle.signals.field.FieldOption</class>

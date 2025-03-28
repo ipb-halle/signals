@@ -18,28 +18,28 @@
  *
  */
 
-package de.ipb_halle.signals.sample;
+package de.ipb_halle.signals.experiments;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "sample_property_values")
-public class SamplePropertyValueEntity {
+@Table(name="experiment_property_values")
+public class ExperimentPropertyValueEntity {
 
     @EmbeddedId
-    private SamplePropertyValueId id;
+    private ExperimentPropertyValueId id;
 
     @Column(name = "property_value")
     private String propertyValue;
 
-    public SamplePropertyValueEntity() {
-    }
-
-    public SamplePropertyValueId getId() {
+    public ExperimentPropertyValueId getId() {
         return id;
     }
 
-    public SamplePropertyValueEntity setId(SamplePropertyValueId id) {
+    public ExperimentPropertyValueEntity setId(ExperimentPropertyValueId id) {
         this.id = id;
         return this;
     }
@@ -48,7 +48,7 @@ public class SamplePropertyValueEntity {
         return propertyValue;
     }
 
-    public SamplePropertyValueEntity setPropertyValue(String propertyValue) {
+    public ExperimentPropertyValueEntity setPropertyValue(String propertyValue) {
         this.propertyValue = propertyValue;
         return this;
     }
