@@ -38,7 +38,13 @@ public class Experiments {
     public final static String EXPERIMENTS_FILENAME = "experiments.filename";
     public final static String EXPERIMENTS_REJECTFILE = "experiments.rejectfile";
 
-    private void importExperiments(InhouseDB inhouseDB) throws Exception {
+    private InhouseDB inhouseDB;
+
+    public Experiments(InhouseDB inhouseDB) {
+        this.inhouseDB = inhouseDB;
+    }
+
+    private void importExperiments() throws Exception {
         System.out.println("Importing experiments");
 /*
         // pattern of 2014 export
@@ -101,8 +107,8 @@ public class Experiments {
         writer.close();
     }
 
-    public void importData(InhouseDB inhouseDB) throws Exception {
-        importExperiments(inhouseDB);
+    public void importData() throws Exception {
+        importExperiments();
     }
 
 }

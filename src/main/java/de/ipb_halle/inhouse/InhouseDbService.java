@@ -24,8 +24,10 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Stateless
@@ -42,7 +44,7 @@ public class InhouseDbService {
 
         List<InhouseCompound> result = this.em.createQuery(criteriaQuery).getResultList();
         for(InhouseCompound mat : result) {
-            mat.addSynonyms(loadCompoundSynonymsByMolId(mat.getMolId()));
+            mat.addSynonyms(loadSynonymsById(InhouseSynonym.SYNONYM_COMPOUND, mat.getMolId()));
         }
         return result;
     }
@@ -55,20 +57,48 @@ public class InhouseDbService {
         criteriaQuery.where(criteriaBuilder.equal(root.get("molId"),molId));
         List<InhouseCompound> result = this.em.createQuery(criteriaQuery).getResultList();
         if (result.size() != 1) {
-            System.out.printf("loadCompoundById(%d) - query returned %d instances\n", molId, result.size());
+            System.out.printf("loadCompoundByMolId(%d) - query returned %d instances\n", molId, result.size());
             return null;
         }
         InhouseCompound compound = result.get(0);
-        compound.addSynonyms(loadCompoundSynonymsByMolId(molId));
+        compound.addSynonyms(loadSynonymsById(InhouseSynonym.SYNONYM_COMPOUND, molId));
         return compound;
     }
 
-    public List<InhouseCompoundSynonym> loadCompoundSynonymsByMolId(Integer molId) {
+    public InhouseTaxon loadTaxonByInhouseId(String level, int inhouseId) {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-        CriteriaQuery<InhouseCompoundSynonym> criteriaQuery = criteriaBuilder.createQuery(InhouseCompoundSynonym.class);
-        Root<InhouseCompoundSynonym> root = criteriaQuery.from(InhouseCompoundSynonym.class);
+        CriteriaQuery<InhouseTaxon> criteriaQuery = criteriaBuilder.createQuery(InhouseTaxon.class);
+        Root<InhouseTaxon> root = criteriaQuery.from(InhouseTaxon.class);
         criteriaQuery.select(root);
-        criteriaQuery.where(criteriaBuilder.equal(root.get("molId"), molId));
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(criteriaBuilder.equal(root.get("inhouseId"), inhouseId));
+        predicates.add(criteriaBuilder.equal(root.get("level"), level));
+        criteriaQuery.where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
+
+        List<InhouseTaxon> result = this.em.createQuery(criteriaQuery).getResultList();
+        if (result.size() != 1) {
+            System.out.printf("loadTaxonByInhouseId(%d) - query returned %d instances\n", inhouseId, result.size());
+            return null;
+        }
+        InhouseTaxon taxon = result.get(0);
+        if (level.equals(InhouseTaxon.TAXONOMY_SPECIES)) {
+            taxon.addSynonyms(loadSynonymsById(InhouseSynonym.SYNONYM_ORGANISM, inhouseId));
+        }
+        return taxon;
+    }
+
+    public List<InhouseSynonym> loadSynonymsById(String type, Integer inhouseId) {
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<InhouseSynonym> criteriaQuery = criteriaBuilder.createQuery(InhouseSynonym.class);
+        Root<InhouseSynonym> root = criteriaQuery.from(InhouseSynonym.class);
+        criteriaQuery.select(root);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(criteriaBuilder.equal(root.get("inhouseId"), inhouseId));
+        predicates.add(criteriaBuilder.equal(root.get("type"), type));
+        criteriaQuery.where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
+
         return this.em.createQuery(criteriaQuery).getResultList();
     }
 
@@ -76,11 +106,15 @@ public class InhouseDbService {
         this.em.merge(mat);
     }
 
-    public void save(InhouseCompoundSynonym synonym) {
+    public void save(InhouseExperiment experiment) {
+        this.em.merge(experiment);
+    }
+
+    public void save(InhouseSynonym synonym) {
         this.em.merge(synonym);
     }
 
-    public void save(InhouseExperiment experiment) {
-        this.em.merge(experiment);
+    public void save(InhouseTaxon taxon) {
+        this.em.merge(taxon);
     }
 }

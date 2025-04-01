@@ -29,6 +29,7 @@ import de.ipb_halle.lbac.search.lang.SqlInsertBuilder;
 import de.ipb_halle.signals.materials.Library;
 import de.ipb_halle.signals.materials.LibraryDbService;
 import de.ipb_halle.signals.materials.Material;
+import jakarta.persistence.criteria.CriteriaBuilder;
 
 import java.io.*;
 import java.util.List;
@@ -59,12 +60,16 @@ public class Compounds {
     public final static String COMPOUNDS_FIELD_IPBCODE = "compounds.fields.ipbcode";
     public final static String COMPOUNDS_FIELD_MOLID = "compounds.fields.molid";
 
+    private InhouseDB inhouseDB;
+
+    public Compounds(InhouseDB inhouseDB) {
+        this.inhouseDB = inhouseDB;
+    }
+
     /**
-     *
-     * @param inhouseDB
      * @throws Exception
      */
-    private void importCompounds(InhouseDB inhouseDB) throws Exception {
+    private void importCompounds() throws Exception {
         System.out.println("Importing compounds");
 
         // 01 Structure                 -> ignored
@@ -136,15 +141,15 @@ public class Compounds {
         writer.close();
       }
 
-    private void importCompoundNames(InhouseDB inhouseDB) throws Exception {
+    private void importCompoundNames() throws Exception {
         RTF rtf = new RTF(inhouseDB);
         rtf.readCompoundSynonym(inhouseDB.getConfigString(COMPOUNDS_SYNONYMS));
 
     }
 
-    public void importData(InhouseDB inhouseDB) throws Exception {
-        // importCompounds(inhouseDB);
-        // importCompoundNames(inhouseDB);
+    public void importData() throws Exception {
+        // importCompounds();
+        // importCompoundNames();
 
         Library library = inhouseDB.getLibraryDbService().loadById(
                 inhouseDB.getConfigString(COMPOUNDS_LIBRARY_ID));

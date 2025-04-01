@@ -135,8 +135,8 @@ public class InhouseCompound {
         mat.addFieldValue(fvName);
     }
 
-    public void addSynonyms(Collection<InhouseCompoundSynonym> synonyms) {
-        for(InhouseCompoundSynonym ics : synonyms) {
+    public void addSynonyms(Collection<InhouseSynonym> synonyms) {
+        for(InhouseSynonym ics : synonyms) {
             this.synonyms.add(new Synonym("", ics.getSynonym()));
         }
     }

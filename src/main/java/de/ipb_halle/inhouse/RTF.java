@@ -201,9 +201,10 @@ public class RTF extends RtfListenerAdaptor {
             compound.setName(synonym);
             dbService.save(compound);
         }
-        dbService.save(new InhouseCompoundSynonym()
+        dbService.save(new InhouseSynonym()
                 .setSynonym(synonym)
-                .setMolId(molId));
+                .setType(InhouseSynonym.SYNONYM_COMPOUND)
+                .setInhouseId(molId));
     }
 
     /*
