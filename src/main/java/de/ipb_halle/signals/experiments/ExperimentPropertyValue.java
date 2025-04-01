@@ -36,11 +36,12 @@ public class ExperimentPropertyValue {
 
     public ExperimentPropertyValue(ExperimentPropertyValueEntity entity) {
         this.experimentId = entity.getId().getExperimentId();
+        this.propertyId=entity.getId().getPropertyId();
+        this.propertyValue = entity.getPropertyValue();
+
         if (entity.getId().getPropertyId() == null) {
             logger.warn("SamplePropertyValueEntity has null propertyId: sampleId = {}", entity.getId().getExperimentId());
         }
-
-        this.propertyValue = entity.getPropertyValue();
     }
 
     public ExperimentPropertyValueEntity createEntity() {

@@ -93,7 +93,14 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
         JsonObject relationships = new JsonObject();
         relationships.add(RestHelper.ATTR_ANCESTORS, prepareAncestors(experiment));
         relationships.add(RestHelper.ATTR_TEMPLATE, prepareTemplate(experiment));
+        // relationships.add(RestHelper.ATTR_WORK_ORDER, prepareWorkOrder(experiment));
         return relationships;
+    }
+
+    private JsonElement prepareWorkOrder(Experiment experiment) {
+
+
+        return null;
     }
 
     private JsonElement prepareTemplate(Experiment experiment) {
@@ -119,6 +126,9 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
     private JsonElement prepareAttributes(Experiment experiment) {
         JsonObject attributes = new JsonObject();
         attributes.addProperty(RestHelper.ATTR_NAME, experiment.getName());
+
+      attributes.add(RestHelper.ATTR_FIELDS, prepareFields(experiment));
+
         return attributes;
     }
 
@@ -255,14 +265,17 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
         JsonObject propertiesObject = experimentPropertiesObject.getAsJsonObject();
         JsonObject definition = propertiesObject.get(RestHelper.ATTR_META).getAsJsonObject().get(RestHelper.ATTR_DEFINITION).getAsJsonObject();
         JsonObject attributes = propertiesObject.get(RestHelper.ATTR_ATTRIBUTES).getAsJsonObject();
+        JsonObject attribute = definition.get(RestHelper.ATTR_ATTRIBUTE).getAsJsonObject();
 
         ExperimentProperty experimentProperty = new ExperimentProperty();
         ExperimentPropertyValue experimentPropertyValue = new ExperimentPropertyValue();
         experimentPropertyValue.setExperimentId(experiment.getId());
 
         //get propertyID
-        if (propertiesObject.has(RestHelper.ATTR_ID)) {
-            experimentProperty.setPropertyId(propertiesObject.get(RestHelper.ATTR_ID).getAsString());
+        if (attribute.has(RestHelper.ATTR_ID)) {
+            experimentProperty.setPropertyId(definition
+                    .get(RestHelper.ATTR_ATTRIBUTE).getAsJsonObject()
+                    .get(RestHelper.ATTR_ID).getAsString());
             experimentPropertyValue.setPropertyId(experimentProperty.getPropertyId());
         }
         //get property name

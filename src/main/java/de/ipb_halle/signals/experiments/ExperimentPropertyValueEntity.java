@@ -20,10 +20,7 @@
 
 package de.ipb_halle.signals.experiments;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name="experiment_property_values")
@@ -34,6 +31,10 @@ public class ExperimentPropertyValueEntity {
 
     @Column(name = "property_value")
     private String propertyValue;
+
+    @ManyToOne
+    @JoinColumn(name="property_id", referencedColumnName = "property_id", insertable = false, updatable = false)
+    private ExperimentPropertyEntity property;
 
     public ExperimentPropertyValueId getId() {
         return id;
@@ -46,6 +47,10 @@ public class ExperimentPropertyValueEntity {
 
     public String getPropertyValue() {
         return propertyValue;
+    }
+
+    public ExperimentPropertyEntity getProperty() {
+        return property;
     }
 
     public ExperimentPropertyValueEntity setPropertyValue(String propertyValue) {

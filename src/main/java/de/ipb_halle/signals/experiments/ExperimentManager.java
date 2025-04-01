@@ -34,10 +34,7 @@ import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ExperimentManager {
     @Inject
@@ -59,12 +56,12 @@ public class ExperimentManager {
 
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void importExperiment(RuntimeConfig runtimeConfig, String id) {
-
+        logger.info("ICH BIN IN IMPORT EXPERIMENT");
         //loads experiments from local DB to be imported into Signals
         ExperimentEntity experimentEntity = experimentDbService.loadExperimentById(id);
         Experiment experiment = new Experiment(experimentEntity, dynEnumManager);
-        //experimentDbService.loadExperimentPropertyValues(experiment);
-
+        experimentDbService.loadExperimentPropertyValuesWithProperties(experiment);
+        logger.info("THE RPOERTIES WERE LOADED");
         experimentRestService.createNewExperiment(experiment);
     }
 

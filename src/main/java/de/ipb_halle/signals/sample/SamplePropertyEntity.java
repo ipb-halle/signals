@@ -36,6 +36,9 @@ public class SamplePropertyEntity {
     @Column(name = "property_type")
     private String propertyType;
 
+    @Column(name = "sample_id")
+    private String sampleId;
+
 
     public SamplePropertyEntity() {
     }
@@ -54,6 +57,10 @@ public class SamplePropertyEntity {
         return propertyName;
     }
 
+    public String getSampleId() {
+        return sampleId;
+    }
+
     // ——— Setters ——— //
     public SamplePropertyEntity setPropertyId(String propertyId) {
         this.propertyId = propertyId;
@@ -70,5 +77,8 @@ public class SamplePropertyEntity {
         return this;
     }
 
-
+    public SamplePropertyEntity setSampleId(String sampleId) {
+        this.sampleId = sampleId;
+        return this;
+    }
 }

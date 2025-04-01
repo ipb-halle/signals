@@ -20,12 +20,20 @@
 
 package de.ipb_halle.signals.experiments;
 
+import de.ipb_halle.signals.sample.*;
 import de.ipb_halle.tda.PersistenceElements;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Root;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Stateless
 @PersistenceElements(entities = {ExperimentEntity.class})
@@ -64,5 +72,25 @@ public class ExperimentDbService {
                 entityManager.merge(experimentPropertyValueEntity);
             }
         }
+    }
+
+    public void loadExperimentPropertyValuesWithProperties(Experiment experiment) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ExperimentPropertyValueEntity> query = cb.createQuery(ExperimentPropertyValueEntity.class);
+        Root<ExperimentPropertyValueEntity> root = query.from(ExperimentPropertyValueEntity.class);
+        root.fetch("property", JoinType.INNER);
+
+        query.select(root).where(cb.equal(root.get("id").get("experimentId"), experiment.getId()));
+
+        List<ExperimentPropertyValueEntity> results = entityManager.createQuery(query).getResultList();
+
+        for (ExperimentPropertyValueEntity valueEntity : results) {
+            ExperimentPropertyValue value = new ExperimentPropertyValue(valueEntity);
+            experiment.addPropertyValue(value);
+            experiment.addProperty(new ExperimentProperty(valueEntity.getProperty()));
+        }
+        logger.info("EXPERIMENT DB SERVICE, EXPERIMENT PROPERTIES = {}\n, EXEPRIMENT PROPERTY VALUES = {}\n",
+                Arrays.toString(experiment.getProperties().toArray()),
+                Arrays.toString(experiment.getPropertyValues().toArray()));
     }
 }

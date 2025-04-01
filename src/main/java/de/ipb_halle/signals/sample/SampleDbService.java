@@ -97,8 +97,7 @@ public class SampleDbService {
         Root<SamplePropertyValueEntity> root = query.from(SamplePropertyValueEntity.class);
 
         // WHERE id.sampleId = :sampleId
-        query.select(root)
-                .where(cb.equal(root.get("id").get("sampleId"), sample.getId()));
+        query.select(root).where(cb.equal(root.get("id").get("sampleId"), sample.getId()));
 
         List<SamplePropertyValueEntity> results = em.createQuery(query).getResultList();
 
