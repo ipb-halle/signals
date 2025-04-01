@@ -13,10 +13,11 @@ CREATE TABLE inhouse_compounds (
     UNIQUE (mol_id)
 );
 
-CREATE TABLE inhouse_compound_synonyms (
+CREATE TABLE inhouse_synonyms (
     id  SERIAL NOT NULL PRIMARY KEY,
-    mol_id INTEGER NOT NULL,
-    synonym VARCHAR
+    inhouse_id INTEGER NOT NULL,
+    type VARCHAR,
+    synonym VARCHAR,
 );
 
 CREATE TABLE inhouse_experiments (
@@ -29,5 +30,16 @@ CREATE TABLE inhouse_experiments (
     remarks VARCHAR,
     UNIQUE(threelc,code),
     UNIQUE(proc_id)
+);
+
+CREATE TABLE inhouse_taxonomy (
+    id SERIAL NOT NULL PRIMARY KEY,
+    eid VARCHAR,
+    inhouse_id INTEGER,
+    inhouse_parent_id INTEGER,
+    organism_id INTEGER,
+    parent VARCHAR,
+    level VARCHAR,
+    name VARCHAR
 );
 

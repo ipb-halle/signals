@@ -27,15 +27,21 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "inhouse_compound_synonyms")
-public class InhouseCompoundSynonym {
+@Table(name = "inhouse_synonyms")
+public class InhouseSynonym {
+
+    public final static String SYNONYM_COMPOUND = "compound";
+    public final static String SYNONYM_ORGANISM = "organism";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "mol_id")
-    private Integer molId;
+    @Column(name = "inhouse_id")
+    private Integer inhouseId;
+
+    @Column
+    private String type;
 
     @Column
     private String synonym;
@@ -44,17 +50,17 @@ public class InhouseCompoundSynonym {
         return id;
     }
 
-    public InhouseCompoundSynonym setId(Integer id) {
+    public InhouseSynonym setId(Integer id) {
         this.id = id;
         return this;
     }
 
-    public Integer getMolId() {
-        return molId;
+    public Integer getInhouseId() {
+        return inhouseId;
     }
 
-    public InhouseCompoundSynonym setMolId(Integer molId) {
-        this.molId = molId;
+    public InhouseSynonym setInhouseId(Integer inhouseId) {
+        this.inhouseId = inhouseId;
         return this;
     }
 
@@ -62,8 +68,17 @@ public class InhouseCompoundSynonym {
         return synonym;
     }
 
-    public InhouseCompoundSynonym setSynonym(String synonym) {
+    public InhouseSynonym setSynonym(String synonym) {
         this.synonym = synonym;
+        return this;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public InhouseSynonym setType(String type) {
+        this.type = type;
         return this;
     }
 }
