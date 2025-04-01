@@ -358,7 +358,7 @@ CREATE TABLE locations (
 );
 
 CREATE TABLE samples (
-    id VARCHAR PRIMARY KEY REFERENCES sample_properties(sample_id),
+    id VARCHAR PRIMARY KEY,
     name VARCHAR NOT NULL,
     description TEXT,
     type INTEGER,
@@ -371,16 +371,47 @@ CREATE TABLE samples (
     ancestor_id VARCHAR,
     stoicRef_id VARCHAR,
     stoicRef_row_id VARCHAR,
-    parent_container_id VARCHAR NOT NULL,
+    parent_container_id VARCHAR,
     template_id VARCHAR
 );
 
-CREATE TABLE sample_properties(
-    id SERIAL PRIMARY KEY,
-    name VARCHAR,
-    type VARCHAR,
-    property_value VARCHAR,
-    property_key VARCHAR,
-    sample_id VARCHAR NOT NULL
+CREATE TABLE sample_properties (
+    property_id VARCHAR PRIMARY KEY,
+    property_name VARCHAR,
+    property_type VARCHAR,
 );
 
+CREATE TABLE sample_property_values (
+    sample_id VARCHAR NOT NULL REFERENCES samples(id) ON DELETE CASCADE,
+    property_id VARCHAR NOT NULL REFERENCES sample_properties(property_id) ON DELETE CASCADE,
+    property_value VARCHAR,
+    PRIMARY KEY (sample_id, property_id)
+);
+
+CREATE TABLE experiments (
+    id VARCHAR PRIMARY KEY,
+    name VARCHAR NOT NULL,
+    description TEXT,
+    type INTEGER,
+    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    edited_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR,
+    edited_by VARCHAR,
+    owner VARCHAR,
+    digest BIGINT NOT NULL,
+    ancestor_id VARCHAR,
+    template_id VARCHAR
+);
+
+CREATE TABLE experiment_properties (
+    property_id VARCHAR PRIMARY KEY,
+    property_name VARCHAR,
+    property_type VARCHAR,
+);
+
+CREATE TABLE experiment_property_values (
+    experiment_id VARCHAR NOT NULL REFERENCES experiments(id) ON DELETE CASCADE,
+    property_id VARCHAR NOT NULL REFERENCES experiment_properties(property_id) ON DELETE CASCADE,
+    property_value VARCHAR,
+    PRIMARY KEY (experiment_id, property_id)
+);

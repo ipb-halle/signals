@@ -18,20 +18,20 @@
 package de.ipb_halle.signals;
 
 import de.ipb_halle.inhouse.InhouseDB;
-import de.ipb_halle.signals.element.ElementConfig;
-import de.ipb_halle.signals.element.ElementManager;
 import de.ipb_halle.signals.attribute.AttributeManager;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.element.ElementConfig;
 import de.ipb_halle.signals.element.ElementManager;
 import de.ipb_halle.signals.entity.SignalsEntityConfig;
 import de.ipb_halle.signals.entity.SignalsEntityManager;
+import de.ipb_halle.signals.experiments.ExperimentConfig;
+import de.ipb_halle.signals.experiments.ExperimentManager;
 import de.ipb_halle.signals.inventory.InventoryConfig;
 import de.ipb_halle.signals.inventory.InventoryManager;
 import de.ipb_halle.signals.materials.MaterialsConfig;
 import de.ipb_halle.signals.materials.MaterialsManager;
-import de.ipb_halle.signals.sample.SamplesConfig;
-import de.ipb_halle.signals.sample.SamplesManager;
+import de.ipb_halle.signals.sample.SampleConfig;
+import de.ipb_halle.signals.sample.SampleManager;
 import de.ipb_halle.signals.users.AccessConfig;
 import de.ipb_halle.signals.users.AccessManager;
 import de.ipb_halle.signals.users.LdapClient;
@@ -82,7 +82,10 @@ public class Signals {
     private MaterialsManager materialsManager;
 
     @Inject
-    private SamplesManager samplesManager;
+    private SampleManager sampleManager;
+
+    @Inject
+    private ExperimentManager experimentManager;
 
     @Inject
     private LdapClient ldapClient;
@@ -99,7 +102,8 @@ public class Signals {
     private AccessConfig accessConfig;
     private MaterialsConfig materialsConfig;
     private InventoryConfig inventoryConfig;
-    private SamplesConfig samplesConfig;
+    private SampleConfig sampleConfig;
+    private ExperimentConfig experimentConfig;
     private ElementConfig elementConfig;
     private RuntimeConfig runtimeConfig;
     private SignalsEntityConfig signalsEntityConfig;
@@ -108,19 +112,10 @@ public class Signals {
     private Logger logger;
 
     @SuppressWarnings("static-access")
-    private static final Option configOpt = Option.builder("c")
-            .longOpt("config")
-            .desc("\nPath to a the config file containing the Signals (tm) web token, base URL as well as database and LDAP connection information.")
-            .hasArg()
-            .argName("FILE")
-            .required(true)
-            .build();
+    private static final Option configOpt = Option.builder("c").longOpt("config").desc("\nPath to a the config file containing the Signals (tm) web token, base URL as well as database and LDAP connection information.").hasArg().argName("FILE").required(true).build();
 
     @SuppressWarnings("static-access")
-    private static final Option helpOpt = Option.builder("h")
-            .longOpt("help")
-            .desc("\nDisplay the help")
-            .build();
+    private static final Option helpOpt = Option.builder("h").longOpt("help").desc("\nDisplay the help").build();
 
 
     /**
@@ -134,16 +129,13 @@ public class Signals {
     // @PostConstruct annotation did not work
     private void postConstruct() {
         runtimeConfig = new RuntimeConfig();
-        accessConfig = new AccessConfig(signalsConfig,
-                runtimeConfig, accessManager);
-        inventoryConfig = new InventoryConfig(signalsConfig,
-                runtimeConfig, inventoryManager);
-        materialsConfig = new MaterialsConfig(signalsConfig,
-                runtimeConfig, materialsManager);
-        signalsEntityConfig = new SignalsEntityConfig(signalsConfig,
-                runtimeConfig, attributeManager, signalsEntityManager);
+        accessConfig = new AccessConfig(signalsConfig, runtimeConfig, accessManager);
+        inventoryConfig = new InventoryConfig(signalsConfig, runtimeConfig, inventoryManager);
+        materialsConfig = new MaterialsConfig(signalsConfig, runtimeConfig, materialsManager);
+        signalsEntityConfig = new SignalsEntityConfig(signalsConfig, runtimeConfig, attributeManager, signalsEntityManager);
         elementConfig = new ElementConfig(signalsConfig, runtimeConfig, elementManager);
-        samplesConfig = new SamplesConfig(samplesManager, runtimeConfig, signalsConfig);
+        sampleConfig = new SampleConfig(sampleManager, runtimeConfig, signalsConfig);
+        experimentConfig = new ExperimentConfig(experimentManager, runtimeConfig, signalsConfig);
     }
 
     public void dumpEntities(Date[] dateRange) {
@@ -190,7 +182,11 @@ public class Signals {
     }
 
     public void manageSamples(Date[] dates) {
-        samplesConfig.manageSamples(dates);
+        sampleConfig.manageSamples(dates);
+    }
+
+    public void manageExperiments(Date[] dates) {
+        experimentConfig.manageExperiments(dates);
     }
 
     @Deprecated // use getMaterialsConfig() instead
@@ -210,8 +206,12 @@ public class Signals {
         return inventoryConfig;
     }
 
-    public SamplesConfig getSamplesConfig() {
-        return samplesConfig;
+    public SampleConfig getSamplesConfig() {
+        return sampleConfig;
+    }
+
+    public ExperimentConfig getExperimentConfig() {
+        return experimentConfig;
     }
 
     public void manageElements(Date[] dateRange) {
@@ -287,7 +287,8 @@ public class Signals {
             InventoryConfig.processCommandLine(cmdline, options, signals);
             InhouseDB.processCommandLine(cmdline, options, signals);
             ElementConfig.processCommandLine(cmdline, options, signals);
-            SamplesConfig.processCommandLine(cmdline, options, signals);
+            SampleConfig.processCommandLine(cmdline, options, signals);
+            ExperimentConfig.processCommandLine(cmdline, options, signals);
 
         } catch (MissingArgumentException mae) {
             printHelp("ERROR: " + mae.getMessage(), options);
@@ -312,7 +313,8 @@ public class Signals {
         ElementConfig.registerOptions(options);
         InventoryConfig.registerOptions(options);
         InhouseDB.registerOptions(options);
-        SamplesConfig.registerOptions(options);
+        SampleConfig.registerOptions(options);
+        ExperimentConfig.registerOptions(options);
         processCommandLine(argv, options);
     }
 

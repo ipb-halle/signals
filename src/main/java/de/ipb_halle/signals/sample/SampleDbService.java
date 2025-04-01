@@ -20,15 +20,17 @@
 
 package de.ipb_halle.signals.sample;
 
-import de.ipb_halle.signals.dynEnum.DynEnumManager;
-import de.ipb_halle.signals.field.FieldDbService;
 import de.ipb_halle.tda.PersistenceElements;
 import jakarta.ejb.Stateless;
-import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.List;
 
 @Stateless
 @PersistenceElements(entities = {SampleEntity.class})
@@ -37,21 +39,73 @@ public class SampleDbService {
     @PersistenceContext(unitName = "signalsDB")
     private EntityManager em;
 
-    @Inject
-    private DynEnumManager dynEnumManager;
-
-    @Inject
-    private FieldDbService fieldDbService;
-
-    private static final Logger logger = LogManager.getLogger(SamplesManager.class);
-
+    private static final Logger logger = LogManager.getLogger(SampleDbService.class);
 
     public void save(Sample sample) {
-        SampleEntity se = sample.createEntity();
-        for (SampleProperty sp : sample.getProperties()) {
-            SamplePropertyEntity spe = sp.createEntity();
-            this.em.merge(spe);
+        SampleEntity sampleEntity = sample.createEntity();
+
+        em.merge(sampleEntity);
+
+        for (SampleProperty sampleProperty : sample.getProperties()) {
+            if (sampleProperty.getPropertyId() == null || sampleProperty.getPropertyId().isBlank()) {
+                logger.warn("Skipping property with null or blank ID: {}", sampleProperty.getPropertyName());
+                continue;
+            }
+            SamplePropertyEntity samplePropertyEntity = sampleProperty.createEntity(); // no template version
+            em.merge(samplePropertyEntity);
         }
-        this.em.merge(se);
+
+        for (SamplePropertyValue samplePropertyValue : sample.getPropertyValues()) {
+            if (samplePropertyValue.getPropertyId() == null || samplePropertyValue.getPropertyId().isBlank()) {
+                logger.warn("Skipping SamplePropertyValue with null or blank propertyId: sampleId={}", samplePropertyValue.getSampleId());
+                continue;
+            }
+            SamplePropertyValueEntity samplePropertyValueEntity = samplePropertyValue.createEntity();
+            if (samplePropertyValueEntity != null) {
+                em.merge(samplePropertyValueEntity);
+            }
+        }
     }
+
+
+    public SampleEntity loadSampleEntityById(String id) {
+        return em.find(SampleEntity.class, id);
+    }
+
+    //ToDO:method needs to be refactored, doesnt load property values
+    public void loadSampleProperties(Sample sample) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<SamplePropertyEntity> query = cb.createQuery(SamplePropertyEntity.class);
+        Root<SamplePropertyEntity> root = query.from(SamplePropertyEntity.class);
+
+        // WHERE sp.template.templateId = :templateId
+        query.select(root);
+
+        List<SamplePropertyEntity> results = em.createQuery(query).getResultList();
+
+        for (SamplePropertyEntity propertyEntity : results) {
+            SampleProperty sampleProperty = new SampleProperty(propertyEntity);
+            sample.addProperty(sampleProperty);
+        }
+
+
+    }
+
+    public void loadSamplePropertyValues(Sample sample) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<SamplePropertyValueEntity> query = cb.createQuery(SamplePropertyValueEntity.class);
+        Root<SamplePropertyValueEntity> root = query.from(SamplePropertyValueEntity.class);
+
+        // WHERE id.sampleId = :sampleId
+        query.select(root).where(cb.equal(root.get("id").get("sampleId"), sample.getId()));
+
+        List<SamplePropertyValueEntity> results = em.createQuery(query).getResultList();
+
+        for (SamplePropertyValueEntity valueEntity : results) {
+            SamplePropertyValue value = new SamplePropertyValue(valueEntity);
+            sample.addPropertyValue(value);
+        }
+    }
+
+
 }

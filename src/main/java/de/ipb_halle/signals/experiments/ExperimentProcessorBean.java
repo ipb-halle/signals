@@ -18,11 +18,8 @@
  *
  */
 
-package de.ipb_halle.signals.sample;
+package de.ipb_halle.signals.experiments;
 
-import de.ipb_halle.signals.inventory.ContainerDbService;
-import de.ipb_halle.signals.inventory.ContainerEntity;
-import de.ipb_halle.signals.inventory.LocationProcessorBean;
 import jakarta.annotation.Resource;
 import jakarta.ejb.LocalBean;
 import jakarta.ejb.Stateless;
@@ -33,72 +30,49 @@ import jakarta.transaction.TransactionSynchronizationRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.List;
-
-
 @Stateless
 @LocalBean
-public class SampleProcessorBean {
+public class ExperimentProcessorBean {
 
     @Inject
-    private SampleRestService sampleRestService;
+    private ExperimentRestService experimentRestService;
 
     @Inject
-    private SampleDbService sampleDbService;
-
-    @Inject
-    private ContainerDbService containerDbService;
+    private ExperimentDbService experimentDbService;
 
     @Resource
     private TransactionSynchronizationRegistry transactionSynchronizationRegistry;
 
-    private static final Logger logger = LogManager.getLogger(LocationProcessorBean.class);
-
+    private static final Logger logger = LogManager.getLogger(ExperimentProcessorBean.class);
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void processSingleSample(String sampleId) {
-        doProcessSample(sampleId);
+    public void processSingleExperiment(String experimentId) {
+        doProcessExperiment(experimentId);
     }
 
-    private void doProcessSample(String sampleId) {
+    private void doProcessExperiment(String experimentId) {
         //If transaction marked for rollback, then break it
         if (transactionSynchronizationRegistry.getTransactionStatus() == jakarta.transaction.Status.STATUS_MARKED_ROLLBACK) {
-            logger.error("SampleProcessorBean:-> Transaction is marked for rollback, skipping.");
+            logger.error("ExperimentProcessorBean:-> Transaction is marked for rollback, skipping.");
         }
 
         try {
-            // 1) Load sample via REST
-            Sample sample = sampleRestService.doGetSample(sampleId);
-
-            // 2) set parent container id
-            sample.setParentContainerId(loadContainerIdForSample(sampleId));
+            // 1) Load experiment via REST
+            Experiment experiment = experimentRestService.doGetExperiment(experimentId);
 
             // 3) receive property keys for each sample
-            sampleRestService.doGetSampleProperties(sample);
+            experimentRestService.doGetExperimentProperties(experiment);
 
             // 4) fetch each property explicitly for given sample in order to process attachments using received property keys
             //sampleRestService.doGetEachPropertyExplicitly(sample);
 
 
-            sampleDbService.save(sample);
+            experimentDbService.save(experiment);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
     }
-
-
-    private String loadContainerIdForSample(String sampleId) {
-        List<ContainerEntity> containerEntities = containerDbService.loadAllContainersWithMaterialIdSample();
-        for (ContainerEntity containerEntity : containerEntities) {
-            if (containerEntity.getMaterialId().equals(sampleId)) {
-                return containerEntity.getId();
-            }
-        }
-        logger.warn("Warning! Where is no container for this sample = {}!!", sampleId);
-        return null;
-    }
-
 
 }

@@ -39,7 +39,7 @@ public class RestHelper {
     public final static String ATTR_DATA = "data";
     public final static String ATTR_DESCRIPTION = "description";
     public final static String ATTR_DIGEST = "digest";
-    public final static String ATTR_EDITED_AT ="editedAt";
+    public final static String ATTR_EDITED_AT = "editedAt";
     public final static String ATTR_FIELDS = "fields";
     public final static String ATTR_ID = "id";
     public final static String ATTR_NAME = "name";
@@ -56,8 +56,8 @@ public class RestHelper {
     public final static String CHILDREN = "children";
     public static final String ATTR_IN_USE = "inUse";
     public static final String ATTR_MOVABLE = "movable";
-    public static final String ATTR_CREATED_AT ="createdAt";
-    public static final String ATTR_UPDATED_AT ="updatedAt";
+    public static final String ATTR_CREATED_AT = "createdAt";
+    public static final String ATTR_UPDATED_AT = "updatedAt";
     public static final String ATTR_DEFINITION = "definition";
     public static final String ATTR_OPTIONS = "options";
     public static final String ATTR_ATTRIBUTE = "attribute";
@@ -66,6 +66,8 @@ public class RestHelper {
     public static final String ATTR_TITLE = "title";
     public static final String ATTR_SAMPLE = "sample";
     public static final String ATTR_TEMPLATE = "template";
+    public static final String ATTR_INCLUDED = "included";
+    public static final String ATTR_WORK_ORDER = "workOrder";
 
 
     public static String formatDate(Date d) {

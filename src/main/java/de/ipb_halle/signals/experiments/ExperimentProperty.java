@@ -18,58 +18,53 @@
  *
  */
 
-package de.ipb_halle.signals.sample;
+package de.ipb_halle.signals.experiments;
 
-public class SampleProperty {
+public class ExperimentProperty {
     private String propertyId;
     private String propertyName;
     private String propertyType;
 
-    public SampleProperty() {
+    public ExperimentProperty() {
     }
 
-    public SampleProperty(SamplePropertyEntity spe) {
-        this.propertyId = spe.getPropertyId();
-        this.propertyName = spe.getPropertyName();
-        this.propertyType = spe.getPropertyType();
+    public ExperimentProperty(ExperimentPropertyEntity experimentPropertyEntity) {
+        this.propertyId = experimentPropertyEntity.getPropertyId();
+        this.propertyName = experimentPropertyEntity.getPropertyName();
+        this.propertyType = experimentPropertyEntity.getPropertyType();
     }
 
-    public SamplePropertyEntity createEntity() {
-        return new SamplePropertyEntity()
+    public ExperimentPropertyEntity createEntity() {
+        return new ExperimentPropertyEntity()
                 .setPropertyId(propertyId)
                 .setPropertyName(propertyName)
                 .setPropertyType(propertyType);
-    }
-
-    //getter
-    public String getPropertyType() {
-        return propertyType;
-    }
-
-    public String getPropertyName() {
-        return propertyName;
     }
 
     public String getPropertyId() {
         return propertyId;
     }
 
-
-    //setter
-    public SampleProperty setPropertyId(String propertyId) {
+    public ExperimentProperty setPropertyId(String propertyId) {
         this.propertyId = propertyId;
         return this;
     }
 
-    public SampleProperty setPropertyName(String propertyName) {
+    public String getPropertyName() {
+        return propertyName;
+    }
+
+    public ExperimentProperty setPropertyName(String propertyName) {
         this.propertyName = propertyName;
         return this;
     }
 
-    public SampleProperty setPropertyType(String propertyType) {
+    public String getPropertyType() {
+        return propertyType;
+    }
+
+    public ExperimentProperty setPropertyType(String propertyType) {
         this.propertyType = propertyType;
         return this;
     }
-
-
 }

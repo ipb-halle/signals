@@ -18,13 +18,16 @@
  *
  */
 
-package de.ipb_halle.signals.sample;
+package de.ipb_halle.signals.experiments;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "sample_properties")
-public class SamplePropertyEntity {
+@Table(name = "experiment_properties")
+public class ExperimentPropertyEntity {
 
     @Id
     @Column(name = "property_id")
@@ -36,49 +39,30 @@ public class SamplePropertyEntity {
     @Column(name = "property_type")
     private String propertyType;
 
-    @Column(name = "sample_id")
-    private String sampleId;
-
-
-    public SamplePropertyEntity() {
-    }
-
-    // ——— getters ——— //
-
     public String getPropertyId() {
         return propertyId;
     }
 
-    public String getPropertyType() {
-        return propertyType;
+    public ExperimentPropertyEntity setPropertyId(String propertyId) {
+        this.propertyId = propertyId;
+        return this;
     }
 
     public String getPropertyName() {
         return propertyName;
     }
 
-    public String getSampleId() {
-        return sampleId;
-    }
-
-    // ——— Setters ——— //
-    public SamplePropertyEntity setPropertyId(String propertyId) {
-        this.propertyId = propertyId;
-        return this;
-    }
-
-    public SamplePropertyEntity setPropertyName(String propertyName) {
+    public ExperimentPropertyEntity setPropertyName(String propertyName) {
         this.propertyName = propertyName;
         return this;
     }
 
-    public SamplePropertyEntity setPropertyType(String propertyType) {
-        this.propertyType = propertyType;
-        return this;
+    public String getPropertyType() {
+        return propertyType;
     }
 
-    public SamplePropertyEntity setSampleId(String sampleId) {
-        this.sampleId = sampleId;
+    public ExperimentPropertyEntity setPropertyType(String propertyType) {
+        this.propertyType = propertyType;
         return this;
     }
 }

@@ -31,7 +31,7 @@ import org.apache.logging.log4j.Logger;
 import java.text.ParseException;
 import java.util.Date;
 
-public class SamplesConfig {
+public class SampleConfig {
     @SuppressWarnings("static-access")
     private static final Option samplesSyncOpt = Option.builder("saS")
             .longOpt("sampleSync")
@@ -44,21 +44,21 @@ public class SamplesConfig {
 
     @SuppressWarnings("static-access")
     private static final Option sampleImportOpt = Option.builder("si")
-            .longOpt("samplesImport")
+            .longOpt("sampleImport")
             .hasArgs()
             .argName("ENTITY_ID")
             .optionalArg(false)
             .desc("\nImport a single sample from DB into SNB (i.e. create new sample in SNB).")
             .build();
 
-    private SamplesManager samplesManager;
+    private SampleManager sampleManager;
     private RuntimeConfig runtimeConfig;
     private SignalsConfig signalsConfig;
     private Logger logger;
 
-    public SamplesConfig(SamplesManager samplesManager, RuntimeConfig runtimeConfig, SignalsConfig signalsConfig) {
-        this.logger = LogManager.getLogger(SamplesConfig.class);
-        this.samplesManager = samplesManager;
+    public SampleConfig(SampleManager sampleManager, RuntimeConfig runtimeConfig, SignalsConfig signalsConfig) {
+        this.logger = LogManager.getLogger(SampleConfig.class);
+        this.sampleManager = sampleManager;
         this.runtimeConfig = runtimeConfig;
         this.signalsConfig = signalsConfig;
     }
@@ -74,10 +74,10 @@ public class SamplesConfig {
                 ******************************************************
                 """, signalsConfig.getSnbInstanceName(), new Date().toString());
 
-        samplesManager.manageSamples(dateRange);
+        sampleManager.manageSamples(dateRange);
     }
 
-    public void importSamples(String id) {
+    public void importSample(String id) {
         logger.info("""
 
                 ******************************************************
@@ -87,7 +87,7 @@ public class SamplesConfig {
                 *
                 ******************************************************
                 """, signalsConfig.getSnbInstanceName(), id);
-        samplesManager.importSample(runtimeConfig, id);
+        sampleManager.importSample(runtimeConfig, id);
     }
 
     public static void registerOptions(Options options) {
@@ -111,7 +111,7 @@ public class SamplesConfig {
         }
 
         if (cmdline.hasOption(sampleImportOpt.getOpt())) {
-            signals.getSamplesConfig().importSamples(
+            signals.getSamplesConfig().importSample(
                     cmdline.getOptionValue(sampleImportOpt.getOpt()));
         }
     }

@@ -18,19 +18,16 @@
  *
  */
 
-package de.ipb_halle.signals.sample;
+package de.ipb_halle.signals.experiments;
 
-import de.ipb_halle.signals.entity.EntityType;
-import de.ipb_halle.signals.users.UserReference;
 import jakarta.persistence.*;
 
 import java.util.Date;
 
 @Entity
-@Table(name = "samples")
-public class SampleEntity {
-
-    public static final String ENTITY_TYPE_SAMPLE = "sample";
+@Table(name="experiments")
+public class ExperimentEntity {
+    public static final String ENTITY_TYPE_EXPERIMENT = "experiment";
     @Id
     private String id;
 
@@ -66,15 +63,6 @@ public class SampleEntity {
     @Column(name = "ancestor_id")
     private String ancestorId;
 
-    @Column(name = "stoicRef_id")
-    private String stoicRefId;
-
-    @Column(name = "stoicRef_row_id")
-    private String stoicRefRowId;
-
-    @Column(name = "parent_container_id")
-    private String parentContainerId;
-
     @Column(name="template_id")
     private String templateId;
 
@@ -82,7 +70,7 @@ public class SampleEntity {
         return id;
     }
 
-    public SampleEntity setId(String id) {
+    public ExperimentEntity setId(String id) {
         this.id = id;
         return this;
     }
@@ -91,7 +79,7 @@ public class SampleEntity {
         return name;
     }
 
-    public SampleEntity setName(String name) {
+    public ExperimentEntity setName(String name) {
         this.name = name;
         return this;
     }
@@ -100,7 +88,7 @@ public class SampleEntity {
         return description;
     }
 
-    public SampleEntity setDescription(String description) {
+    public ExperimentEntity setDescription(String description) {
         this.description = description;
         return this;
     }
@@ -109,7 +97,7 @@ public class SampleEntity {
         return type;
     }
 
-    public SampleEntity setType(Integer type) {
+    public ExperimentEntity setType(Integer type) {
         this.type = type;
         return this;
     }
@@ -118,7 +106,7 @@ public class SampleEntity {
         return createdAt;
     }
 
-    public SampleEntity setCreatedAt(Date createdAt) {
+    public ExperimentEntity setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
         return this;
     }
@@ -127,7 +115,7 @@ public class SampleEntity {
         return editedAt;
     }
 
-    public SampleEntity setEditedAt(Date editedAt) {
+    public ExperimentEntity setEditedAt(Date editedAt) {
         this.editedAt = editedAt;
         return this;
     }
@@ -136,7 +124,7 @@ public class SampleEntity {
         return createdBy;
     }
 
-    public SampleEntity setCreatedBy(String createdBy) {
+    public ExperimentEntity setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
         return this;
     }
@@ -145,7 +133,7 @@ public class SampleEntity {
         return editedBy;
     }
 
-    public SampleEntity setEditedBy(String editedBy) {
+    public ExperimentEntity setEditedBy(String editedBy) {
         this.editedBy = editedBy;
         return this;
     }
@@ -154,7 +142,7 @@ public class SampleEntity {
         return owner;
     }
 
-    public SampleEntity setOwner(String owner) {
+    public ExperimentEntity setOwner(String owner) {
         this.owner = owner;
         return this;
     }
@@ -163,7 +151,7 @@ public class SampleEntity {
         return digest;
     }
 
-    public SampleEntity setDigest(Long digest) {
+    public ExperimentEntity setDigest(Long digest) {
         this.digest = digest;
         return this;
     }
@@ -172,35 +160,8 @@ public class SampleEntity {
         return ancestorId;
     }
 
-    public SampleEntity setAncestorId(String ancestorId) {
+    public ExperimentEntity setAncestorId(String ancestorId) {
         this.ancestorId = ancestorId;
-        return this;
-    }
-
-    public String getStoicRefId() {
-        return stoicRefId;
-    }
-
-    public SampleEntity setStoicRefId(String stoicRefId) {
-        this.stoicRefId = stoicRefId;
-        return this;
-    }
-
-    public String getStoicRefRowId() {
-        return stoicRefRowId;
-    }
-
-    public SampleEntity setStoicRefRowId(String stoicRefRowId) {
-        this.stoicRefRowId = stoicRefRowId;
-        return this;
-    }
-
-    public String getParentContainerId() {
-        return parentContainerId;
-    }
-
-    public SampleEntity setParentContainerId(String parentContainerId) {
-        this.parentContainerId = parentContainerId;
         return this;
     }
 
@@ -208,7 +169,7 @@ public class SampleEntity {
         return templateId;
     }
 
-    public SampleEntity setTemplateId(String templateId) {
+    public ExperimentEntity setTemplateId(String templateId) {
         this.templateId = templateId;
         return this;
     }

@@ -21,12 +21,12 @@
 package de.ipb_halle.signals.sample;
 
 import de.ipb_halle.signals.RuntimeConfig;
+import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.entity.SignalsEntityDbService;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
 import de.ipb_halle.signals.field.FieldDbService;
-import de.ipb_halle.signals.materials.Material;
 import jakarta.ejb.TransactionAttribute;
 import jakarta.ejb.TransactionAttributeType;
 import jakarta.inject.Inject;
@@ -38,7 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SamplesManager {
+public class SampleManager {
 
     @Inject
     private SignalsEntityDbService signalsEntityDbService;
@@ -52,15 +52,30 @@ public class SamplesManager {
     @Inject
     private SampleProcessorBean sampleProcessorBean;
 
-    private final Logger logger = LogManager.getLogger(SamplesManager.class);
+    @Inject
+    private DynEnumManager dynEnumManager;
 
+    @Inject
+    private SampleRestService sampleRestService;
+
+
+    private final Logger logger = LogManager.getLogger(SampleManager.class);
+
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void importSample(RuntimeConfig runtimeConfig, String id) {
+        //loads samples from local DB to be imported into Signals
+        SampleEntity sampleEntity = sampleDbService.loadSampleEntityById(id);
+        Sample sample = new Sample(sampleEntity, dynEnumManager);
+        sampleDbService.loadSamplePropertyValues(sample);
+        sampleDbService.loadSampleProperties(sample);
+
+        sampleRestService.createNewSample(sample);
     }
 
 
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void manageSamples(Date[] dateRange) {
-        logger.debug("MS:-> START MANAGE SAMPLES");
+        logger.debug("Sample Manager:-> START MANAGE SAMPLES");
 
         // 1) Query parameters for load
         EntityType entityTypes[] = {EntityType.valueOf(SampleEntity.ENTITY_TYPE_SAMPLE)};

@@ -23,17 +23,16 @@ package de.ipb_halle.signals.sample;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntity;
-import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldValue;
-import de.ipb_halle.signals.inventory.ContainerDbService;
-import de.ipb_halle.signals.inventory.ContainerEntity;
 import de.ipb_halle.signals.users.IUser;
 import de.ipb_halle.signals.users.UserReference;
-import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class Sample {
@@ -41,9 +40,7 @@ public class Sample {
     public static final String ATTR_STOIC_REF_EID = "stoicRef.eid";
     public static final String ATTR_STOIC_REF_ROWID = "stoicRef.rowId";
     public static final String ATTR_STOIC_REF = "stoicRef";
-
-    @Inject
-    private ContainerDbService containerDbService;
+    public static final String ATTR_SAMPLE = "sample";
 
     private final Logger logger = LogManager.getLogger(Sample.class);
 
@@ -63,18 +60,17 @@ public class Sample {
     private String templateId;
 
 
-    private Set<Field> fields;
-    private Set<FieldValue> fieldValues;
     private Set<SignalsEntity> ancestors;
     private Set<SignalsEntity> children;
     private Set<SampleProperty> properties;
+    private Set<SamplePropertyValue> propertyValues;
+
 
     public Sample() {
-        fields = new HashSet<>();
-        fieldValues = new HashSet<>();
         ancestors = new HashSet<>();
         children = new HashSet<>();
         properties = new HashSet<>();
+        propertyValues = new HashSet<>();
     }
 
     public Sample(SampleEntity sampleEntity, DynEnumManager dynEnumManager) {
@@ -89,15 +85,15 @@ public class Sample {
         this.owner = new UserReference(sampleEntity.getOwner());
         this.digest = sampleEntity.getDigest();
         this.ancestorId = sampleEntity.getAncestorId();
+        this.parentContainerId = sampleEntity.getParentContainerId();
         this.stoicRef = new StoicRef().setEid(sampleEntity.getStoicRefId()).setRowId(sampleEntity.getStoicRefRowId());
         this.templateId = sampleEntity.getTemplateId();
 
         this.ancestors = new HashSet<>();
         this.children = new HashSet<>();
 
-        this.fields = new HashSet<>();
-        this.fieldValues = new HashSet<>();
         this.properties = new HashSet<>();
+        this.propertyValues = new HashSet<>();
 
     }
 
@@ -136,9 +132,6 @@ public class Sample {
     }
 
     //getter
-    public ContainerDbService getContainerDbService() {
-        return containerDbService;
-    }
 
     public Logger getLogger() {
         return logger;
@@ -196,12 +189,8 @@ public class Sample {
         return parentContainerId;
     }
 
-    public Set<Field> getFields() {
-        return fields;
-    }
-
-    public Set<FieldValue> getFieldValues() {
-        return fieldValues;
+    public Set<SamplePropertyValue> getPropertyValues() {
+        return propertyValues;
     }
 
     public Set<SignalsEntity> getAncestors() {
@@ -220,10 +209,6 @@ public class Sample {
         return templateId;
     }
     //setter
-
-    public void setContainerDbService(ContainerDbService containerDbService) {
-        this.containerDbService = containerDbService;
-    }
 
     public void setId(String id) {
         this.id = id;
@@ -278,12 +263,8 @@ public class Sample {
         this.parentContainerId = parentContainerId;
     }
 
-    public void setFields(Set<Field> fields) {
-        this.fields = fields;
-    }
-
-    public void addFieldValues(Collection<FieldValue> fieldValues) {
-        this.fieldValues.addAll(fieldValues);
+    public void addPropertyValues(Collection<FieldValue> fieldValues) {
+        this.propertyValues.addAll(propertyValues);
     }
 
     public void setProperties(Set<SampleProperty> properties) {
@@ -303,24 +284,10 @@ public class Sample {
     }
 
     public void setTemplateId(String templateId) {
-        this.templateId = templateId;
+        this.templateId=templateId;
     }
 
-    //equals and hashcode
-
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        Sample sample = (Sample) object;
-        return Objects.equals(containerDbService, sample.containerDbService) && Objects.equals(logger, sample.logger) && Objects.equals(id, sample.id) && Objects.equals(name, sample.name) && Objects.equals(description, sample.description) && Objects.equals(type, sample.type) && Objects.equals(createdAt, sample.createdAt) && Objects.equals(editedAt, sample.editedAt) && Objects.equals(createdBy, sample.createdBy) && Objects.equals(editedBy, sample.editedBy) && Objects.equals(digest, sample.digest) && Objects.equals(stoicRef, sample.stoicRef) && Objects.equals(parentContainerId, sample.parentContainerId) && Objects.equals(fields, sample.fields) && Objects.equals(ancestors, sample.ancestors) && Objects.equals(children, sample.children);
+    public void addPropertyValue(SamplePropertyValue samplePropertyValue) {
+        this.propertyValues.add(samplePropertyValue);
     }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(containerDbService, logger, id, name, description, type, createdAt, editedAt, createdBy, editedBy, digest, stoicRef, parentContainerId, fields, ancestors, children);
-    }
-
-
-
 }
