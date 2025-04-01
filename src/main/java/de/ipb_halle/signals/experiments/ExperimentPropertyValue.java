@@ -86,4 +86,13 @@ public class ExperimentPropertyValue {
         this.propertyValue = propertyValue;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "ExperimentPropertyValue{" +
+                "experimentId='" + experimentId + '\'' +
+                ", propertyId='" + propertyId + '\'' +
+                ", propertyValue='" + propertyValue + '\'' +
+                '}';
+    }
 }

@@ -24,6 +24,7 @@ public class ExperimentProperty {
     private String propertyId;
     private String propertyName;
     private String propertyType;
+    private String templateId;
 
     public ExperimentProperty() {
     }
@@ -32,13 +33,15 @@ public class ExperimentProperty {
         this.propertyId = experimentPropertyEntity.getPropertyId();
         this.propertyName = experimentPropertyEntity.getPropertyName();
         this.propertyType = experimentPropertyEntity.getPropertyType();
+        this.templateId = experimentPropertyEntity.getTemplateId();
     }
 
     public ExperimentPropertyEntity createEntity() {
         return new ExperimentPropertyEntity()
                 .setPropertyId(propertyId)
                 .setPropertyName(propertyName)
-                .setPropertyType(propertyType);
+                .setPropertyType(propertyType)
+                .setTemplateId(templateId);
     }
 
     public String getPropertyId() {
@@ -65,6 +68,15 @@ public class ExperimentProperty {
 
     public ExperimentProperty setPropertyType(String propertyType) {
         this.propertyType = propertyType;
+        return this;
+    }
+
+    public String getTemplateId() {
+        return templateId;
+    }
+
+    public ExperimentProperty setTemplateId(String templateId) {
+        this.templateId = templateId;
         return this;
     }
 }

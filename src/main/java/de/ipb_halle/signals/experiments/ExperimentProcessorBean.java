@@ -61,7 +61,12 @@ public class ExperimentProcessorBean {
             Experiment experiment = experimentRestService.doGetExperiment(experimentId);
 
             // 3) receive property keys for each sample
-            experimentRestService.doGetExperimentProperties(experiment);
+            if (experiment.getTemplateId() != null) {
+                experimentRestService.doGetExperimentProperties(experiment);
+            }
+
+            // 3) recieve experiment property values upon template id
+            experimentRestService.doGetExperimentPropertyValues(experiment);
 
             // 4) fetch each property explicitly for given sample in order to process attachments using received property keys
             //sampleRestService.doGetEachPropertyExplicitly(sample);

@@ -67,6 +67,7 @@ public class ExperimentDbService {
                 logger.warn("Skipping SamplePropertyValue with null or blank propertyId: experimentId={}", experimentPropertyValue.getExperimentId());
                 continue;
             }
+            logger.info("ExperimentDbService:-> SAVING PROPERTY VALUES()");
             ExperimentPropertyValueEntity experimentPropertyValueEntity = experimentPropertyValue.createEntity();
             if (experimentPropertyValueEntity != null) {
                 entityManager.merge(experimentPropertyValueEntity);

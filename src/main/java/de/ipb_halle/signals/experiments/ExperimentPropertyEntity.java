@@ -39,6 +39,9 @@ public class ExperimentPropertyEntity {
     @Column(name = "property_type")
     private String propertyType;
 
+  @Column(name = "template_id")
+    private String templateId;
+
     public String getPropertyId() {
         return propertyId;
     }
@@ -63,6 +66,15 @@ public class ExperimentPropertyEntity {
 
     public ExperimentPropertyEntity setPropertyType(String propertyType) {
         this.propertyType = propertyType;
+        return this;
+    }
+
+    public String getTemplateId() {
+        return templateId;
+    }
+
+    public ExperimentPropertyEntity setTemplateId(String templateId) {
+        this.templateId = templateId;
         return this;
     }
 }
