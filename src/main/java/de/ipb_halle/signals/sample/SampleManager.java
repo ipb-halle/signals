@@ -66,8 +66,8 @@ public class SampleManager {
         //loads samples from local DB to be imported into Signals
         SampleEntity sampleEntity = sampleDbService.loadSampleEntityById(id);
         Sample sample = new Sample(sampleEntity, dynEnumManager);
-        sampleDbService.loadSamplePropertyValues(sample);
-        sampleDbService.loadSampleProperties(sample);
+        sampleDbService.loadSamplePropertyValuesWithProperties(sample);
+        //sampleDbService.loadSampleProperties(sample);
 
         sampleRestService.createNewSample(sample);
     }

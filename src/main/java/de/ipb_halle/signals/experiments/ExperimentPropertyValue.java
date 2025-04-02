@@ -20,7 +20,6 @@
 
 package de.ipb_halle.signals.experiments;
 
-import de.ipb_halle.signals.sample.SamplePropertyValue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,19 +28,15 @@ public class ExperimentPropertyValue {
     private String experimentId;
     private String propertyId;
     private String propertyValue;
-    public static final Logger logger = LogManager.getLogger(SamplePropertyValue.class);
+    public static final Logger logger = LogManager.getLogger(ExperimentPropertyValue.class);
 
     public ExperimentPropertyValue() {
     }
 
     public ExperimentPropertyValue(ExperimentPropertyValueEntity entity) {
         this.experimentId = entity.getId().getExperimentId();
-        this.propertyId=entity.getId().getPropertyId();
+        this.propertyId = entity.getId().getPropertyId();
         this.propertyValue = entity.getPropertyValue();
-
-        if (entity.getId().getPropertyId() == null) {
-            logger.warn("SamplePropertyValueEntity has null propertyId: sampleId = {}", entity.getId().getExperimentId());
-        }
     }
 
     public ExperimentPropertyValueEntity createEntity() {
@@ -49,6 +44,7 @@ public class ExperimentPropertyValue {
             logger.warn("Skipping SamplePropertyValueEntity creation: sampleId={}, propertyId={}", experimentId, propertyId);
             return null;
         }
+
         ExperimentPropertyValueId experimentPropertyValueId = new ExperimentPropertyValueId();
         experimentPropertyValueId
                 .setExperimentId(experimentId)

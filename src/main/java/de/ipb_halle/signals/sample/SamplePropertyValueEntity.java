@@ -32,6 +32,10 @@ public class SamplePropertyValueEntity {
     @Column(name = "property_value")
     private String propertyValue;
 
+    @ManyToOne
+    @JoinColumn(name = "property_id", referencedColumnName = "property_id", insertable = false, updatable = false)
+    private SamplePropertyEntity property;
+
     public SamplePropertyValueEntity() {
     }
 
@@ -50,6 +54,15 @@ public class SamplePropertyValueEntity {
 
     public SamplePropertyValueEntity setPropertyValue(String propertyValue) {
         this.propertyValue = propertyValue;
+        return this;
+    }
+
+    public SamplePropertyEntity getProperty() {
+        return property;
+    }
+
+    public SamplePropertyValueEntity setProperty(SamplePropertyEntity property) {
+        this.property = property;
         return this;
     }
 }
