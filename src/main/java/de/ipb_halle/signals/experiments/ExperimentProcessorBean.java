@@ -50,6 +50,7 @@ public class ExperimentProcessorBean {
         doProcessExperiment(experimentId);
     }
 
+
     private void doProcessExperiment(String experimentId) {
         //If transaction marked for rollback, then break it
         if (transactionSynchronizationRegistry.getTransactionStatus() == jakarta.transaction.Status.STATUS_MARKED_ROLLBACK) {

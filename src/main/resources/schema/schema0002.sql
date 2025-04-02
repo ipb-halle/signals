@@ -378,7 +378,7 @@ CREATE TABLE samples (
 CREATE TABLE sample_properties (
     property_id VARCHAR PRIMARY KEY,
     property_name VARCHAR,
-    property_type VARCHAR,
+    property_type VARCHAR
 );
 
 CREATE TABLE sample_property_values (
