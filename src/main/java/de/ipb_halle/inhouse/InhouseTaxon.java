@@ -19,7 +19,11 @@
 
 package de.ipb_halle.inhouse;
 
+import de.ipb_halle.signals.entity.EntityType;
+import de.ipb_halle.signals.field.FieldValue;
+import de.ipb_halle.signals.materials.Material;
 import de.ipb_halle.signals.materials.Synonym;
+import de.ipb_halle.signals.users.UserReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -27,6 +31,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -69,6 +74,41 @@ public class InhouseTaxon {
 
     public InhouseTaxon() {
         synonyms = new HashSet<>();
+    }
+
+    public Material createAsset(InhouseDB inhouseDB) throws IOException {
+        Material  mat = new Material();
+        mat.setEntityType(EntityType.valueOf(Material.ENTITY_TYPE_ASSET));
+        mat.setLibraryId(inhouseDB.getConfigString(Taxonomy.TAXONOMY_LIBRARY_ID));
+        mat.setName(name);
+        mat.setOwner(new UserReference(inhouseDB.getConfigString(Taxonomy.TAXONOMY_OWNER)));
+        mat.setSynonyms(synonyms);
+        createAssetFields(inhouseDB, mat);
+        return mat;
+    }
+
+    private void createAssetFields(InhouseDB inhouseDB, Material mat) {
+        if (organismId != 0) {
+            FieldValue fvMolId = new FieldValue();
+            fvMolId.setFieldId(inhouseDB.getConfigString(Taxonomy.TAXONOMY_FIELD_ORGANISM_ID));
+            fvMolId.setValue(Integer.toString(organismId));
+            mat.addFieldValue(fvMolId);
+        }
+
+        FieldValue fvAccess = new FieldValue();
+        fvAccess.setFieldId(inhouseDB.getConfigString(Taxonomy.TAXONOMY_FIELD_ACCESS));
+        fvAccess.setValue(inhouseDB.getConfigString(Taxonomy.TAXONOMY_ACCESS));
+        mat.addFieldValue(fvAccess);
+
+        FieldValue fvName = new FieldValue();
+        fvName.setFieldId(inhouseDB.getConfigString(Taxonomy.TAXONOMY_FIELD_ASSET_NAME));
+        fvName.setValue(name);
+        mat.addFieldValue(fvName);
+
+        FieldValue fvParent = new FieldValue();
+        fvParent.setFieldId(inhouseDB.getConfigString(Taxonomy.TAXONOMY_FIELD_PARENT_EID));
+        fvParent.setValue(parent);
+        mat.addFieldValue(fvParent);
     }
 
     public InhouseTaxon addSynonyms(Collection<InhouseSynonym> synonyms) {

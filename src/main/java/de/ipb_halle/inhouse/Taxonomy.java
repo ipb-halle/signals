@@ -17,7 +17,9 @@
  */
 package de.ipb_halle.inhouse;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
+import de.ipb_halle.signals.materials.Library;
+import de.ipb_halle.signals.materials.Material;
+import de.ipb_halle.signals.materials.MaterialRestService;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -25,7 +27,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -38,14 +40,29 @@ import java.util.regex.Pattern;
  */
 public class Taxonomy {
 
+    public record InhouseTaxonKey(String level, Integer inhouseId) {
+
+    }
+
+    public final static String DEFAULT_STRAIN_ID = "taxonomy.defaultStrainId";
+
     public final static String INPUT_TAXONOMY_CLASSES = "taxonomy.inputClasses";
     public final static String INPUT_TAXONOMY_FAMILIES = "taxonomy.inputFamilies";
     public final static String INPUT_TAXONOMY_SPECIES = "taxonomy.inputSpecies";
     public final static String INPUT_TAXONOMY_SPECIES_SYNONYMS = "taxonomy.inputSpeciesSynonyms";
     public final static String INPUT_TAXONOMY_STRAINS = "taxonomy.inputStrains";
     public final static String INPUT_ORGANISM_ID = "taxonomy.inputOrganisms";
+
+    public final static String TAXONOMY_ACCESS = "taxonomy.access";
+    public final static String TAXONOMY_OWNER = "taxonomy.owner";
     public final static String TAXONOMY_REJECT_FILE = "taxonomy.rejectFile";
-    public final static String DEFAULT_STRAIN_ID = "taxonomy.defaultStrainId";
+
+    public final static String TAXONOMY_LIBRARY_ID = "taxonomy.libraryId";
+    public final static String TAXONOMY_FIELD_ACCESS = "taxonomy.field.access";
+    public final static String TAXONOMY_FIELD_ASSET_NAME = "taxonomy.field.assetName";
+    public final static String TAXONOMY_FIELD_ORGANISM_ID = "taxonomy.field.organismId";
+    public final static String TAXONOMY_FIELD_PARENT_EID = "taxonomy.field.parentEID";
+
 
     public final static String UNKNOWN_TAXONOMY_PARENT_ID = "UNKNOWN_TAXONOMY_PARENT_ID";
 
@@ -64,6 +81,42 @@ public class Taxonomy {
         importTaxonomySpeciesSynonyms();
         importTaxonomyStrains();
         importOrganismIds();
+
+        createMaterials();
+    }
+
+    private void createMaterials() throws Exception {
+        MaterialRestService restService = inhouseDB.getMaterialRestService();
+        InhouseDbService dbService = inhouseDB.getInhouseDbService();;
+        Map<InhouseTaxonKey, InhouseTaxon> taxonMap = new HashMap<>();
+        Map<String, String> parentLevelMap = prepareParentLevelMap();
+        Library library = inhouseDB.getLibraryDbService().loadById(
+                inhouseDB.getConfigString(TAXONOMY_LIBRARY_ID));
+        List<InhouseTaxon> taxonList = inhouseDB.getInhouseDbService().loadAllTaxa();
+        for(InhouseTaxon taxon : taxonList) {
+            taxonMap.put(new InhouseTaxonKey(taxon.getLevel(), taxon.getInhouseId()), taxon);
+            if (taxon.getInhouseParentId() != null) {
+                InhouseTaxon parentTaxon = taxonMap.get(new InhouseTaxonKey(
+                        parentLevelMap.get(taxon.getLevel()),
+                        taxon.getInhouseParentId()));
+                taxon.setParent(parentTaxon.getEid());
+            }
+
+            Material mat = restService.doCreateMaterial(library,
+                    taxon.createAsset(inhouseDB), null);
+            taxon.setEid(mat.getId());
+            dbService.save(taxon);
+        }
+
+    }
+
+    private Map<String, String> prepareParentLevelMap() {
+        Map<String, String> parentLevelMap = new HashMap<>();
+        // parentLevelMap.put("class", ---);
+        parentLevelMap.put("family", "class");
+        parentLevelMap.put("species", "family");
+        parentLevelMap.put("strain", "species");
+        return parentLevelMap;
     }
 
     void reject(BufferedWriter writer, String where, String line) throws IOException {

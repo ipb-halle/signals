@@ -21,9 +21,11 @@ package de.ipb_halle.inhouse;
 
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
@@ -65,6 +67,22 @@ public class InhouseDbService {
         return compound;
     }
 
+    public List<InhouseTaxon> loadAllTaxa() {
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<InhouseTaxon> criteriaQuery = criteriaBuilder.createQuery(InhouseTaxon.class);
+        Root<InhouseTaxon> root = criteriaQuery.from(InhouseTaxon.class);
+        criteriaQuery.select(root);
+        // ascending order --> parent before child
+        criteriaQuery.orderBy(criteriaBuilder.asc(root.get("id")));
+        List<InhouseTaxon> result = this.em.createQuery(criteriaQuery).getResultList();
+        for (InhouseTaxon taxon : result) {
+            if (taxon.getLevel().equals(InhouseTaxon.TAXONOMY_SPECIES)) {
+                taxon.addSynonyms(loadSynonymsById(InhouseSynonym.SYNONYM_ORGANISM, taxon.getInhouseId()));
+            }
+        }
+        return result;
+    }
+
     public InhouseTaxon loadTaxonByInhouseId(String level, int inhouseId) {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<InhouseTaxon> criteriaQuery = criteriaBuilder.createQuery(InhouseTaxon.class);
@@ -88,6 +106,26 @@ public class InhouseDbService {
         return taxon;
     }
 
+    public InhouseTaxon loadTaxonByOrganismId(int organismId) {
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<InhouseTaxon> criteriaQuery = criteriaBuilder.createQuery(InhouseTaxon.class);
+        Root<InhouseTaxon> root = criteriaQuery.from(InhouseTaxon.class);
+        criteriaQuery.select(root);
+
+        criteriaQuery.where(criteriaBuilder.equal(root.get("organismId"), organismId));
+
+        List<InhouseTaxon> result = this.em.createQuery(criteriaQuery).getResultList();
+        if (result.size() != 1) {
+            System.out.printf("loadTaxonByOrganismId(%d) - query returned %d instances\n", organismId, result.size());
+            return null;
+        }
+        InhouseTaxon taxon = result.get(0);
+        if (taxon.getLevel().equals(InhouseTaxon.TAXONOMY_SPECIES)) {
+            taxon.addSynonyms(loadSynonymsById(InhouseSynonym.SYNONYM_ORGANISM, taxon.getInhouseId()));
+        }
+        return taxon;
+    }
+
     public List<InhouseSynonym> loadSynonymsById(String type, Integer inhouseId) {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<InhouseSynonym> criteriaQuery = criteriaBuilder.createQuery(InhouseSynonym.class);
@@ -104,6 +142,10 @@ public class InhouseDbService {
 
     public void save(InhouseCompound mat) {
         this.em.merge(mat);
+    }
+
+    public void save(InhouseCorrelation corr) {
+        this.em.merge(corr);
     }
 
     public void save(InhouseExperiment experiment) {
