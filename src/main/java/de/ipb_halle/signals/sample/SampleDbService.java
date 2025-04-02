@@ -26,6 +26,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Root;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -72,29 +73,11 @@ public class SampleDbService {
         return em.find(SampleEntity.class, id);
     }
 
-    //ToDO:method needs to be refactored, doesnt load property values
-    public void loadSampleProperties(Sample sample) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<SamplePropertyEntity> query = cb.createQuery(SamplePropertyEntity.class);
-        Root<SamplePropertyEntity> root = query.from(SamplePropertyEntity.class);
-
-        // WHERE sp.template.templateId = :templateId
-        query.select(root);
-
-        List<SamplePropertyEntity> results = em.createQuery(query).getResultList();
-
-        for (SamplePropertyEntity propertyEntity : results) {
-            SampleProperty sampleProperty = new SampleProperty(propertyEntity);
-            sample.addProperty(sampleProperty);
-        }
-
-
-    }
-
-    public void loadSamplePropertyValues(Sample sample) {
+    public void loadSamplePropertyValuesWithProperties(Sample sample) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<SamplePropertyValueEntity> query = cb.createQuery(SamplePropertyValueEntity.class);
         Root<SamplePropertyValueEntity> root = query.from(SamplePropertyValueEntity.class);
+        root.fetch("property", JoinType.INNER);
 
         // WHERE id.sampleId = :sampleId
         query.select(root).where(cb.equal(root.get("id").get("sampleId"), sample.getId()));
@@ -104,6 +87,7 @@ public class SampleDbService {
         for (SamplePropertyValueEntity valueEntity : results) {
             SamplePropertyValue value = new SamplePropertyValue(valueEntity);
             sample.addPropertyValue(value);
+            sample.addProperty(new SampleProperty(valueEntity.getProperty()));
         }
     }
 

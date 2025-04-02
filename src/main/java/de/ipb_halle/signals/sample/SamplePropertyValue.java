@@ -35,27 +35,25 @@ public class SamplePropertyValue {
 
     public SamplePropertyValue(SamplePropertyValueEntity entity) {
         this.sampleId = entity.getId().getSampleId();
-        if (entity.getId().getPropertyId() == null) {
-            logger.warn("SamplePropertyValueEntity has null propertyId: sampleId = {}", entity.getId().getSampleId());
-        }
-
+        this.propertyId = entity.getId().getPropertyId();
         this.propertyValue = entity.getPropertyValue();
     }
 
     public SamplePropertyValueEntity createEntity() {
-     if (sampleId == null || propertyId == null) {
-        logger.warn("Skipping SamplePropertyValueEntity creation: sampleId={}, propertyId={}", sampleId, propertyId);
-        return null;
+        if (sampleId == null || propertyId == null) {
+            logger.warn("Skipping SamplePropertyValueEntity creation: sampleId={}, propertyId={}", sampleId, propertyId);
+            return null;
+        }
+
+        SamplePropertyValueId samplePropertyValueId = new SamplePropertyValueId();
+        samplePropertyValueId
+                .setSampleId(sampleId)
+                .setPropertyId(propertyId);
+
+        return new SamplePropertyValueEntity()
+                .setId(samplePropertyValueId)
+                .setPropertyValue(propertyValue);
     }
-
-    SamplePropertyValueId samplePropertyValueId = new SamplePropertyValueId();
-    samplePropertyValueId
-        .setSampleId(sampleId)
-        .setPropertyId(propertyId);
-
-    return new SamplePropertyValueEntity()
-        .setId(samplePropertyValueId)
-        .setPropertyValue(propertyValue); }
 
     //getter
     public String getSampleId() {
@@ -81,5 +79,14 @@ public class SamplePropertyValue {
 
     public void setPropertyValue(String propertyValue) {
         this.propertyValue = propertyValue;
+    }
+
+    @Override
+    public String toString() {
+        return "SamplePropertyValue{" +
+                "sampleId='" + sampleId + '\'' +
+                ", propertyId='" + propertyId + '\'' +
+                ", propertyValue='" + propertyValue + '\'' +
+                '}';
     }
 }

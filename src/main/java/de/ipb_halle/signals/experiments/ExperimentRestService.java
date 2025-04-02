@@ -30,7 +30,6 @@ import de.ipb_halle.signals.entity.SignalsEntity;
 import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
 import de.ipb_halle.signals.rest.*;
-import de.ipb_halle.signals.sample.Sample;
 import de.ipb_halle.signals.sample.SampleRestService;
 import de.ipb_halle.signals.users.UserReference;
 import jakarta.ejb.TransactionAttribute;
@@ -44,6 +43,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 
 public class ExperimentRestService implements RestReplyParser<Experiment> {
@@ -60,7 +60,8 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
     private static final Logger logger = LogManager.getLogger(SampleRestService.class);
 
     private static final String RECEIVE_EXPERIMENT_ENDPOINT = "/entities/%s";
-    private static final String EXPERIMENT_GET_PROPERTIES_ENDPOINT = "/entities/%s/properties";
+    private static final String EXPERIMENT_GET_PROPERTY_VALUES_ENDPOINT = "/entities/%s/properties";
+    private static final String EXPERIMENT_GET_PROPERTIES_ENDPOINT = "/entities/templates/%s/fields";
     public static final String CREATE_NEW_EXPERIMENT_ENDPOINT = "/entities?force=true";
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
@@ -123,15 +124,24 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
         return ancestors;
     }
 
+    /**
+     * For experiment,
+     * the properties are not passed as "fields" during creation,
+     * but via separate PATCH or PUT (e.g. /properties or /attributes endpoint of signals)
+     *
+     * @param experiment
+     * @return
+     */
     private JsonElement prepareAttributes(Experiment experiment) {
         JsonObject attributes = new JsonObject();
         attributes.addProperty(RestHelper.ATTR_NAME, experiment.getName());
 
-      attributes.add(RestHelper.ATTR_FIELDS, prepareFields(experiment));
+        // attributes.add(RestHelper.ATTR_FIELDS, prepareFields(experiment));
 
         return attributes;
     }
 
+    //method is currently not in use
     private JsonElement prepareFields(Experiment experiment) {
         JsonArray fields = new JsonArray();
         for (ExperimentProperty experimentProperty : experiment.getProperties()) {
@@ -168,8 +178,8 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
                     .setEndpoint(String.format(receiveExperimentEndpoint, experimentId))
                     .execute();
 
-            return JsonParser.parseString(restClient.getResponse().getString());
-
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
+            return jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA);
 
         } catch (UnexpectedResponseCodeException | IOException | URISyntaxException e) {
             throw new RuntimeException(e);
@@ -178,13 +188,15 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
 
     @Override
     public Experiment parseReply(JsonElement j) throws Exception {
-        JsonObject dataObject = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_DATA);
-        JsonObject attributes = dataObject.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
-        JsonObject relationships = dataObject.getAsJsonObject(RestHelper.ATTR_RELATIONSHIPS);
+
+        JsonObject data = j.getAsJsonObject();
+
+        JsonObject attributes = data.get(RestHelper.ATTR_ATTRIBUTES).getAsJsonObject();
+        JsonObject relationships = data.getAsJsonObject(RestHelper.ATTR_RELATIONSHIPS);
 
         Experiment experiment = new Experiment();
 
-        experiment.setId(RestHelper.parseString(dataObject, RestHelper.ATTR_ID));
+        experiment.setId(RestHelper.parseString(data, RestHelper.ATTR_ID));
         experiment.setName(RestHelper.parseString(attributes, RestHelper.ATTR_NAME));
         experiment.setDescription(RestHelper.parseString(attributes, RestHelper.ATTR_DESCRIPTION));
 
@@ -194,7 +206,7 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
 
         experiment.setDigest(RestHelper.parseLong(attributes, RestHelper.ATTR_DIGEST));
 
-        parseRelationships(dataObject, experiment);
+        parseRelationships(data, experiment);
 
         if (relationships.has(RestHelper.ATTR_ANCESTORS)) {
             parseAncestors(relationships, experiment);
@@ -205,6 +217,7 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
         if (relationships.has(RestHelper.ATTR_TEMPLATE)) {
             paresTemplate(relationships, experiment);
         }
+
         return experiment;
     }
 
@@ -218,7 +231,9 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
         JsonArray dataArray = relationships
                 .getAsJsonObject(RestHelper.ATTR_ANCESTORS)
                 .getAsJsonArray(RestHelper.ATTR_DATA);
+
         List<SignalsEntity> entities = new ArrayList<>();
+
         for (JsonElement element : dataArray) {
             String id = RestHelper.parseString(element.getAsJsonObject(), RestHelper.ATTR_ID);
             JsonElement seJson = fetchSample(RECEIVE_EXPERIMENT_ENDPOINT, id);
@@ -245,16 +260,15 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
 
     private void paresTemplate(JsonElement relationships, Experiment experiment) {
         JsonObject data = relationships.getAsJsonObject()
-                .getAsJsonObject(RestHelper.ATTR_TEMPLATE)
+                .getAsJsonObject(RestHelper.ATTR_SYSTEM_TEMPLATE)
                 .getAsJsonObject(RestHelper.ATTR_DATA);
         experiment.setTemplateId(data.get(RestHelper.ATTR_ID).getAsString());
     }
 
     public void doGetExperimentProperties(Experiment experiment) {
-        JsonElement json = fetchSample(EXPERIMENT_GET_PROPERTIES_ENDPOINT, experiment.getId());
-        JsonArray dataArray = json.getAsJsonObject().getAsJsonArray(RestHelper.ATTR_DATA);
+        JsonElement json = fetchSample(EXPERIMENT_GET_PROPERTIES_ENDPOINT, experiment.getTemplateId());
 
-        Iterator<JsonElement> iter = dataArray.getAsJsonArray().iterator();
+        Iterator<JsonElement> iter = json.getAsJsonArray().iterator();
         while (iter.hasNext()) {
             JsonElement experimentPropertiesObject = iter.next();
             parseExperimentProperties(experiment, experimentPropertiesObject);
@@ -265,33 +279,60 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
         JsonObject propertiesObject = experimentPropertiesObject.getAsJsonObject();
         JsonObject definition = propertiesObject.get(RestHelper.ATTR_META).getAsJsonObject().get(RestHelper.ATTR_DEFINITION).getAsJsonObject();
         JsonObject attributes = propertiesObject.get(RestHelper.ATTR_ATTRIBUTES).getAsJsonObject();
-        JsonObject attribute = definition.get(RestHelper.ATTR_ATTRIBUTE).getAsJsonObject();
 
         ExperimentProperty experimentProperty = new ExperimentProperty();
-        ExperimentPropertyValue experimentPropertyValue = new ExperimentPropertyValue();
-        experimentPropertyValue.setExperimentId(experiment.getId());
 
-        //get propertyID
-        if (attribute.has(RestHelper.ATTR_ID)) {
-            experimentProperty.setPropertyId(definition
-                    .get(RestHelper.ATTR_ATTRIBUTE).getAsJsonObject()
-                    .get(RestHelper.ATTR_ID).getAsString());
-            experimentPropertyValue.setPropertyId(experimentProperty.getPropertyId());
-        }
+        //get property id
+        experimentProperty.setPropertyId(propertiesObject.get(RestHelper.ATTR_ID).getAsString());
+
         //get property name
         if (attributes.has(RestHelper.ATTR_NAME)) {
             experimentProperty.setPropertyName(attributes.get(RestHelper.ATTR_NAME).getAsString());
         }
+
         //get property type
         experimentProperty.setPropertyType(definition.get(RestHelper.ATTR_TYPE).getAsString());
 
-
-        //get property value
-        if (attributes.has(RestHelper.ATTR_VALUE)) {
-            experimentPropertyValue.setPropertyValue(attributes.get(RestHelper.ATTR_VALUE).getAsString());
-        }
+        //set template id
+        experimentProperty.setTemplateId(experiment.getTemplateId());
         experiment.addProperty(experimentProperty);
+    }
 
-        experiment.addPropertyValue(experimentPropertyValue);
+    // RECEIVE EXPERIMENT PROPERTY VALUES
+    public void doGetExperimentPropertyValues(Experiment experiment) {
+        JsonElement json = fetchSample(EXPERIMENT_GET_PROPERTY_VALUES_ENDPOINT, experiment.getId());
+
+        Iterator<JsonElement> iter = json.getAsJsonArray().iterator();
+        while (iter.hasNext()) {
+            JsonElement experimentPropertiesObject = iter.next();
+            parseExperimentPropertyValues(experiment, experimentPropertiesObject);
+        }
+    }
+
+    private void parseExperimentPropertyValues(Experiment experiment, JsonElement experimentPropertiesObject) {
+        JsonObject propertiesObject = experimentPropertiesObject.getAsJsonObject();
+        JsonObject attributes = propertiesObject.get(RestHelper.ATTR_ATTRIBUTES).getAsJsonObject();
+
+
+        String name = Optional.ofNullable(attributes.get(RestHelper.ATTR_NAME))
+                .map(JsonElement::getAsString)
+                .orElse("");
+
+        String value = Optional.ofNullable(attributes.get(RestHelper.ATTR_VALUE))
+                .map(JsonElement::getAsString)
+                .orElse("");
+
+        ExperimentPropertyValue propertyValue = new ExperimentPropertyValue();
+
+        for (ExperimentProperty property : experiment.getProperties()) {
+            if (property.getPropertyName().equalsIgnoreCase(name)) {
+
+                propertyValue.setExperimentId(experiment.getId());
+                propertyValue.setPropertyId(property.getPropertyId());
+                propertyValue.setPropertyValue(value);
+
+                experiment.addPropertyValue(propertyValue);
+            }
+        }
     }
 }

@@ -20,7 +20,6 @@
 
 package de.ipb_halle.signals.experiments;
 
-import de.ipb_halle.signals.sample.*;
 import de.ipb_halle.tda.PersistenceElements;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
@@ -32,7 +31,6 @@ import jakarta.persistence.criteria.Root;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Stateless
@@ -89,8 +87,5 @@ public class ExperimentDbService {
             experiment.addPropertyValue(value);
             experiment.addProperty(new ExperimentProperty(valueEntity.getProperty()));
         }
-        logger.info("EXPERIMENT DB SERVICE, EXPERIMENT PROPERTIES = {}\n, EXEPRIMENT PROPERTY VALUES = {}\n",
-                Arrays.toString(experiment.getProperties().toArray()),
-                Arrays.toString(experiment.getPropertyValues().toArray()));
     }
 }

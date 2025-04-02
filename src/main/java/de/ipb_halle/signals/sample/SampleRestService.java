@@ -42,6 +42,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 public class SampleRestService implements RestReplyParser<Sample> {
 
@@ -160,7 +161,9 @@ public class SampleRestService implements RestReplyParser<Sample> {
                     .setEndpoint(String.format(endpoint, sampleId))
                     .execute();
 
-            return JsonParser.parseString(restClient.getResponse().getString());
+
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
+            return jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA);
 
 
         } catch (UnexpectedResponseCodeException | IOException | URISyntaxException e) {
@@ -174,7 +177,8 @@ public class SampleRestService implements RestReplyParser<Sample> {
                     .setEndpoint(String.format(endpoint, sampleId, samplePropertyId))
                     .execute();
 
-            return JsonParser.parseString(restClient.getResponse().getString());
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
+            return jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA);
 
         } catch (UnexpectedResponseCodeException | IOException | URISyntaxException e) {
             throw new RuntimeException(e);
@@ -183,13 +187,15 @@ public class SampleRestService implements RestReplyParser<Sample> {
 
     @Override
     public Sample parseReply(JsonElement j) throws Exception {
-        JsonObject dataObject = j.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_DATA);
-        JsonObject attributes = dataObject.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
-        JsonObject relationships = dataObject.getAsJsonObject(RestHelper.ATTR_RELATIONSHIPS);
+
+        JsonObject data = j.getAsJsonObject();
+
+        JsonObject attributes = data.get(RestHelper.ATTR_ATTRIBUTES).getAsJsonObject();
+        JsonObject relationships = data.getAsJsonObject(RestHelper.ATTR_RELATIONSHIPS);
 
         Sample sample = new Sample();
 
-        sample.setId(RestHelper.parseString(dataObject, RestHelper.ATTR_ID));
+        sample.setId(RestHelper.parseString(data, RestHelper.ATTR_ID));
         sample.setName(RestHelper.parseString(attributes, RestHelper.ATTR_NAME));
         sample.setDescription(RestHelper.parseString(attributes, RestHelper.ATTR_DESCRIPTION));
 
@@ -199,7 +205,7 @@ public class SampleRestService implements RestReplyParser<Sample> {
 
         sample.setDigest(RestHelper.parseLong(attributes, RestHelper.ATTR_DIGEST));
 
-        parseRelationships(dataObject, sample);
+        parseRelationships(data, sample);
 
         if (attributes.has(Sample.ATTR_STOIC_REF)) {
             parseStoicRef(attributes, sample);
@@ -273,9 +279,8 @@ public class SampleRestService implements RestReplyParser<Sample> {
 
     public void doGetSampleProperties(Sample sample) {
         JsonElement json = fetchSample(SAMPLE_GET_PROPERTIES_ENDPOINT, sample.getId());
-        JsonArray dataArray = json.getAsJsonObject().getAsJsonArray(RestHelper.ATTR_DATA);
 
-        Iterator<JsonElement> iter = dataArray.getAsJsonArray().iterator();
+        Iterator<JsonElement> iter = json.getAsJsonArray().iterator();
         while (iter.hasNext()) {
             JsonElement samplesPropertyObject = iter.next();
             parseSampleProperties(sample, samplesPropertyObject);
@@ -287,10 +292,6 @@ public class SampleRestService implements RestReplyParser<Sample> {
         JsonObject propertiesObject = samplesPropertyObject.getAsJsonObject();
         JsonObject definition = propertiesObject.get(RestHelper.ATTR_META).getAsJsonObject().get(RestHelper.ATTR_DEFINITION).getAsJsonObject();
         JsonObject attributes = propertiesObject.get(RestHelper.ATTR_ATTRIBUTES).getAsJsonObject();
-        JsonObject data = propertiesObject
-                .get(RestHelper.ATTR_RELATIONSHIPS).getAsJsonObject()
-                .get(RestHelper.ATTR_SAMPLE).getAsJsonObject()
-                .get(RestHelper.ATTR_DATA).getAsJsonObject();
 
         SampleProperty sampleProperty = new SampleProperty();
         SamplePropertyValue samplePropertyValue = new SamplePropertyValue();

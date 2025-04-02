@@ -68,6 +68,7 @@ public class RestHelper {
     public static final String ATTR_TEMPLATE = "template";
     public static final String ATTR_INCLUDED = "included";
     public static final String ATTR_WORK_ORDER = "workOrder";
+    public static final String ATTR_SYSTEM_TEMPLATE = "systemTemplate";
 
 
     public static String formatDate(Date d) {

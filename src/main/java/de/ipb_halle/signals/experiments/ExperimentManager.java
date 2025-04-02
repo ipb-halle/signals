@@ -57,11 +57,16 @@ public class ExperimentManager {
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void importExperiment(RuntimeConfig runtimeConfig, String id) {
         logger.info("ICH BIN IN IMPORT EXPERIMENT");
-        //loads experiments from local DB to be imported into Signals
+
+        // 1) loads experiments from local DB to be imported into Signals
         ExperimentEntity experimentEntity = experimentDbService.loadExperimentById(id);
         Experiment experiment = new Experiment(experimentEntity, dynEnumManager);
+
+        // 2) loads Experiment Properties
         experimentDbService.loadExperimentPropertyValuesWithProperties(experiment);
         logger.info("THE RPOERTIES WERE LOADED");
+
+        // 3) create new experiment
         experimentRestService.createNewExperiment(experiment);
     }
 

@@ -378,7 +378,7 @@ CREATE TABLE samples (
 CREATE TABLE sample_properties (
     property_id VARCHAR PRIMARY KEY,
     property_name VARCHAR,
-    property_type VARCHAR,
+    property_type VARCHAR
 );
 
 CREATE TABLE sample_property_values (
@@ -407,6 +407,7 @@ CREATE TABLE experiment_properties (
     property_id VARCHAR PRIMARY KEY,
     property_name VARCHAR,
     property_type VARCHAR,
+    template_id VARCHAR
 );
 
 CREATE TABLE experiment_property_values (
