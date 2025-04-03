@@ -47,7 +47,7 @@ public class SampleRestService implements RestReplyParser<Sample> {
 
     private static final String RECEIVE_SAMPLE_ENDPOINT = "/entities/%s";
     private static final String SAMPLE_GET_PROPERTIES_ENDPOINT = "/samples/%s/properties";
-   // private static final String SAMPLE_GET_PROPERTY_EXPLICITLY_ENDPOINT = "/samples/%s/properties/%s";
+    // private static final String SAMPLE_GET_PROPERTY_EXPLICITLY_ENDPOINT = "/samples/%s/properties/%s";
     //?force=true if we don't want to send a digest
     public static final String CREATE_NEW_SAMPLE_ENDPOINT = "/entities?force=true";
     //public static final String CREATE_NEW_SAMPLE_ENDPOINT = "/entities?digest=%s";
@@ -151,10 +151,15 @@ public class SampleRestService implements RestReplyParser<Sample> {
 
     public Sample doGetSample(String sampleId) throws Exception {
         JsonElement object = fetchSample(RECEIVE_SAMPLE_ENDPOINT, sampleId);
-        return parseReply(object);
+        Sample sample = parseReply(object);
+
+        JsonObject relationships = object.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_RELATIONSHIPS);
+        getSampleAncestors(sample, relationships);
+        getSampleChildren(sample, relationships);
+        return sample;
     }
 
-    JsonElement fetchSample(String endpoint, String sampleId) {
+   public JsonElement fetchSample(String endpoint, String sampleId) {
         try {
             restClient.setMethod(Method.GET)
                     .setEndpoint(String.format(endpoint, sampleId))
@@ -209,18 +214,30 @@ public class SampleRestService implements RestReplyParser<Sample> {
         if (attributes.has(Sample.ATTR_STOIC_REF)) {
             parseStoicRef(attributes, sample);
         }
-//        if (relationships.has(RestHelper.ATTR_ANCESTORS)) {
-//            parseAncestors(relationships, sample);
-//        }
+
 //        if (relationships.has(RestHelper.ATTR_CHILDREN)) {
 //            parseChildren(relationships, sample);
 //        }
         if (relationships.has(RestHelper.ATTR_TEMPLATE)) {
             paresTemplate(relationships, sample);
         }
-       return sample;
+        return sample;
     }
 
+
+   public void getSampleAncestors(Sample sample, JsonElement element) throws Exception {
+        JsonObject relationships = element.getAsJsonObject();
+        if (relationships.has(RestHelper.ATTR_ANCESTORS)) {
+            parseAncestors(relationships, sample);
+        }
+    }
+
+    public void getSampleChildren(Sample sample, JsonElement element) throws Exception {
+        JsonObject relationships = element.getAsJsonObject();
+        if (relationships.has(RestHelper.ATTR_CHILDREN)) {
+            parseChildren(relationships, sample);
+        }
+    }
 
     private void parseRelationships(JsonObject relationships, Sample sample) {
         sample.setCreatedBy(new UserReference(RestHelper.parseString(RestHelper.getPrimitiveFromPath(relationships, SignalsEntityDTO.ATTR_CREATED_BY), null)));

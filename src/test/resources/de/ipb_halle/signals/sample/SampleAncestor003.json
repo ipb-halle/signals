@@ -1,0 +1,180 @@
+{
+  "links": {
+    "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/samplesContainer:28268246-f154-42fb-8348-cd76ad356f19"
+  },
+  "data": {
+    "type": "entity",
+    "id": "samplesContainer:28268246-f154-42fb-8348-cd76ad356f19",
+    "links": {
+      "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/samplesContainer:28268246-f154-42fb-8348-cd76ad356f19"
+    },
+    "attributes": {
+      "id": "samplesContainer:28268246-f154-42fb-8348-cd76ad356f19",
+      "eid": "samplesContainer:28268246-f154-42fb-8348-cd76ad356f19",
+      "name": "Samples Table",
+      "description": "",
+      "createdAt": "2022-07-21T11:02:54.870Z",
+      "editedAt": "2023-03-27T10:23:55.024Z",
+      "type": "samplesContainer",
+      "digest": "67161701",
+      "fields": {
+        "Description": {
+          "value": ""
+        },
+        "Name": {
+          "value": "Samples Table"
+        }
+      },
+      "flags": {
+        "canEdit": true
+      }
+    },
+    "relationships": {
+      "createdBy": {
+        "links": {
+          "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/102"
+        },
+        "data": {
+          "type": "user",
+          "id": "102"
+        }
+      },
+      "editedBy": {
+        "links": {
+          "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/102"
+        },
+        "data": {
+          "type": "user",
+          "id": "102"
+        }
+      },
+      "ancestors": {
+        "links": {
+          "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/samplesContainer:28268246-f154-42fb-8348-cd76ad356f19/ancestors"
+        },
+        "data": [
+          {
+            "type": "entity",
+            "id": "journal:fe624b25-959e-4359-9ff4-372d396c1392",
+            "meta": {
+              "links": {
+                "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/journal:fe624b25-959e-4359-9ff4-372d396c1392"
+              }
+            }
+          },
+          {
+            "type": "entity",
+            "id": "experiment:9c57624e-99c7-44db-afad-e579d5fe32cc",
+            "meta": {
+              "links": {
+                "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc"
+              }
+            }
+          }
+        ]
+      },
+      "owner": {
+        "links": {
+          "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/102"
+        },
+        "data": {
+          "type": "user",
+          "id": "102"
+        }
+      },
+      "csv": {
+        "links": {
+          "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/samplesContainer:28268246-f154-42fb-8348-cd76ad356f19/export?format=csv"
+        }
+      },
+      "sdf": {
+        "links": {
+          "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/samplesContainer:28268246-f154-42fb-8348-cd76ad356f19/export?format=sdf"
+        }
+      },
+      "children": {
+        "links": {
+          "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/samplesContainer:28268246-f154-42fb-8348-cd76ad356f19/children"
+        }
+      }
+    }
+  },
+  "included": [
+    {
+      "type": "entity",
+      "id": "journal:fe624b25-959e-4359-9ff4-372d396c1392",
+      "links": {
+        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/journal:fe624b25-959e-4359-9ff4-372d396c1392"
+      },
+      "attributes": {
+        "type": "journal",
+        "eid": "journal:fe624b25-959e-4359-9ff4-372d396c1392",
+        "name": "XBF Notebook 2022.02",
+        "digest": "70029449",
+        "fields": {
+          "Description": {
+            "value": "Franks Test Notebook Feb. 2022"
+          },
+          "Name": {
+            "value": "XBF Notebook 2022.02"
+          }
+        },
+        "flags": {}
+      }
+    },
+    {
+      "type": "user",
+      "id": "102",
+      "links": {
+        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/102"
+      },
+      "attributes": {
+        "userId": "102",
+        "userName": "fbroda@ipb-halle.de",
+        "flags": {
+          "isSystemStandardUser": true
+        },
+        "alias": "XBF",
+        "email": "fbroda@ipb-halle.de",
+        "firstName": "Frank",
+        "lastName": "Broda",
+        "isEnabled": true
+      },
+      "relationships": {
+        "systemGroups": {
+          "links": {
+            "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/102/systemGroups"
+          }
+        }
+      }
+    },
+    {
+      "type": "entity",
+      "id": "experiment:9c57624e-99c7-44db-afad-e579d5fe32cc",
+      "links": {
+        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc"
+      },
+      "attributes": {
+        "type": "experiment",
+        "eid": "experiment:9c57624e-99c7-44db-afad-e579d5fe32cc",
+        "name": "Esterification",
+        "digest": "67161701",
+        "fields": {
+          "Department": {
+            "value": "Chemistry"
+          },
+          "Description": {
+            "value": "Simple Chemical Reaction (open properties and click multiple times to enable editing of the description or the name)"
+          },
+          "Name": {
+            "value": "Esterification"
+          },
+          "Research group": {
+            "value": "Group A"
+          }
+        },
+        "flags": {}
+      }
+    }
+  ]
+}

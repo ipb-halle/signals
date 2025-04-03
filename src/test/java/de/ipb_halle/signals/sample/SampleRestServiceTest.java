@@ -21,10 +21,12 @@
 package de.ipb_halle.signals.sample;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import de.ipb_halle.signals.PostgresqlContainerExtension;
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.rest.MockRestClient;
+import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.tda.DeploymentElement;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Assertions;
@@ -61,14 +63,11 @@ public class SampleRestServiceTest {
     @DeploymentElement
     private DynEnumManager dynEnumManager;
 
-
     @Test
     public void testFetchSample() throws Exception {
         JsonElement element = sampleRestService.fetchSample(TEST_ENDPOINT_1, TEST_SAMPLE_ID);
         Assertions.assertNotNull(element, "Returned JSON element should not be null");
     }
-
-
 
     @Test
     public void testParseReply() throws Exception {
@@ -81,6 +80,23 @@ public class SampleRestServiceTest {
         Assertions.assertEquals(TEST_SAMPLE_ID, sample.getId(), "Sample ID should match the expected value");
 
         System.out.println("Fetched Sample: " + sample);
+    }
+
+    @Test
+    public void testGetSampleAncestors() throws Exception {
+        // prepare mocks
+        TestBase.prepareRestClients(mockRestClient, "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/journal:fe624b25-959e-4359-9ff4-372d396c1392", getClass().getResourceAsStream("SampleAncestor001.json"));
+        TestBase.prepareRestClients(mockRestClient, "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc", getClass().getResourceAsStream("SampleAncestor002.json"));
+        TestBase.prepareRestClients(mockRestClient, "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/samplesContainer:28268246-f154-42fb-8348-cd76ad356f19", getClass().getResourceAsStream("SampleAncestor003.json"));
+
+        JsonElement element = sampleRestService.fetchSample(TEST_ENDPOINT_1, TEST_SAMPLE_ID);
+        Sample sample = sampleRestService.parseReply(element);
+
+        JsonObject relationships = element.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_RELATIONSHIPS);
+        sampleRestService.getSampleAncestors(sample, relationships);
+
+        Assertions.assertFalse(sample.getAncestors().isEmpty(), "Ancestors should be loaded");
+        Assertions.assertEquals(sample.getAncestors().size(), 3);
     }
 
 }
