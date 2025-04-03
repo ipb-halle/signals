@@ -43,3 +43,11 @@ CREATE TABLE inhouse_taxonomy (
     name VARCHAR
 );
 
+CREATE TABLE inhouse_correlation (
+    id SERIAL NOT NULL PRIMARY KEY,
+    context VARCHAR,
+    mol_id INTEGER,
+    organism_id INTEGER,
+    procedure_id INTEGER
+);
+

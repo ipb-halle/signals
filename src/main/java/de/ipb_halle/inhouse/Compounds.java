@@ -29,7 +29,6 @@ import de.ipb_halle.lbac.search.lang.SqlInsertBuilder;
 import de.ipb_halle.signals.materials.Library;
 import de.ipb_halle.signals.materials.LibraryDbService;
 import de.ipb_halle.signals.materials.Material;
-import jakarta.persistence.criteria.CriteriaBuilder;
 
 import java.io.*;
 import java.util.List;
@@ -148,8 +147,8 @@ public class Compounds {
     }
 
     public void importData() throws Exception {
-        // importCompounds();
-        // importCompoundNames();
+        importCompounds();
+        importCompoundNames();
 
         Library library = inhouseDB.getLibraryDbService().loadById(
                 inhouseDB.getConfigString(COMPOUNDS_LIBRARY_ID));

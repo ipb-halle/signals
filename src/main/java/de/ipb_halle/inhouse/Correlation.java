@@ -17,16 +17,7 @@
  */
 package de.ipb_halle.inhouse;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -34,6 +25,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Migration tool for the InhouseDB
@@ -42,132 +35,67 @@ import java.util.Map;
  */
 public class Correlation {
 
-    public final static String INPUT_MOLPROC = "INPUT_MOLPROC";
-    public final static String INPUT_ORGPROC = "INPUT_ORGPROC";
+    public final static String INPUT_MOLORG = "correlation.inputMolOrg";
+    public final static String INPUT_MOLPROC = "correlation.inputMolProc";
+    public final static String INPUT_ORGPROC = "correlation.inputOrgProc";
+    public final static String REJECTFILE = "correlation.rejectFile";
 
-    public final static String MOLPROC_QUERY = "MOLPROC_QUERY";
-    public final static String MOLPROC_UPDATE = "MOLPROC_UPDATE";
-    public final static String ORGPROC_QUERY = "ORGPROC_QUERY";
-    public final static String ORGPROC_UPDATE = "ORGPROC_UPDATE";
-
-    public final static String CORRELATION_MOLPROCMAT = "MolProcMat";
-    public final static String CORRELATION_MOLPROCEXP = "MolProcExp";
-    public final static String CORRELATION_ORGPROCMAT = "OrgProcMat";
-    public final static String CORRELATION_ORGPROCEXP = "OrgProcExp";
+    public final static String MOLORG = "molorg";
+    public final static String ORGPROC = "orgproc";
+    public final static String MOLPROC = "molproc";
 
     private InhouseDB inhouseDB;
 
     public Correlation(InhouseDB inhouseDB) throws Exception {
         this.inhouseDB = inhouseDB;
-        addInsertBuilders();
     }
 
-    private void addInsertBuilders() {
-    }
-
-    private void createLinkedData() throws Exception {
-        /*
-        for(String key : new String[] { MOLPROC_QUERY, MOLPROC_UPDATE, ORGPROC_QUERY, ORGPROC_UPDATE} )  {
-            String sql = this.inhouseDB.getConfigString(key);
-            this.inhouseDB.getConnection().prepareStatement(sql).execute();
-        }
-        */
-    }
-
-    private void importMolProc(String fileName) throws Exception {
-        System.out.println("Importing correlation table compound / experiment");
-
-        String pattern = "^(\\d+);(\\d+);(\\d+)$";
-
-        BufferedReader reader = new BufferedReader(new FileReader(fileName));
-        reader.readLine(); // discard header
-        int line = 1;
-        while (reader.ready()) {
-            String st = reader.readLine();
-            line++;
-
-            int correlationId = Integer.parseInt(st.replaceAll(pattern, "$1"));
-            int molId = Integer.parseInt(st.replaceAll(pattern, "$2"));
-            int experimentId = Integer.parseInt(st.replaceAll(pattern, "$3"));
-
-
-            try {
-                // saveMolProc(correlationId, molId, experimentId);
-                if ((line % 1000) == 0) {
-                    System.out.printf("imported %d link records\n", line);
-                }
-            } catch (Exception e) {
-                System.out.printf("Error in line %d\n", line);
-                throw e;
-            }
-        }
-        reader.close();
-    }
-
-    private void importOrgProc(String fileName) throws Exception {
+    private void importCorrelation(String context, String filename) throws Exception {
         System.out.println("Importing correlation table organism / experiment");
 
-        String pattern = "^(\\d+);(\\d+);(\\d+)$";
+        Pattern pattern = Pattern.compile("^(\\d+);(\\d+);(\\d+)$");
 
-        BufferedReader reader = new BufferedReader(new FileReader(fileName));
+        BufferedReader reader = new BufferedReader(new FileReader(filename));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(inhouseDB.getConfigString(REJECTFILE)));
+
         reader.readLine(); // discard header
-        int line = 1;
         while (reader.ready()) {
-            String st = reader.readLine();
-            line++;
-
-            int correlationId = Integer.parseInt(st.replaceAll(pattern, "$1"));
-            int organismId = Integer.parseInt(st.replaceAll(pattern, "$2"));
-            int experimentId = Integer.parseInt(st.replaceAll(pattern, "$3"));
-
-
-            try {
-                saveOrgProc(correlationId, organismId, experimentId);
-                if ((line % 1000) == 0) {
-                    System.out.printf("imported %d link records\n", line);
+            String line = reader.readLine();
+            Matcher matcher = pattern.matcher(line);
+            if (matcher.matches()) {
+                int correlationId = Integer.parseInt(matcher.group(1));
+                InhouseCorrelation corr = new InhouseCorrelation()
+                        .setContext(context);
+                switch(context) {
+                    case MOLORG:
+                        corr.setMolId(Integer.parseInt(matcher.group(2)));
+                        corr.setOrganismId(Integer.parseInt(matcher.group(3)));
+                        break;
+                    case MOLPROC:
+                        corr.setMolId(Integer.parseInt(matcher.group(2)));
+                        corr.setProcedureId(Integer.parseInt(matcher.group(3)));
+                        break;
+                    case ORGPROC:
+                        corr.setOrganismId(Integer.parseInt(matcher.group(2)));
+                        corr.setProcedureId(Integer.parseInt(matcher.group(3)));
+                        break;
                 }
-            } catch (Exception e) {
-                System.out.printf("Error in line %d\n", line);
-                throw e;
+                inhouseDB.getInhouseDbService().save(corr);
+            } else {
+                reject(writer, context, line);
             }
         }
         reader.close();
+        writer.close();
+    }
+
+    private void reject(BufferedWriter writer, String context, String line) throws IOException {
+        writer.append(String.format("%s %s\n", context, line));
     }
 
     public void importData() throws Exception {
-        /*
-        importMolProc(inhouseDB.getConfigString(INPUT_MOLPROC));
-        importOrgProc(inhouseDB.getConfigString(INPUT_ORGPROC));
-        createLinkedData();
-
-         */
-    }
-
-    private void saveMolProc(int correlationId, int molId, int experimentId) throws Exception {
-/*
-        String sql = "INSERT INTO tmp_import (old_id, new_id, type) SELECT ? AS old_id, new_id AS new_id, '"
-            + CORRELATION_MOLPROCMAT
-            + "' FROM tmp_import WHERE old_id=? AND type=?";
-        this.inhouseDB.saveTriple(sql, correlationId, molId, Compounds.TMP_MatId_MolId);
-
-        sql = "INSERT INTO tmp_import (old_id, new_id, type) SELECT ? AS old_id, new_id AS new_id, '"
-            + CORRELATION_MOLPROCEXP
-            + "' FROM tmp_import WHERE old_id=? AND type=?";
-        this.inhouseDB.saveTriple(sql, correlationId, experimentId, Experiments.TMP_Procedure);
- */
-    }
-
-    private void saveOrgProc(int correlationId, int organismId, int experimentId) throws Exception {
-/*
-        String sql = "INSERT INTO tmp_import (old_id, new_id, type) SELECT ? AS old_id, new_id AS new_id, '"
-                + CORRELATION_ORGPROCMAT
-                + "' FROM tmp_import WHERE old_id=? AND type=?";
-        this.inhouseDB.saveTriple(sql, correlationId, organismId, Taxonomy.ORGANISM_ID_REF);
-
-        sql = "INSERT INTO tmp_import (old_id, new_id, type) SELECT ? AS old_id, new_id AS new_id, '"
-                + CORRELATION_ORGPROCEXP
-                + "' FROM tmp_import WHERE old_id=? AND type=?";
-        this.inhouseDB.saveTriple(sql, correlationId, experimentId, Experiments.TMP_Procedure);
-*/
+        importCorrelation(MOLORG, inhouseDB.getConfigString(INPUT_MOLORG));
+        importCorrelation(MOLPROC, inhouseDB.getConfigString(INPUT_MOLPROC));
+        importCorrelation(ORGPROC, inhouseDB.getConfigString(INPUT_ORGPROC));
     }
 }
