@@ -42,13 +42,12 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 
 public class SampleRestService implements RestReplyParser<Sample> {
 
     private static final String RECEIVE_SAMPLE_ENDPOINT = "/entities/%s";
     private static final String SAMPLE_GET_PROPERTIES_ENDPOINT = "/samples/%s/properties";
-    private static final String SAMPLE_GET_PROPERTY_EXPLICITLY_ENDPOINT = "/samples/%s/properties/%s";
+   // private static final String SAMPLE_GET_PROPERTY_EXPLICITLY_ENDPOINT = "/samples/%s/properties/%s";
     //?force=true if we don't want to send a digest
     public static final String CREATE_NEW_SAMPLE_ENDPOINT = "/entities?force=true";
     //public static final String CREATE_NEW_SAMPLE_ENDPOINT = "/entities?digest=%s";
@@ -155,7 +154,7 @@ public class SampleRestService implements RestReplyParser<Sample> {
         return parseReply(object);
     }
 
-    private JsonElement fetchSample(String endpoint, String sampleId) {
+    JsonElement fetchSample(String endpoint, String sampleId) {
         try {
             restClient.setMethod(Method.GET)
                     .setEndpoint(String.format(endpoint, sampleId))
@@ -171,19 +170,19 @@ public class SampleRestService implements RestReplyParser<Sample> {
         }
     }
 
-    private JsonElement fetchProperty(String endpoint, String sampleId, String samplePropertyId) {
-        try {
-            restClient.setMethod(Method.GET)
-                    .setEndpoint(String.format(endpoint, sampleId, samplePropertyId))
-                    .execute();
-
-            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
-            return jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA);
-
-        } catch (UnexpectedResponseCodeException | IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    public JsonElement fetchProperty(String endpoint, String sampleId, String samplePropertyId) {
+//        try {
+//            restClient.setMethod(Method.GET)
+//                    .setEndpoint(String.format(endpoint, sampleId, samplePropertyId))
+//                    .execute();
+//
+//            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
+//            return jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA);
+//
+//        } catch (UnexpectedResponseCodeException | IOException | URISyntaxException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     @Override
     public Sample parseReply(JsonElement j) throws Exception {
@@ -210,16 +209,16 @@ public class SampleRestService implements RestReplyParser<Sample> {
         if (attributes.has(Sample.ATTR_STOIC_REF)) {
             parseStoicRef(attributes, sample);
         }
-        if (relationships.has(RestHelper.ATTR_ANCESTORS)) {
-            parseAncestors(relationships, sample);
-        }
-        if (relationships.has(RestHelper.ATTR_CHILDREN)) {
-            parseChildren(relationships, sample);
-        }
+//        if (relationships.has(RestHelper.ATTR_ANCESTORS)) {
+//            parseAncestors(relationships, sample);
+//        }
+//        if (relationships.has(RestHelper.ATTR_CHILDREN)) {
+//            parseChildren(relationships, sample);
+//        }
         if (relationships.has(RestHelper.ATTR_TEMPLATE)) {
             paresTemplate(relationships, sample);
         }
-        return sample;
+       return sample;
     }
 
 
@@ -317,13 +316,13 @@ public class SampleRestService implements RestReplyParser<Sample> {
         sample.addPropertyValue(samplePropertyValue);
     }
 
-    //toDo implement or delete, depends on proposal
-    public void doGetEachPropertyExplicitly(Sample sample) {
-        for (SampleProperty sampleProperty : sample.getProperties()) {
-            JsonElement propertyDataObject = fetchProperty(SAMPLE_GET_PROPERTY_EXPLICITLY_ENDPOINT, sample.getId(), sampleProperty.getPropertyId());
-            //logger.info("DO GET PROPERTY EXPLICITLY sampleId={}\n, samplePropertyKey={}\n, dataObject={}\n", sample.getId(), sampleProperty.getKey(), propertyDataObject);
-        }
-
-
-    }
+//    //toDo implement or delete, depends on proposal
+//    public void doGetEachPropertyExplicitly(Sample sample) {
+//        for (SampleProperty sampleProperty : sample.getProperties()) {
+//            JsonElement propertyDataObject = fetchProperty(SAMPLE_GET_PROPERTY_EXPLICITLY_ENDPOINT, sample.getId(), sampleProperty.getPropertyId());
+//            //logger.info("DO GET PROPERTY EXPLICITLY sampleId={}\n, samplePropertyKey={}\n, dataObject={}\n", sample.getId(), sampleProperty.getKey(), propertyDataObject);
+//        }
+//
+//
+//    }
 }

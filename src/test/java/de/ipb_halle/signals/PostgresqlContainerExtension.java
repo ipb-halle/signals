@@ -45,7 +45,7 @@ import org.testcontainers.utility.MountableFile;
  * Usage: Annotate the test class with
  * {@code @ExtendWith(PostgresqlContainerExtension.class)}
  *
- * @author flange
+ * @author fbroda
  */
 public class PostgresqlContainerExtension implements BeforeAllCallback {
     private static final String SCHEMA_FILE_RESOURCE = "/PostgresqlContainerSchemaFiles";

@@ -34,7 +34,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.List;
 
 @Stateless
-@PersistenceElements(entities = {SampleEntity.class})
+@PersistenceElements(entities = {SampleEntity.class, SamplePropertyEntity.class, SamplePropertyValueEntity.class})
 public class SampleDbService {
 
     @PersistenceContext(unitName = "signalsDB")
