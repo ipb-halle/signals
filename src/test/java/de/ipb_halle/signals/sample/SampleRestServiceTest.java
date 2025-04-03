@@ -29,27 +29,18 @@ import de.ipb_halle.signals.rest.MockRestClient;
 import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.tda.DeploymentElement;
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(PostgresqlContainerExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class SampleRestServiceTest {
+public abstract class SampleRestServiceTest {
 
 
     private final String TEST_RESOURCE_1 = "SampleRestServiceTest001.json";
     private final String TEST_KEY_1 = "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035";
     private final String TEST_ENDPOINT_1 = "/entities/%s";
     private final String TEST_SAMPLE_ID = "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035";
-
-    @BeforeEach
-    public void testSetup() {
-        dynEnumManager.allowEnumDiscovery();
-        TestBase.prepareRestClients(mockRestClient, TEST_KEY_1, getClass().getResourceAsStream(TEST_RESOURCE_1));
-    }
 
     @Inject
     @DeploymentElement
@@ -62,6 +53,12 @@ public class SampleRestServiceTest {
     @Inject
     @DeploymentElement
     private DynEnumManager dynEnumManager;
+
+    @BeforeAll
+    public void testSetup() {
+        TestBase.prepareRestClients(mockRestClient, TEST_KEY_1, getClass().getResourceAsStream(TEST_RESOURCE_1));
+        dynEnumManager.allowEnumDiscovery();
+    }
 
     @Test
     public void testFetchSample() throws Exception {
@@ -98,5 +95,21 @@ public class SampleRestServiceTest {
         Assertions.assertFalse(sample.getAncestors().isEmpty(), "Ancestors should be loaded");
         Assertions.assertEquals(sample.getAncestors().size(), 3);
     }
+
+    @Test
+    public void testGetSampleChildren() throws Exception {
+        // prepare mocks
+        TestBase.prepareRestClients(mockRestClient, "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:e4f69432-2c96-4139-ae4e-84cc24d7a9ac", getClass().getResourceAsStream("SampleChild001.json"));
+
+        JsonElement element = sampleRestService.fetchSample(TEST_ENDPOINT_1, TEST_SAMPLE_ID);
+        Sample sample = sampleRestService.parseReply(element);
+
+        JsonObject relationships = element.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_RELATIONSHIPS);
+        sampleRestService.getSampleChildren(sample, relationships);
+
+        Assertions.assertFalse(sample.getChildren().isEmpty(), "Child should be loaded");
+        Assertions.assertEquals(sample.getChildren().size(), 1);
+    }
+
 
 }
