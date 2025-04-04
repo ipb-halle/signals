@@ -152,7 +152,7 @@ public class SampleRestService implements RestReplyParser<Sample> {
         return field;
     }
 
-
+    //tested
     public Sample doGetSample(String sampleId) throws Exception {
         JsonElement object = fetchSample(RECEIVE_SAMPLE_ENDPOINT, sampleId);
         Sample sample = parseReply(object);

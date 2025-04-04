@@ -20,6 +20,7 @@ package de.ipb_halle.signals.rest;
 import jakarta.ejb.LocalBean;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -74,7 +75,7 @@ public class MockRestClient extends RestClientImpl {
         if (mockResponse == null) {
             //additional method for debugging
             logRequestData();
-            throw new NullPointerException("MockRestClient not configured for key: " + key);
+            throw new IOException("MockRestClient not configured for key: " + key);
         }
 
         // Check the status code and throw exception if it differs
@@ -98,14 +99,19 @@ public class MockRestClient extends RestClientImpl {
     }
 
     private void handleStreamResponse(String content) {
-        try {
-            Path p = Files.createTempFile(
+        try (InputStream stream = this.getClass().getResourceAsStream(content)) {
+            if (stream == null) {
+                throw new IOException("Resource not found: " + content);
+            }
+            Path path = Files.createTempFile(
                     Path.of("/tmp"),
                     "mock",
                     "bin",
                     PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-r--r--")));
-            digest(this.getClass().getResourceAsStream(content), p);
-            Files.delete(p);
+            digest(stream, path);
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to handle stream", e);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -117,6 +123,5 @@ public class MockRestClient extends RestClientImpl {
             System.out.println(getRequestData());
             System.out.println("\n*\n* \n*");
         }
-
     }
 }

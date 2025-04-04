@@ -1,0 +1,145 @@
+{
+  "links": {
+    "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties"
+  },
+  "data": [
+    {
+      "type": "property",
+      "id": "Name",
+      "meta": {
+        "definition": {
+          "type": "text",
+          "attribute": {
+            "name": "Text",
+            "type": "text",
+            "counts": {
+              "templates": {}
+            }
+          },
+          "flags": {
+            "canEdit": false
+          }
+        }
+      },
+      "attributes": {
+        "id": "Name",
+        "name": "Name",
+        "value": "Sample-XBF-XBF Esterification-001",
+        "values": [
+          "Sample-XBF-XBF Esterification-001"
+        ]
+      },
+      "relationships": {
+        "owner": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          },
+          "data": {
+            "type": "entity",
+            "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          }
+        }
+      }
+    },
+    {
+      "type": "property",
+      "id": "2837",
+      "meta": {
+        "definition": {
+          "type": "choice",
+          "attribute": {
+            "id": "31",
+            "name": "Sample Status",
+            "type": "choice",
+            "options": [
+              "Active",
+              "Closed",
+              "Cancelled"
+            ],
+            "counts": {
+              "templates": {}
+            }
+          },
+          "flags": {
+            "isRequired": true,
+            "isReadOnly": true
+          }
+        }
+      },
+      "attributes": {
+        "id": "2837",
+        "name": "Status",
+        "value": "Active",
+        "values": [
+          "Active"
+        ]
+      },
+      "relationships": {
+        "attribute": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/attributes/31"
+          },
+          "data": {
+            "type": "attribute",
+            "id": "31"
+          }
+        },
+        "owner": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          },
+          "data": {
+            "type": "entity",
+            "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          }
+        }
+      }
+    }
+  ],
+  "included": [
+    {
+      "type": "entity",
+      "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+      },
+      "attributes": {
+        "type": "sample",
+        "eid": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035",
+        "name": "Sample-XBF-XBF Esterification-001",
+        "digest": "67161701",
+        "fields": {
+          "Description": {
+            "value": ""
+          },
+          "Name": {
+            "value": "Sample-XBF-XBF Esterification-001"
+          },
+          "Status": {
+            "value": "Active"
+          }
+        }
+      }
+    },
+    {
+      "type": "attribute",
+      "id": "31",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/attributes/31"
+      },
+      "attributes": {
+        "id": "31",
+        "name": "Sample Status",
+        "type": "choice",
+        "options": [
+          "Active",
+          "Closed",
+          "Cancelled"
+        ],
+        "counts": {
+          "templates": {}
+        }
+      }
+    }
+  ]
+}

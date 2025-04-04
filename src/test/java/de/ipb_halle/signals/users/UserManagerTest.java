@@ -177,7 +177,7 @@ public abstract class UserManagerTest {
         manager.syncUsersFromLdap(context);
 
         String html = context.report.render();
-        Assertions.assertTrue(htmlq.contains("ae@somewhere.invalid"), "report contains 'ae@somewhere.invalid'");
+        Assertions.assertTrue(html.contains("ae@somewhere.invalid"), "report contains 'ae@somewhere.invalid'");
     }
 
     @Test
