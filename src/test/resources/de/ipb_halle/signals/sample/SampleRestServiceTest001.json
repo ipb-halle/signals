@@ -371,7 +371,7 @@
         "digest": "70029449",
         "fields": {
           "Description": {
-            "value": "Franks Test Notebook Feb. 2022"
+            "value": "Joes Test Notebook Feb. 2022"
           },
           "Name": {
             "value": "XBF Notebook 2022.02"
@@ -388,14 +388,14 @@
       },
       "attributes": {
         "userId": "116",
-        "userName": "andreas.stegmuller@perkinelmer.com",
+        "userName": "user@usermail.org",
         "flags": {
           "isSystemStandardUser": true
         },
         "alias": "ANST",
-        "email": "andreas.stegmuller@perkinelmer.com",
-        "firstName": "Andreas",
-        "lastName": "Stegmüller",
+        "email": "user@usermail.org",
+        "firstName": "User",
+        "lastName": "SomeUser",
         "isEnabled": true
       },
       "relationships": {
@@ -435,14 +435,14 @@
       },
       "attributes": {
         "userId": "102",
-        "userName": "fbroda@ipb-halle.de",
+        "userName": "user@usermail.org",
         "flags": {
           "isSystemStandardUser": true
         },
         "alias": "XBF",
-        "email": "fbroda@ipb-halle.de",
-        "firstName": "Frank",
-        "lastName": "Broda",
+        "email": "user@usermail.org",
+        "firstName": "User",
+        "lastName": "SomeUser",
         "isEnabled": true
       },
       "relationships": {

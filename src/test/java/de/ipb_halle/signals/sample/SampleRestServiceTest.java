@@ -27,9 +27,13 @@ import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.rest.MockRestClient;
 import de.ipb_halle.signals.rest.RestHelper;
+import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
 import de.ipb_halle.tda.DeploymentElement;
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(PostgresqlContainerExtension.class)
@@ -65,6 +69,22 @@ public abstract class SampleRestServiceTest {
         JsonElement element = sampleRestService.fetchSample(TEST_ENDPOINT_1, TEST_SAMPLE_ID);
         Assertions.assertNotNull(element, "Returned JSON element should not be null");
     }
+
+    @Test
+    public void testFetchSample_exception() throws Exception {
+        String errorKey = "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035";
+        mockRestClient.addResponse(
+                errorKey,
+                "Error-Payload",
+                500
+        );
+
+        // Act & Assert
+        Assertions.assertThrows(UnexpectedResponseCodeException.class, () -> {
+            sampleRestService.fetchSample(TEST_ENDPOINT_1, TEST_SAMPLE_ID);
+        });
+    }
+
 
     @Test
     public void testParseReply() throws Exception {
@@ -110,6 +130,4 @@ public abstract class SampleRestServiceTest {
         Assertions.assertFalse(sample.getChildren().isEmpty(), "Child should be loaded");
         Assertions.assertEquals(sample.getChildren().size(), 1);
     }
-
-
 }

@@ -1,12 +1,12 @@
 {
   "links": {
-    "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/text:e4f69432-2c96-4139-ae4e-84cc24d7a9ac"
+    "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:e4f69432-2c96-4139-ae4e-84cc24d7a9ac"
   },
   "data": {
     "type": "entity",
     "id": "text:e4f69432-2c96-4139-ae4e-84cc24d7a9ac",
     "links": {
-      "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/text:e4f69432-2c96-4139-ae4e-84cc24d7a9ac"
+      "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:e4f69432-2c96-4139-ae4e-84cc24d7a9ac"
     },
     "attributes": {
       "id": "text:e4f69432-2c96-4139-ae4e-84cc24d7a9ac",
@@ -32,7 +32,7 @@
     "relationships": {
       "createdBy": {
         "links": {
-          "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/102"
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"
         },
         "data": {
           "type": "user",
@@ -41,7 +41,7 @@
       },
       "editedBy": {
         "links": {
-          "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/102"
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"
         },
         "data": {
           "type": "user",
@@ -50,7 +50,7 @@
       },
       "ancestors": {
         "links": {
-          "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/text:e4f69432-2c96-4139-ae4e-84cc24d7a9ac/ancestors"
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:e4f69432-2c96-4139-ae4e-84cc24d7a9ac/ancestors"
         },
         "data": [
           {
@@ -58,7 +58,7 @@
             "id": "journal:fe624b25-959e-4359-9ff4-372d396c1392",
             "meta": {
               "links": {
-                "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/journal:fe624b25-959e-4359-9ff4-372d396c1392"
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/journal:fe624b25-959e-4359-9ff4-372d396c1392"
               }
             }
           },
@@ -67,7 +67,7 @@
             "id": "experiment:9c57624e-99c7-44db-afad-e579d5fe32cc",
             "meta": {
               "links": {
-                "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc"
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc"
               }
             }
           },
@@ -76,7 +76,7 @@
             "id": "samplesContainer:28268246-f154-42fb-8348-cd76ad356f19",
             "meta": {
               "links": {
-                "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/samplesContainer:28268246-f154-42fb-8348-cd76ad356f19"
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/samplesContainer:28268246-f154-42fb-8348-cd76ad356f19"
               }
             }
           },
@@ -85,7 +85,7 @@
             "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035",
             "meta": {
               "links": {
-                "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
               }
             }
           }
@@ -93,7 +93,7 @@
       },
       "owner": {
         "links": {
-          "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/102"
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"
         },
         "data": {
           "type": "user",
@@ -102,7 +102,7 @@
       },
       "template": {
         "links": {
-          "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/text:39cff8f0-8623-4fab-af79-548f1ebead1d"
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:39cff8f0-8623-4fab-af79-548f1ebead1d"
         },
         "data": {
           "type": "entity",
@@ -111,7 +111,7 @@
       },
       "source": {
         "links": {
-          "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/text:e4f69432-2c96-4139-ae4e-84cc24d7a9ac/export"
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:e4f69432-2c96-4139-ae4e-84cc24d7a9ac/export"
         }
       }
     }
@@ -121,7 +121,7 @@
       "type": "entity",
       "id": "text:39cff8f0-8623-4fab-af79-548f1ebead1d",
       "links": {
-        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/text:39cff8f0-8623-4fab-af79-548f1ebead1d"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:39cff8f0-8623-4fab-af79-548f1ebead1d"
       },
       "attributes": {
         "id": "text:39cff8f0-8623-4fab-af79-548f1ebead1d",
@@ -147,7 +147,7 @@
       "relationships": {
         "createdBy": {
           "links": {
-            "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/116"
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/116"
           },
           "data": {
             "type": "user",
@@ -156,7 +156,7 @@
         },
         "editedBy": {
           "links": {
-            "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/116"
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/116"
           },
           "data": {
             "type": "user",
@@ -165,7 +165,7 @@
         },
         "ancestors": {
           "links": {
-            "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/text:39cff8f0-8623-4fab-af79-548f1ebead1d/ancestors"
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:39cff8f0-8623-4fab-af79-548f1ebead1d/ancestors"
           },
           "data": [
             {
@@ -173,7 +173,7 @@
               "id": "sample:0174e78c-0b95-49f9-8a57-39061bbc0050",
               "meta": {
                 "links": {
-                  "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/sample:0174e78c-0b95-49f9-8a57-39061bbc0050"
+                  "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:0174e78c-0b95-49f9-8a57-39061bbc0050"
                 }
               }
             }
@@ -181,7 +181,7 @@
         },
         "owner": {
           "links": {
-            "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/3"
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
           },
           "data": {
             "type": "user",
@@ -190,7 +190,7 @@
         },
         "source": {
           "links": {
-            "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/text:39cff8f0-8623-4fab-af79-548f1ebead1d/export"
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:39cff8f0-8623-4fab-af79-548f1ebead1d/export"
           }
         }
       }
@@ -199,7 +199,7 @@
       "type": "entity",
       "id": "sample:0174e78c-0b95-49f9-8a57-39061bbc0050",
       "links": {
-        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/sample:0174e78c-0b95-49f9-8a57-39061bbc0050"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:0174e78c-0b95-49f9-8a57-39061bbc0050"
       },
       "attributes": {
         "type": "sample",
@@ -224,7 +224,7 @@
       "type": "entity",
       "id": "samplesContainer:28268246-f154-42fb-8348-cd76ad356f19",
       "links": {
-        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/samplesContainer:28268246-f154-42fb-8348-cd76ad356f19"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/samplesContainer:28268246-f154-42fb-8348-cd76ad356f19"
       },
       "attributes": {
         "type": "samplesContainer",
@@ -246,7 +246,7 @@
       "type": "entity",
       "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035",
       "links": {
-        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
       },
       "attributes": {
         "type": "sample",
@@ -271,7 +271,7 @@
       "type": "entity",
       "id": "journal:fe624b25-959e-4359-9ff4-372d396c1392",
       "links": {
-        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/journal:fe624b25-959e-4359-9ff4-372d396c1392"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/journal:fe624b25-959e-4359-9ff4-372d396c1392"
       },
       "attributes": {
         "type": "journal",
@@ -280,7 +280,7 @@
         "digest": "70029449",
         "fields": {
           "Description": {
-            "value": "Franks Test Notebook Feb. 2022"
+            "value": "Users Test Notebook Feb. 2022"
           },
           "Name": {
             "value": "XBF Notebook 2022.02"
@@ -293,24 +293,24 @@
       "type": "user",
       "id": "116",
       "links": {
-        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/116"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/116"
       },
       "attributes": {
         "userId": "116",
-        "userName": "andreas.stegmuller@perkinelmer.com",
+        "userName": "user@usermail.org",
         "flags": {
           "isSystemStandardUser": true
         },
         "alias": "ANST",
-        "email": "andreas.stegmuller@perkinelmer.com",
-        "firstName": "Andreas",
-        "lastName": "Stegmüller",
+        "email": "user@usermail.org",
+        "firstName": "User",
+        "lastName": "SomeUser",
         "isEnabled": true
       },
       "relationships": {
         "systemGroups": {
           "links": {
-            "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/116/systemGroups"
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/116/systemGroups"
           }
         }
       }
@@ -319,24 +319,24 @@
       "type": "user",
       "id": "102",
       "links": {
-        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/102"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"
       },
       "attributes": {
         "userId": "102",
-        "userName": "fbroda@ipb-halle.de",
+        "userName": "user@usermail.org",
         "flags": {
           "isSystemStandardUser": true
         },
         "alias": "XBF",
-        "email": "fbroda@ipb-halle.de",
-        "firstName": "Frank",
-        "lastName": "Broda",
+        "email": "user@usermail.org",
+        "firstName": "User",
+        "lastName": "SomeUser",
         "isEnabled": true
       },
       "relationships": {
         "systemGroups": {
           "links": {
-            "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/102/systemGroups"
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102/systemGroups"
           }
         }
       }
@@ -345,7 +345,7 @@
       "type": "entity",
       "id": "experiment:9c57624e-99c7-44db-afad-e579d5fe32cc",
       "links": {
-        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc"
       },
       "attributes": {
         "type": "experiment",
@@ -373,7 +373,7 @@
       "type": "user",
       "id": "3",
       "links": {
-        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/3"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
       },
       "attributes": {
         "userId": "3",
@@ -388,7 +388,7 @@
       "relationships": {
         "systemGroups": {
           "links": {
-            "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/3/systemGroups"
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3/systemGroups"
           }
         }
       }

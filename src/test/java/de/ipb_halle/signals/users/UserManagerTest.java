@@ -25,9 +25,7 @@ import de.ipb_halle.signals.rest.MockRestClient;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.tda.DeploymentElement;
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.HashMap;
@@ -39,22 +37,22 @@ public abstract class UserManagerTest {
 
     private final String TEST_RESOURCE_1 = "UserManagerTest001.json";
     private final String TEST_KEY_1 =
-        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users?page%5Blimit%5D=20&page%5Boffset%5D=0&enabled=true";
-//      "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users?page%5Blimit%5D=20&q=ThreeLast&page%5Boffset%5D=0&enabled=true";
+            "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users?page%5Blimit%5D=20&page%5Boffset%5D=0&enabled=true";
+    //      "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users?page%5Blimit%5D=20&q=ThreeLast&page%5Boffset%5D=0&enabled=true";
     private final String TEST_RESOURCE_2 = "UserManagerTest002.json";
     private final String TEST_KEY_2 =
-        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/107";
+            "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/107";
     private final String TEST_RESOURCE_3 = "UserManagerTest003.json";
     private final String TEST_KEY_3a =
-        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/102/systemGroups";
+            "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/102/systemGroups";
     private final String TEST_KEY_3b =
-        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/107/systemGroups";
+            "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/107/systemGroups";
     private final String TEST_KEY_3c =
-        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/122/systemGroups";
+            "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/122/systemGroups";
 
     private final String TEST_RESOURCE_4 = "UserManagerTest004.json";
     private final String TEST_KEY_4 =
-        "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users?page%5Blimit%5D=20&page%5Boffset%5D=0&enabled=false";
+            "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users?page%5Blimit%5D=20&page%5Boffset%5D=0&enabled=false";
 
     private final String TEST_RESOURCE_5 = "UserManagerTest005.json";
     private final String TEST_KEY_5 =
@@ -83,14 +81,14 @@ public abstract class UserManagerTest {
     private final String TEST_ROLE5_NAME = "Super User";
 
     @Inject
-    @DeploymentElement(mock="de.ipb_halle.signals.rest.MockRestClient")
+    @DeploymentElement(mock = "de.ipb_halle.signals.rest.MockRestClient")
     private RestClient mockRestClient;
 
     @Inject
-    @DeploymentElement(mock="de.ipb_halle.signals.users.MockLdapAdapterFactory")
+    @DeploymentElement(mock = "de.ipb_halle.signals.users.MockLdapAdapterFactory")
     private LdapAdapterFactory ldapAdapterFactory;
 
-    @DeploymentElement(mock="de.ipb_halle.signals.users.MockLdapAdapter")
+    @DeploymentElement(mock = "de.ipb_halle.signals.users.MockLdapAdapter")
     private LdapAdapter ldapAdapter;
 
     @Inject
@@ -131,7 +129,7 @@ public abstract class UserManagerTest {
                 getClass().getResourceAsStream(TEST_RESOURCE_4));
         TestBase.prepareRestClients((MockRestClient) mockRestClient,
                 TEST_KEY_5,
-                getClass().getResourceAsStream(TEST_RESOURCE_5));
+                getClass().getResourceAsStream(TEST_RESOURCE_5), 201);
         TestBase.prepareRestClients((MockRestClient) mockRestClient,
                 String.format(TEST_KEY_6, TEST_USER3_ID),
                 getClass().getResourceAsStream(TEST_RESOURCE_6));
@@ -173,12 +171,13 @@ public abstract class UserManagerTest {
     public void syncUsersFromLdapTest() {
         RuntimeConfig config = new RuntimeConfig(true, false, true, true, true);
         UserSynchronizationContext context = new UserSynchronizationContext(config);
-        context.groupsByDN = new HashMap<> ();
-        context.rolesByDN = new HashMap<> ();
-        AccessManager.prepareReport(context,  new HtmlReport());
+        context.groupsByDN = new HashMap<>();
+        context.rolesByDN = new HashMap<>();
+        AccessManager.prepareReport(context, new HtmlReport());
         manager.syncUsersFromLdap(context);
+
         String html = context.report.render();
-        Assertions.assertTrue(context.report.render().contains("ae@somewhere.invalid"), "report contains 'ae@somewhere.invalid'");
+        Assertions.assertTrue(htmlq.contains("ae@somewhere.invalid"), "report contains 'ae@somewhere.invalid'");
     }
 
     @Test

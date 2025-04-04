@@ -26,10 +26,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Properties;
+import java.util.*;
 
 import de.ipb_halle.signals.users.Group;
 import de.ipb_halle.signals.users.GroupDbService;
@@ -94,11 +91,10 @@ public class TestBase {
      * @param config resource name of the MockRestClientConfig
      */
     public static void prepareRestClients(MockRestClient client, Class clazz, String config) {
-        InputStreamReader reader = new InputStreamReader(clazz.getResourceAsStream(config));
+        InputStreamReader reader = new InputStreamReader(Objects.requireNonNull(clazz.getResourceAsStream(config)));
         JsonElement json = JsonParser.parseReader(reader);
-        Iterator<JsonElement> iter = json.getAsJsonArray().iterator();
-        while(iter.hasNext()) {
-            JsonObject obj = iter.next().getAsJsonObject();
+        for (JsonElement element : json.getAsJsonArray()) {
+            JsonObject obj = element.getAsJsonObject();
             client.addResponse(obj.get("key").getAsString(),
                     readStream(clazz.getResourceAsStream(obj.get("resource").getAsString())));
         }
@@ -122,5 +118,10 @@ public class TestBase {
             return "";
         }
         return sb.toString();
+    }
+
+    public static void prepareRestClients(MockRestClient mockRestClient, String urlKey, InputStream inputStream, int statusCode){
+        String responseBody = readStream(inputStream);
+        mockRestClient.addResponse(urlKey, responseBody, statusCode);
     }
 }

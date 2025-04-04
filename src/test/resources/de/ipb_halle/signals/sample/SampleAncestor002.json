@@ -1,12 +1,12 @@
 {
   "links": {
-    "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc"
+    "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc"
   },
   "data": {
     "type": "entity",
     "id": "experiment:9c57624e-99c7-44db-afad-e579d5fe32cc",
     "links": {
-      "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc"
+      "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc"
     },
     "attributes": {
       "id": "experiment:9c57624e-99c7-44db-afad-e579d5fe32cc",
@@ -39,7 +39,7 @@
     "relationships": {
       "createdBy": {
         "links": {
-          "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/102"
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"
         },
         "data": {
           "type": "user",
@@ -48,7 +48,7 @@
       },
       "editedBy": {
         "links": {
-          "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/102"
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"
         },
         "data": {
           "type": "user",
@@ -57,7 +57,7 @@
       },
       "ancestors": {
         "links": {
-          "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc/ancestors"
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc/ancestors"
         },
         "data": [
           {
@@ -65,7 +65,7 @@
             "id": "journal:fe624b25-959e-4359-9ff4-372d396c1392",
             "meta": {
               "links": {
-                "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/journal:fe624b25-959e-4359-9ff4-372d396c1392"
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/journal:fe624b25-959e-4359-9ff4-372d396c1392"
               }
             }
           }
@@ -73,7 +73,7 @@
       },
       "children": {
         "links": {
-          "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc/children"
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc/children"
         },
         "data": [
           {
@@ -81,7 +81,7 @@
             "id": "text:f6569504-b9aa-4820-91db-5f22c874964b",
             "meta": {
               "links": {
-                "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/text:f6569504-b9aa-4820-91db-5f22c874964b"
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:f6569504-b9aa-4820-91db-5f22c874964b"
               }
             }
           },
@@ -90,7 +90,7 @@
             "id": "materialsTable:85d02840-d2b3-446c-bfbe-5d9aae645fd8",
             "meta": {
               "links": {
-                "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/materialsTable:85d02840-d2b3-446c-bfbe-5d9aae645fd8"
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/materialsTable:85d02840-d2b3-446c-bfbe-5d9aae645fd8"
               }
             }
           },
@@ -99,7 +99,7 @@
             "id": "chemicalDrawing:d86dd97d-a4ed-4afb-9846-0d5ccdb193e1",
             "meta": {
               "links": {
-                "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/chemicalDrawing:d86dd97d-a4ed-4afb-9846-0d5ccdb193e1"
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/chemicalDrawing:d86dd97d-a4ed-4afb-9846-0d5ccdb193e1"
               }
             }
           },
@@ -108,7 +108,7 @@
             "id": "viewonly:38243742-4eb9-47cf-ac54-b0664fd844af",
             "meta": {
               "links": {
-                "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/viewonly:38243742-4eb9-47cf-ac54-b0664fd844af"
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/viewonly:38243742-4eb9-47cf-ac54-b0664fd844af"
               }
             }
           },
@@ -117,7 +117,7 @@
             "id": "text:839a61c7-65e6-4e35-a483-c7d2fa5c820d",
             "meta": {
               "links": {
-                "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/text:839a61c7-65e6-4e35-a483-c7d2fa5c820d"
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:839a61c7-65e6-4e35-a483-c7d2fa5c820d"
               }
             }
           },
@@ -126,7 +126,7 @@
             "id": "plateContainer:cd48fd89-e25e-4072-acf0-c780cb1b2bd0",
             "meta": {
               "links": {
-                "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/plateContainer:cd48fd89-e25e-4072-acf0-c780cb1b2bd0"
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/plateContainer:cd48fd89-e25e-4072-acf0-c780cb1b2bd0"
               }
             }
           },
@@ -135,7 +135,7 @@
             "id": "text:faeb402d-3c21-4524-a677-791695c30b67",
             "meta": {
               "links": {
-                "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/text:faeb402d-3c21-4524-a677-791695c30b67"
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:faeb402d-3c21-4524-a677-791695c30b67"
               }
             }
           },
@@ -144,7 +144,7 @@
             "id": "text:367e6b2f-b972-484b-8d09-bc107161b337",
             "meta": {
               "links": {
-                "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/text:367e6b2f-b972-484b-8d09-bc107161b337"
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:367e6b2f-b972-484b-8d09-bc107161b337"
               }
             }
           },
@@ -153,7 +153,7 @@
             "id": "samplesContainer:28268246-f154-42fb-8348-cd76ad356f19",
             "meta": {
               "links": {
-                "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/samplesContainer:28268246-f154-42fb-8348-cd76ad356f19"
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/samplesContainer:28268246-f154-42fb-8348-cd76ad356f19"
               }
             }
           }
@@ -161,7 +161,7 @@
       },
       "owner": {
         "links": {
-          "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/102"
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"
         },
         "data": {
           "type": "user",
@@ -170,7 +170,7 @@
       },
       "systemTemplate": {
         "links": {
-          "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/experiment:a6699800-5615-4c5d-8d9e-2dd060cd277a"
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:a6699800-5615-4c5d-8d9e-2dd060cd277a"
         },
         "data": {
           "type": "entity",
@@ -179,7 +179,7 @@
       },
       "template": {
         "links": {
-          "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/experiment:a6699800-5615-4c5d-8d9e-2dd060cd277a"
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:a6699800-5615-4c5d-8d9e-2dd060cd277a"
         },
         "data": {
           "type": "entity",
@@ -188,7 +188,7 @@
       },
       "pdf": {
         "links": {
-          "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc/pdf"
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc/pdf"
         }
       }
     }
@@ -198,29 +198,29 @@
       "type": "user",
       "id": "100",
       "links": {
-        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/100"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/100"
       },
       "attributes": {
         "userId": "100",
-        "userName": "oduchrow@ipb-halle.de",
+        "userName": "user@usermail.org",
         "flags": {
           "isSystemStandardUser": true
         },
         "alias": "DUX",
-        "email": "oduchrow@ipb-halle.de",
-        "firstName": "Oliver",
-        "lastName": "Duchrow",
+        "email": "user@usermail.org",
+        "firstName": "User",
+        "lastName": "SomeUser",
         "isEnabled": true
       },
       "relationships": {
         "picture": {
           "links": {
-            "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/100/picture"
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/100/picture"
           }
         },
         "systemGroups": {
           "links": {
-            "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/100/systemGroups"
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/100/systemGroups"
           }
         }
       }
@@ -229,7 +229,7 @@
       "type": "entity",
       "id": "text:367e6b2f-b972-484b-8d09-bc107161b337",
       "links": {
-        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/text:367e6b2f-b972-484b-8d09-bc107161b337"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:367e6b2f-b972-484b-8d09-bc107161b337"
       },
       "attributes": {
         "type": "text",
@@ -250,7 +250,7 @@
       "type": "entity",
       "id": "samplesContainer:28268246-f154-42fb-8348-cd76ad356f19",
       "links": {
-        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/samplesContainer:28268246-f154-42fb-8348-cd76ad356f19"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/samplesContainer:28268246-f154-42fb-8348-cd76ad356f19"
       },
       "attributes": {
         "type": "samplesContainer",
@@ -271,7 +271,7 @@
       "type": "entity",
       "id": "experiment:a6699800-5615-4c5d-8d9e-2dd060cd277a",
       "links": {
-        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/experiment:a6699800-5615-4c5d-8d9e-2dd060cd277a"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:a6699800-5615-4c5d-8d9e-2dd060cd277a"
       },
       "attributes": {
         "id": "experiment:a6699800-5615-4c5d-8d9e-2dd060cd277a",
@@ -301,7 +301,7 @@
       "relationships": {
         "createdBy": {
           "links": {
-            "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/3"
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
           },
           "data": {
             "type": "user",
@@ -310,7 +310,7 @@
         },
         "editedBy": {
           "links": {
-            "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/100"
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/100"
           },
           "data": {
             "type": "user",
@@ -319,7 +319,7 @@
         },
         "owner": {
           "links": {
-            "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/3"
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
           },
           "data": {
             "type": "user",
@@ -328,7 +328,7 @@
         },
         "pdf": {
           "links": {
-            "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/experiment:a6699800-5615-4c5d-8d9e-2dd060cd277a/pdf"
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:a6699800-5615-4c5d-8d9e-2dd060cd277a/pdf"
           }
         }
       }
@@ -337,7 +337,7 @@
       "type": "entity",
       "id": "journal:fe624b25-959e-4359-9ff4-372d396c1392",
       "links": {
-        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/journal:fe624b25-959e-4359-9ff4-372d396c1392"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/journal:fe624b25-959e-4359-9ff4-372d396c1392"
       },
       "attributes": {
         "type": "journal",
@@ -346,7 +346,7 @@
         "digest": "70029449",
         "fields": {
           "Description": {
-            "value": "Franks Test Notebook Feb. 2022"
+            "value": "Joes Test Notebook Feb. 2022"
           },
           "Name": {
             "value": "XBF Notebook 2022.02"
@@ -359,7 +359,7 @@
       "type": "entity",
       "id": "chemicalDrawing:d86dd97d-a4ed-4afb-9846-0d5ccdb193e1",
       "links": {
-        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/chemicalDrawing:d86dd97d-a4ed-4afb-9846-0d5ccdb193e1"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/chemicalDrawing:d86dd97d-a4ed-4afb-9846-0d5ccdb193e1"
       },
       "attributes": {
         "type": "chemicalDrawing",
@@ -380,7 +380,7 @@
       "type": "entity",
       "id": "text:faeb402d-3c21-4524-a677-791695c30b67",
       "links": {
-        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/text:faeb402d-3c21-4524-a677-791695c30b67"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:faeb402d-3c21-4524-a677-791695c30b67"
       },
       "attributes": {
         "type": "text",
@@ -401,24 +401,24 @@
       "type": "user",
       "id": "102",
       "links": {
-        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/102"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"
       },
       "attributes": {
         "userId": "102",
-        "userName": "fbroda@ipb-halle.de",
+        "userName": "user@usermail.org",
         "flags": {
           "isSystemStandardUser": true
         },
         "alias": "XBF",
-        "email": "fbroda@ipb-halle.de",
-        "firstName": "Frank",
-        "lastName": "Broda",
+        "email": "user@usermail.org",
+        "firstName": "User",
+        "lastName": "SomeUser",
         "isEnabled": true
       },
       "relationships": {
         "systemGroups": {
           "links": {
-            "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/102/systemGroups"
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102/systemGroups"
           }
         }
       }
@@ -427,7 +427,7 @@
       "type": "user",
       "id": "3",
       "links": {
-        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/3"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
       },
       "attributes": {
         "userId": "3",
@@ -442,7 +442,7 @@
       "relationships": {
         "systemGroups": {
           "links": {
-            "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/users/3/systemGroups"
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3/systemGroups"
           }
         }
       }
@@ -451,7 +451,7 @@
       "type": "entity",
       "id": "plateContainer:cd48fd89-e25e-4072-acf0-c780cb1b2bd0",
       "links": {
-        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/plateContainer:cd48fd89-e25e-4072-acf0-c780cb1b2bd0"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/plateContainer:cd48fd89-e25e-4072-acf0-c780cb1b2bd0"
       },
       "attributes": {
         "type": "plateContainer",
@@ -472,7 +472,7 @@
       "type": "entity",
       "id": "text:f6569504-b9aa-4820-91db-5f22c874964b",
       "links": {
-        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/text:f6569504-b9aa-4820-91db-5f22c874964b"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:f6569504-b9aa-4820-91db-5f22c874964b"
       },
       "attributes": {
         "type": "text",
@@ -493,7 +493,7 @@
       "type": "entity",
       "id": "viewonly:38243742-4eb9-47cf-ac54-b0664fd844af",
       "links": {
-        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/viewonly:38243742-4eb9-47cf-ac54-b0664fd844af"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/viewonly:38243742-4eb9-47cf-ac54-b0664fd844af"
       },
       "attributes": {
         "type": "viewonly",
@@ -514,7 +514,7 @@
       "type": "entity",
       "id": "text:839a61c7-65e6-4e35-a483-c7d2fa5c820d",
       "links": {
-        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/text:839a61c7-65e6-4e35-a483-c7d2fa5c820d"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:839a61c7-65e6-4e35-a483-c7d2fa5c820d"
       },
       "attributes": {
         "type": "text",
@@ -535,7 +535,7 @@
       "type": "entity",
       "id": "materialsTable:85d02840-d2b3-446c-bfbe-5d9aae645fd8",
       "links": {
-        "self": "https://ipb-halle-trial.signalsresearch.revvitycloud.eu/api/rest/v1.0/entities/materialsTable:85d02840-d2b3-446c-bfbe-5d9aae645fd8"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/materialsTable:85d02840-d2b3-446c-bfbe-5d9aae645fd8"
       },
       "attributes": {
         "type": "materialsTable",
