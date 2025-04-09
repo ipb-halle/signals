@@ -27,11 +27,7 @@ import de.ipb_halle.lbac.search.lang.EntityGraph;
 import de.ipb_halle.lbac.search.lang.SqlInsertBuilder;
 */
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -44,6 +40,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Migration tool for the InhouseDB
@@ -52,100 +50,50 @@ import java.util.Map;
  */
 public class Samples {
 
-    public final static String CONTAINER_DIMENSIONS = "CONTAINER_DIMENSIONS";
-    public final static String CONTAINERTYPE_OTHER = "CUPBOARD";
-    public final static String CONTAINERTYPE_TRAY = "TRAY";
-    public final static String CONTAINERTYPE_VIAL = "GLASS_VIAL";
-    public final static String INPUT_SAMPLES = "INPUT_SAMPLES";
-    public final static String INPUT_EXTRACTS = "INPUT_EXTRACTS";
-    public final static String PARENT_CONTAINER_ID = "PARENT_CONTAINER_ID";
-    public final static String SAMPLE_ITEM_ID = "SampleId_ItemId";
-    public final static String SAMPLE_EXP_ID = "RefMolProc_ItemId";
-    public final static String UNKNOWN_CONTAINER = "UNKNOWN_CONTAINER";
+    public record Dimension(String prefix, boolean zerobased, int rows, int colums) {
+    }
+
+    public final static String SAMPLES_INPUT = "samples.inputFile";
+    public final static String SAMPLES_REJECT = "samples.rejectFile";
+
+    public final static String CONTAINER_DEFAULT_LOCATION = "samples.defaultLocation";
+
 
     private InhouseDB inhouseDB;
-/*
-    private int parentContainerId;
-    private Map<String, ContainerEntity> containers;
-    private Map<String, int[]> dimensions;
 
-    public Samples(InhouseDB inhouseDB) throws Exception {
-        this.inhouseDB = inhouseDB;
-        addInsertBuilders();
-        init();
-    }
+    private Map<String, InhouseLocation> locations;
+    private final static Map<String, Dimension> dimensions;
 
-    private void addInsertBuilders() {
-        this.inhouseDB.addInsertBuilder(ItemEntity.class.getName(),
-                new SqlInsertBuilder(new EntityGraph(ItemEntity.class)));
-        this.inhouseDB.addInsertBuilder(ItemPositionEntity.class.getName(),
-                new SqlInsertBuilder(new EntityGraph(ItemPositionEntity.class)));
-        this.inhouseDB.addInsertBuilder(ContainerEntity.class.getName(),
-                new SqlInsertBuilder(new EntityGraph(ContainerEntity.class)));
-        this.inhouseDB.addInsertBuilder(ContainerNestingEntity.class.getName(),
-                new SqlInsertBuilder(new EntityGraph(ContainerNestingEntity.class)));
-    }
+    private Pattern quotePattern = Pattern.compile("\"(.*)\"");
+    private Pattern locationPattern = Pattern.compile("(([A-Z]{2,3})\\d{3})\\.([A-Z])(\\d)(.*)");
 
-    private ContainerEntity createContainer(String name) throws Exception {
-        ContainerEntity container = new ContainerEntity();
-        container.setLabel(name);
-        container.setProjectid(inhouseDB.getProject());
-        int[] dimension = getDimension(name);
-        if (dimension != null) {
-            container.setRows(dimension[0]);
-            container.setColumns(dimension[1]);
-            container.setType(CONTAINERTYPE_TRAY);
-            container.setZeroBased(dimension[2] == 1);
-            container.setSwapDimensions(dimension[3] == 1);
-        } else {
-            container.setType(CONTAINERTYPE_OTHER);
-        }
-
-        container = (ContainerEntity) this.inhouseDB.getBuilder(container.getClass().getName())
-                .insert(this.inhouseDB.getConnection(), container);
-        this.containers.put(name, container);
-
-        ContainerNestingEntity nesting = new ContainerNestingEntity();
-        nesting.setId(new ContainerNestingId(container.getId(), this.parentContainerId));
-        this.inhouseDB.getBuilder(nesting.getClass().getName())
-                .insert(this.inhouseDB.getConnection(), nesting);
-
-        return container;
-    }
-
-    public ContainerEntity getContainer(String place) throws Exception {
-        if ((place == null) || place.isEmpty()) {
-            return getContainer(UNKNOWN_CONTAINER);
-        }
-        ContainerEntity container = this.containers.get(place);
-        if (container == null) {
-            container = createContainer(place);
-        }
-        return container;
-    }
-
-    public Integer getMaterialId(int molid) throws Exception {
-        String sql = "SELECT old_id FROM tmp_import WHERE new_id=? AND type=?";
-        return this.inhouseDB.loadRefId(sql, molid, Compounds.TMP_MatId_MolId);
-    }
-
-    public Integer getMolId(int id) throws Exception {
-        String sql = "SELECT old_id FROM tmp_import WHERE new_id=? AND type=?";
-        return this.inhouseDB.loadRefId(sql, id, Correlation.CORRELATION_MOLPROCMAT);
-    }
-*/
-    /**
-     * return a dimensions string for a given container name
+    /*
+     * static constructor
      */
-/*
-    private int[] getDimension(String name) {
-        String pattern = "^([A-Za-z]+).*$";
-        String prefix = name.replaceAll(pattern, "$1");
-        return this.dimensions.get(prefix);
+    static {
+        // Intialize container dimensions.
+        // The pattern given below should capture container prefixes
+        // like TS, TM, TL, TH, MTP, ...
+        // rows use letters, columns use digits
+
+        dimensions = new HashMap<>();
+        dimensions.put("TS", new Dimension("TS", true, 25, 10));
+        dimensions.put("TM", new Dimension("TM", true, 15, 6));
+        dimensions.put("TL", new Dimension("TL", true, 11, 4));
+        dimensions.put("TLneu", new Dimension("TL", true, 12, 5));
+        dimensions.put("TH", new Dimension("TH", true, 8, 3));
+        dimensions.put("MTP", new Dimension("MTP", false, 12, 8));
     }
+
+
+    public Samples(InhouseDB inhouseDB) {
+        this.inhouseDB = inhouseDB;
+        this.locations = new HashMap<>();
+    }
+
 
     public void importData() throws Exception {
-        importSamples(inhouseDB.getConfigString(INPUT_SAMPLES));
+        // importSamples();
     }
 
     private void importExtracts(String fileName) throws Exception {
@@ -153,7 +101,7 @@ public class Samples {
 
     }
 
-    private void importSamples(String fileName) throws Exception {
+    private void importSamples() throws Exception {
         System.out.println("Importing compound samples");
 
         // 01 SampleID                          internal id
@@ -174,87 +122,58 @@ public class Samples {
         // 16 Isolated                          unused
         // 17 BiolDataAvailable                 unused
 
+        Pattern pattern = Pattern.compile("^(\\d+);"    //  1 sampleId
+                + "(\\d+);"                             //  2 molProcId
+                + "(.*)?;"                              //  3 last solvent
+                + "(\\d?);"                             //  4 permission
+                + "(.*)?;"                              //  5 storage place
+                + "(.*)?;"                              //  6 "Lerbs-Marker"
+                + "(.*)?;"                              //  7 sample code
+                + "([0-9,\\.])?;"                       //  8 amount [mg]
+                + "([0-9,\\.])?;"                       //  9 tara [mg]
+                + "(\\d+)?;"                            // 10 purity
+                + "(.*)?;"                              // 11 physical phase,
+                + "('\\d{10}')?;"                       // 12 CLAKS-Id / KICKS-Label
+                + "(.*)?;"                              // 13 remarks
+                + "0;0;0;0$");                          //  - unused fields
 
-        String pattern = "^(\\d+);"             //  1 sampleId
-                + "(\\d+);"                     //  2 molProcId
-                + "('(.*)')?;"                  //  4 last solvent
-                + "(\\d?);"                     //  5 permission
-                + "('(.*)')?;"                  //  7 storage place
-                + "('.*')?;"                    //  8 "Lerbs-Marker"
-                + "('(.*)')?;"                  // 10 sample code
-                + "(\\d+,\\d+)?;"               // 11 amount [mg]
-                + "(\\d+,\\d+)?;"               // 12 tara [mg]
-                + "(\\d+)?;"                    // 13 purity
-                + "('(.*)')?;"                  // 15 physical phase,
-                + "('\\d{10}')?;"               // 16 CLAKS-Id / KICKS-Label
-                + "('(.*)')?;"                  // 18 remarks
-                + "0;0;0;0$";                   //  - unused fields
-
-        BufferedReader reader = new BufferedReader(new FileReader(fileName));
+        BufferedReader reader = new BufferedReader(new FileReader(inhouseDB.getConfigString(SAMPLES_INPUT)));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(inhouseDB.getConfigString(SAMPLES_REJECT)));
         reader.readLine(); // discard header
-        int line = 1;
-        while(reader.ready()) {
-                String st = reader.readLine();
-                line++;
+        while (reader.ready()) {
+            String line = reader.readLine();
 
-                int sampleId = Integer.parseInt(st.replaceAll(pattern, "$1"));
-                int molProcId = Integer.parseInt(st.replaceAll(pattern, "$2"));
-                String solvent = st.replaceAll(pattern, "$4");
-                String place = st.replaceAll(pattern, "$7");
-                String sampleCode = st.replaceAll(pattern, "$10");
-                double amount = parseDecimalString(st.replaceAll(pattern, "$11"));
-                double tara = parseDecimalString(st.replaceAll(pattern, "$12"));
-                String purity = st.replaceAll(pattern, "$13");
-                String appearance = st.replaceAll(pattern, "$15");
-                String remarks = st.replaceAll(pattern, "$18");
+            Matcher matcher = pattern.matcher(line);
+            if (matcher.matches()) {
+                InhouseContainer container = new InhouseContainer()
+                        .setSampleId(Integer.parseInt(matcher.group(1)))
+                        .setCompoundCorrelationId(Integer.parseInt(matcher.group(2)))
+                        .setLastSolvent(matcher.group(3))
+                        .setSampleCode(matcher.group(7))
+                        .setAmount(parseDecimalString(matcher.group(8)))
+                        .setTara(parseDecimalString(matcher.group(9)))
+                        .setPurity(Integer.parseInt(matcher.group(10)))
+                        .setAppearance(matcher.group(11))
+                        .setRemarks(matcher.group(13));
 
-//              System.out.printf("SAMPLE: %d \t%d \t%s \t%f \t%f \t%s \t%s \t%s \t%s\n", sampleId, molProcId, purity,
-//                  amount, tara, place, solvent, appearance, remarks);
+                parseLocation(container, matcher.group(5));
+                inhouseDB.getInhouseDbService().save(container);
 
-                try {
-                    saveSample(sampleId, molProcId, solvent, place, sampleCode, amount, tara, purity, appearance, remarks);
-                    if ((line % 1000) == 0) {
-                        System.out.printf("imported %d samples\n", line);
-                    }
-                } catch(Exception e) {
-                    System.out.printf("Error in line %d\n", line);
-                    throw e;
-                }
+
+            } else {
+                writer.append(line);
+                writer.newLine();
+            }
         }
         reader.close();
+        writer.close();
     }
-
-
-    private void init() {
-        this.containers = new HashMap<> ();
-        this.dimensions = new HashMap<> ();
-        this.parentContainerId = inhouseDB.getConfigInt(PARENT_CONTAINER_ID);
-
-        // Intialize container dimensions. Dimensions are specified as
-        // "prefix.dimensionString[/prefix.rows.columns]*", e.g. "TS.25;10/TM.15;6/TL...."
-        //
-        // The pattern given below should capture container prefixes
-        // like TS, TM, TL, TH, MTP, ...
-
-        String pattern = "^([A-Za-z]+)\\.([0-9]+);([0-9]+);([01]);([01])$";
-        String[] format = inhouseDB.getConfigString(CONTAINER_DIMENSIONS).split("/");
-        for (String f : format) {
-            int[] dim = new int[4];
-            dim[0] = Integer.parseInt(f.replaceAll(pattern, "$2")); // rows (letters by default)
-            dim[1] = Integer.parseInt(f.replaceAll(pattern, "$3")); // columns
-            dim[2] = Integer.parseInt(f.replaceAll(pattern, "$4")); // 1 = zerobased
-            dim[3] = Integer.parseInt(f.replaceAll(pattern, "$5")); // 1 = swap labels (make letters for columns)
-
-            this.dimensions.put(f.replaceAll(pattern, "$1"), dim);
-        }
-    }
-*/
 
     /**
      * numbers are given in German locale (',' as decimal separator)
      *
-     * @param a   string representation of a number
-     * @param the double value of the number (or 0.0)
+     * @param decimal string representation of a number
+     * @return the double value of the number (or 0.0)
      */
     private double parseDecimalString(String decimal) {
         if ((decimal != null) && (!decimal.isEmpty())) {
@@ -262,103 +181,57 @@ public class Samples {
         }
         return 0.0;
     }
-/*
-    private void saveSample(int sampleId, int molProcId, String solvent, String place, String sampleCode,
-                double amount, double tara, String purity, String appearance,
-                String remarks) throws Exception {
 
-        String pattern = "^([A-Z]{2,3}[0-9]{3})\\.([A-Z])([0-9])$";
-        Date importDate = new Date();
-        ContainerEntity container = getContainer(UNKNOWN_CONTAINER);
-        int column = -1;
-        int row = -1;
-
-        if (place.matches(pattern)) {
-            String containerName = place.replaceAll(pattern, "$1");
-            container = getContainer(containerName);
-            row = place.replaceAll(pattern, "$2").charAt(0) - 65;
-            column = Integer.parseInt(place.replaceAll(pattern, "$3"));
-            int containerRows = container.getRows() == null ? -2 : container.getRows();
-            int containerColumns = container.getColumns() == null ? -2 :container.getColumns();
-            if ((row >= containerRows) || (column >= containerColumns)) {
-                System.out.printf("Out of range for sampleId %d in container %s\n", sampleId, containerName);
-                container = getContainer(UNKNOWN_CONTAINER);
-                row = -1;
-                column = -1;
-            }
-        }
-
-        Integer materialId = null;
-        Integer molId = getMolId(molProcId);
-
-        if ((molId == null) || (molId == 0)) {
-//          System.out.printf("No molId found for sampleId %d\n", sampleId);
-            materialId = inhouseDB.getUnknownCompoundId();
+    private void parseLocation(InhouseContainer container, String loc) {
+        Matcher matcher = locationPattern.matcher(loc);
+        InhouseLocation location;
+        if (matcher.matches()) {
+            String locationName = matcher.group(1);
+            location = lookupOrCreateLocation(matcher);
+            container.setLocation(locationName)
+                    .setLocationId(location.getId())
+                    .setRow(parseRow(matcher.group(4)))
+                    .setColumn(parseColumn(location, matcher.group(5)));
         } else {
-            materialId = getMaterialId(molId);
-            if ((materialId == null) || (materialId == 0)) {
-//              System.out.printf("No material found for sampleId %d\n", sampleId);
-                materialId = inhouseDB.getUnknownCompoundId();
-            }
+            // could not parse location, setting default location
+            location = locations.get(inhouseDB.getConfigString(CONTAINER_DEFAULT_LOCATION));
+            container.setLocationId(location.getId())
+                    .setLocation(loc);
         }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("Samplecode: ");
-        sb.append(sampleCode);
-        sb.append(String.format("; MolId: %d", molId));
-        sb.append(String.format("; Tara: %.3f mg; Appearance: ", tara));
-        sb.append(appearance);
-        sb.append("; Remarks: ");
-        sb.append(remarks);
-
-        ItemEntity item = new ItemEntity();
-        item.setACList(inhouseDB.getACList());
-        item.setOwner(inhouseDB.getOwner());
-        item.setProjectid(inhouseDB.getProject());
-        item.setAmount(amount);
-        item.setUnit("mg");
-        if (! purity.isEmpty()) {
-            item.setConcentration(Double.valueOf(purity));
-        } else {
-            item.setConcentration(100.0);
-        }
-        item.setConcentrationUnit("%");
-        item.setDescription(sb.toString());
-        item.setMaterialid(materialId);
-        item.setPurity(purity);                                                  // free text might not be appropriate!
-//      item.setLabel();
-        item.setContainertype(CONTAINERTYPE_VIAL);
-        item.setContainerid(container.getId());
-        item.setCtime(importDate);
-
-        item = (ItemEntity) this.inhouseDB.getBuilder(item.getClass().getName())
-                .insert(this.inhouseDB.getConnection(), item);
-
-
-        // item position
-        if (row >= 0) {
-            try {
-                ItemPositionEntity pos = new ItemPositionEntity();
-                pos.setItemId(item.getId());
-                pos.setContainerId(container.getId());
-                pos.setItemRow(row);
-                pos.setItemCol(column);
-                this.inhouseDB.getBuilder(pos.getClass().getName())
-                        .insert(this.inhouseDB.getConnection(), pos);
-            } catch(Exception e) {
-                System.out.printf("Saving of item position failed: SampleId: %d, Container %s (%d), row: %d col: %d\n",
-                    sampleId, container.getLabel(), container.getId(), row, column);
-            }
-        }
-
-        // tmp reference
-        String sql = "INSERT INTO tmp_import (old_id, new_id, type) VALUES (?, ?, ?)";
-        this.inhouseDB.saveTriple(sql, sampleId, item.getId(), SAMPLE_ITEM_ID);
-
-        //
-        sql = "INSERT INTO tmp_import (old_id, new_id, type) VALUES (?, ?, ?)";
-        this.inhouseDB.saveTriple(sql, molProcId, item.getId(), SAMPLE_EXP_ID);
-
     }
-*/
+
+    private InhouseLocation lookupOrCreateLocation(Matcher matcher) {
+        String locationName = matcher.group(1);
+        InhouseLocation location = locations.get(locationName);
+        if (location == null) {
+            String locationType = matcher.group(2);
+            Dimension dimension = dimensions.get(locationType);
+            location = new InhouseLocation()
+                    .setName(matcher.group(1))
+                    .setRows(dimension.rows)
+                    .setColumns(dimension.colums)
+                    .setZeroBased(dimension.zerobased);
+            location = inhouseDB.getInhouseDbService().save(location);
+            locations.put(locationName, location);
+        }
+        return location;
+    }
+
+    private int parseRow(String row) {
+        return "ABCDEFGHIJKLMNOPQRSTUVWXYZ".indexOf(row) + 1;
+    }
+
+    private int parseColumn(InhouseLocation location, String col) {
+        return (location.isZeroBased() ? 1 : 0) + Integer.parseInt(col);
+    }
+
+    /**
+     * return a dimensions string for a given container name
+     */
+    private int[] getDimension(String name) {
+        String pattern = "^([A-Za-z]+).*$";
+        String prefix = name.replaceAll(pattern, "$1");
+        return null;
+//        return this.dimensions.get(pref
+    }
 }

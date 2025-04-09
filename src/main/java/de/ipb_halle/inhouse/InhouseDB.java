@@ -144,7 +144,7 @@ public class InhouseDB {
         Experiments experiments = new Experiments(this);
         Taxonomy taxonomy = new Taxonomy(this);
         Correlation correlation = new Correlation(this);
-//        Samples samples = new Samples(this);
+        Samples samples = new Samples(this);
 
 //        compounds.importData(this);
 //        experiments.importData(this);

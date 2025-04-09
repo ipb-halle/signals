@@ -10,7 +10,10 @@
         <non-jta-data-source>signalsDSNonJTA</non-jta-data-source>
 
         <class>de.ipb_halle.inhouse.InhouseCompound</class>
+        <class>de.ipb_halle.inhouse.InhouseContainer</class>
+        <class>de.ipb_halle.inhouse.InhouseCorrelation</class>
         <class>de.ipb_halle.inhouse.InhouseExperiment</class>
+        <class>de.ipb_halle.inhouse.InhouseLocation</class>
         <class>de.ipb_halle.inhouse.InhouseSynonym</class>
         <class>de.ipb_halle.inhouse.InhouseTaxon</class>
         <class>de.ipb_halle.signals.attachment.Attachment</class>

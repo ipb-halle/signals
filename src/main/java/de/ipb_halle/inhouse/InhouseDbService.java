@@ -144,12 +144,20 @@ public class InhouseDbService {
         this.em.merge(mat);
     }
 
+    public void save(InhouseContainer container) {
+        this.em.merge(container);
+    }
+
     public void save(InhouseCorrelation corr) {
         this.em.merge(corr);
     }
 
     public void save(InhouseExperiment experiment) {
         this.em.merge(experiment);
+    }
+
+    public InhouseLocation save(InhouseLocation location) {
+        return this.em.merge(location);
     }
 
     public void save(InhouseSynonym synonym) {

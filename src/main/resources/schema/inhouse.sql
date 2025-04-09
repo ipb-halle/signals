@@ -51,3 +51,32 @@ CREATE TABLE inhouse_correlation (
     procedure_id INTEGER
 );
 
+CREATE TABLE inhouse_locations (
+    id SERIAL NOT NULL PRIMARY KEY,
+    eid VARCHAR,
+    name VARCHAR,
+    columns INTEGER,
+    rows INTEGER,
+    zerobased BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE inhouse_containers (
+    id SERIAL NOT NULL PRIMARY KEY,
+    eid VARCHAR,
+    sample_id INTEGER,
+    amount FLOAT,
+    tara FLOAT,
+    volume FLOAT,
+    concentration FLOAT,
+    sample_code VARCHAR,
+    purity INTEGER,
+    appearance VARCHAR,
+    remarks VARCHAR,
+    ipb_code VARCHAR,
+    last_solvent VARCHAR,
+    compound_correlation_id INTEGER,
+    organism_correlation_id INTEGER,
+    location VARCHAR,
+    location_id INTEGER
+);
+
