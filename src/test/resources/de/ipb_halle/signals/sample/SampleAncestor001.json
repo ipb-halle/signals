@@ -1,0 +1,234 @@
+{
+  "links": {
+    "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/journal:fe624b25-959e-4359-9ff4-372d396c1392"
+  },
+  "data": {
+    "type": "entity",
+    "id": "journal:fe624b25-959e-4359-9ff4-372d396c1392",
+    "links": {
+      "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/journal:fe624b25-959e-4359-9ff4-372d396c1392"
+    },
+    "attributes": {
+      "id": "journal:fe624b25-959e-4359-9ff4-372d396c1392",
+      "eid": "journal:fe624b25-959e-4359-9ff4-372d396c1392",
+      "name": "XBF Notebook 2022.02",
+      "description": "Joes Test Notebook Feb. 2022",
+      "createdAt": "2022-02-23T11:49:36.275Z",
+      "editedAt": "2022-02-23T11:49:36.275Z",
+      "type": "journal",
+      "digest": "70029449",
+      "fields": {
+        "Description": {
+          "value": "Joes Test Notebook Feb. 2022"
+        },
+        "Name": {
+          "value": "XSF Notebook 2022.02"
+        }
+      },
+      "flags": {
+        "canEdit": true
+      }
+    },
+    "relationships": {
+      "createdBy": {
+        "links": {
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"
+        },
+        "data": {
+          "type": "user",
+          "id": "102"
+        }
+      },
+      "editedBy": {
+        "links": {
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"
+        },
+        "data": {
+          "type": "user",
+          "id": "102"
+        }
+      },
+      "owner": {
+        "links": {
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"
+        },
+        "data": {
+          "type": "user",
+          "id": "102"
+        }
+      },
+      "systemTemplate": {
+        "links": {
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/journal:6db0b265-42fd-4fc7-8445-13785fddb4e6"
+        },
+        "data": {
+          "type": "entity",
+          "id": "journal:6db0b265-42fd-4fc7-8445-13785fddb4e6"
+        }
+      },
+      "template": {
+        "links": {
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/journal:6db0b265-42fd-4fc7-8445-13785fddb4e6"
+        },
+        "data": {
+          "type": "entity",
+          "id": "journal:6db0b265-42fd-4fc7-8445-13785fddb4e6"
+        }
+      },
+      "children": {
+        "links": {
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/journal:fe624b25-959e-4359-9ff4-372d396c1392/children"
+        }
+      }
+    }
+  },
+  "included": [
+    {
+      "type": "user",
+      "id": "100",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/100"
+      },
+      "attributes": {
+        "userId": "100",
+        "userName": "ogre@someogre.org",
+        "flags": {
+          "isSystemStandardUser": true
+        },
+        "alias": "DUX",
+        "email": "ogre@someogre.org",
+        "firstName": "Ogre",
+        "lastName": "Pegre",
+        "isEnabled": true
+      },
+      "relationships": {
+        "picture": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/100/picture"
+          }
+        },
+        "systemGroups": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/100/systemGroups"
+          }
+        }
+      }
+    },
+    {
+      "type": "entity",
+      "id": "journal:6db0b265-42fd-4fc7-8445-13785fddb4e6",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/journal:6db0b265-42fd-4fc7-8445-13785fddb4e6"
+      },
+      "attributes": {
+        "id": "journal:6db0b265-42fd-4fc7-8445-13785fddb4e6",
+        "eid": "journal:6db0b265-42fd-4fc7-8445-13785fddb4e6",
+        "name": "DEFAULT_NOTEBOOK",
+        "description": "",
+        "createdAt": "2022-02-22T16:33:18.927Z",
+        "editedAt": "2023-01-18T11:35:45.243Z",
+        "type": "journal",
+        "digest": "11384640",
+        "fields": {
+          "Description": {
+            "value": ""
+          },
+          "Name": {
+            "value": "DEFAULT_NOTEBOOK"
+          },
+          "Research Group": {
+            "value": "",
+            "values": []
+          }
+        },
+        "flags": {
+          "canEdit": true
+        }
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": {
+            "type": "user",
+            "id": "3"
+          }
+        },
+        "editedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/100"
+          },
+          "data": {
+            "type": "user",
+            "id": "100"
+          }
+        },
+        "owner": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": {
+            "type": "user",
+            "id": "3"
+          }
+        },
+        "children": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/journal:6db0b265-42fd-4fc7-8445-13785fddb4e6/children"
+          }
+        }
+      }
+    },
+    {
+      "type": "user",
+      "id": "102",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"
+      },
+      "attributes": {
+        "userId": "102",
+        "userName": "user@usermail.org",
+        "flags": {
+          "isSystemStandardUser": true
+        },
+        "alias": "XBF",
+        "email": "user@usermail.org",
+        "firstName": "User",
+        "lastName": "SomeUser",
+        "isEnabled": true
+      },
+      "relationships": {
+        "systemGroups": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102/systemGroups"
+          }
+        }
+      }
+    },
+    {
+      "type": "user",
+      "id": "3",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+      },
+      "attributes": {
+        "userId": "3",
+        "userName": "system",
+        "flags": {
+          "isSystemStandardUser": true
+        },
+        "firstName": "System",
+        "lastName": "",
+        "isEnabled": true
+      },
+      "relationships": {
+        "systemGroups": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3/systemGroups"
+          }
+        }
+      }
+    }
+  ]
+}

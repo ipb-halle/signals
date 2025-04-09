@@ -42,13 +42,12 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 
 public class SampleRestService implements RestReplyParser<Sample> {
 
     private static final String RECEIVE_SAMPLE_ENDPOINT = "/entities/%s";
     private static final String SAMPLE_GET_PROPERTIES_ENDPOINT = "/samples/%s/properties";
-    private static final String SAMPLE_GET_PROPERTY_EXPLICITLY_ENDPOINT = "/samples/%s/properties/%s";
+    // private static final String SAMPLE_GET_PROPERTY_EXPLICITLY_ENDPOINT = "/samples/%s/properties/%s";
     //?force=true if we don't want to send a digest
     public static final String CREATE_NEW_SAMPLE_ENDPOINT = "/entities?force=true";
     //public static final String CREATE_NEW_SAMPLE_ENDPOINT = "/entities?digest=%s";
@@ -62,6 +61,13 @@ public class SampleRestService implements RestReplyParser<Sample> {
     private SignalsEntityRestService signalsEntityRestService;
 
     private static final Logger logger = LogManager.getLogger(SampleRestService.class);
+
+    public SampleRestService(RestClient restClient) {
+        this.restClient = restClient;
+    }
+
+    public SampleRestService() {
+    }
 
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
@@ -96,7 +102,6 @@ public class SampleRestService implements RestReplyParser<Sample> {
         return relationships;
     }
 
-
     private JsonElement prepareAncestors(Sample sample) {
         JsonObject ancestors = new JsonObject();
         JsonArray data = new JsonArray();
@@ -123,7 +128,6 @@ public class SampleRestService implements RestReplyParser<Sample> {
         return attributes;
     }
 
-    //toDo method doesn't load sample property values needs to be refactored
     private JsonArray prepareFields(Sample sample) {
         JsonArray fields = new JsonArray();
         for (SampleProperty sampleProperty : sample.getProperties()) {
@@ -134,7 +138,6 @@ public class SampleRestService implements RestReplyParser<Sample> {
                 }
             }
         }
-
         return fields;
     }
 
@@ -149,42 +152,36 @@ public class SampleRestService implements RestReplyParser<Sample> {
         return field;
     }
 
-
+    //tested
     public Sample doGetSample(String sampleId) throws Exception {
         JsonElement object = fetchSample(RECEIVE_SAMPLE_ENDPOINT, sampleId);
-        return parseReply(object);
+        Sample sample = parseReply(object);
+
+        JsonObject relationships = object.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_RELATIONSHIPS);
+        getSampleAncestors(sample, relationships);
+        getSampleChildren(sample, relationships);
+        return sample;
     }
 
-    private JsonElement fetchSample(String endpoint, String sampleId) {
+    //tested
+    JsonElement fetchSample(String endpoint, String sampleId) throws IOException, UnexpectedResponseCodeException, URISyntaxException {
         try {
             restClient.setMethod(Method.GET)
                     .setEndpoint(String.format(endpoint, sampleId))
                     .execute();
 
-
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
             return jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA);
-
-
-        } catch (UnexpectedResponseCodeException | IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
+        } catch (UnexpectedResponseCodeException e) {
+            throw new UnexpectedResponseCodeException();
+        } catch (IOException e) {
+            throw new IOException(e);
+        } catch (URISyntaxException e) {
+            throw new URISyntaxException("Exception: ", e.getMessage());
         }
     }
 
-    private JsonElement fetchProperty(String endpoint, String sampleId, String samplePropertyId) {
-        try {
-            restClient.setMethod(Method.GET)
-                    .setEndpoint(String.format(endpoint, sampleId, samplePropertyId))
-                    .execute();
-
-            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
-            return jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA);
-
-        } catch (UnexpectedResponseCodeException | IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
+    //tested
     @Override
     public Sample parseReply(JsonElement j) throws Exception {
 
@@ -210,18 +207,28 @@ public class SampleRestService implements RestReplyParser<Sample> {
         if (attributes.has(Sample.ATTR_STOIC_REF)) {
             parseStoicRef(attributes, sample);
         }
-        if (relationships.has(RestHelper.ATTR_ANCESTORS)) {
-            parseAncestors(relationships, sample);
-        }
-        if (relationships.has(RestHelper.ATTR_CHILDREN)) {
-            parseChildren(relationships, sample);
-        }
+
         if (relationships.has(RestHelper.ATTR_TEMPLATE)) {
             paresTemplate(relationships, sample);
         }
         return sample;
     }
 
+    //tested
+    void getSampleAncestors(Sample sample, JsonElement element) throws Exception {
+        JsonObject relationships = element.getAsJsonObject();
+        if (relationships.has(RestHelper.ATTR_ANCESTORS)) {
+            parseAncestors(relationships, sample);
+        }
+    }
+
+    //tested
+    void getSampleChildren(Sample sample, JsonElement element) throws Exception {
+        JsonObject relationships = element.getAsJsonObject();
+        if (relationships.has(RestHelper.ATTR_CHILDREN)) {
+            parseChildren(relationships, sample);
+        }
+    }
 
     private void parseRelationships(JsonObject relationships, Sample sample) {
         sample.setCreatedBy(new UserReference(RestHelper.parseString(RestHelper.getPrimitiveFromPath(relationships, SignalsEntityDTO.ATTR_CREATED_BY), null)));
@@ -238,6 +245,7 @@ public class SampleRestService implements RestReplyParser<Sample> {
     }
 
     private void parseAncestors(JsonObject relationships, Sample sample) throws Exception {
+        System.out.println("PARSE ANCESTOR");
         JsonArray dataArray = relationships
                 .getAsJsonObject(RestHelper.ATTR_ANCESTORS)
                 .getAsJsonArray(RestHelper.ATTR_DATA);
@@ -254,7 +262,7 @@ public class SampleRestService implements RestReplyParser<Sample> {
         }
     }
 
-    private void parseChildren(JsonObject relationships, Sample sample) {
+    private void parseChildren(JsonObject relationships, Sample sample) throws UnexpectedResponseCodeException, IOException, URISyntaxException {
         JsonObject children = relationships.get(RestHelper.ATTR_CHILDREN).getAsJsonObject();
         JsonArray dataArray = children.get(RestHelper.ATTR_DATA).getAsJsonArray();
         Iterator<JsonElement> iter = dataArray.iterator();
@@ -266,18 +274,14 @@ public class SampleRestService implements RestReplyParser<Sample> {
         }
     }
 
-
     private void paresTemplate(JsonElement relationships, Sample sample) {
         JsonObject data = relationships.getAsJsonObject()
                 .getAsJsonObject(RestHelper.ATTR_TEMPLATE)
                 .getAsJsonObject(RestHelper.ATTR_DATA);
-        //JsonObject attributes = includedObject.get(RestHelper.ATTR_ATTRIBUTES).getAsJsonObject();
         sample.setTemplateId(data.get(RestHelper.ATTR_ID).getAsString());
-        //sample.setTemplateName(attributes.get(RestHelper.ATTR_NAME).getAsString());
     }
 
-
-    public void doGetSampleProperties(Sample sample) {
+    public void doGetSampleProperties(Sample sample) throws UnexpectedResponseCodeException, IOException, URISyntaxException {
         JsonElement json = fetchSample(SAMPLE_GET_PROPERTIES_ENDPOINT, sample.getId());
 
         Iterator<JsonElement> iter = json.getAsJsonArray().iterator();
@@ -285,7 +289,6 @@ public class SampleRestService implements RestReplyParser<Sample> {
             JsonElement samplesPropertyObject = iter.next();
             parseSampleProperties(sample, samplesPropertyObject);
         }
-
     }
 
     private void parseSampleProperties(Sample sample, JsonElement samplesPropertyObject) {
@@ -317,13 +320,4 @@ public class SampleRestService implements RestReplyParser<Sample> {
         sample.addPropertyValue(samplePropertyValue);
     }
 
-    //toDo implement or delete, depends on proposal
-    public void doGetEachPropertyExplicitly(Sample sample) {
-        for (SampleProperty sampleProperty : sample.getProperties()) {
-            JsonElement propertyDataObject = fetchProperty(SAMPLE_GET_PROPERTY_EXPLICITLY_ENDPOINT, sample.getId(), sampleProperty.getPropertyId());
-            //logger.info("DO GET PROPERTY EXPLICITLY sampleId={}\n, samplePropertyKey={}\n, dataObject={}\n", sample.getId(), sampleProperty.getKey(), propertyDataObject);
-        }
-
-
-    }
 }

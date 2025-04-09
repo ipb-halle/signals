@@ -1,0 +1,556 @@
+{
+  "links": {
+    "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc"
+  },
+  "data": {
+    "type": "entity",
+    "id": "experiment:9c57624e-99c7-44db-afad-e579d5fe32cc",
+    "links": {
+      "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc"
+    },
+    "attributes": {
+      "id": "experiment:9c57624e-99c7-44db-afad-e579d5fe32cc",
+      "eid": "experiment:9c57624e-99c7-44db-afad-e579d5fe32cc",
+      "name": "Esterification",
+      "description": "Simple Chemical Reaction (open properties and click multiple times to enable editing of the description or the name)",
+      "createdAt": "2022-02-23T12:18:54.682Z",
+      "editedAt": "2023-01-25T12:30:40.224Z",
+      "type": "experiment",
+      "state": "open",
+      "digest": "67161701",
+      "fields": {
+        "Department": {
+          "value": "Chemistry"
+        },
+        "Description": {
+          "value": "Simple Chemical Reaction (open properties and click multiple times to enable editing of the description or the name)"
+        },
+        "Name": {
+          "value": "Esterification"
+        },
+        "Research group": {
+          "value": "Group A"
+        }
+      },
+      "flags": {
+        "canEdit": true
+      }
+    },
+    "relationships": {
+      "createdBy": {
+        "links": {
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"
+        },
+        "data": {
+          "type": "user",
+          "id": "102"
+        }
+      },
+      "editedBy": {
+        "links": {
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"
+        },
+        "data": {
+          "type": "user",
+          "id": "102"
+        }
+      },
+      "ancestors": {
+        "links": {
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc/ancestors"
+        },
+        "data": [
+          {
+            "type": "entity",
+            "id": "journal:fe624b25-959e-4359-9ff4-372d396c1392",
+            "meta": {
+              "links": {
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/journal:fe624b25-959e-4359-9ff4-372d396c1392"
+              }
+            }
+          }
+        ]
+      },
+      "children": {
+        "links": {
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc/children"
+        },
+        "data": [
+          {
+            "type": "entity",
+            "id": "text:f6569504-b9aa-4820-91db-5f22c874964b",
+            "meta": {
+              "links": {
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:f6569504-b9aa-4820-91db-5f22c874964b"
+              }
+            }
+          },
+          {
+            "type": "entity",
+            "id": "materialsTable:85d02840-d2b3-446c-bfbe-5d9aae645fd8",
+            "meta": {
+              "links": {
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/materialsTable:85d02840-d2b3-446c-bfbe-5d9aae645fd8"
+              }
+            }
+          },
+          {
+            "type": "entity",
+            "id": "chemicalDrawing:d86dd97d-a4ed-4afb-9846-0d5ccdb193e1",
+            "meta": {
+              "links": {
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/chemicalDrawing:d86dd97d-a4ed-4afb-9846-0d5ccdb193e1"
+              }
+            }
+          },
+          {
+            "type": "entity",
+            "id": "viewonly:38243742-4eb9-47cf-ac54-b0664fd844af",
+            "meta": {
+              "links": {
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/viewonly:38243742-4eb9-47cf-ac54-b0664fd844af"
+              }
+            }
+          },
+          {
+            "type": "entity",
+            "id": "text:839a61c7-65e6-4e35-a483-c7d2fa5c820d",
+            "meta": {
+              "links": {
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:839a61c7-65e6-4e35-a483-c7d2fa5c820d"
+              }
+            }
+          },
+          {
+            "type": "entity",
+            "id": "plateContainer:cd48fd89-e25e-4072-acf0-c780cb1b2bd0",
+            "meta": {
+              "links": {
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/plateContainer:cd48fd89-e25e-4072-acf0-c780cb1b2bd0"
+              }
+            }
+          },
+          {
+            "type": "entity",
+            "id": "text:faeb402d-3c21-4524-a677-791695c30b67",
+            "meta": {
+              "links": {
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:faeb402d-3c21-4524-a677-791695c30b67"
+              }
+            }
+          },
+          {
+            "type": "entity",
+            "id": "text:367e6b2f-b972-484b-8d09-bc107161b337",
+            "meta": {
+              "links": {
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:367e6b2f-b972-484b-8d09-bc107161b337"
+              }
+            }
+          },
+          {
+            "type": "entity",
+            "id": "samplesContainer:28268246-f154-42fb-8348-cd76ad356f19",
+            "meta": {
+              "links": {
+                "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/samplesContainer:28268246-f154-42fb-8348-cd76ad356f19"
+              }
+            }
+          }
+        ]
+      },
+      "owner": {
+        "links": {
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"
+        },
+        "data": {
+          "type": "user",
+          "id": "102"
+        }
+      },
+      "systemTemplate": {
+        "links": {
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:a6699800-5615-4c5d-8d9e-2dd060cd277a"
+        },
+        "data": {
+          "type": "entity",
+          "id": "experiment:a6699800-5615-4c5d-8d9e-2dd060cd277a"
+        }
+      },
+      "template": {
+        "links": {
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:a6699800-5615-4c5d-8d9e-2dd060cd277a"
+        },
+        "data": {
+          "type": "entity",
+          "id": "experiment:a6699800-5615-4c5d-8d9e-2dd060cd277a"
+        }
+      },
+      "pdf": {
+        "links": {
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc/pdf"
+        }
+      }
+    }
+  },
+  "included": [
+    {
+      "type": "user",
+      "id": "100",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/100"
+      },
+      "attributes": {
+        "userId": "100",
+        "userName": "user@usermail.org",
+        "flags": {
+          "isSystemStandardUser": true
+        },
+        "alias": "DUX",
+        "email": "user@usermail.org",
+        "firstName": "User",
+        "lastName": "SomeUser",
+        "isEnabled": true
+      },
+      "relationships": {
+        "picture": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/100/picture"
+          }
+        },
+        "systemGroups": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/100/systemGroups"
+          }
+        }
+      }
+    },
+    {
+      "type": "entity",
+      "id": "text:367e6b2f-b972-484b-8d09-bc107161b337",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:367e6b2f-b972-484b-8d09-bc107161b337"
+      },
+      "attributes": {
+        "type": "text",
+        "eid": "text:367e6b2f-b972-484b-8d09-bc107161b337",
+        "name": "Text-1",
+        "digest": "67161701",
+        "fields": {
+          "Description": {
+            "value": ""
+          },
+          "Name": {
+            "value": "Text-1"
+          }
+        }
+      }
+    },
+    {
+      "type": "entity",
+      "id": "samplesContainer:28268246-f154-42fb-8348-cd76ad356f19",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/samplesContainer:28268246-f154-42fb-8348-cd76ad356f19"
+      },
+      "attributes": {
+        "type": "samplesContainer",
+        "eid": "samplesContainer:28268246-f154-42fb-8348-cd76ad356f19",
+        "name": "Samples Table",
+        "digest": "67161701",
+        "fields": {
+          "Description": {
+            "value": ""
+          },
+          "Name": {
+            "value": "Samples Table"
+          }
+        }
+      }
+    },
+    {
+      "type": "entity",
+      "id": "experiment:a6699800-5615-4c5d-8d9e-2dd060cd277a",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:a6699800-5615-4c5d-8d9e-2dd060cd277a"
+      },
+      "attributes": {
+        "id": "experiment:a6699800-5615-4c5d-8d9e-2dd060cd277a",
+        "eid": "experiment:a6699800-5615-4c5d-8d9e-2dd060cd277a",
+        "name": "DEFAULT_EXPERIMENT",
+        "description": "",
+        "createdAt": "2022-02-22T16:33:18.592Z",
+        "editedAt": "2023-10-13T08:48:51.922Z",
+        "type": "experiment",
+        "digest": "56594037",
+        "fields": {
+          "Description": {
+            "value": ""
+          },
+          "Name": {
+            "value": "DEFAULT_EXPERIMENT"
+          },
+          "Research group": {
+            "value": "",
+            "values": []
+          }
+        },
+        "flags": {
+          "canEdit": true
+        }
+      },
+      "relationships": {
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": {
+            "type": "user",
+            "id": "3"
+          }
+        },
+        "editedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/100"
+          },
+          "data": {
+            "type": "user",
+            "id": "100"
+          }
+        },
+        "owner": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+          },
+          "data": {
+            "type": "user",
+            "id": "3"
+          }
+        },
+        "pdf": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:a6699800-5615-4c5d-8d9e-2dd060cd277a/pdf"
+          }
+        }
+      }
+    },
+    {
+      "type": "entity",
+      "id": "journal:fe624b25-959e-4359-9ff4-372d396c1392",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/journal:fe624b25-959e-4359-9ff4-372d396c1392"
+      },
+      "attributes": {
+        "type": "journal",
+        "eid": "journal:fe624b25-959e-4359-9ff4-372d396c1392",
+        "name": "XBF Notebook 2022.02",
+        "digest": "70029449",
+        "fields": {
+          "Description": {
+            "value": "Joes Test Notebook Feb. 2022"
+          },
+          "Name": {
+            "value": "XBF Notebook 2022.02"
+          }
+        },
+        "flags": {}
+      }
+    },
+    {
+      "type": "entity",
+      "id": "chemicalDrawing:d86dd97d-a4ed-4afb-9846-0d5ccdb193e1",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/chemicalDrawing:d86dd97d-a4ed-4afb-9846-0d5ccdb193e1"
+      },
+      "attributes": {
+        "type": "chemicalDrawing",
+        "eid": "chemicalDrawing:d86dd97d-a4ed-4afb-9846-0d5ccdb193e1",
+        "name": "ChemDraw Document",
+        "digest": "67161701",
+        "fields": {
+          "Description": {
+            "value": ""
+          },
+          "Name": {
+            "value": "ChemDraw Document"
+          }
+        }
+      }
+    },
+    {
+      "type": "entity",
+      "id": "text:faeb402d-3c21-4524-a677-791695c30b67",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:faeb402d-3c21-4524-a677-791695c30b67"
+      },
+      "attributes": {
+        "type": "text",
+        "eid": "text:faeb402d-3c21-4524-a677-791695c30b67",
+        "name": "Auswertung",
+        "digest": "67161701",
+        "fields": {
+          "Description": {
+            "value": ""
+          },
+          "Name": {
+            "value": "Auswertung"
+          }
+        }
+      }
+    },
+    {
+      "type": "user",
+      "id": "102",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"
+      },
+      "attributes": {
+        "userId": "102",
+        "userName": "user@usermail.org",
+        "flags": {
+          "isSystemStandardUser": true
+        },
+        "alias": "XBF",
+        "email": "user@usermail.org",
+        "firstName": "User",
+        "lastName": "SomeUser",
+        "isEnabled": true
+      },
+      "relationships": {
+        "systemGroups": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102/systemGroups"
+          }
+        }
+      }
+    },
+    {
+      "type": "user",
+      "id": "3",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3"
+      },
+      "attributes": {
+        "userId": "3",
+        "userName": "system",
+        "flags": {
+          "isSystemStandardUser": true
+        },
+        "firstName": "System",
+        "lastName": "",
+        "isEnabled": true
+      },
+      "relationships": {
+        "systemGroups": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/3/systemGroups"
+          }
+        }
+      }
+    },
+    {
+      "type": "entity",
+      "id": "plateContainer:cd48fd89-e25e-4072-acf0-c780cb1b2bd0",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/plateContainer:cd48fd89-e25e-4072-acf0-c780cb1b2bd0"
+      },
+      "attributes": {
+        "type": "plateContainer",
+        "eid": "plateContainer:cd48fd89-e25e-4072-acf0-c780cb1b2bd0",
+        "name": "Plates",
+        "digest": "67161701",
+        "fields": {
+          "Description": {
+            "value": ""
+          },
+          "Name": {
+            "value": "Plates"
+          }
+        }
+      }
+    },
+    {
+      "type": "entity",
+      "id": "text:f6569504-b9aa-4820-91db-5f22c874964b",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:f6569504-b9aa-4820-91db-5f22c874964b"
+      },
+      "attributes": {
+        "type": "text",
+        "eid": "text:f6569504-b9aa-4820-91db-5f22c874964b",
+        "name": "Description",
+        "digest": "67161701",
+        "fields": {
+          "Description": {
+            "value": ""
+          },
+          "Name": {
+            "value": "Description"
+          }
+        }
+      }
+    },
+    {
+      "type": "entity",
+      "id": "viewonly:38243742-4eb9-47cf-ac54-b0664fd844af",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/viewonly:38243742-4eb9-47cf-ac54-b0664fd844af"
+      },
+      "attributes": {
+        "type": "viewonly",
+        "eid": "viewonly:38243742-4eb9-47cf-ac54-b0664fd844af",
+        "name": "Document.docx",
+        "digest": "67161701",
+        "fields": {
+          "Description": {
+            "value": ""
+          },
+          "Name": {
+            "value": "Document.docx"
+          }
+        }
+      }
+    },
+    {
+      "type": "entity",
+      "id": "text:839a61c7-65e6-4e35-a483-c7d2fa5c820d",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:839a61c7-65e6-4e35-a483-c7d2fa5c820d"
+      },
+      "attributes": {
+        "type": "text",
+        "eid": "text:839a61c7-65e6-4e35-a483-c7d2fa5c820d",
+        "name": "Text",
+        "digest": "67161701",
+        "fields": {
+          "Description": {
+            "value": ""
+          },
+          "Name": {
+            "value": "Text"
+          }
+        }
+      }
+    },
+    {
+      "type": "entity",
+      "id": "materialsTable:85d02840-d2b3-446c-bfbe-5d9aae645fd8",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/materialsTable:85d02840-d2b3-446c-bfbe-5d9aae645fd8"
+      },
+      "attributes": {
+        "type": "materialsTable",
+        "eid": "materialsTable:85d02840-d2b3-446c-bfbe-5d9aae645fd8",
+        "name": "Materials Table",
+        "digest": "67161701",
+        "fields": {
+          "Description": {
+            "value": ""
+          },
+          "Name": {
+            "value": "Materials Table"
+          }
+        }
+      }
+    }
+  ]
+}

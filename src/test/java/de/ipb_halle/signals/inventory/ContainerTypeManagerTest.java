@@ -18,34 +18,21 @@
 package de.ipb_halle.signals.inventory;
 
 import de.ipb_halle.signals.PostgresqlContainerExtension;
-import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.attachment.Attachment;
-import de.ipb_halle.signals.attachment.AttachmentDbService;
-import de.ipb_halle.signals.dynEnum.DynEnum;
-import de.ipb_halle.signals.dynEnum.DynEnumDbService;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
-import de.ipb_halle.signals.field.*;
+import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.rest.MockRestClient;
-
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-
-import de.ipb_halle.signals.util.EmbeddedKeyValue;
 import de.ipb_halle.tda.DeploymentElement;
 import jakarta.inject.Inject;
-import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.junit5.RunWithApplicationComposer;
-import org.apache.openejb.testing.Classes;
-import org.apache.openejb.testing.Configuration;
-import org.apache.openejb.testing.Module;
-import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+
+import java.util.List;
+import java.util.Set;
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -53,8 +40,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public abstract class ContainerTypeManagerTest {
 
     private final String TEST_RESOURCE_1 = "ContainerTypeManagerTest001.json";
-    private final String TEST_KEY_1 =
-            "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/types?page%5Blimit%5D=20&page%5Boffset%5D=0&entityType=container";
+    private final String TEST_KEY_1 = "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/types?page%5Blimit%5D=20&page%5Boffset%5D=0&entityType=container";
     private final String TEST_CONTAINER_TYPE_ID = "container:b17da130-259d-4009-b99e-49e9352b3b89:ivt";
     private final String TEST_CONTAINER_TYPE_NAME = "Bottle";
     private final String TEST_CONTAINER_ATTACHMENT_ID = "7e38bb31-4860-4d6f-b481-e83ba32d27fb";
@@ -78,9 +64,7 @@ public abstract class ContainerTypeManagerTest {
     @BeforeAll
     public void testSetup() {
         dynEnumMgr.allowEnumDiscovery();
-        TestBase.prepareRestClients(mockRestClient,
-                TEST_KEY_1,
-                getClass().getResourceAsStream(TEST_RESOURCE_1));
+        TestBase.prepareRestClients(mockRestClient, TEST_KEY_1, getClass().getResourceAsStream(TEST_RESOURCE_1));
     }
 
     private Attachment getAttachmentById(Set<Attachment> aSet, String id) {
@@ -119,9 +103,7 @@ public abstract class ContainerTypeManagerTest {
         */
 
         // field definitions
-        Field f = getFieldById(
-                ct.getFields(),
-                TEST_CONTAINER_FIELD_ID);
+        Field f = getFieldById(ct.getFields(), TEST_CONTAINER_FIELD_ID);
         Assertions.assertEquals(TEST_CONTAINER_FIELD_KEY, f.getKey(), "Field definition key matches");
     }
 }
