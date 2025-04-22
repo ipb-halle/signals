@@ -1,36 +1,30 @@
 {
   "links": {
-    "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties"
+    "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/samples/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties"
   },
   "data": [
     {
       "type": "property",
-      "id": "Name",
+      "id": "b718adec-73e0-3ce3-ac72-0dd11a06a308",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/samples/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties/b718adec-73e0-3ce3-ac72-0dd11a06a308"
+      },
       "meta": {
         "definition": {
+          "title": "ID",
           "type": "text",
-          "attribute": {
-            "name": "Text",
-            "type": "text",
-            "counts": {
-              "templates": {}
-            }
-          },
-          "flags": {
-            "canEdit": false
-          }
+          "key": "b718adec-73e0-3ce3-ac72-0dd11a06a308"
         }
       },
       "attributes": {
-        "id": "Name",
-        "name": "Name",
-        "value": "Sample-XBF-XBF Esterification-001",
-        "values": [
-          "Sample-XBF-XBF Esterification-001"
-        ]
+        "id": "b718adec-73e0-3ce3-ac72-0dd11a06a308",
+        "name": "ID",
+        "content": {
+          "value": "Sample-XBF-XBF Esterification-001"
+        }
       },
       "relationships": {
-        "owner": {
+        "sample": {
           "links": {
             "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
           },
@@ -43,48 +37,625 @@
     },
     {
       "type": "property",
-      "id": "2837",
+      "id": "278c491b-dd8a-3361-8c14-9c4ac790da34",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/samples/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties/278c491b-dd8a-3361-8c14-9c4ac790da34"
+      },
       "meta": {
         "definition": {
-          "type": "choice",
-          "attribute": {
-            "id": "31",
-            "name": "Sample Status",
-            "type": "choice",
-            "options": [
-              "Active",
-              "Closed",
-              "Cancelled"
-            ],
-            "counts": {
-              "templates": {}
-            }
-          },
-          "flags": {
-            "isRequired": true,
-            "isReadOnly": true
-          }
+          "title": "Template",
+          "type": "text",
+          "key": "278c491b-dd8a-3361-8c14-9c4ac790da34"
         }
       },
       "attributes": {
-        "id": "2837",
-        "name": "Status",
-        "value": "Active",
-        "values": [
-          "Active"
-        ]
+        "id": "278c491b-dd8a-3361-8c14-9c4ac790da34",
+        "name": "Template",
+        "content": {
+          "value": "Chemical Sample"
+        }
       },
       "relationships": {
-        "attribute": {
+        "sample": {
           "links": {
-            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/attributes/31"
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
           },
           "data": {
-            "type": "attribute",
-            "id": "31"
+            "type": "entity",
+            "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
           }
-        },
-        "owner": {
+        }
+      }
+    },
+    {
+      "type": "property",
+      "id": "digests.self",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/samples/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties/digests.self"
+      },
+      "meta": {
+        "definition": {
+          "type": "text",
+          "key": "digests.self"
+        }
+      },
+      "attributes": {
+        "id": "digests.self",
+        "content": {
+          "value": "fa3d44f3e7c0ed2cff0d73b924eb5debb1110a423708ef0cc4362fccc31219fb"
+        }
+      },
+      "relationships": {
+        "sample": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          },
+          "data": {
+            "type": "entity",
+            "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          }
+        }
+      }
+    },
+    {
+      "type": "property",
+      "id": "digests.external",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/samples/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties/digests.external"
+      },
+      "meta": {
+        "definition": {
+          "type": "text",
+          "key": "digests.external"
+        }
+      },
+      "attributes": {
+        "id": "digests.external",
+        "content": {
+          "value": "fa3d44f3e7c0ed2cff0d73b924eb5debb1110a423708ef0cc4362fccc31219fb"
+        }
+      },
+      "relationships": {
+        "sample": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          },
+          "data": {
+            "type": "entity",
+            "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          }
+        }
+      }
+    },
+    {
+      "type": "property",
+      "id": "sampleId",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/samples/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties/sampleId"
+      },
+      "meta": {
+        "definition": {
+          "key": "sampleId",
+          "title": "ID",
+          "type": "link",
+          "readOnly": true,
+          "mandatory": true
+        }
+      },
+      "attributes": {
+        "id": "sampleId",
+        "name": "ID",
+        "content": {
+          "name": "Sample-XBF-XBF Esterification-001",
+          "type": "sample",
+          "value": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+        }
+      },
+      "relationships": {
+        "sample": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          },
+          "data": {
+            "type": "entity",
+            "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          }
+        }
+      }
+    },
+    {
+      "type": "property",
+      "id": "sourceName",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/samples/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties/sourceName"
+      },
+      "meta": {
+        "definition": {
+          "key": "sourceName",
+          "title": "Template",
+          "type": "text",
+          "readOnly": true,
+          "mandatory": true
+        }
+      },
+      "attributes": {
+        "id": "sourceName",
+        "name": "Template",
+        "content": {
+          "value": "Chemical Sample"
+        }
+      },
+      "relationships": {
+        "sample": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          },
+          "data": {
+            "type": "entity",
+            "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          }
+        }
+      }
+    },
+    {
+      "type": "property",
+      "id": "10",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/samples/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties/10"
+      },
+      "meta": {
+        "definition": {
+          "key": "10",
+          "title": "Attached Docs",
+          "type": "childEntityCount",
+          "readOnly": true,
+          "mandatory": true
+        }
+      },
+      "attributes": {
+        "id": "10",
+        "name": "Attached Docs",
+        "content": {
+          "value": "1",
+          "eid": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+        }
+      },
+      "relationships": {
+        "sample": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          },
+          "data": {
+            "type": "entity",
+            "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          }
+        }
+      }
+    },
+    {
+      "type": "property",
+      "id": "1",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/samples/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties/1"
+      },
+      "meta": {
+        "definition": {
+          "key": "1",
+          "title": "Created Date",
+          "type": "date",
+          "readOnly": true,
+          "mandatory": true
+        }
+      },
+      "attributes": {
+        "id": "1",
+        "name": "Created Date",
+        "content": {
+          "value": "2022-07-21T11:02:56.616923456Z"
+        }
+      },
+      "relationships": {
+        "sample": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          },
+          "data": {
+            "type": "entity",
+            "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          }
+        }
+      }
+    },
+    {
+      "type": "property",
+      "id": "2",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/samples/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties/2"
+      },
+      "meta": {
+        "definition": {
+          "key": "2",
+          "title": "Description",
+          "type": "text"
+        }
+      },
+      "attributes": {
+        "id": "2",
+        "name": "Description",
+        "content": {
+          "value": "Ester"
+        }
+      },
+      "relationships": {
+        "sample": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          },
+          "data": {
+            "type": "entity",
+            "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          }
+        }
+      }
+    },
+    {
+      "type": "property",
+      "id": "3",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/samples/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties/3"
+      },
+      "meta": {
+        "definition": {
+          "key": "3",
+          "title": "Comments",
+          "type": "text"
+        }
+      },
+      "attributes": {
+        "id": "3",
+        "name": "Comments",
+        "content": {
+          "value": "Wieso muss man die Menge per Hand eintragen?"
+        }
+      },
+      "relationships": {
+        "sample": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          },
+          "data": {
+            "type": "entity",
+            "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          }
+        }
+      }
+    },
+    {
+      "type": "property",
+      "id": "4",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/samples/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties/4"
+      },
+      "meta": {
+        "definition": {
+          "key": "4",
+          "title": "Amount",
+          "type": "unit",
+          "measure": "mass"
+        }
+      },
+      "attributes": {
+        "id": "4",
+        "name": "Amount",
+        "content": {
+          "value": "35 g"
+        }
+      },
+      "relationships": {
+        "sample": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          },
+          "data": {
+            "type": "entity",
+            "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          }
+        }
+      }
+    },
+    {
+      "type": "property",
+      "id": "5",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/samples/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties/5"
+      },
+      "meta": {
+        "definition": {
+          "key": "5",
+          "title": "Chemical Name",
+          "type": "text"
+        }
+      },
+      "attributes": {
+        "id": "5",
+        "name": "Chemical Name",
+        "content": {
+          "value": "propyl propionate"
+        }
+      },
+      "relationships": {
+        "sample": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          },
+          "data": {
+            "type": "entity",
+            "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          }
+        }
+      }
+    },
+    {
+      "type": "property",
+      "id": "6",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/samples/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties/6"
+      },
+      "meta": {
+        "definition": {
+          "key": "6",
+          "title": "FM",
+          "type": "unit",
+          "measure": "molecular mass"
+        }
+      },
+      "attributes": {
+        "id": "6",
+        "name": "FM",
+        "content": {
+          "value": "116.16 g/mol"
+        }
+      },
+      "relationships": {
+        "sample": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          },
+          "data": {
+            "type": "entity",
+            "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          }
+        }
+      }
+    },
+    {
+      "type": "property",
+      "id": "7",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/samples/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties/7"
+      },
+      "meta": {
+        "definition": {
+          "key": "7",
+          "title": "EM",
+          "type": "unit",
+          "measure": "molecular mass"
+        }
+      },
+      "attributes": {
+        "id": "7",
+        "name": "EM",
+        "content": {
+          "value": "116.08373"
+        }
+      },
+      "relationships": {
+        "sample": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          },
+          "data": {
+            "type": "entity",
+            "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          }
+        }
+      }
+    },
+    {
+      "type": "property",
+      "id": "8",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/samples/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties/8"
+      },
+      "meta": {
+        "definition": {
+          "key": "8",
+          "title": "MF",
+          "type": "text"
+        }
+      },
+      "attributes": {
+        "id": "8",
+        "name": "MF",
+        "content": {
+          "value": "C<sub>6</sub>H<sub>12</sub>O<sub>2</sub>"
+        }
+      },
+      "relationships": {
+        "sample": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          },
+          "data": {
+            "type": "entity",
+            "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          }
+        }
+      }
+    },
+    {
+      "type": "property",
+      "id": "9",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/samples/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties/9"
+      },
+      "meta": {
+        "definition": {
+          "key": "9",
+          "title": "MW",
+          "type": "unit",
+          "measure": "molecular mass"
+        }
+      },
+      "attributes": {
+        "id": "9",
+        "name": "MW",
+        "content": {
+          "value": "116.16 g/mol"
+        }
+      },
+      "relationships": {
+        "sample": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          },
+          "data": {
+            "type": "entity",
+            "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          }
+        }
+      }
+    },
+    {
+      "type": "property",
+      "id": "102",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/samples/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties/102"
+      },
+      "meta": {
+        "definition": {
+          "key": "102",
+          "title": "CAS Number",
+          "type": "text",
+          "options": []
+        }
+      },
+      "attributes": {
+        "id": "102",
+        "name": "CAS Number"
+      },
+      "relationships": {
+        "sample": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          },
+          "data": {
+            "type": "entity",
+            "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          }
+        }
+      }
+    },
+    {
+      "type": "property",
+      "id": "sampleContainerKey",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/samples/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties/sampleContainerKey"
+      },
+      "meta": {
+        "definition": {
+          "key": "sampleContainerKey",
+          "title": "Containers",
+          "type": "links"
+        }
+      },
+      "attributes": {
+        "id": "sampleContainerKey",
+        "name": "Containers",
+        "content": {
+          "value": "item00000007",
+          "values": [
+            {
+              "id": "cf1e2ba4-c340-4213-b9b6-d5788061ef8d",
+              "name": "item00000007"
+            }
+          ]
+        }
+      },
+      "relationships": {
+        "sample": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          },
+          "data": {
+            "type": "entity",
+            "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          }
+        }
+      }
+    },
+    {
+      "type": "property",
+      "id": "materialId",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/samples/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties/materialId"
+      },
+      "meta": {
+        "definition": {
+          "key": "materialId",
+          "title": "Material ID",
+          "type": "link",
+          "internalSearchQuery": {}
+        }
+      },
+      "attributes": {
+        "id": "materialId",
+        "name": "Material ID",
+        "content": {
+          "name": "Compound000004-001",
+          "type": "batch",
+          "value": "batch:62da60d0b3491b7b03978a84"
+        }
+      },
+      "relationships": {
+        "sample": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          },
+          "data": {
+            "type": "entity",
+            "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
+          }
+        }
+      }
+    },
+    {
+      "type": "property",
+      "id": "Status",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/samples/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties/Status"
+      },
+      "meta": {
+        "definition": {
+          "key": "Status",
+          "title": "Status",
+          "type": "attributeList",
+          "attribute": "attribute:31",
+          "readOnly": true,
+          "mandatory": true,
+          "isStatusField": true,
+          "options": ["Active", "Closed", "Cancelled"]
+        }
+      },
+      "attributes": {
+        "id": "Status",
+        "name": "Status",
+        "content": {
+          "value": "Active"
+        }
+      },
+      "relationships": {
+        "sample": {
           "links": {
             "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
           },
@@ -98,15 +669,128 @@
   ],
   "included": [
     {
+      "type": "product",
+      "id": "28",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/stoichiometry/chemicalDrawing:d86dd97d-a4ed-4afb-9846-0d5ccdb193e1/28"
+      },
+      "attributes": {
+        "id": "28",
+        "grid": "products",
+        "values": {
+          "_cdxml": "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n<!DOCTYPE CDXML SYSTEM \"http://www.cambridgesoft.com/xml/cdxml.dtd\" >\n<CDXML\n CreationProgram=\"ChemDrawSDK 21.0.2.0\"\n Name=\"&lt;put_data&gt;\"\n BoundingBox=\"640.57 67.65 715.69 97.52\"\n WindowPosition=\"0 0\"\n WindowSize=\"0 0\"\n FractionalWidths=\"yes\"\n InterpretChemically=\"yes\"\n ShowAtomQuery=\"yes\"\n ShowAtomStereo=\"no\"\n ShowAtomEnhancedStereo=\"yes\"\n ShowAtomNumber=\"no\"\n ShowResidueID=\"no\"\n ShowBondQuery=\"yes\"\n ShowBondRxn=\"yes\"\n ShowBondStereo=\"no\"\n ShowTerminalCarbonLabels=\"no\"\n ShowNonTerminalCarbonLabels=\"no\"\n HideImplicitHydrogens=\"no\"\n Magnification=\"666\"\n LabelFont=\"3\"\n LabelSize=\"10\"\n LabelFace=\"96\"\n CaptionFont=\"3\"\n CaptionSize=\"10\"\n HashSpacing=\"2.50\"\n MarginWidth=\"1.60\"\n LineWidth=\"0.60\"\n BoldWidth=\"2\"\n BondLength=\"14.40\"\n BondSpacing=\"18\"\n ChainAngle=\"120\"\n LabelJustification=\"Auto\"\n CaptionJustification=\"Left\"\n AminoAcidTermini=\"HOH\"\n ShowSequenceTermini=\"yes\"\n ShowSequenceBonds=\"yes\"\n ShowSequenceUnlinkedBranches=\"no\"\n ResidueWrapCount=\"40\"\n ResidueBlockCount=\"10\"\n ResidueZigZag=\"yes\"\n NumberResidueBlocks=\"no\"\n PrintMargins=\"36 36 36 36\"\n MacPrintInfo=\"0003000000480048000000000318026400000000031802640367052803FC00020000004800480000000003180264000100000064000000010001010100000001270F000100010000000000000000000000000002001901900000000000400000000000000000000100000000000000000000000000000000\"\n ChemPropName=\"\"\n ChemPropFormula=\"Chemical Formula: \"\n ChemPropExactMass=\"Exact Mass: \"\n ChemPropMolWt=\"Molecular Weight: \"\n ChemPropMOverZ=\"m/z: \"\n ChemPropAnalysis=\"Elemental Analysis: \"\n ChemPropBoilingPt=\"Boiling Point: \"\n ChemPropMeltingPt=\"Melting Point: \"\n ChemPropCritTemp=\"Critical Temp: \"\n ChemPropCritPres=\"Critical Pres: \"\n ChemPropCritVol=\"Critical Vol: \"\n ChemPropGibbs=\"Gibbs Energy: \"\n ChemPropLogP=\"Log P: \"\n ChemPropMR=\"MR: \"\n ChemPropHenry=\"Henry&apos;s Law: \"\n ChemPropEForm=\"Heat of Form: \"\n ChemProptPSA=\"tPSA: \"\n ChemPropCLogP=\"CLogP: \"\n ChemPropCMR=\"CMR: \"\n ChemPropLogS=\"LogS: \"\n ChemPropPKa=\"pKa: \"\n ChemPropID=\"\"\n ChemPropFragmentLabel=\"\"\n color=\"0\"\n bgcolor=\"1\"\n RxnAutonumberStart=\"1\"\n RxnAutonumberConditions=\"no\"\n RxnAutonumberStyle=\"Roman\"\n RxnAutonumberFormat=\"(#)\"\n><colortable>\n<color r=\"1\" g=\"1\" b=\"1\"/>\n<color r=\"0\" g=\"0\" b=\"0\"/>\n<color r=\"1\" g=\"0\" b=\"0\"/>\n<color r=\"1\" g=\"1\" b=\"0\"/>\n<color r=\"0\" g=\"1\" b=\"0\"/>\n<color r=\"0\" g=\"1\" b=\"1\"/>\n<color r=\"0\" g=\"0\" b=\"1\"/>\n<color r=\"1\" g=\"0\" b=\"1\"/>\n</colortable><fonttable>\n<font id=\"3\" charset=\"utf-8\" name=\"Arial\"/>\n</fonttable><page\n id=\"137\"\n BoundingBox=\"0 0 1030 196\"\n Width=\"1030\"\n Height=\"196\"\n HeaderPosition=\"36\"\n FooterPosition=\"36\"\n PageOverlap=\"0\"\n PrintTrimMarks=\"yes\"\n HeightPages=\"1\"\n WidthPages=\"2\"\n DrawingSpace=\"poster\"\n><fragment\n id=\"28\"\n BoundingBox=\"640.57 67.65 715.69 97.52\"\n Z=\"57\"\n><n\n id=\"27\"\n p=\"653.19 93.97\"\n Z=\"56\"\n AS=\"N\"\n/><n\n id=\"29\"\n p=\"665.66 86.77\"\n Z=\"58\"\n AS=\"N\"\n/><n\n id=\"31\"\n p=\"678.13 93.97\"\n Z=\"60\"\n Element=\"8\"\n NumHydrogens=\"0\"\n NeedsClean=\"yes\"\n AS=\"N\"\n><t\n p=\"674.23 97.42\"\n BoundingBox=\"674.23 89.25 682.03 97.52\"\n LabelJustification=\"Left\"\n><s font=\"3\" size=\"10\" color=\"0\" face=\"96\">O</s></t></n><n\n id=\"33\"\n p=\"690.60 86.77\"\n Z=\"62\"\n AS=\"N\"\n/><n\n id=\"35\"\n p=\"703.07 93.97\"\n Z=\"64\"\n AS=\"N\"\n/><n\n id=\"70\"\n p=\"690.60 72.37\"\n Z=\"68\"\n Element=\"8\"\n NumHydrogens=\"0\"\n NeedsClean=\"yes\"\n AS=\"N\"\n><t\n p=\"686.70 75.82\"\n BoundingBox=\"686.70 67.65 694.50 75.92\"\n LabelJustification=\"Left\"\n><s font=\"3\" size=\"10\" color=\"0\" face=\"96\">O</s></t></n><n\n id=\"79\"\n p=\"715.54 86.77\"\n Z=\"74\"\n AS=\"N\"\n/><n\n id=\"81\"\n p=\"640.72 86.77\"\n Z=\"76\"\n AS=\"N\"\n/><b\n id=\"30\"\n Z=\"59\"\n B=\"27\"\n E=\"29\"\n BS=\"N\"\n/><b\n id=\"32\"\n Z=\"61\"\n B=\"29\"\n E=\"31\"\n BS=\"N\"\n/><b\n id=\"34\"\n Z=\"63\"\n B=\"31\"\n E=\"33\"\n BS=\"N\"\n/><b\n id=\"36\"\n Z=\"65\"\n B=\"33\"\n E=\"35\"\n BS=\"N\"\n/><b\n id=\"71\"\n Z=\"69\"\n B=\"33\"\n E=\"70\"\n Order=\"2\"\n BS=\"N\"\n/><b\n id=\"80\"\n Z=\"75\"\n B=\"35\"\n E=\"79\"\n BS=\"N\"\n/><b\n id=\"82\"\n Z=\"77\"\n B=\"27\"\n E=\"81\"\n BS=\"N\"\n/><annotation\n Keyword=\"Fragment Label\"\n Content=\"[III]\"\n/></fragment></page></CDXML>\r\n",
+          "rxnid": {
+            "value": "III"
+          },
+          "formula": {
+            "value": "C<sub>6</sub>H<sub>12</sub>O<sub>2</sub>"
+          },
+          "name": {
+            "value": "propyl propionate"
+          },
+          "IUPACName": {
+            "value": "propyl propionate"
+          },
+          "mf": {
+            "display": "116.16 g/mol",
+            "value": 116.16,
+            "units": "g/mol"
+          },
+          "mw": {
+            "display": "116.16 g/mol",
+            "value": 116.16,
+            "units": "g/mol"
+          },
+          "em": {
+            "display": "116.08373",
+            "value": 116.08373
+          },
+          "theoMass": {
+            "display": "41 g",
+            "value": 40.76889848812095,
+            "units": "g"
+          },
+          "actualMass": {
+            "display": "35 g",
+            "value": 35,
+            "units": "g"
+          },
+          "yield": {
+            "display": "86 %",
+            "value": 85.84975630430176,
+            "units": "%"
+          },
+          "theoMol": {
+            "display": "0.35 mol",
+            "value": 0.3509719222462203,
+            "units": "mol"
+          },
+          "actualMol": {
+            "display": "0.30 mol",
+            "value": 0.3013085399449036,
+            "units": "mol"
+          },
+          "productId": {
+            "value": "P1"
+          },
+          "row_id": "28",
+          "inchi": "InChI=1S/C6H12O2/c1-3-5-8-6(7)4-2/h3-5H2,1-2H3",
+          "hash": "fa3d44f3e7c0ed2cff0d73b924eb5debb1110a423708ef0cc4362fccc31219fb"
+        }
+      },
+      "relationships": {
+        "chemicalDrawing": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/chemicalDrawing:d86dd97d-a4ed-4afb-9846-0d5ccdb193e1"
+          },
+          "data": {
+            "type": "entity",
+            "id": "chemicalDrawing:d86dd97d-a4ed-4afb-9846-0d5ccdb193e1"
+          }
+        },
+        "structure": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/stoichiometry/chemicalDrawing:d86dd97d-a4ed-4afb-9846-0d5ccdb193e1/28/structure"
+          }
+        }
+      }
+    },
+    {
+      "type": "entity",
+      "id": "samplesContainer:28268246-f154-42fb-8348-cd76ad356f19",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/samplesContainer:28268246-f154-42fb-8348-cd76ad356f19"
+      },
+      "attributes": {
+        "type": "samplesContainer",
+        "eid": "samplesContainer:28268246-f154-42fb-8348-cd76ad356f19",
+        "name": "Samples Table",
+        "digest": "67161701",
+        "fields": {
+          "Description": {
+            "value": ""
+          },
+          "Name": {
+            "value": "Samples Table"
+          }
+        },
+        "flags": {}
+      }
+    },
+    {
       "type": "entity",
       "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035",
       "links": {
         "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035"
       },
       "attributes": {
-        "type": "sample",
+        "id": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035",
         "eid": "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035",
         "name": "Sample-XBF-XBF Esterification-001",
+        "description": "",
+        "createdAt": "2022-07-21T11:02:56.340Z",
+        "editedAt": "2022-07-22T08:33:21.199Z",
+        "type": "sample",
         "digest": "67161701",
         "fields": {
           "Description": {
@@ -118,27 +802,209 @@
           "Status": {
             "value": "Active"
           }
+        },
+        "flags": {
+          "canEdit": true
+        },
+        "stoicRef": {
+          "eid": "chemicalDrawing:d86dd97d-a4ed-4afb-9846-0d5ccdb193e1",
+          "rowId": "28"
+        },
+        "digests": {
+          "self": "fa3d44f3e7c0ed2cff0d73b924eb5debb1110a423708ef0cc4362fccc31219fb",
+          "external": "fa3d44f3e7c0ed2cff0d73b924eb5debb1110a423708ef0cc4362fccc31219fb"
+        }
+      },
+      "relationships": {
+        "stoichiometry": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/stoichiometry/chemicalDrawing:d86dd97d-a4ed-4afb-9846-0d5ccdb193e1/28"
+          },
+          "data": {
+            "type": "product",
+            "id": "28"
+          }
+        },
+        "createdBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"
+          },
+          "data": {
+            "type": "user",
+            "id": "102"
+          }
+        },
+        "editedBy": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"
+          },
+          "data": {
+            "type": "user",
+            "id": "102"
+          }
+        },
+        "ancestors": {
+          "data": [
+            {
+              "type": "entity",
+              "id": "journal:fe624b25-959e-4359-9ff4-372d396c1392",
+              "meta": {
+                "links": {
+                  "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/journal:fe624b25-959e-4359-9ff4-372d396c1392"
+                }
+              }
+            },
+            {
+              "type": "entity",
+              "id": "experiment:9c57624e-99c7-44db-afad-e579d5fe32cc",
+              "meta": {
+                "links": {
+                  "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc"
+                }
+              }
+            },
+            {
+              "type": "entity",
+              "id": "samplesContainer:28268246-f154-42fb-8348-cd76ad356f19",
+              "meta": {
+                "links": {
+                  "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/samplesContainer:28268246-f154-42fb-8348-cd76ad356f19"
+                }
+              }
+            }
+          ]
+        },
+        "owner": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"
+          },
+          "data": {
+            "type": "user",
+            "id": "102"
+          }
+        },
+        "properties": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/samples/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties"
+          }
+        },
+        "mol": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/export?format=mol"
+          }
+        },
+        "mol3k": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/export?format=mol-v3000"
+          }
+        },
+        "cdxml": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/export?format=cdxml"
+          }
+        },
+        "svg": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/export?format=svg"
+          }
         }
       }
     },
     {
-      "type": "attribute",
-      "id": "31",
+      "type": "entity",
+      "id": "journal:fe624b25-959e-4359-9ff4-372d396c1392",
       "links": {
-        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/attributes/31"
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/journal:fe624b25-959e-4359-9ff4-372d396c1392"
       },
       "attributes": {
-        "id": "31",
-        "name": "Sample Status",
-        "type": "choice",
-        "options": [
-          "Active",
-          "Closed",
-          "Cancelled"
-        ],
-        "counts": {
-          "templates": {}
+        "type": "journal",
+        "eid": "journal:fe624b25-959e-4359-9ff4-372d396c1392",
+        "name": "XBF Notebook 2022.02",
+        "digest": "70029449",
+        "fields": {
+          "Description": {
+            "value": "TestPerson1s Test Notebook Feb. 2022"
+          },
+          "Name": {
+            "value": "XBF Notebook 2022.02"
+          }
+        },
+        "flags": {}
+      }
+    },
+    {
+      "type": "entity",
+      "id": "chemicalDrawing:d86dd97d-a4ed-4afb-9846-0d5ccdb193e1",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/chemicalDrawing:d86dd97d-a4ed-4afb-9846-0d5ccdb193e1"
+      },
+      "attributes": {
+        "type": "chemicalDrawing",
+        "eid": "chemicalDrawing:d86dd97d-a4ed-4afb-9846-0d5ccdb193e1",
+        "name": "ChemDraw Document",
+        "digest": "67161701",
+        "fields": {
+          "Description": {
+            "value": ""
+          },
+          "Name": {
+            "value": "ChemDraw Document"
+          }
         }
+      }
+    },
+    {
+      "type": "user",
+      "id": "102",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102"
+      },
+      "attributes": {
+        "userId": "102",
+        "userName": "test@example.com",
+        "flags": {
+          "isSystemStandardUser": true
+        },
+        "alias": "XBF",
+        "email": "test@example.com",
+        "firstName": "Name",
+        "lastName": "SurName",
+        "isEnabled": true
+      },
+      "relationships": {
+        "systemGroups": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/102/systemGroups"
+          }
+        }
+      }
+    },
+    {
+      "type": "entity",
+      "id": "experiment:9c57624e-99c7-44db-afad-e579d5fe32cc",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc"
+      },
+      "attributes": {
+        "type": "experiment",
+        "eid": "experiment:9c57624e-99c7-44db-afad-e579d5fe32cc",
+        "name": "Esterification",
+        "digest": "67161701",
+        "fields": {
+          "Department": {
+            "value": "Chemistry"
+          },
+          "Description": {
+            "value": "Simple Chemical Reaction (open properties and click multiple times to enable editing of the description or the name)"
+          },
+          "Name": {
+            "value": "Esterification"
+          },
+          "Research group": {
+            "value": "Group A"
+          }
+        },
+        "flags": {}
       }
     }
   ]

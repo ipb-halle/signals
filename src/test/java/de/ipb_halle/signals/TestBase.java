@@ -21,17 +21,18 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import de.ipb_halle.signals.rest.MockRestClient;
+import de.ipb_halle.signals.sample.Sample;
+import de.ipb_halle.signals.sample.SampleProperty;
+import de.ipb_halle.signals.sample.SamplePropertyValue;
+import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.IOException;
-import java.util.*;
-
-import de.ipb_halle.signals.users.Group;
-import de.ipb_halle.signals.users.GroupDbService;
-import de.ipb_halle.signals.users.User;
-import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Properties;
 
 public class TestBase {
 
@@ -123,5 +124,29 @@ public class TestBase {
     public static void prepareRestClients(MockRestClient mockRestClient, String urlKey, InputStream inputStream, int statusCode){
         String responseBody = readStream(inputStream);
         mockRestClient.addResponse(urlKey, responseBody, statusCode);
+    }
+
+    public static Sample createSampleWithProperties(String sampleId) {
+        Sample sample = new Sample();
+        sample.setId(sampleId);
+        sample.setName("Test Sample");
+        sample.setDescription("Test Description");
+        sample.setTemplateId("template:abc123");
+        sample.setAncestorId("journal:xyz789");
+
+        SampleProperty prop = new SampleProperty();
+        prop.setPropertyId("prop1");
+        prop.setPropertyName("Property 1");
+        prop.setPropertyType("STRING");
+
+        SamplePropertyValue val = new SamplePropertyValue();
+        val.setPropertyId("prop1");
+        val.setPropertyValue("TestValue");
+        val.setSampleId(sampleId);
+
+        sample.addProperty(prop);
+        sample.addPropertyValue(val);
+
+        return sample;
     }
 }

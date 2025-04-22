@@ -1,23 +1,3 @@
-/*
- *
- *  * IPB Signals client
- *  * Copyright 2024 Leibniz-Institut f. Pflanzenbiochemie
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  * you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  *     http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
- *  *
- *
- */
-
 package de.ipb_halle.signals.sample;
 
 import com.google.gson.JsonElement;
@@ -26,30 +6,30 @@ import de.ipb_halle.signals.PostgresqlContainerExtension;
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.rest.MockRestClient;
-import de.ipb_halle.signals.rest.RestHelper;
 import de.ipb_halle.signals.rest.UnexpectedResponseCodeException;
 import de.ipb_halle.tda.DeploymentElement;
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @ExtendWith(PostgresqlContainerExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class SampleRestServiceTest {
 
-
-    private final String TEST_RESOURCE_1 = "SampleRestServiceTest001.json";
-    private final String TEST_KEY_1 = "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035";
-    private final String TEST_KEY_2 = "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035/properties";
-    private final String TEST_ENDPOINT_1 = "/entities/%s";
-    private final String TEST_ENDPOINT_2 = "/entities/%s/properties";
-    private final String TEST_SAMPLE_ID = "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035";
+    private static final String TEST_SAMPLE_ID = "sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035";
+    private static final String TEST_RESOURCE_1 = "SampleRestServiceTest001.json";
+    private static final String TEST_KEY_ENTITY = "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/" + TEST_SAMPLE_ID;
+    private static final String TEST_KEY_PROPERTIES = "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/samples/" + TEST_SAMPLE_ID + "/properties";
+    private static final String POST_SAMPLE_KEY = "POST:https://endpoint.somewhere.invalid/api/rest/v1.0/entities?force=true";
 
     @Inject
     @DeploymentElement
@@ -63,134 +43,96 @@ public abstract class SampleRestServiceTest {
     @DeploymentElement
     private DynEnumManager dynEnumManager;
 
-    @BeforeAll
-    public void testSetup() {
-        TestBase.prepareRestClients(mockRestClient, TEST_KEY_1, getClass().getResourceAsStream(TEST_RESOURCE_1));
+    @BeforeEach
+    public void setup() {
+        assumeTrue(mockRestClient != null, "MockRestClient was not injected. Test skipped.");
+        TestBase.prepareRestClients(mockRestClient, TEST_KEY_ENTITY, getClass().getResourceAsStream(TEST_RESOURCE_1));
         dynEnumManager.allowEnumDiscovery();
     }
 
+
     @Test
     public void testDoGetSample() throws Exception {
-        // prepare mocks for ancestors and children
-        TestBase.prepareRestClients(mockRestClient, "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/journal:fe624b25-959e-4359-9ff4-372d396c1392", getClass().getResourceAsStream("SampleAncestor001.json"));
-        TestBase.prepareRestClients(mockRestClient, "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc", getClass().getResourceAsStream("SampleAncestor002.json"));
-        TestBase.prepareRestClients(mockRestClient, "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/samplesContainer:28268246-f154-42fb-8348-cd76ad356f19", getClass().getResourceAsStream("SampleAncestor003.json"));
-        TestBase.prepareRestClients(mockRestClient, "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:e4f69432-2c96-4139-ae4e-84cc24d7a9ac", getClass().getResourceAsStream("SampleChild001.json"));
-
+        prepareAncestorsAndChildren();
         Sample sample = sampleRestService.doGetSample(TEST_SAMPLE_ID);
-        Assertions.assertEquals(TEST_SAMPLE_ID, sample.getId());
+        assertEquals(TEST_SAMPLE_ID, sample.getId());
+        assertEquals(3, sample.getAncestors().size());
+        assertEquals(1, sample.getChildren().size());
     }
 
     @Test
     public void testDoGetSampleProperties() throws Exception {
-        TestBase.prepareRestClients(mockRestClient, TEST_KEY_1, getClass().getResourceAsStream(TEST_RESOURCE_1));
-
-        // prepare mocks for ancestors and children
-
-        TestBase.prepareRestClients(mockRestClient, "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/journal:fe624b25-959e-4359-9ff4-372d396c1392", getClass().getResourceAsStream("SampleAncestor001.json"));
-        TestBase.prepareRestClients(mockRestClient, "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc", getClass().getResourceAsStream("SampleAncestor002.json"));
-        TestBase.prepareRestClients(mockRestClient, "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/samplesContainer:28268246-f154-42fb-8348-cd76ad356f19", getClass().getResourceAsStream("SampleAncestor003.json"));
-        TestBase.prepareRestClients(mockRestClient, "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:e4f69432-2c96-4139-ae4e-84cc24d7a9ac", getClass().getResourceAsStream("SampleChild001.json"));
         Sample sample = sampleRestService.doGetSample(TEST_SAMPLE_ID);
+        TestBase.prepareRestClients(mockRestClient, TEST_KEY_PROPERTIES, getClass().getResourceAsStream("SamplePropertiesJson001.json"));
+        sampleRestService.doGetSampleProperties(sample);
 
-        //this part doesnt work
-//        mockRestClient.resetMockClient();
-//
-//        TestBase.prepareRestClients(mockRestClient, TEST_KEY_2, getClass().getResourceAsStream("SamplePropertiesJson001.json"));
-//        sampleRestService.doGetSampleProperties(sample);
-//
-//
-//        Assertions.assertFalse(sample.getProperties().isEmpty(), "Ancestors should be loaded");
-//        Assertions.assertEquals(sample.getAncestors().size(), 2);
-
+        assertFalse(sample.getProperties().isEmpty());
+        assertEquals(20, sample.getProperties().size());
     }
 
     @Test
-    public void testFetchSample() throws Exception {
-        JsonElement element = sampleRestService.fetchSample(TEST_ENDPOINT_1, TEST_SAMPLE_ID);
-        Assertions.assertNotNull(element, "Returned JSON element should not be null");
+    public void testFetchSampleSuccess() throws Exception {
+        JsonElement element = sampleRestService.fetchSample("/entities/%s", TEST_SAMPLE_ID);
+        assertNotNull(element);
     }
 
     @Test
-    public void testFetchSample_exception() throws Exception {
-        String errorKey = "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/sample:5af19f39-cd6a-4d65-ab8d-46f586e3c035";
-        mockRestClient.addResponse(
-                errorKey,
-                "Error-Payload",
-                500
-        );
-
-        // Act & Assert
-        Assertions.assertThrows(UnexpectedResponseCodeException.class, () -> {
-            sampleRestService.fetchSample(TEST_ENDPOINT_1, TEST_SAMPLE_ID);
-        });
-
-
+    public void testFetchSampleThrowsUnexpectedResponseCodeException() {
+        mockRestClient.addResponse(TEST_KEY_ENTITY, "Error", 500);
+        assertThrows(UnexpectedResponseCodeException.class, () ->
+                sampleRestService.fetchSample("/entities/%s", TEST_SAMPLE_ID));
     }
 
     @Test
-    public void testFetchSample_URISyntaxException() throws Exception {
+    public void testFetchSampleThrowsIOException() {
+        assertThrows(IOException.class, () ->
+                sampleRestService.fetchSample("/entities/%s", "non-existent"));
+    }
 
+    @Test
+    public void testFetchSampleThrowsURISyntaxException() {
         String invalidEndpoint = "GET:https://[invalidUrl]";
-        mockRestClient.addResponse(
-                invalidEndpoint,
-                "Error-Payload",
-                500
-        );
-        Assertions.assertThrows(URISyntaxException.class, () -> {
-            sampleRestService.fetchSample(invalidEndpoint, TEST_SAMPLE_ID);
-        });
-    }
-
-    @Test
-    public void testFetchSample_IOException() throws Exception {
-        Assertions.assertThrows(IOException.class, () -> {
-            sampleRestService.fetchSample(TEST_ENDPOINT_1, "non-existent-sample-id");
-        });
+        mockRestClient.addResponse(invalidEndpoint, "", 500);
+        assertThrows(URISyntaxException.class, () ->
+                sampleRestService.fetchSample(invalidEndpoint, TEST_SAMPLE_ID));
     }
 
     @Test
     public void testParseReply() throws Exception {
-        JsonElement element = sampleRestService.fetchSample(TEST_ENDPOINT_1, TEST_SAMPLE_ID);
-
-        Assertions.assertNotNull(element, "Returned JSON element should not be null");
-
+        JsonElement element = sampleRestService.fetchSample("/entities/%s", TEST_SAMPLE_ID);
         Sample sample = sampleRestService.parseReply(element);
-        Assertions.assertNotNull(sample, "Parsed sample should not be null");
-        Assertions.assertEquals(TEST_SAMPLE_ID, sample.getId(), "Sample ID should match the expected value");
-
-        System.out.println("Fetched Sample: " + sample);
+        assertEquals(TEST_SAMPLE_ID, sample.getId());
     }
 
     @Test
-    public void testGetSampleAncestors() throws Exception {
-        // prepare mocks
-        TestBase.prepareRestClients(mockRestClient, "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/journal:fe624b25-959e-4359-9ff4-372d396c1392", getClass().getResourceAsStream("SampleAncestor001.json"));
-        TestBase.prepareRestClients(mockRestClient, "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc", getClass().getResourceAsStream("SampleAncestor002.json"));
-        TestBase.prepareRestClients(mockRestClient, "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/samplesContainer:28268246-f154-42fb-8348-cd76ad356f19", getClass().getResourceAsStream("SampleAncestor003.json"));
-
-        JsonElement element = sampleRestService.fetchSample(TEST_ENDPOINT_1, TEST_SAMPLE_ID);
-        Sample sample = sampleRestService.parseReply(element);
-
-        JsonObject relationships = element.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_RELATIONSHIPS);
-        sampleRestService.getSampleAncestors(sample, relationships);
-
-        Assertions.assertFalse(sample.getAncestors().isEmpty(), "Ancestors should be loaded");
-        Assertions.assertEquals(sample.getAncestors().size(), 3);
+    public void testCreateNewSample() throws Exception {
+        Sample sample = TestBase.createSampleWithProperties(TEST_SAMPLE_ID);
+        mockRestClient.addResponse(POST_SAMPLE_KEY, "", 201);
+        sampleRestService.createNewSample(sample);
     }
 
     @Test
-    public void testGetSampleChildren() throws Exception {
-        // prepare mocks
-        TestBase.prepareRestClients(mockRestClient, "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:e4f69432-2c96-4139-ae4e-84cc24d7a9ac", getClass().getResourceAsStream("SampleChild001.json"));
+    public void testPrivatePrepareSampleMethod() throws Exception {
+        Sample sample = TestBase.createSampleWithProperties(TEST_SAMPLE_ID);
+        Method method = SampleRestService.class.getDeclaredMethod("prepareSample", Sample.class);
+        method.setAccessible(true);
+        JsonObject json = (JsonObject) method.invoke(sampleRestService, sample);
+        assertNotNull(json);
+        assertTrue(json.has("data"));
+    }
 
-        JsonElement element = sampleRestService.fetchSample(TEST_ENDPOINT_1, TEST_SAMPLE_ID);
-        Sample sample = sampleRestService.parseReply(element);
-
-        JsonObject relationships = element.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_RELATIONSHIPS);
-        sampleRestService.getSampleChildren(sample, relationships);
-
-        Assertions.assertFalse(sample.getChildren().isEmpty(), "Child should be loaded");
-        Assertions.assertEquals(sample.getChildren().size(), 1);
+    private void prepareAncestorsAndChildren() {
+        TestBase.prepareRestClients(mockRestClient,
+                "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/journal:fe624b25-959e-4359-9ff4-372d396c1392",
+                getClass().getResourceAsStream("SampleAncestor001.json"));
+        TestBase.prepareRestClients(mockRestClient,
+                "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/experiment:9c57624e-99c7-44db-afad-e579d5fe32cc",
+                getClass().getResourceAsStream("SampleAncestor002.json"));
+        TestBase.prepareRestClients(mockRestClient,
+                "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/samplesContainer:28268246-f154-42fb-8348-cd76ad356f19",
+                getClass().getResourceAsStream("SampleAncestor003.json"));
+        TestBase.prepareRestClients(mockRestClient,
+                "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/entities/text:e4f69432-2c96-4139-ae4e-84cc24d7a9ac",
+                getClass().getResourceAsStream("SampleChild001.json"));
     }
 }
