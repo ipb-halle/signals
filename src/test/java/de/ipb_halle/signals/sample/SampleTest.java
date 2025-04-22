@@ -105,7 +105,54 @@ public abstract class SampleTest {
 
         SampleEntity entity = sample.createEntity();
         assertNotNull(entity);
-
-        //assertNull(entity);
     }
+
+    @Test
+    public void testSampleConstructorFromEntity() {
+        dynEnumMgr.allowEnumDiscovery();
+
+        SampleEntity entity = new SampleEntity();
+        entity.setId("sample:456");
+        entity.setName("Constructed Sample");
+        entity.setDescription("From Entity");
+        entity.setType(dynEnumMgr.valueOf(EntityType.valueOf("sample")).getId());
+        entity.setCreatedAt(new Date());
+        entity.setEditedAt(new Date());
+        entity.setDigest(789L);
+        entity.setCreatedBy("user:creator");
+        entity.setEditedBy("user:editor");
+        entity.setOwner("user:owner");
+        entity.setAncestorId("ancestor:abc");
+        entity.setParentContainerId("container:xyz");
+        entity.setStoicRefId("stoic:eid");
+        entity.setStoicRefRowId("stoic:row");
+        entity.setTemplateId("template:999");
+
+        Sample sample = new Sample(entity, dynEnumMgr);
+
+        assertEquals("sample:456", sample.getId());
+        assertEquals("Constructed Sample", sample.getName());
+        assertEquals("From Entity", sample.getDescription());
+        assertEquals(7, sample.getType().getId());
+        assertEquals("ancestor:abc", sample.getAncestorId());
+        assertEquals("container:xyz", sample.getParentContainerId());
+        assertEquals("template:999", sample.getTemplateId());
+        assertEquals(789L, sample.getDigest());
+
+        assertNotNull(sample.getCreatedBy());
+        assertNotNull(sample.getEditedBy());
+        assertNotNull(sample.getOwner());
+        assertNotNull(sample.getCreatedAt());
+        assertNotNull(sample.getEditedAt());
+
+        assertNotNull(sample.getStoicRef());
+        assertEquals("stoic:eid", sample.getStoicRef().getEid());
+        assertEquals("stoic:row", sample.getStoicRef().getRowId());
+
+        assertTrue(sample.getProperties().isEmpty());
+        assertTrue(sample.getPropertyValues().isEmpty());
+        assertTrue(sample.getAncestors().isEmpty());
+        assertTrue(sample.getChildren().isEmpty());
+    }
+
 }

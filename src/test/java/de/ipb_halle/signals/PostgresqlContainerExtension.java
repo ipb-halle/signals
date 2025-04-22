@@ -31,6 +31,7 @@ import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.testcontainers.containers.Container.ExecResult;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 
@@ -107,4 +108,5 @@ public class PostgresqlContainerExtension implements BeforeAllCallback {
         logger.info("Stdout: " + result.getStdout());
         logger.error("Stderr: " + result.getStderr());
     }
+
 }
