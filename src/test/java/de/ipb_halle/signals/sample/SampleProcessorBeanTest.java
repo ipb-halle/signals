@@ -92,7 +92,6 @@ public class SampleProcessorBeanTest {
         sampleProcessorBean.processSingleSample(sampleId);
 
         // then
-        // ни один из методов не должен быть вызван
         verify(sampleRestService, never()).doGetSample(anyString());
         verify(sampleDbService, never()).save(any());
         verify(sampleRestService, never()).doGetSampleProperties(any());

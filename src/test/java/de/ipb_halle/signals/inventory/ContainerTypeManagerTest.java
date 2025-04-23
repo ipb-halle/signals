@@ -56,6 +56,7 @@ public abstract class ContainerTypeManagerTest {
     @DeploymentElement
     private ContainerTypeManager manager;
 
+
     @Inject
     @DeploymentElement
     private DynEnumManager dynEnumMgr;
@@ -93,14 +94,6 @@ public abstract class ContainerTypeManagerTest {
 
         ContainerType ct = manager.getDbContainerType(TEST_CONTAINER_TYPE_ID);
         Assertions.assertEquals(TEST_CONTAINER_TYPE_NAME, ct.getName(), "ContainerType name mismatch");
-
-        // attachments
-        /*
-        Attachment a = getAttachmentById(
-                ct.getAttachments(),
-                TEST_CONTAINER_ATTACHMENT_ID);
-        Assertionss.assertEquals(TEST_CONTAINER_ATTACHMENT_FILE_NAME, a.getFileName(), "Attachment file name matches");
-        */
 
         // field definitions
         Field f = getFieldById(ct.getFields(), TEST_CONTAINER_FIELD_ID);

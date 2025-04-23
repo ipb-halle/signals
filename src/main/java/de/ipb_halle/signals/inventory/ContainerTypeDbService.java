@@ -87,9 +87,7 @@ public class ContainerTypeDbService {
 
     public ContainerType loadById(String id) {
         ContainerTypeEntity cte = this.em.find(ContainerTypeEntity.class, id);
-        return new ContainerType(cte,
-                // loadAttachments(cte.getId()),
-                loadFields(cte.getId()));
+        return new ContainerType(cte, loadFields(cte.getId()));
     }
 
     /**

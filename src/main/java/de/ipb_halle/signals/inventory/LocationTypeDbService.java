@@ -87,8 +87,7 @@ public class LocationTypeDbService {
 
     public LocationType loadById(String id) {
         LocationTypeEntity lte = this.em.find(LocationTypeEntity.class, id);
-        LocationType locationType = new LocationType(lte, loadFields(lte.getId()));
-        return locationType;
+        return new LocationType(lte, loadFields(lte.getId()));
     }
 
     private List<Field> loadFields(String id) {

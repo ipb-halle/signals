@@ -39,11 +39,6 @@ public class LocationTypeManager {
     @Inject
     private LocationTypeRestService restService;
 
-
-    public LocationType loadById(String id, boolean augment) {
-        return dbService.loadById(id);
-    }
-
     public LocationType getDbLocationType(String id) {
         return dbService.loadById(id);
     }
