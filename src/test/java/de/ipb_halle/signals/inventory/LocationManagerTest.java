@@ -124,7 +124,7 @@ public abstract class LocationManagerTest {
         Location location = locationManager.getSnbLocation(TEST_LOCATION_ID);
         String locationId = location.getId();
         location.getFieldValues().forEach(fieldValue -> fieldValue.setEntityId(locationId));
-        locationManager.save(location);
+        locationManager.saveL(location);
         Assertions.assertEquals(TEST_LOCATION_NAME, location.getName(), "Container name mismatch");
 
         location = locationManager.getLocation(TEST_LOCATION_ID, true);

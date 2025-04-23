@@ -62,7 +62,7 @@ public class LocationDbService {
     }
 
 
-    public void save(Location loc) {
+    public void saveLocation(Location loc) {
         LocationEntity le = loc.createEntity();
         this.em.merge(le);
         for (Field f : loc.getFields()) {
@@ -76,9 +76,5 @@ public class LocationDbService {
 
     }
 
-
-    public void save(LocationEntity loc) {
-        this.em.merge(loc);
-    }
 }
 

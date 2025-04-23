@@ -64,10 +64,6 @@ public class ContainerTypeEntity {
         updatedAt = new Date();
     }
 
-    public ContainerTypeEntity addPrefixSuffix() {
-        return this.setId(CONTAINER_TYPE_ENTITY_PREFIX + this.getId() + CONTAINER_TYPE_ENTITY_SUFFIX);
-    }
-
     public String getId() {
         return id;
     }

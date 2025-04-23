@@ -115,7 +115,7 @@ public abstract class ContainerManagerTest {
         loc.setUpdatedAt(new Date(1200000000));
         loc.setUpdatedBy(new UserReference(TEST_USER2_ID));
         loc.getFieldValues().forEach(fieldValue -> fieldValue.setEntityId(TEST_LOCATION_ID));
-        locationManager.save(loc);
+        locationManager.saveL(loc);
 
         SignalsEntityDTO dto = new SignalsEntityDTO();
         dto.setId(TEST_CONTAINER_ID);

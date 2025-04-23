@@ -92,7 +92,7 @@ public class LocationProcessorBean {
 
         // 2) Process location fields
         processLocationFields(location);
-        locationDbService.save(location);
+        locationDbService.saveLocation(location);
 
     }
 
@@ -123,7 +123,7 @@ public class LocationProcessorBean {
         if (tempPath != null) {
             Attachment attachment = getAttachment(location, field);
             if (isNewRevision(attachment, fieldValue, tempPath)) {
-                locationDbService.save(location);
+                locationDbService.saveLocation(location);
                 storeAttachment(attachment, tempPath);
             } else {
                 storageService.removeFromStaging(tempPath);
