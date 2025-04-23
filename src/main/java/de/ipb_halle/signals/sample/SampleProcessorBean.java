@@ -64,6 +64,7 @@ public class SampleProcessorBean {
         //If transaction marked for rollback, then break it
         if (transactionSynchronizationRegistry.getTransactionStatus() == jakarta.transaction.Status.STATUS_MARKED_ROLLBACK) {
             logger.error("SampleProcessorBean:-> Transaction is marked for rollback, skipping.");
+            return;
         }
 
         try {

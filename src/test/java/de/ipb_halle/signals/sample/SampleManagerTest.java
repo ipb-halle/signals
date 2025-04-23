@@ -20,15 +20,13 @@
 
 package de.ipb_halle.signals.sample;
 
-import de.ipb_halle.signals.PostgresqlContainerExtension;
+import de.ipb_halle.signals.RuntimeConfig;
+import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.entity.SignalsEntityDbService;
-import de.ipb_halle.tda.DeploymentElement;
-import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Date;
 import java.util.List;
@@ -41,17 +39,27 @@ public  class  SampleManagerTest {
     private SampleManager sampleManager;
     private SignalsEntityDbService signalsEntityDbService;
     private SampleProcessorBean sampleProcessorBean;
+    private SampleDbService sampleDbService;
+    private SampleRestService sampleRestService;
+    private DynEnumManager dynEnumManager;
 
     @BeforeEach
     public void setUp() {
         sampleManager = new SampleManager();
 
+        // mocks
         signalsEntityDbService = mock(SignalsEntityDbService.class);
         sampleProcessorBean = mock(SampleProcessorBean.class);
+        sampleDbService = mock(SampleDbService.class);
+        sampleRestService = mock(SampleRestService.class);
+        dynEnumManager = mock(DynEnumManager.class);
 
-        sampleManager.getClass().getDeclaredFields();
+        // inject mocks
         injectField(sampleManager, "signalsEntityDbService", signalsEntityDbService);
         injectField(sampleManager, "sampleProcessorBean", sampleProcessorBean);
+        injectField(sampleManager, "sampleDbService", sampleDbService);
+        injectField(sampleManager, "sampleRestService", sampleRestService);
+        injectField(sampleManager, "dynEnumManager", dynEnumManager);
     }
 
     @Test
@@ -73,8 +81,26 @@ public  class  SampleManagerTest {
 
         // then
         verify(signalsEntityDbService).loadSE(anyMap());
-        verify(sampleProcessorBean, times(1)).processSingleSample("sample:1");
-        verify(sampleProcessorBean, times(1)).processSingleSample("sample:2");
+        verify(sampleProcessorBean).processSingleSample("sample:1");
+        verify(sampleProcessorBean).processSingleSample("sample:2");
+    }
+
+    @Test
+    public void testImportSample_executesExpectedFlow() {
+        // given
+        String sampleId = "sample:xyz123";
+        RuntimeConfig config = new RuntimeConfig();
+
+        SampleEntity mockEntity = mock(SampleEntity.class);
+        when(sampleDbService.loadSampleEntityById(sampleId)).thenReturn(mockEntity);
+
+        // when
+        sampleManager.importSample(config, sampleId);
+
+        // then
+        verify(sampleDbService).loadSampleEntityById(sampleId);
+        verify(sampleDbService).loadSamplePropertyValuesWithProperties(any(Sample.class));
+        verify(sampleRestService).createNewSample(any(Sample.class));
     }
 
     // Helper for injecting fields via reflection
