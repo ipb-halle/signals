@@ -100,10 +100,10 @@ public abstract class SampleDbServiceTest {
         newSample.setId("sample:test-id");
         newSample.setCreatedAt(new Date());
         newSample.setEditedAt(new Date());
-//        UserReference user = new UserReference("user:2");
-//        newSample.setCreatedBy(user);
-//        newSample.setEditedBy(user);
-//        newSample.setOwner(user);
+        UserReference user = new UserReference("user:2");
+        newSample.setCreatedBy(user);
+        newSample.setEditedBy(user);
+        newSample.setOwner(user);
 
         sampleDbService.loadSamplePropertyValuesWithProperties(newSample);
 
