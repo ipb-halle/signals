@@ -119,10 +119,10 @@ public class SignalsTest {
     @Test
     public void testManageElements_shouldDelegateToElementConfig() {
         // given
-        signals.postConstruct(); // сначала инициализация
+        signals.postConstruct();
 
         var mockElementConfig = mock(ElementConfig.class);
-        inject(signals, "elementConfig", mockElementConfig); // потом подменяем
+        inject(signals, "elementConfig", mockElementConfig);
 
         Date[] dates = new Date[] { new Date() };
 
@@ -183,7 +183,6 @@ public class SignalsTest {
 
             doNothing().when(context).bind(eq("inject"), any(Signals.class));
 
-            // используем рефлексию, чтобы заменить signals внутри getInstance
             Signals instance = Signals.getInstance("mock-config.xml");
             assertNotNull(instance);
         } catch (NamingException e) {
