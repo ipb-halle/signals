@@ -87,9 +87,7 @@ public abstract class ContainerManagerTest {
     @BeforeAll
     public void testSetup() {
         dynEnumManager.allowEnumDiscovery();
-        TestBase.prepareRestClients(mockRestClient,
-                TEST_KEY_1,
-                getClass().getResourceAsStream(TEST_RESOURCE_1));
+        TestBase.prepareRestClients(mockRestClient, TEST_KEY_1, getClass().getResourceAsStream(TEST_RESOURCE_1));
 
         User user = new User();
         user.setEnabled(true);

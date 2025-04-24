@@ -25,7 +25,10 @@ import de.ipb_halle.signals.attachment.AttachmentRestService;
 import de.ipb_halle.signals.attachment.AttachmentRevision;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.Unit;
-import de.ipb_halle.signals.field.*;
+import de.ipb_halle.signals.field.Field;
+import de.ipb_halle.signals.field.FieldDesignation;
+import de.ipb_halle.signals.field.FieldParser;
+import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.materials.MaterialReference;
 import de.ipb_halle.signals.rest.*;
 import de.ipb_halle.signals.sample.SampleProcessorBean;
@@ -53,6 +56,7 @@ public class ContainerRestService implements RestReplyParser<Container> {
     public final String CONTAINER_ATTACHMENT_ENDPOINT = "/inventory/containers/%s/fields/%s/attachment";
     public final String CONTAINER_ENDPOINT = "/inventory/containers/%s";
     private static final String CONTAINER_CREATE_ENDPOINT = "/inventory/containers";
+
     @Inject
     private RestClient restClient;
 
@@ -249,8 +253,9 @@ public class ContainerRestService implements RestReplyParser<Container> {
                     .setEndpoint(CONTAINER_CREATE_ENDPOINT)
                     .setRequestData(request.toString())
                     .execute(RestClient.HTTP_CREATED);
+
         } catch (Exception e) {
-            throw new RuntimeException(e.getLocalizedMessage());
+            throw new RuntimeException("something went wrong", e);
         }
     }
 

@@ -56,9 +56,9 @@ public interface RestClient {
     public final String TEXT_PLAIN = "text/plain";
     public final String IMAGE_UNKNOWN = "image/*";
 
-    public RestClient execute() throws IOException, URISyntaxException, UnexpectedResponseCodeException ;
+    public RestClient execute() throws IOException, URISyntaxException, UnexpectedResponseCodeException;
 
-    public RestClient execute(int expectedResponseCode) throws IOException, URISyntaxException, UnexpectedResponseCodeException ;
+    public RestClient execute(int expectedResponseCode) throws IOException, URISyntaxException, UnexpectedResponseCodeException;
 
     public RestReply getResponse();
 

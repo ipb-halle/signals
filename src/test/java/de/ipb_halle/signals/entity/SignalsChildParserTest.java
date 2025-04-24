@@ -23,12 +23,9 @@ package de.ipb_halle.signals.entity;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
-import de.ipb_halle.tda.DeploymentElement;
-import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.Objects;
 

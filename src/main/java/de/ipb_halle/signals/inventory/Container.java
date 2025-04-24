@@ -321,6 +321,6 @@ public class Container {
     }
 
     public void addSamples(Sample sample) {
-        samples.add( sample);
+        samples.add(sample);
     }
 }
