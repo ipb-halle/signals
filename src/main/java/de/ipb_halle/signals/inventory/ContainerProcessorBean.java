@@ -70,16 +70,17 @@ public class ContainerProcessorBean {
         try {
             //The main processing of container takes places in this method
             doProcessContainer(containerId);
-        } catch (IOException e) {
+        } catch (RuntimeException e) {
             logger.error("ContainerProcessorBean:-> processContainer() caught an exception.", e);
         }
     }
 
-    private void doProcessContainer(String containerId) throws IOException {
+    private void doProcessContainer(String containerId){
 
         //If transaction marked for rollback, then break it
         if (transactionSynchronizationRegistry.getTransactionStatus() == jakarta.transaction.Status.STATUS_MARKED_ROLLBACK) {
             logger.error("ContainerProcessorBean:-> Transaction is marked for rollback, skipping.");
+            return;
         }
 
         // 1) Load container via REST
@@ -95,7 +96,11 @@ public class ContainerProcessorBean {
 
 
         // 2) Process container fields
-        processContainerFields(container);
+        try {
+            processContainerFields(container);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         logger.info(container.getId());
         containerDbService.saveContainer(container);
     }
@@ -222,5 +227,35 @@ public class ContainerProcessorBean {
         for (AttachmentFile stagedFile : attachment.getFiles(attachment.getLatestRevision().getId())) {
             storageService.storeFile(stagedFile);
         }
+    }
+
+
+
+    public ContainerProcessorBean setContainerRestService(ContainerRestService containerRestService) {
+        this.containerRestService = containerRestService;
+        return this;
+    }
+
+
+
+    public ContainerProcessorBean setContainerDbService(ContainerDbService containerDbService) {
+        this.containerDbService = containerDbService;
+        return this;
+    }
+
+
+    public ContainerProcessorBean setAttachmentDbService(AttachmentDbService attachmentDbService) {
+        this.attachmentDbService = attachmentDbService;
+        return this;
+    }
+
+    public ContainerProcessorBean setStorageService(StorageService storageService) {
+        this.storageService = storageService;
+        return this;
+    }
+
+    public ContainerProcessorBean setTransactionSynchronizationRegistry(TransactionSynchronizationRegistry transactionSynchronizationRegistry) {
+        this.transactionSynchronizationRegistry = transactionSynchronizationRegistry;
+        return this;
     }
 }
