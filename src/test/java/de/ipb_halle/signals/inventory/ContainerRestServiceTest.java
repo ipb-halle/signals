@@ -26,14 +26,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
+import de.ipb_halle.signals.attachment.AttachmentRestService;
+import de.ipb_halle.signals.attachment.AttachmentRevision;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.Unit;
 import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.materials.MaterialReference;
-import de.ipb_halle.signals.rest.MockRestClient;
-import de.ipb_halle.signals.rest.RestClientImpl;
-import de.ipb_halle.signals.rest.RestHelper;
+import de.ipb_halle.signals.rest.*;
 import de.ipb_halle.signals.sample.SampleProcessorBean;
 import jakarta.json.Json;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,9 +43,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
@@ -109,7 +113,6 @@ public class ContainerRestServiceTest {
         containerType.setName("testVial");
 
 
-
         java.lang.reflect.Field restClientField = ContainerRestService.class.getDeclaredField("restClient");
         restClientField.setAccessible(true);
         restClientField.set(containerRestService, mockRestClient);
@@ -129,11 +132,10 @@ public class ContainerRestServiceTest {
     }
 
     @Test
-    public void shouldCallSampleProcessorBean_whenSampleTypeIsParsed() {
+    public void parseContainerContentsTest_Sample() {
         JsonArray jsonArray = new JsonArray();
         JsonObject jsonObject = new JsonObject();
 
-        JsonObject contentType = new JsonObject();
         jsonObject.add(ContainerEntity.ATTR_CONTENT_TYPE, new JsonPrimitive("sample"));
         jsonObject.add(ContainerEntity.ATTR_CONTENT_ID, new JsonPrimitive("sample:e9435f5a-7e55-450d-957b-2f8d9710eb18"));
 
@@ -141,8 +143,24 @@ public class ContainerRestServiceTest {
 
         containerRestService.parseReply(buildMockedJson(jsonArray));
 
-        // 💡 Verify-Aufruf
         verify(sampleProcessorBean, times(1)).processSingleSample("sample:e9435f5a-7e55-450d-957b-2f8d9710eb18");
+    }
+
+    @Test
+    public void parseContainerContentsTest_Asset() {
+        JsonArray jsonArray = new JsonArray();
+        JsonObject jsonObject = new JsonObject();
+
+        jsonObject.add(ContainerEntity.ATTR_CONTENT_TYPE, new JsonPrimitive("asset"));
+        jsonObject.add(ContainerEntity.ATTR_CONTENT_ID, new JsonPrimitive("asset:test"));
+
+        jsonArray.add(jsonObject);
+
+        Container result = containerRestService.parseReply(buildMockedJson(jsonArray));
+
+        assertNotNull(result);
+        assertNotNull(result.getMaterial());
+        assertEquals("asset:test", result.getMaterial().getId());
     }
 
     private JsonElement buildMockedJson(JsonArray containerContents) {
@@ -163,5 +181,76 @@ public class ContainerRestServiceTest {
         dataWrapper.add(RestHelper.ATTR_DATA, container);
         return dataWrapper.get(RestHelper.ATTR_DATA);
     }
+
+    @Test
+    public void doGetContainerAttachmentTest() throws Exception {
+        AttachmentRestService attachmentRestService = mock(AttachmentRestService.class);
+        ContainerRestService containerRestService = new ContainerRestService();
+
+        java.lang.reflect.Field attachmentField = ContainerRestService.class.getDeclaredField("attachmentRestService");
+        attachmentField.setAccessible(true);
+        attachmentField.set(containerRestService, attachmentRestService);
+
+        Container container = new Container();
+        container.setId("container:abc");
+
+        Field field = new Field();
+        field.setId("field:testField");
+
+        String mimeType = "application/pdf";
+        Path dummyPath = Path.of("/tmp/fake.pdf");
+        RestReply expectedReply = new RestReply(dummyPath, "dummy-digest", mimeType);
+
+        when(attachmentRestService.fetchAttachment(
+                contains("/containers/container:abc/fields/"), eq(mimeType))
+        ).thenReturn(expectedReply);
+
+        RestReply reply = containerRestService.doGetContainerAttachment(container, field, mimeType);
+
+        assertNotNull(reply);
+        assertEquals(dummyPath, reply.getPath());
+        assertEquals(mimeType, reply.getMimeType());
+    }
+
+    @Test
+    public void test_parseAttachmentMimeType_shouldReturnMimeType() {
+        ContainerRestService service = new ContainerRestService();
+
+        String jsonValue = "{\"attachment\": {\"mimeType\": \"application/pdf\"}}";
+
+        FieldValue fieldValue = new FieldValue();
+        fieldValue.setValue(jsonValue);
+
+        String mimeType = service.parseAttachmentMimeType(fieldValue);
+
+        assertEquals("application/pdf", mimeType);
+    }
+
+    @Test
+    public void test_parseAttachmentRevisionInfo_shouldFillAttachmentRevisionCorrectly() {
+        ContainerRestService service = new ContainerRestService();
+
+        String jsonValue = """
+        {
+            "attachment": {
+                "filename": "certificate.pdf",
+                "mimeType": "application/pdf",
+                "size": 21568
+            }
+        }
+        """;
+
+        FieldValue fieldValue = new FieldValue();
+        fieldValue.setValue(jsonValue);
+
+        AttachmentRevision revision = new AttachmentRevision();
+
+        service.parseAttachmentRevisionInfo(revision, fieldValue);
+
+        assertEquals("certificate.pdf", revision.getOriginalName());
+        assertEquals("application/pdf", revision.getMimeType());
+        assertEquals(21568L, revision.getSize());
+    }
+
 
 }
