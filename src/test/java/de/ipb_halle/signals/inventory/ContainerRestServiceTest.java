@@ -33,10 +33,11 @@ import de.ipb_halle.signals.entity.Unit;
 import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.materials.MaterialReference;
-import de.ipb_halle.signals.rest.*;
+import de.ipb_halle.signals.rest.MockRestClient;
+import de.ipb_halle.signals.rest.RestClientImpl;
+import de.ipb_halle.signals.rest.RestHelper;
+import de.ipb_halle.signals.rest.RestReply;
 import de.ipb_halle.signals.sample.SampleProcessorBean;
-import jakarta.json.Json;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -45,15 +46,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.file.Path;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ContainerRestServiceTest {

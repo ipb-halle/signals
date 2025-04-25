@@ -90,4 +90,27 @@ public class InventoryManager {
     public void importContainer(RuntimeConfig runtimeConfig, String id) {
         containerManager.importContainer(runtimeConfig, id);
     }
+
+
+    public InventoryManager setLocationManager(LocationManager locationManager) {
+        this.locationManager = locationManager;
+        return this;
+    }
+
+
+    public InventoryManager setLocationTypeManager(LocationTypeManager locationTypeManager) {
+        this.locationTypeManager = locationTypeManager;
+        return this;
+    }
+
+    public InventoryManager setContainerManager(ContainerManager containerManager) {
+        this.containerManager = containerManager;
+        return this;
+    }
+
+
+    public InventoryManager setContainerTypeManager(ContainerTypeManager containerTypeManager) {
+        this.containerTypeManager = containerTypeManager;
+        return this;
+    }
 }
