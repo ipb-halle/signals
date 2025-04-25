@@ -20,6 +20,10 @@
 
 package de.ipb_halle.signals.inventory;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
@@ -29,30 +33,44 @@ import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.materials.MaterialReference;
 import de.ipb_halle.signals.rest.MockRestClient;
 import de.ipb_halle.signals.rest.RestClientImpl;
+import de.ipb_halle.signals.rest.RestHelper;
+import de.ipb_halle.signals.sample.SampleProcessorBean;
+import jakarta.json.Json;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
+@ExtendWith(MockitoExtension.class)
 public class ContainerRestServiceTest {
     private static final String answer = "container saved";
     private static final String endpoint = "POST:https://endpoint.somewhere.invalid/inventory/containers";
     private final String TEST_RESOURCE_1 = "ContainerManagerTest001.json";
 
+    @InjectMocks
+    private ContainerRestService containerRestService;
+
+    @Mock
+    private SampleProcessorBean sampleProcessorBean;
+
+
     @Test
     public void doCreateContainerTest() throws NoSuchFieldException, IllegalAccessException {
         DynEnumManager dynEnumManager = mock(DynEnumManager.class);
-
         MockRestClient mockRestClient = new MockRestClient();
         mockRestClient.addResponse(endpoint, answer, 201);
-
         TestBase.prepareRestClients(mockRestClient, endpoint, getClass().getResourceAsStream(TEST_RESOURCE_1), 201);
 
-
-        //create sample of container
         Container container = new Container();
         container.setId("container:abc");
         container.setName("testContainer");
@@ -90,7 +108,7 @@ public class ContainerRestServiceTest {
         containerType.setId("vial:abc");
         containerType.setName("testVial");
 
-        ContainerRestService containerRestService = new ContainerRestService();
+
 
         java.lang.reflect.Field restClientField = ContainerRestService.class.getDeclaredField("restClient");
         restClientField.setAccessible(true);
@@ -102,7 +120,6 @@ public class ContainerRestServiceTest {
 
         SignalsConfig mockConfig = mock(SignalsConfig.class);
         when(mockConfig.getBaseUrl()).thenReturn("https://endpoint.somewhere.invalid");
-        when(mockConfig.getApiKey()).thenReturn("dummy-api-key");
 
         java.lang.reflect.Field configFieldInMockClient = RestClientImpl.class.getDeclaredField("signalsConfig");
         configFieldInMockClient.setAccessible(true);
@@ -110,4 +127,41 @@ public class ContainerRestServiceTest {
 
         containerRestService.doCreateContainer(containerType, container);
     }
+
+    @Test
+    public void shouldCallSampleProcessorBean_whenSampleTypeIsParsed() {
+        JsonArray jsonArray = new JsonArray();
+        JsonObject jsonObject = new JsonObject();
+
+        JsonObject contentType = new JsonObject();
+        jsonObject.add(ContainerEntity.ATTR_CONTENT_TYPE, new JsonPrimitive("sample"));
+        jsonObject.add(ContainerEntity.ATTR_CONTENT_ID, new JsonPrimitive("sample:e9435f5a-7e55-450d-957b-2f8d9710eb18"));
+
+        jsonArray.add(jsonObject);
+
+        containerRestService.parseReply(buildMockedJson(jsonArray));
+
+        // 💡 Verify-Aufruf
+        verify(sampleProcessorBean, times(1)).processSingleSample("sample:e9435f5a-7e55-450d-957b-2f8d9710eb18");
+    }
+
+    private JsonElement buildMockedJson(JsonArray containerContents) {
+        JsonObject container = new JsonObject();
+        JsonObject attributes = new JsonObject();
+
+        // Inhalt hinzufügen
+        attributes.add(ContainerEntity.ATTR_CONTENTS, containerContents);
+        attributes.addProperty(RestHelper.ATTR_NAME, "TestContainer");
+
+        attributes.add(RestHelper.ATTR_UNIT, new JsonPrimitive("g"));
+        attributes.add(RestHelper.ATTR_FIELDS, new JsonArray());
+
+        container.add(RestHelper.ATTR_ID, new JsonPrimitive("test-id"));
+        container.add(RestHelper.ATTR_ATTRIBUTES, attributes);
+
+        JsonObject dataWrapper = new JsonObject();
+        dataWrapper.add(RestHelper.ATTR_DATA, container);
+        return dataWrapper.get(RestHelper.ATTR_DATA);
+    }
+
 }

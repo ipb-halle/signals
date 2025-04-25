@@ -98,7 +98,7 @@ public class SampleProcessorBean {
             }
         }
         logger.warn("Warning! Where is no container for this sample = {}!!", sampleId);
-        return null;
+        return "null";
     }
 
 
