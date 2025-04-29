@@ -20,18 +20,25 @@
 
 package de.ipb_halle.signals.inventory;
 
+import de.ipb_halle.signals.attachment.Attachment;
 import de.ipb_halle.signals.attachment.AttachmentDbService;
+import de.ipb_halle.signals.attachment.AttachmentFile;
+import de.ipb_halle.signals.attachment.AttachmentRevision;
+import de.ipb_halle.signals.field.Field;
+import de.ipb_halle.signals.field.FieldType;
 import de.ipb_halle.signals.field.FieldValue;
+import de.ipb_halle.signals.rest.RestReply;
 import de.ipb_halle.signals.storage.StorageService;
 import jakarta.transaction.Status;
 import jakarta.transaction.TransactionSynchronizationRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import de.ipb_halle.signals.field.Field;
+import org.mockito.stubbing.OngoingStubbing;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.mockito.Mockito.*;
 
@@ -104,6 +111,63 @@ public class ContainerProcessorBeanTest {
         containerProcessorBean.processSingleContainer(containerId);
 
         verify(containerDbService, never()).saveContainer(any());
+
+    }
+
+    @Test
+    public void processSingleContainer_withAttachmentField_shouldProcessAttachment() throws IOException {
+        String containerId = "container:test";
+        String conatinerTypeId = "123";
+        String fullContainerTypeId = ContainerType.CONTAINER_TYPE_ENTITY_PREFIX + conatinerTypeId + ContainerType.CONTAINER_TYPE_ENTITY_SUFFIX;
+        String fieldId = "field1";
+        String fieldIdTransformed = fieldId + ":" + fullContainerTypeId;
+
+        Container container = new Container();
+        container.setId(containerId);
+        container.setContainerTypeId(conatinerTypeId);
+
+        Field field = new Field();
+        field.setId(fieldId);
+        field.setFieldType(FieldType.valueOf(FieldType.ATTACHMENT_FILE));
+
+        FieldValue fieldValue = new FieldValue();
+        fieldValue.setFieldId(fieldId);
+
+        container.setFields(List.of(field));
+        container.setFieldValues(List.of(fieldValue));
+
+        when(transactionSynchronizationRegistry.getTransactionStatus()).thenReturn(Status.STATUS_ACTIVE);
+        when(containerRestService.doGetContainer(containerId)).thenReturn(container);
+        when(containerRestService.parseAttachmentMimeType(any())).thenReturn("application/pdf");
+
+        String mimeType = "application/pdf";
+        Path dummyPath = Path.of("/tmp/fake.pdf");
+        RestReply reply = new RestReply(dummyPath, "digest123", mimeType);
+        reply.setFileSize(100L);
+
+        when(containerRestService.doGetContainerAttachment(any(), any(), any())).thenReturn(reply);
+
+        doAnswer(invocation -> {
+            AttachmentRevision revision = invocation.getArgument(0);
+            revision.setFileId("digest123");
+            return null;
+        }).when(containerRestService).parseAttachmentRevisionInfo(any(), any());
+
+        Attachment existingAttachment = new Attachment();
+        existingAttachment.setAncestorId(containerId);
+        existingAttachment.setFieldId(fieldIdTransformed);
+        existingAttachment.addRevisions(new HashSet<>());
+
+        when(attachmentDbService.load(any())).thenReturn(List.of(existingAttachment));
+        doNothing().when(attachmentDbService).save(any(Attachment.class));
+
+        containerProcessorBean.processSingleContainer(containerId);
+
+        verify(containerRestService).doGetContainer(containerId);
+        verify(containerDbService, times(2)).saveContainer(container);
+        verify(containerRestService).doGetContainerAttachment(any(), any(), any());
+        verify(attachmentDbService).save(any(Attachment.class));
+        verify(storageService).storeFile(any(AttachmentFile.class));
 
     }
 }
