@@ -22,7 +22,6 @@ package de.ipb_halle.signals.inventory;
 
 import de.ipb_halle.signals.attachment.Attachment;
 import de.ipb_halle.signals.attachment.AttachmentDbService;
-import de.ipb_halle.signals.attachment.AttachmentFile;
 import de.ipb_halle.signals.attachment.AttachmentRevision;
 import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldType;
@@ -33,7 +32,6 @@ import jakarta.transaction.Status;
 import jakarta.transaction.TransactionSynchronizationRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.stubbing.OngoingStubbing;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -51,6 +49,15 @@ public class ContainerProcessorBeanTest {
     private AttachmentDbService attachmentDbService;
     private StorageService storageService;
     private TransactionSynchronizationRegistry transactionSynchronizationRegistry;
+
+    private Container container;
+    private Field field;
+    private FieldValue fieldValue;
+    private final String containerId = "container:test";
+    private final String containerTypeId = "123";
+    private final String fieldId = "field1";
+    private final String mimeType = "application/pdf";
+    private final Path dummyPath = Path.of("/tmp/fake.pdf");
 
     @BeforeEach
     public void setUp() {
@@ -116,35 +123,18 @@ public class ContainerProcessorBeanTest {
 
     @Test
     public void processSingleContainer_withAttachmentField_shouldProcessAttachment() throws IOException {
-        String containerId = "container:test";
-        String conatinerTypeId = "123";
-        String fullContainerTypeId = ContainerType.CONTAINER_TYPE_ENTITY_PREFIX + conatinerTypeId + ContainerType.CONTAINER_TYPE_ENTITY_SUFFIX;
-        String fieldId = "field1";
+        prepareContainerWithAttachment();
+
+        String fullContainerTypeId = ContainerType.CONTAINER_TYPE_ENTITY_PREFIX + containerTypeId + ContainerType.CONTAINER_TYPE_ENTITY_SUFFIX;
         String fieldIdTransformed = fieldId + ":" + fullContainerTypeId;
 
-        Container container = new Container();
-        container.setId(containerId);
-        container.setContainerTypeId(conatinerTypeId);
 
-        Field field = new Field();
-        field.setId(fieldId);
-        field.setFieldType(FieldType.valueOf(FieldType.ATTACHMENT_FILE));
-
-        FieldValue fieldValue = new FieldValue();
-        fieldValue.setFieldId(fieldId);
-
-        container.setFields(List.of(field));
-        container.setFieldValues(List.of(fieldValue));
-
-        when(transactionSynchronizationRegistry.getTransactionStatus()).thenReturn(Status.STATUS_ACTIVE);
-        when(containerRestService.doGetContainer(containerId)).thenReturn(container);
-        when(containerRestService.parseAttachmentMimeType(any())).thenReturn("application/pdf");
-
-        String mimeType = "application/pdf";
-        Path dummyPath = Path.of("/tmp/fake.pdf");
         RestReply reply = new RestReply(dummyPath, "digest123", mimeType);
         reply.setFileSize(100L);
 
+        when(transactionSynchronizationRegistry.getTransactionStatus()).thenReturn(Status.STATUS_ACTIVE);
+        when(containerRestService.doGetContainer(containerId)).thenReturn(container);
+        when(containerRestService.parseAttachmentMimeType(any())).thenReturn(mimeType);
         when(containerRestService.doGetContainerAttachment(any(), any(), any())).thenReturn(reply);
 
         doAnswer(invocation -> {
@@ -159,15 +149,104 @@ public class ContainerProcessorBeanTest {
         existingAttachment.addRevisions(new HashSet<>());
 
         when(attachmentDbService.load(any())).thenReturn(List.of(existingAttachment));
-        doNothing().when(attachmentDbService).save(any(Attachment.class));
+        doNothing().when(attachmentDbService).save(any());
+        doNothing().when(containerDbService).saveContainer(any());
 
         containerProcessorBean.processSingleContainer(containerId);
 
         verify(containerRestService).doGetContainer(containerId);
         verify(containerDbService, times(2)).saveContainer(container);
         verify(containerRestService).doGetContainerAttachment(any(), any(), any());
-        verify(attachmentDbService).save(any(Attachment.class));
-        verify(storageService).storeFile(any(AttachmentFile.class));
+        verify(attachmentDbService).save(any());
+        verify(storageService).storeFile(any());
 
     }
+
+    @Test
+    public void processSingleContainer_noExistingAttachment_shouldCreateNew() throws IOException {
+        prepareContainerWithAttachment();
+
+        String fullContainerTypeId = ContainerType.CONTAINER_TYPE_ENTITY_PREFIX + containerTypeId + ContainerType.CONTAINER_TYPE_ENTITY_SUFFIX;
+        String fieldIdTransformed = fieldId + ":" + fullContainerTypeId;
+
+        RestReply reply = new RestReply(dummyPath, "digest123", mimeType);
+        reply.setFileSize(100L);
+
+        when(transactionSynchronizationRegistry.getTransactionStatus()).thenReturn(Status.STATUS_ACTIVE);
+        when(containerRestService.doGetContainer(containerId)).thenReturn(container);
+        when(containerRestService.parseAttachmentMimeType(any())).thenReturn(mimeType);
+        when(containerRestService.doGetContainerAttachment(any(), any(), any())).thenReturn(reply);
+
+        doAnswer(invocation -> {
+            AttachmentRevision revision = invocation.getArgument(0);
+            revision.setFileId("digest123");
+            return null;
+        }).when(containerRestService).parseAttachmentRevisionInfo(any(), any());
+
+        when(attachmentDbService.load(any())).thenReturn(List.of());
+
+        doNothing().when(attachmentDbService).save(any());
+        doNothing().when(containerDbService).saveContainer(any());
+
+        containerProcessorBean.processSingleContainer(containerId);
+
+        verify(containerRestService).doGetContainer(containerId);
+        verify(containerDbService, times(2)).saveContainer(container);
+        verify(containerRestService).doGetContainerAttachment(any(),any(),any());
+        verify(attachmentDbService).save(any());
+        verify(storageService).storeFile(any());
+    }
+
+    @Test
+    public  void processSingleContainer_multipleAttachment_shouldLogErrorAndSkipAttachment() throws IOException {
+        prepareContainerWithAttachment();
+
+        RestReply reply = new RestReply(dummyPath, "digest123", mimeType);
+        reply.setFileSize(100L);
+
+        when(transactionSynchronizationRegistry.getTransactionStatus()).thenReturn(Status.STATUS_ACTIVE);
+        when(containerRestService.doGetContainer(containerId)).thenReturn(container);
+        when(containerRestService.parseAttachmentMimeType(any())).thenReturn(mimeType);
+        when(containerRestService.doGetContainerAttachment(any(),any(),any())).thenReturn(reply);
+
+        doAnswer(invocation->{
+            AttachmentRevision revision = invocation.getArgument(0);
+            revision.setFileId("digest123");
+            return null;
+
+        }).when(containerRestService).parseAttachmentRevisionInfo(any(),any());
+
+        Attachment attachment1 = new Attachment();
+        Attachment attachment2 = new Attachment();
+        when(attachmentDbService.load(any())).thenReturn(List.of(attachment1,attachment2));
+
+        doNothing().when(containerDbService).saveContainer(any());
+
+        containerProcessorBean.processSingleContainer(containerId);
+
+        verify(containerRestService).doGetContainer(containerId);
+        verify(containerDbService, times(1)).saveContainer(container);
+        verify(containerRestService).doGetContainerAttachment(any(), any(), any());
+
+        verify(attachmentDbService, never()).save(any());
+        verify(storageService, never()).storeFile(any());
+
+    }
+
+    private void prepareContainerWithAttachment() {
+        container = new Container();
+        container.setId(containerId);
+        container.setContainerTypeId(containerTypeId);
+
+        field = new Field();
+        field.setId(fieldId);
+        field.setFieldType(FieldType.valueOf(FieldType.ATTACHMENT_FILE));
+
+        fieldValue = new FieldValue();
+        fieldValue.setFieldId(fieldId);
+
+        container.setFields(List.of(field));
+        container.setFieldValues(List.of(fieldValue));
+    }
+
 }

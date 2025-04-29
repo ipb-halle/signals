@@ -75,7 +75,7 @@ public class ContainerProcessorBean {
         }
     }
 
-    private void doProcessContainer(String containerId){
+    private void doProcessContainer(String containerId) {
 
         //If transaction marked for rollback, then break it
         if (transactionSynchronizationRegistry.getTransactionStatus() == jakarta.transaction.Status.STATUS_MARKED_ROLLBACK) {
@@ -131,6 +131,12 @@ public class ContainerProcessorBean {
         RestReply tempPath = containerRestService.doGetContainerAttachment(container, field, mimeType);
         if (tempPath != null) {
             Attachment attachment = getAttachment(container, field);
+
+            if(attachment == null){
+                logger.error("ContainerProcessorBean:-> Attachment is null for container {}, field {}", container.getId(), field.getId());
+                return;
+            }
+
             if (isNewRevision(attachment, fieldValue, tempPath)) {
                 containerDbService.saveContainer(container);
                 storeAttachment(attachment, tempPath);
@@ -230,12 +236,10 @@ public class ContainerProcessorBean {
     }
 
 
-
     public ContainerProcessorBean setContainerRestService(ContainerRestService containerRestService) {
         this.containerRestService = containerRestService;
         return this;
     }
-
 
 
     public ContainerProcessorBean setContainerDbService(ContainerDbService containerDbService) {
@@ -259,4 +263,4 @@ public class ContainerProcessorBean {
         return this;
     }
 
- }
+}
