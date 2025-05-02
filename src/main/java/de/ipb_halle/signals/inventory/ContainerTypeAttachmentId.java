@@ -31,6 +31,25 @@ public class ContainerTypeAttachmentId implements Serializable {
 
     private String attachment_id;
 
+
+    public String getContainer_type_id() {
+        return container_type_id;
+    }
+
+    public ContainerTypeAttachmentId setContainer_type_id(String container_type_id) {
+        this.container_type_id = container_type_id;
+        return this;
+    }
+
+    public String getAttachment_id() {
+        return attachment_id;
+    }
+
+    public ContainerTypeAttachmentId setAttachment_id(String attachment_id) {
+        this.attachment_id = attachment_id;
+        return this;
+    }
+
     @Override
     public boolean equals(Object o) {
         if ((o == null) || (getClass() != o.getClass())) {

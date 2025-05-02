@@ -101,7 +101,6 @@ public class ContainerProcessorBean {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        logger.info(container.getId());
         containerDbService.saveContainer(container);
     }
 
@@ -132,7 +131,7 @@ public class ContainerProcessorBean {
         if (tempPath != null) {
             Attachment attachment = getAttachment(container, field);
 
-            if(attachment == null){
+            if (attachment == null) {
                 logger.error("ContainerProcessorBean:-> Attachment is null for container {}, field {}", container.getId(), field.getId());
                 return;
             }
@@ -179,7 +178,7 @@ public class ContainerProcessorBean {
      * @param reply
      * @return
      */
-    private boolean isNewRevision(Attachment attachment, FieldValue fieldValue, RestReply reply) {
+    boolean isNewRevision(Attachment attachment, FieldValue fieldValue, RestReply reply) {
         AttachmentRevision latestRevision = attachment.getLatestRevision();
         AttachmentRevision newRevision = new AttachmentRevision();
         containerRestService.parseAttachmentRevisionInfo(newRevision, fieldValue);
@@ -236,31 +235,26 @@ public class ContainerProcessorBean {
     }
 
 
-    public ContainerProcessorBean setContainerRestService(ContainerRestService containerRestService) {
+    public void setContainerRestService(ContainerRestService containerRestService) {
         this.containerRestService = containerRestService;
-        return this;
     }
 
 
-    public ContainerProcessorBean setContainerDbService(ContainerDbService containerDbService) {
+    public void setContainerDbService(ContainerDbService containerDbService) {
         this.containerDbService = containerDbService;
-        return this;
     }
 
 
-    public ContainerProcessorBean setAttachmentDbService(AttachmentDbService attachmentDbService) {
+    public void setAttachmentDbService(AttachmentDbService attachmentDbService) {
         this.attachmentDbService = attachmentDbService;
-        return this;
     }
 
-    public ContainerProcessorBean setStorageService(StorageService storageService) {
+    public void setStorageService(StorageService storageService) {
         this.storageService = storageService;
-        return this;
     }
 
-    public ContainerProcessorBean setTransactionSynchronizationRegistry(TransactionSynchronizationRegistry transactionSynchronizationRegistry) {
+    public void setTransactionSynchronizationRegistry(TransactionSynchronizationRegistry transactionSynchronizationRegistry) {
         this.transactionSynchronizationRegistry = transactionSynchronizationRegistry;
-        return this;
     }
 
 }

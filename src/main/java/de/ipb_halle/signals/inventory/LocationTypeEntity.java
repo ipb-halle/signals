@@ -67,9 +67,6 @@ public class LocationTypeEntity {
         fields = new HashSet<>();
     }
 
-    public LocationTypeEntity addSuffixPrefix() {
-        return this.setId(LOCATION_TYPE_ENTITY_PREFIX + this.getId() + LOCATION_TYPE_ENTITY_SUFFIX);
-    }
 
     public String getId() {
         return id;

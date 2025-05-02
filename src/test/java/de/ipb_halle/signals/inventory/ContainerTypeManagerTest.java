@@ -98,5 +98,22 @@ public abstract class ContainerTypeManagerTest {
         // field definitions
         Field f = getFieldById(ct.getFields(), TEST_CONTAINER_FIELD_ID);
         Assertions.assertEquals(TEST_CONTAINER_FIELD_KEY, f.getKey(), "Field definition key matches");
+
+        ContainerTypeAttachmentId containerTypeAttachmentId = new ContainerTypeAttachmentId();
+        containerTypeAttachmentId.setAttachment_id("testAttachment");
+        containerTypeAttachmentId.setContainer_type_id("testVial");
+
+        Assertions.assertEquals("testAttachment", containerTypeAttachmentId.getAttachment_id());
+        Assertions.assertEquals("testVial", containerTypeAttachmentId.getContainer_type_id());
+
+        ContainerTypeAttachmentId containerTypeAttachmentId2 = new ContainerTypeAttachmentId();
+        containerTypeAttachmentId2.setAttachment_id("testAttachment");
+        containerTypeAttachmentId2.setContainer_type_id("testVial");
+
+        Assertions.assertEquals(containerTypeAttachmentId, containerTypeAttachmentId2); // equals true
+        Assertions.assertNotEquals(containerTypeAttachmentId, null); // equals null = false
+        Assertions.assertEquals(containerTypeAttachmentId.hashCode(), containerTypeAttachmentId2.hashCode());
+
+
     }
 }

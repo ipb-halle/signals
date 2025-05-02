@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -85,6 +86,11 @@ public abstract class LocationTypeManagerTest {
 
         LocationType lt = locationTypeManager.getDbLocationType(TEST_LOCATION_TYPE_ID);
         Assertions.assertEquals(TEST_LOCATION_TYPE_NAME, lt.getName(), "LocationType name mismatch");
+        LocationTypeEntity locationTypeEntity = lt.createEntity();
+        Assertions.assertNotNull(locationTypeEntity.toString());
+        Assertions.assertNotNull(locationTypeEntity.isInUse());
+        Assertions.assertNotNull(locationTypeEntity.getFields());
+        Assertions.assertNotNull(locationTypeEntity.setFields(new HashSet<>()));
 
         // field definitions
         Field f = getFieldById(lt.getFields(), TEST_LOCATION_FIELD_ID);

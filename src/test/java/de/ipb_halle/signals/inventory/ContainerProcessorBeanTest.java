@@ -22,6 +22,7 @@ package de.ipb_halle.signals.inventory;
 
 import de.ipb_halle.signals.attachment.Attachment;
 import de.ipb_halle.signals.attachment.AttachmentDbService;
+import de.ipb_halle.signals.attachment.AttachmentFile;
 import de.ipb_halle.signals.attachment.AttachmentRevision;
 import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldType;
@@ -38,6 +39,7 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.*;
 
 public class ContainerProcessorBeanTest {
@@ -233,6 +235,38 @@ public class ContainerProcessorBeanTest {
 
     }
 
+    @Test
+    public void isNewRevision_shouldReturnFalse_whenDigestMatchesExitingFile(){
+        prepareContainerWithAttachment();
+
+        Attachment attachment = new Attachment();
+        attachment.setAncestorId(containerId);
+        attachment.setFieldId(fieldId);
+
+        AttachmentRevision latestRevision = new AttachmentRevision();
+        latestRevision.setId(1111);
+        latestRevision.setFileId("digest123");
+        attachment.addRevision(latestRevision);
+
+        AttachmentFile existingFile = new AttachmentFile();
+        existingFile.setDigest("digest123");
+        existingFile.setRevisionId(latestRevision.getId());
+        attachment.addFile(existingFile);
+
+        RestReply reply = new RestReply(dummyPath, "digest123", mimeType);
+        reply.setFileSize(100L);
+
+        doAnswer(invocation->{
+            AttachmentRevision revision = invocation.getArgument(0);
+            revision.setFileId("digest123");
+            return null;
+        }).when(containerRestService).parseAttachmentRevisionInfo(any(),any());
+
+        boolean result = containerProcessorBean.isNewRevision(attachment, fieldValue, reply);
+
+        assertFalse(result, "Should return false because digest matches existing file");
+    }
+
     private void prepareContainerWithAttachment() {
         container = new Container();
         container.setId(containerId);
@@ -248,5 +282,7 @@ public class ContainerProcessorBeanTest {
         container.setFields(List.of(field));
         container.setFieldValues(List.of(fieldValue));
     }
+
+
 
 }
