@@ -130,7 +130,6 @@ public abstract class ContainerManagerTest {
 
     @Test
     public void containerManagerTest() {
-
         // String strippedId = TEST_CONTAINER_ID.split(":")[1];
         Container ct = manager.getSnbContainer(TEST_CONTAINER_ID);
         String containerId = ct.getId();

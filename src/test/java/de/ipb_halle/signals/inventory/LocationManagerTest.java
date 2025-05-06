@@ -137,4 +137,33 @@ public abstract class LocationManagerTest {
         Assertions.assertEquals(TEST_USER2_ID, location.getUpdatedBy().getId(), "Location updated by matches");
         Assertions.assertNotNull(lr.dump());
     }
+
+    @Test
+    public void testLocationAdditionalMethods() {
+        Location location = new Location();
+        location.setId("loc:123");
+        location.setName("TestLocation");
+        location.setDescription("Test Description");
+        location.setRows(10);
+        location.setColumns(5);
+        location.setCreatedAt(new Date());
+        location.setUpdatedAt(new Date());
+        location.setTypeName("Shelf");
+        location.setAncestorId("ancestor:001");
+        location.setAncestorName("RootLocation");
+
+        Assertions.assertEquals("Test Description", location.getDescription());
+        Assertions.assertEquals(10, location.getRows());
+        Assertions.assertEquals(5, location.getColumns());
+        Assertions.assertEquals("Shelf", location.getTypeName());
+        Assertions.assertEquals("ancestor:001", location.getAncestorId());
+        Assertions.assertEquals("RootLocation", location.getAncestorName());
+        Assertions.assertNotNull(location.getCreatedAt());
+        Assertions.assertNotNull(location.getUpdatedAt());
+        Assertions.assertFalse(location.isGrid()); // зависит от реализации
+
+        String stringValue = location.toString();
+        Assertions.assertTrue(stringValue.contains("TestLocation"));
+        Assertions.assertTrue(stringValue.contains("loc:123"));
+    }
 }

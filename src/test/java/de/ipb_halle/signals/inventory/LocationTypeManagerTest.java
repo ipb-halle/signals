@@ -17,10 +17,12 @@
  */
 package de.ipb_halle.signals.inventory;
 
+import com.google.gson.JsonObject;
 import de.ipb_halle.signals.PostgresqlContainerExtension;
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.field.Field;
+import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.rest.MockRestClient;
 import de.ipb_halle.tda.DeploymentElement;
 import jakarta.inject.Inject;
@@ -95,5 +97,21 @@ public abstract class LocationTypeManagerTest {
         // field definitions
         Field f = getFieldById(lt.getFields(), TEST_LOCATION_FIELD_ID);
         Assertions.assertEquals(TEST_LOCATION_FIELD_KEY, f.getKey(), "Field definition key matches");
+    }
+
+    @Test
+    public void testParseFieldValueObject() {
+        LocationTypeFieldValuesParser parser = new LocationTypeFieldValuesParser();
+        JsonObject input = new JsonObject();
+        JsonObject valueObject = new JsonObject();
+        valueObject.addProperty("value", "test123");
+        input.add("Test Field", valueObject);
+
+        List<FieldValue> result = parser.parseReply(input);
+
+        Assertions.assertEquals(1, result.size());
+        FieldValue fv = result.get(0);
+        Assertions.assertEquals("Test Field", fv.getFieldTitle());
+        Assertions.assertEquals("\"test123\"", fv.getValue());
     }
 }
