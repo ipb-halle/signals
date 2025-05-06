@@ -93,12 +93,43 @@ public class Samples {
 
 
     public void importData() throws Exception {
-        // importSamples();
+        importSamples();
     }
 
     private void importExtracts(String fileName) throws Exception {
         System.out.println("Importing extract samples");
 
+        // 01 ExtractID
+        // 02 RefCorrOrganisms_ProcedureID
+        // 03 RefLastSolventUsed
+        // 04 StorePlace
+        // 05 Extract
+        // 06 Tara
+        // 07 Amount
+        // 08 Volume
+        // 09 Concentration
+        // 10 Solution
+        // 11 ExtractRemarks
+        // 12 HPLC
+        // 13 ExtractPlateID
+        // 14 ExtractPosition
+        // 15 ExtractBarcode
+        // 16 IPBCode
+
+        Pattern pattern = Pattern.compile( "^(\\d+);"   //  1 extractId
+                + "(\\d+);"                             //  2 correlationId
+                + "(.*);"                               //  3 last solvent
+                + "(.*);"                               //  4 storage place
+                + "(.*);"                               //  5 extract code (= sample code)
+                + "(.*);"                               //  6 taga [mg], decimal
+                + "(.*);"                               //  7 amount [mg], decimal
+                + "(.*);"                               //  8 volume [ml], decimal
+                + "(.*);"                               //  9 concentration [mg/ml], decimal
+                + "(.*);"                               //  10 solution [Boolean: J(~160)/N(~780)/-(~9900)]
+                + "(.*);"                               //  11 remarks
+                + "(.*);"                               //  12 H
+                + "(.*);"                               //  3 last solvent
+        );
     }
 
     private void importSamples() throws Exception {
@@ -148,18 +179,16 @@ public class Samples {
                 InhouseContainer container = new InhouseContainer()
                         .setSampleId(Integer.parseInt(matcher.group(1)))
                         .setCompoundCorrelationId(Integer.parseInt(matcher.group(2)))
-                        .setLastSolvent(matcher.group(3))
-                        .setSampleCode(matcher.group(7))
+                        .setLastSolvent(stripQuotes(matcher.group(3)))      // "acetic acid"
+                        .setSampleCode(stripQuotes(matcher.group(7)))
                         .setAmount(parseDecimalString(matcher.group(8)))
                         .setTara(parseDecimalString(matcher.group(9)))
                         .setPurity(Integer.parseInt(matcher.group(10)))
-                        .setAppearance(matcher.group(11))
-                        .setRemarks(matcher.group(13));
+                        .setAppearance(stripQuotes(matcher.group(11)))
+                        .setRemarks(stripQuotes(matcher.group(13)));
 
                 parseLocation(container, matcher.group(5));
                 inhouseDB.getInhouseDbService().save(container);
-
-
             } else {
                 writer.append(line);
                 writer.newLine();
@@ -225,13 +254,11 @@ public class Samples {
         return (location.isZeroBased() ? 1 : 0) + Integer.parseInt(col);
     }
 
-    /**
-     * return a dimensions string for a given container name
-     */
-    private int[] getDimension(String name) {
-        String pattern = "^([A-Za-z]+).*$";
-        String prefix = name.replaceAll(pattern, "$1");
-        return null;
-//        return this.dimensions.get(pref
+    private String stripQuotes(String st) {
+        Matcher matcher = quotePattern.matcher(st);
+        if (matcher.matches()) {
+            return matcher.group(1);
+        }
+        return st;
     }
 }
