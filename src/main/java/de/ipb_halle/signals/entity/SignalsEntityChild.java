@@ -28,7 +28,7 @@ import java.io.Serializable;
  */
 
 @Entity
-@Table(name="signalsentities_children")
+@Table(name = "signalsentities_children")
 public class SignalsEntityChild implements Serializable {
 
     private final static long serialVersionUID = 1L;

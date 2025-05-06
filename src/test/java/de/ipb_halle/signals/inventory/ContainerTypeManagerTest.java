@@ -56,6 +56,7 @@ public abstract class ContainerTypeManagerTest {
     @DeploymentElement
     private ContainerTypeManager manager;
 
+
     @Inject
     @DeploymentElement
     private DynEnumManager dynEnumMgr;
@@ -94,16 +95,25 @@ public abstract class ContainerTypeManagerTest {
         ContainerType ct = manager.getDbContainerType(TEST_CONTAINER_TYPE_ID);
         Assertions.assertEquals(TEST_CONTAINER_TYPE_NAME, ct.getName(), "ContainerType name mismatch");
 
-        // attachments
-        /*
-        Attachment a = getAttachmentById(
-                ct.getAttachments(),
-                TEST_CONTAINER_ATTACHMENT_ID);
-        Assertionss.assertEquals(TEST_CONTAINER_ATTACHMENT_FILE_NAME, a.getFileName(), "Attachment file name matches");
-        */
-
         // field definitions
         Field f = getFieldById(ct.getFields(), TEST_CONTAINER_FIELD_ID);
         Assertions.assertEquals(TEST_CONTAINER_FIELD_KEY, f.getKey(), "Field definition key matches");
+
+        ContainerTypeAttachmentId containerTypeAttachmentId = new ContainerTypeAttachmentId();
+        containerTypeAttachmentId.setAttachment_id("testAttachment");
+        containerTypeAttachmentId.setContainer_type_id("testVial");
+
+        Assertions.assertEquals("testAttachment", containerTypeAttachmentId.getAttachment_id());
+        Assertions.assertEquals("testVial", containerTypeAttachmentId.getContainer_type_id());
+
+        ContainerTypeAttachmentId containerTypeAttachmentId2 = new ContainerTypeAttachmentId();
+        containerTypeAttachmentId2.setAttachment_id("testAttachment");
+        containerTypeAttachmentId2.setContainer_type_id("testVial");
+
+        Assertions.assertEquals(containerTypeAttachmentId, containerTypeAttachmentId2); // equals true
+        Assertions.assertNotEquals(containerTypeAttachmentId, null); // equals null = false
+        Assertions.assertEquals(containerTypeAttachmentId.hashCode(), containerTypeAttachmentId2.hashCode());
+
+
     }
 }

@@ -214,9 +214,11 @@ public class LocationRestService implements RestReplyParser<Location> {
     //creates gridBox as Example
     private JsonObject prepareAttributes(LocationType locationType, Location location) {
         JsonObject attributes = new JsonObject();
-        attributes.addProperty(RestHelper.ATTR_NAME, location.getName());
-        attributes.addProperty(RestHelper.ATTR_DESCRIPTION, location.getDescription());
+
         attributes.addProperty(RestHelper.ATTR_TYPE_ID, locationType.getId().split(":")[1]);
+        attributes.addProperty(RestHelper.ATTR_DESCRIPTION, location.getDescription());
+        attributes.addProperty(RestHelper.ATTR_NAME, location.getName());
+
         attributes.addProperty(LocationEntity.ATTR_GRID, true);
         attributes.addProperty(LocationEntity.ATTR_ROWS, 8);
         attributes.addProperty(LocationEntity.ATTR_COLUMNS, 12);

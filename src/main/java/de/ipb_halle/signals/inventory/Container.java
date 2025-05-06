@@ -26,10 +26,8 @@ import de.ipb_halle.signals.sample.Sample;
 import de.ipb_halle.signals.users.IUser;
 import de.ipb_halle.signals.users.UserReference;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Single signals entity (entities API endpoint)
@@ -276,8 +274,11 @@ public class Container {
         digest = d;
     }
 
-    public void setFieldValues(Set<FieldValue> vs) {
-        fieldValues = vs;
+    public void setFieldValues(List<Object> vs) {
+        fieldValues = vs.stream()
+                .filter(FieldValue.class::isInstance)
+                .map(FieldValue.class::cast)
+                .collect(Collectors.toSet());
     }
 
     public void setId(String i) {
@@ -312,8 +313,11 @@ public class Container {
         updatedBy = u;
     }
 
-    public void setFields(Set<Field> fields) {
-        this.fields = fields;
+    public void setFields(List<Object> fields) {
+        this.fields = fields.stream()
+                .filter(Field.class::isInstance)
+                .map(Field.class::cast)
+                .collect(Collectors.toSet());
     }
 
     public void setSamples(Set<Sample> samples) {
@@ -321,6 +325,6 @@ public class Container {
     }
 
     public void addSamples(Sample sample) {
-        samples.add( sample);
+        samples.add(sample);
     }
 }

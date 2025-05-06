@@ -70,19 +70,22 @@ public class LocationProcessorBean {
 
         try {
             doProcessLocation(locationId);
-        } catch (IOException e) {
+        } catch (RuntimeException e) {
             logger.error("LocationProcessorBean:-> processLocation() caught an exception.", e);
         }
     }
 
-    private void doProcessLocation(String locationId) throws IOException {
+    private void doProcessLocation(String locationId) throws RuntimeException {
         //If transaction marked for rollback, then break it
         if (transactionSynchronizationRegistry.getTransactionStatus() == jakarta.transaction.Status.STATUS_MARKED_ROLLBACK) {
             logger.error("LocationProcessorBean:-> Transaction is marked for rollback, skipping.");
+            return;
         }
 
         // 1) Load location via REST
         Location location = locationRestService.doGetLocation(locationId);
+
+
         location.setLocationTypeId(LocationType.LOCATION_TYPE_ENTITY_PREFIX + location.getLocationTypeId() + LocationType.LOCATION_TYPE_ENTITY_SUFFIX);
         location.getFields().forEach(field -> field.setId(field.getId() + ":" + location.getLocationTypeId()));
         location.getFieldValues().forEach(fieldValue -> {
@@ -91,16 +94,19 @@ public class LocationProcessorBean {
         });
 
         // 2) Process location fields
-        processLocationFields(location);
-        locationDbService.save(location);
-
+        try {
+            processLocationFields(location);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        locationDbService.saveLocation(location);
     }
 
     private void processLocationFields(Location location) throws IOException {
         for (Field field : location.getFields()) {
             if (field.getType().getValue().equals(FieldType.ATTACHMENT_FILE)) {
                 for (FieldValue fieldValue : location.getFieldValues()) {
-                    if (fieldValue.getFieldId().equals(field.getStripedId())) {
+                    if (fieldValue.getFieldId().equals(field.getId())) {
                         obtainAttachment(location, field, fieldValue);
                     }
                 }
@@ -122,8 +128,14 @@ public class LocationProcessorBean {
         RestReply tempPath = locationRestService.doGetLocationAttachment(location, field, mimeType);
         if (tempPath != null) {
             Attachment attachment = getAttachment(location, field);
+
+            if(attachment == null){
+                logger.error("LocationProcessorBean:-> Attachment is null for location {}, field {}", location.getId(), field.getId());
+                return;
+            }
+
             if (isNewRevision(attachment, fieldValue, tempPath)) {
-                locationDbService.save(location);
+                locationDbService.saveLocation(location);
                 storeAttachment(attachment, tempPath);
             } else {
                 storageService.removeFromStaging(tempPath);
@@ -164,7 +176,7 @@ public class LocationProcessorBean {
      * @param reply
      * @return
      */
-    private boolean isNewRevision(Attachment attachment, FieldValue fieldValue, RestReply reply) {
+     boolean isNewRevision(Attachment attachment, FieldValue fieldValue, RestReply reply) {
         AttachmentRevision latestRevision = attachment.getLatestRevision();
         AttachmentRevision newRevision = new AttachmentRevision();
         locationRestService.parseAttachmentRevisionInfo(newRevision, fieldValue);
@@ -217,5 +229,25 @@ public class LocationProcessorBean {
         for (AttachmentFile stagedFile : attachment.getFiles(attachment.getLatestRevision().getId())) {
             storageService.storeFile(stagedFile);
         }
+    }
+
+    public void setLocationRestService(LocationRestService locationRestService) {
+        this.locationRestService = locationRestService;
+    }
+
+    public void setLocationDbService(LocationDbService locationDbService) {
+        this.locationDbService = locationDbService;
+    }
+
+    public void setAttachmentDbService(AttachmentDbService attachmentDbService) {
+        this.attachmentDbService = attachmentDbService;
+    }
+
+    public void setStorageService(StorageService storageService) {
+        this.storageService = storageService;
+    }
+
+    public void setTransactionSynchronizationRegistry(TransactionSynchronizationRegistry transactionSynchronizationRegistry) {
+        this.transactionSynchronizationRegistry = transactionSynchronizationRegistry;
     }
 }

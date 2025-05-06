@@ -71,5 +71,12 @@ public class SampleProperty {
         return this;
     }
 
-
+    @Override
+    public String toString() {
+        return "SampleProperty{" +
+                "propertyId='" + propertyId + '\'' +
+                ", propertyName='" + propertyName + '\'' +
+                ", propertyType='" + propertyType + '\'' +
+                '}';
+    }
 }

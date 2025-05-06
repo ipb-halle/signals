@@ -70,16 +70,17 @@ public class ContainerProcessorBean {
         try {
             //The main processing of container takes places in this method
             doProcessContainer(containerId);
-        } catch (IOException e) {
+        } catch (RuntimeException e) {
             logger.error("ContainerProcessorBean:-> processContainer() caught an exception.", e);
         }
     }
 
-    private void doProcessContainer(String containerId) throws IOException {
+    private void doProcessContainer(String containerId) {
 
         //If transaction marked for rollback, then break it
         if (transactionSynchronizationRegistry.getTransactionStatus() == jakarta.transaction.Status.STATUS_MARKED_ROLLBACK) {
             logger.error("ContainerProcessorBean:-> Transaction is marked for rollback, skipping.");
+            return;
         }
 
         // 1) Load container via REST
@@ -95,8 +96,11 @@ public class ContainerProcessorBean {
 
 
         // 2) Process container fields
-        processContainerFields(container);
-        logger.info(container.getId());
+        try {
+            processContainerFields(container);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         containerDbService.saveContainer(container);
     }
 
@@ -126,6 +130,12 @@ public class ContainerProcessorBean {
         RestReply tempPath = containerRestService.doGetContainerAttachment(container, field, mimeType);
         if (tempPath != null) {
             Attachment attachment = getAttachment(container, field);
+
+            if (attachment == null) {
+                logger.error("ContainerProcessorBean:-> Attachment is null for container {}, field {}", container.getId(), field.getId());
+                return;
+            }
+
             if (isNewRevision(attachment, fieldValue, tempPath)) {
                 containerDbService.saveContainer(container);
                 storeAttachment(attachment, tempPath);
@@ -168,7 +178,7 @@ public class ContainerProcessorBean {
      * @param reply
      * @return
      */
-    private boolean isNewRevision(Attachment attachment, FieldValue fieldValue, RestReply reply) {
+    boolean isNewRevision(Attachment attachment, FieldValue fieldValue, RestReply reply) {
         AttachmentRevision latestRevision = attachment.getLatestRevision();
         AttachmentRevision newRevision = new AttachmentRevision();
         containerRestService.parseAttachmentRevisionInfo(newRevision, fieldValue);
@@ -223,4 +233,28 @@ public class ContainerProcessorBean {
             storageService.storeFile(stagedFile);
         }
     }
+
+
+    public void setContainerRestService(ContainerRestService containerRestService) {
+        this.containerRestService = containerRestService;
+    }
+
+
+    public void setContainerDbService(ContainerDbService containerDbService) {
+        this.containerDbService = containerDbService;
+    }
+
+
+    public void setAttachmentDbService(AttachmentDbService attachmentDbService) {
+        this.attachmentDbService = attachmentDbService;
+    }
+
+    public void setStorageService(StorageService storageService) {
+        this.storageService = storageService;
+    }
+
+    public void setTransactionSynchronizationRegistry(TransactionSynchronizationRegistry transactionSynchronizationRegistry) {
+        this.transactionSynchronizationRegistry = transactionSynchronizationRegistry;
+    }
+
 }

@@ -1,1 +1,161 @@
-{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/containers/ef16c7af-a763-49f2-b218-294ac02fc224"},"data":{"type":"inventoryContainer","id":"ef16c7af-a763-49f2-b218-294ac02fc224","links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/containers/ef16c7af-a763-49f2-b218-294ac02fc224"},"attributes":{"id":"ef16c7af-a763-49f2-b218-294ac02fc224","name":"item00000021","typeId":"e3dcd097-02a0-4b32-abe1-8e8433974939","typeName":"Tube","location":{"id":"e13620f4-4933-4275-83cc-3194a4be6607"},"status":"AVAILABLE","state":"PRESENT","totalCapacity":1000000,"availableCapacity":999998,"safetyInfo":"NONE","barcode":"0000000026","owner":{"picture":{}},"coordinateX":3,"coordinateY":0,"contents":[{"entityId":"batch:62d96bee0eb1120f699bcb07","entityType":"batch","status":"AVAILABLE","purity":0.0,"totalAmount":0.0,"availableAmount":0.0,"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/116"},"data":{"type":"user","id":"116"}},"createdAt":"2022-08-17T09:33:00.708872Z","updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/116"},"data":{"type":"user","id":"116"}},"updatedAt":"2022-08-17T09:33:00.708872Z"}],"ancestors":[{"id":"e13620f4-4933-4275-83cc-3194a4be6607","name":"Grid96Well_Test"},{"id":"ad191ee4-c44d-4633-84cb-c0c1e07ca790","name":"CrazyRoom"},{"id":"2af549e1-e596-44d9-b800-a63e258a58e0","name":"R301.S1"},{"id":"a22a9c6b-3398-4d3f-b0e5-f15c35748760","name":"R301"}],"unit":"g","amount":2,"displayAmount":"2 g","createdAt":"2022-08-17T09:33:00.707965Z","updatedAt":"2022-08-17T09:33:00.707965Z","fields":[{"id":"b50d782a-8247-4adb-8dc9-9ea69aff987e","definition":{"key":"b50d782a-8247-4adb-8dc9-9ea69aff987e","title":"Inventory Security","type":"attributeList","attributeListEid":"attribute:18","isUserDefined":false,"isRequired":true},"content":{"isRawValue":false,"user":"Default"}},{"id":"PE_INV_SYSTEM_Responsible_Person","definition":{"key":"PE_INV_SYSTEM_Responsible_Person","title":"Responsible Person","type":"user","isUserDefined":false,"isRequired":false},"content":{"isRawValue":false,"user":"116","value":{"userId":"116","userName":"user.two@someplace.invalid","alias":"USR2","email":"user.two@someplace.invalid","firstName":"TwoFirst","lastName":"TwoLast","picture":{}}}},{"id":"ec4cdb3f-06e6-4522-84d2-3eea6c82bc1d","definition":{"key":"ec4cdb3f-06e6-4522-84d2-3eea6c82bc1d","title":"Inventory Material Type","type":"list","options":["Chemical Compound","Primer","Cell Line","Macroscopic Biology"],"multiSelect":false,"hidden":false},"content":{"isRawValue":false,"user":"Chemical Compound"}}],"digest":"cd89570f-9146-425c-be5d-14a1f49c582c"},"relationships":{"createdBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/116"},"data":{"type":"user","id":"116"}},"updatedBy":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/116"},"data":{"type":"user","id":"116"}}}},"included":[{"type":"user","id":"116","links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/116"},"attributes":{"userId":"116","userName":"user.two@someplace.invalid","alias":"USR2","email":"user.two@someplace.invalid","firstName":"TwoFirst","lastName":"TwoLast","country":"Germany","organization":"trialorg"},"relationships":{"systemGroups":{"links":{"self":"https://endpoint.somewhere.invalid/api/rest/v1.0/users/116/systemGroups"}}}}]}
+{
+  "links": {
+    "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/containers/ef16c7af-a763-49f2-b218-294ac02fc224"
+  },
+  "data": {
+    "type": "inventoryContainer",
+    "id": "ef16c7af-a763-49f2-b218-294ac02fc224",
+    "links": {
+      "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/inventory/containers/ef16c7af-a763-49f2-b218-294ac02fc224"
+    },
+    "attributes": {
+      "id": "ef16c7af-a763-49f2-b218-294ac02fc224",
+      "name": "item00000021",
+      "typeId": "e3dcd097-02a0-4b32-abe1-8e8433974939",
+      "typeName": "Tube",
+      "location": { "id": "e13620f4-4933-4275-83cc-3194a4be6607" },
+      "status": "AVAILABLE",
+      "state": "PRESENT",
+      "totalCapacity": 1000000,
+      "availableCapacity": 999998,
+      "safetyInfo": "NONE",
+      "barcode": "0000000026",
+      "owner": { "picture": {} },
+      "coordinateX": 3,
+      "coordinateY": 0,
+      "contents": [
+        {
+          "entityId": "batch:62d96bee0eb1120f699bcb07",
+          "entityType": "batch",
+          "status": "AVAILABLE",
+          "purity": 0.0,
+          "totalAmount": 0.0,
+          "availableAmount": 0.0,
+          "createdBy": {
+            "links": {
+              "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/116"
+            },
+            "data": { "type": "user", "id": "116" }
+          },
+          "createdAt": "2022-08-17T09:33:00.708872Z",
+          "updatedBy": {
+            "links": {
+              "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/116"
+            },
+            "data": { "type": "user", "id": "116" }
+          },
+          "updatedAt": "2022-08-17T09:33:00.708872Z"
+        }
+      ],
+      "ancestors": [
+        {
+          "id": "e13620f4-4933-4275-83cc-3194a4be6607",
+          "name": "Grid96Well_Test"
+        },
+        { "id": "ad191ee4-c44d-4633-84cb-c0c1e07ca790", "name": "CrazyRoom" },
+        { "id": "2af549e1-e596-44d9-b800-a63e258a58e0", "name": "R301.S1" },
+        { "id": "a22a9c6b-3398-4d3f-b0e5-f15c35748760", "name": "R301" }
+      ],
+      "unit": "g",
+      "amount": 2,
+      "displayAmount": "2 g",
+      "createdAt": "2022-08-17T09:33:00.707965Z",
+      "updatedAt": "2022-08-17T09:33:00.707965Z",
+      "fields": [
+        {
+          "id": "b50d782a-8247-4adb-8dc9-9ea69aff987e",
+          "definition": {
+            "key": "b50d782a-8247-4adb-8dc9-9ea69aff987e",
+            "title": "Inventory Security",
+            "type": "attributeList",
+            "attributeListEid": "attribute:18",
+            "isUserDefined": false,
+            "isRequired": true
+          },
+          "content": { "isRawValue": false, "user": "Default" }
+        },
+        {
+          "id": "PE_INV_SYSTEM_Responsible_Person",
+          "definition": {
+            "key": "PE_INV_SYSTEM_Responsible_Person",
+            "title": "Responsible Person",
+            "type": "user",
+            "isUserDefined": false,
+            "isRequired": false
+          },
+          "content": {
+            "isRawValue": false,
+            "user": "116",
+            "value": {
+              "userId": "116",
+              "userName": "user.two@someplace.invalid",
+              "alias": "USR2",
+              "email": "user.two@someplace.invalid",
+              "firstName": "TwoFirst",
+              "lastName": "TwoLast",
+              "picture": {}
+            }
+          }
+        },
+        {
+          "id": "ec4cdb3f-06e6-4522-84d2-3eea6c82bc1d",
+          "definition": {
+            "key": "ec4cdb3f-06e6-4522-84d2-3eea6c82bc1d",
+            "title": "Inventory Material Type",
+            "type": "list",
+            "options": [
+              "Chemical Compound",
+              "Primer",
+              "Cell Line",
+              "Macroscopic Biology"
+            ],
+            "multiSelect": false,
+            "hidden": false
+          },
+          "content": { "isRawValue": false, "user": "Chemical Compound" }
+        }
+      ],
+      "digest": "cd89570f-9146-425c-be5d-14a1f49c582c"
+    },
+    "relationships": {
+      "createdBy": {
+        "links": {
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/116"
+        },
+        "data": { "type": "user", "id": "116" }
+      },
+      "updatedBy": {
+        "links": {
+          "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/116"
+        },
+        "data": { "type": "user", "id": "116" }
+      }
+    }
+  },
+  "included": [
+    {
+      "type": "user",
+      "id": "116",
+      "links": {
+        "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/116"
+      },
+      "attributes": {
+        "userId": "116",
+        "userName": "user.two@someplace.invalid",
+        "alias": "USR2",
+        "email": "user.two@someplace.invalid",
+        "firstName": "TwoFirst",
+        "lastName": "TwoLast",
+        "country": "Germany",
+        "organization": "trialorg"
+      },
+      "relationships": {
+        "systemGroups": {
+          "links": {
+            "self": "https://endpoint.somewhere.invalid/api/rest/v1.0/users/116/systemGroups"
+          }
+        }
+      }
+    }
+  ]
+}

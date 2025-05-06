@@ -87,9 +87,7 @@ public abstract class ContainerManagerTest {
     @BeforeAll
     public void testSetup() {
         dynEnumManager.allowEnumDiscovery();
-        TestBase.prepareRestClients(mockRestClient,
-                TEST_KEY_1,
-                getClass().getResourceAsStream(TEST_RESOURCE_1));
+        TestBase.prepareRestClients(mockRestClient, TEST_KEY_1, getClass().getResourceAsStream(TEST_RESOURCE_1));
 
         User user = new User();
         user.setEnabled(true);
@@ -115,7 +113,7 @@ public abstract class ContainerManagerTest {
         loc.setUpdatedAt(new Date(1200000000));
         loc.setUpdatedBy(new UserReference(TEST_USER2_ID));
         loc.getFieldValues().forEach(fieldValue -> fieldValue.setEntityId(TEST_LOCATION_ID));
-        locationManager.save(loc);
+        locationManager.saveL(loc);
 
         SignalsEntityDTO dto = new SignalsEntityDTO();
         dto.setId(TEST_CONTAINER_ID);

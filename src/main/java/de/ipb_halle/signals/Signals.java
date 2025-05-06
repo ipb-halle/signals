@@ -127,7 +127,7 @@ public class Signals {
     }
 
     // @PostConstruct annotation did not work
-    private void postConstruct() {
+    protected void postConstruct() {
         runtimeConfig = new RuntimeConfig();
         accessConfig = new AccessConfig(signalsConfig, runtimeConfig, accessManager);
         inventoryConfig = new InventoryConfig(signalsConfig, runtimeConfig, inventoryManager);

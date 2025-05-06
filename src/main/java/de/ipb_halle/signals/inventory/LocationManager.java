@@ -143,12 +143,8 @@ public class LocationManager {
         locationProcessorBean.processSingleLocation(locationId);
     }
 
-    public void save(LocationEntity loc) {
-        locationDbService.save(loc);
-    }
-
-    public void save(Location loc) {
-        locationDbService.save(loc);
+    public void saveL(Location loc) {
+        locationDbService.saveLocation(loc);
     }
 
     public ILocation loadById(String id, boolean augment) {
