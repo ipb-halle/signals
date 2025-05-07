@@ -281,31 +281,4 @@ public class LocationEntity implements ILocation {
         return this;
 
     }
-
-
-    @Override
-    public String toString() {
-        return "LocationEntity{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", barcode='" + barcode + '\'' +
-                ", grid=" + grid +
-                ", rows=" + rows +
-                ", columns=" + columns +
-                ", createdAt=" + createdAt +
-                ", createdBy='" + createdBy + '\'' +
-                ", typeId='" + typeId + '\'' +
-                ", typeName='" + typeName + '\'' +
-                ", ancestorId='" + ancestorId + '\'' +
-                ", ancestorName='" + ancestorName + '\'' +
-                ", updatedAt=" + updatedAt +
-                ", updatedBy='" + updatedBy + '\'' +
-                ", type=" + type +
-                ", ancestor=" + ancestor +
-                ", fieldValues=" + fieldValues +
-                '}';
-    }
-
-
 }

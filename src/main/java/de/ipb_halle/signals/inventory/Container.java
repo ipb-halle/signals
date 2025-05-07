@@ -65,13 +65,13 @@ public class Container {
     private Set<IMaterial> materials;
     private Set<Sample> samples;
 
-    public String dump() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format("Container(%s): name=%s barcode=%s\n", id, name, barcode));
-        sb.append(String.format("  createdBy='%s', updatedBy='%s'\n", createdBy.dump(), updatedBy.dump()));
-        sb.append(String.format("  amount=%f, location='%s'\n", amount, location.dump()));
-        return sb.toString();
-    }
+//    public String dump() {
+//        StringBuilder sb = new StringBuilder();
+//        sb.append(String.format("Container(%s): name=%s barcode=%s\n", id, name, barcode));
+//        sb.append(String.format("  createdBy='%s', updatedBy='%s'\n", createdBy.dump(), updatedBy.dump()));
+//        sb.append(String.format("  amount=%f, location='%s'\n", amount, location.dump()));
+//        return sb.toString();
+//    }
 
     /**
      * default constructor
@@ -326,5 +326,15 @@ public class Container {
 
     public void addSamples(Sample sample) {
         samples.add(sample);
+    }
+
+    @Override
+    public String toString() {
+        return "Container{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", barcode='" + barcode + '\'' +
+                ", amount=" + amount +
+                '}';
     }
 }

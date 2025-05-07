@@ -240,7 +240,7 @@ public class LocationRestService implements RestReplyParser<Location> {
         return ancestor;
     }
 
-    private JsonElement prepareFields(Location location) {
+     JsonElement prepareFields(Location location) {
         JsonArray fields = new JsonArray();
         for (FieldValue fieldValue : location.getFieldValues()) {
             if (fieldValue.getField().getRequired()
@@ -252,7 +252,7 @@ public class LocationRestService implements RestReplyParser<Location> {
         return fields;
     }
 
-    private JsonElement prepareFieldValue(FieldValue fieldValue) {
+     JsonElement prepareFieldValue(FieldValue fieldValue) {
         JsonObject field = new JsonObject();
         field.addProperty(RestHelper.ATTR_ID, fieldValue.getFieldId().split(":")[0]);
         JsonObject content = new JsonObject();

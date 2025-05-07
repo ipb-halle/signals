@@ -35,6 +35,9 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Date;
+import java.util.HashSet;
+
+import static org.mockito.Mockito.*;
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -82,8 +85,6 @@ public abstract class LocationManagerTest {
 
     @BeforeAll
     public void testSetup() {
-
-
         dynEnumManager.allowEnumDiscovery();
         TestBase.prepareRestClients(mockRestClient,
                 TEST_KEY_1,

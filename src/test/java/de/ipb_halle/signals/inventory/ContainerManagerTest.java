@@ -24,7 +24,10 @@ import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.entity.SignalsEntityDbService;
+import de.ipb_halle.signals.materials.Material;
+import de.ipb_halle.signals.materials.MaterialReference;
 import de.ipb_halle.signals.rest.MockRestClient;
+import de.ipb_halle.signals.sample.Sample;
 import de.ipb_halle.signals.users.*;
 import de.ipb_halle.tda.DeploymentElement;
 import jakarta.inject.Inject;
@@ -35,6 +38,10 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Date;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(PostgresqlContainerExtension.class)
@@ -135,13 +142,106 @@ public abstract class ContainerManagerTest {
         String containerId = ct.getId();
         ct.getFieldValues().forEach(fieldValue -> fieldValue.setEntityId(containerId));
         manager.saveContainer(ct);
-        Assertions.assertEquals(TEST_CONTAINER_NAME, ct.getName(), "Container name mismatch");
+        assertEquals(TEST_CONTAINER_NAME, ct.getName(), "Container name mismatch");
 
         ct = manager.getContainer(TEST_CONTAINER_ID, true);
-        Assertions.assertEquals(TEST_CONTAINER_BARCODE, ct.getBarcode(), "Container barcode mismatch");
-        Assertions.assertEquals(TEST_USER1_ID, ct.getCreatedBy().getId(), "Created by Id matches");
-        Assertions.assertEquals(TEST_USER1_FIRST, ((User) ct.getCreatedBy()).getFirstName(), "Created by first name matches");
-        Assertions.assertEquals(TEST_LOCATION_NAME, ((LocationEntity) ct.getLocation()).getName(), "Location name matches");
-        Assertions.assertEquals(TEST_USER2_ID, ((LocationEntity) ct.getLocation()).getUpdatedBy(), "Location updated by matches");
+        assertEquals(TEST_CONTAINER_BARCODE, ct.getBarcode(), "Container barcode mismatch");
+        assertEquals(TEST_USER1_ID, ct.getCreatedBy().getId(), "Created by Id matches");
+        assertEquals(TEST_USER1_FIRST, ((User) ct.getCreatedBy()).getFirstName(), "Created by first name matches");
+        assertEquals(TEST_LOCATION_NAME, ((LocationEntity) ct.getLocation()).getName(), "Location name matches");
+        assertEquals(TEST_USER2_ID, ((LocationEntity) ct.getLocation()).getUpdatedBy(), "Location updated by matches");
     }
+
+    @Test
+    public void testAddMaterialAndSamples() {
+        Container container = new Container();
+        Sample sample = new Sample();
+        sample.setId("testSample");
+        container.addSamples(sample);
+        Material material = new Material();
+        material.setId("material1");
+        container.addMaterial(material);
+
+        assertTrue(
+                container.getSamples().stream().anyMatch(s -> s instanceof Sample && "testSample".equals(((Sample) s).getId()))
+        );
+        assertTrue(
+                container.getMaterials().stream().anyMatch(m -> m instanceof Material && "material1".equals(((Material) m).getId()))
+        );
+    }
+    @Test
+    public void testSettersAndGetters() {
+        Container container = new Container();
+        container.setAmount(12.5);
+        container.setCoordinateX(5);
+        container.setCoordinateY(10);
+
+        ContainerType type = new ContainerType();
+        type.setName("Rack");
+        container.setContainerType(type);
+
+        Material m1 = new Material();
+        m1.setId("m1");
+        Material m2 = new Material();
+        m2.setId("m2");
+
+        Sample s1 = new Sample();
+        s1.setId("s1");
+        Sample s2 = new Sample();
+        s2.setId("s2");
+
+        container.setMaterials(Set.of(m1, m2));
+        container.setSamples(Set.of(s1, s2));
+
+        assertEquals(12.5, container.getAmount());
+        assertEquals(5, container.getCoordinateX());
+        assertEquals(10, container.getCoordinateY());
+        assertEquals("Rack", container.getContainerType().getName());
+
+        Set<String> materialIds = container.getMaterials().stream()
+                .filter(m -> m instanceof Material)
+                .map(m -> ((Material) m).getId())
+                .collect(Collectors.toSet());
+
+        Set<String> sampleIds = container.getSamples().stream()
+                .filter(s -> s instanceof Sample)
+                .map(s -> ((Sample) s).getId())
+                .collect(Collectors.toSet());
+
+        assertTrue(materialIds.containsAll(Set.of("m1", "m2")));
+        assertTrue(sampleIds.containsAll(Set.of("s1", "s2")));
+    }
+
+
+
+    @Test
+    public void testDigestAndTimestamps() {
+        Container container = new Container();
+        container.setDigest("someDigest");
+        container.setCreatedAt(new Date());
+        container.setUpdatedAt(new Date());
+
+        assertEquals("someDigest", container.getDigest());
+        assertNotNull(container.getCreatedAt());
+        assertNotNull(container.getUpdatedAt());
+    }
+
+
+    @Test
+    public void testToString() {
+        Container container = new Container();
+        container.setId("container:xyz");
+        container.setName("myContainer");
+        container.setBarcode("000001");
+        container.setAmount(42.0);
+
+        String result = container.toString();
+
+        assertTrue(result.contains("container:xyz"));
+        assertTrue(result.contains("myContainer"));
+        assertTrue(result.contains("000001"));
+        assertTrue(result.contains("42.0"));
+    }
+
+
 }

@@ -167,7 +167,6 @@ public class ContainerRestServiceTest {
         JsonObject container = new JsonObject();
         JsonObject attributes = new JsonObject();
 
-        // Inhalt hinzufügen
         attributes.add(ContainerEntity.ATTR_CONTENTS, containerContents);
         attributes.addProperty(RestHelper.ATTR_NAME, "TestContainer");
 
