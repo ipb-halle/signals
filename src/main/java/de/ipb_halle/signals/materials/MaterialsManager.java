@@ -103,14 +103,14 @@ public class MaterialsManager {
      *     {@link #processMaterialsSequentially(List, Map)}.</li>
      * </ul>
      *
-     * @param dateRange     an array with one or two date elements:
-     *                      <ul>
-     *                          <li><b>[0]</b> start date (required)</li>
-     *                          <li><b>[1]</b> optional end date</li>
-     *                      </ul>
+     * @param dateRange an array with one or two date elements:
+     *                  <ul>
+     *                      <li><b>[0]</b> start date (required)</li>
+     *                      <li><b>[1]</b> optional end date</li>
+     *                  </ul>
      */
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
-    public void manageMaterials( Date[] dateRange) {
+    public void manageMaterials(Date[] dateRange) {
         logger.debug("MM:-> START MANAGE MATERIALS");
 
         // 1) Query parameters for load
@@ -153,8 +153,6 @@ public class MaterialsManager {
         // 3) Build the nested map
         Map<String, Map<String, Field>> fieldMap = new HashMap<>();
         for (Field field : allFields) {
-            //removing prefix assetType-> definingEntityId='assetType:6329671b759ae07953c8117b',
-            //String libraryId = field.getDefiningEntityId().split(":")[1];
             String libraryId = field.getDefiningEntityId();
             fieldMap.putIfAbsent(libraryId, new HashMap<>());
             fieldMap.get(libraryId).put(field.getId(), field);
@@ -192,12 +190,33 @@ public class MaterialsManager {
     private void processMaterialsSequentially(List<SignalsEntityDTO> materials,
                                               Map<String, Map<String, Field>> allFields) {
         int count = 0;
-        for (SignalsEntityDTO dto : materials) {
-            materialProcessorBean.processSingleMaterial(dto, allFields);
+
+        List<SignalsEntityDTO> assets = new ArrayList<>();
+        List<SignalsEntityDTO> batches = new ArrayList<>();
+
+        for (SignalsEntityDTO m : materials) {
+            if (m.getId().startsWith(Material.MATERIAL_ASSET_PREFIX)) {
+                assets.add(m);
+            } else if (m.getId().startsWith(Material.MATERIAL_BATCH_PREFIX)) {
+                batches.add(m);
+            } else {
+                throw new IllegalArgumentException("MaterialsManager-> Unknown material ID prefix: " + m.getId());
+            }
             count++;
             if (count % 500 == 0) {
                 System.out.printf("%d materials are proceeded.\n", count);
             }
+        }
+        logger.info("Processing {} assets...", assets.size());
+        for (SignalsEntityDTO asset : assets) {
+            logger.debug("Processing asset {}", asset.getId());
+            materialProcessorBean.processSingleMaterial(asset, allFields);
+        }
+
+        logger.info("Processing {} batches...", batches.size());
+        for (SignalsEntityDTO batch : batches) {
+            logger.debug("Processing batch {}", batch.getId());
+            materialProcessorBean.processSingleMaterial(batch, allFields);
         }
     }
 

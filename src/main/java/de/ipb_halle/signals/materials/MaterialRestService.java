@@ -120,7 +120,7 @@ public class MaterialRestService implements RestReplyParser<Material> {
      * @param material   the Material batch object
      */
     private void parseMaterialId(JsonObject attributes, Material material) {
-        material.setMaterial(new MaterialReference()
+        material.setParentMaterial(new MaterialReference()
                 .setId(Material.MATERIAL_ASSET_PREFIX + RestHelper.parseString(attributes, Material.ATTR_ASSET_ID)));
     }
 
@@ -178,10 +178,22 @@ public class MaterialRestService implements RestReplyParser<Material> {
 
         //ToDO the method is almost not in use and only for emergency case, if a new filed will be discovered
         if (field == null) {
-            logger.trace("MRS:-> FIELD IS NULL !!!!! \n");
-            //receiving a file information from material attachment->
-            fieldValue.setField(parseFieldDefinition(metaFieldJsonObject));
+            logger.warn("MRS:-> FIELD IS NULL for fieldId={}", id);
+            field = parseFieldDefinition(metaFieldJsonObject);
+
+            if (field == null) {
+                // fallback stub
+                field = new Field();
+                field.setId(id);
+                field.setTitle(name);
+                field.setFieldType((FieldType) dynEnumManager.valueOf(FieldType.valueOf(FieldType.TEXT)));
+                field.setRequired(false);
+                field.setCalculated(false);
+                field.setReadOnly(false);
+                field.setDefinedBy("AUTO-STUB");
+            }
         }
+        fieldValue.setField(field);
 
         return fieldValue;
     }
@@ -315,16 +327,16 @@ public class MaterialRestService implements RestReplyParser<Material> {
     }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public Material doCreateMaterial(Library lib, Material mat, Material batch) {
+    public Material doCreateMaterial(Library lib, Material asset, Material batch) {
         JsonObject request;
         String endpoint;
 
-        if (mat.getEntityType().equals(EntityType.valueOf(Material.ENTITY_TYPE_ASSET))) {
+        if (asset.getEntityType().equals(EntityType.valueOf(Material.ENTITY_TYPE_ASSET))) {
             endpoint = String.format(ASSET_CREATE_ENDPOINT, lib.getName());
-            request = prepareAsset(lib, mat, batch);
+            request = prepareAsset(lib, asset, batch);
         } else {
-            endpoint = String.format(BATCH_CREATE_ENDPOINT, lib.getName(), mat.getMaterial().getId());
-            request = prepareBatch(lib, mat);
+            endpoint = String.format(BATCH_CREATE_ENDPOINT, lib.getName(), batch.getParentMaterial().getId());
+            request = prepareBatch(lib, batch);
         }
         try {
             restClient.reset()
@@ -347,47 +359,42 @@ public class MaterialRestService implements RestReplyParser<Material> {
         return null;
     }
 
-    private JsonObject prepareAsset(Library lib, Material mat, Material batch) {
-
+    private JsonObject prepareAsset(Library lib, Material asset, Material batch) {
         JsonObject attr = new JsonObject();
-        attr.add(Material.ATTR_SYNONYMS, prepareSynonyms(mat));
-        attr.add(RestHelper.ATTR_FIELDS, prepareFields(mat));
-        if (batch == null) {
-            attr.add(RestHelper.ATTR_RELATIONSHIPS, new JsonObject());
-        } else {
-            /*
-             * batch is mandatory, if library is configured with batches (lots):
-             * "relationships": {
-             *      "batch": {
-             *              "data":{
-             *                      "type":"batch",
-             *                      "id":"bc824377-682d-4bbd-bce5-c090e3b55f12",
-             *                      "attributes": {
-             *                              "fields": [
-             *                                      {
-             *                                              "id":"6215104dab0ad27bf7942a57",
-             *                                              "value":"123456789"
-             *                                      }
-             *                              ]
-             *                      }
-             *              }
-             *      }
-             *  }
-             */
-            JsonObject jsonBatch = new JsonObject();
-            jsonBatch.add(Material.ATTR_BATCH, prepareBatch(lib, batch));
-            attr.add(RestHelper.ATTR_RELATIONSHIPS, jsonBatch);
-        }
 
+        //Synonyms
+        attr.add(Material.ATTR_SYNONYMS, prepareSynonyms(asset));
+
+        // Fields
+        JsonArray fieldArray = prepareFields(asset);
+        attr.add(RestHelper.ATTR_FIELDS, fieldArray);
+
+        // Basic Json structure
         JsonObject data = new JsonObject();
-        //data.addProperty(RestHelper.ATTR_ID, mat.getStrippedId());
-        data.addProperty(RestHelper.ATTR_ID, mat.getName());
-        data.addProperty(RestHelper.ATTR_TYPE, mat.getEntityType().getValue());
+
+        // Signals allows null -> if ID ist not given, it will be generated automatically
+        if (asset.getStrippedId() != null) {
+            data.addProperty(RestHelper.ATTR_ID, asset.getStrippedId());
+        }
+        data.addProperty(RestHelper.ATTR_TYPE, asset.getEntityType().getValue());
         data.add(RestHelper.ATTR_ATTRIBUTES, attr);
 
-        JsonObject asset = new JsonObject();
-        asset.add(RestHelper.ATTR_DATA, data);
-        return asset;
+        // Add batch to relationships if batch is present
+        if (batch != null) {
+            JsonObject relationships = new JsonObject();
+            relationships.add(Material.ATTR_BATCH, prepareBatch(lib, batch));
+            attr.add(RestHelper.ATTR_RELATIONSHIPS, relationships);
+        }
+
+        // Wrap data into root
+        JsonObject assetWrapper = new JsonObject();
+        assetWrapper.add(RestHelper.ATTR_DATA, data);
+
+        // for debugging
+        logger.info("Prepared JSON for asset creation:\n{}", assetWrapper.toString());
+
+
+        return assetWrapper;
     }
 
     private JsonObject prepareBatch(Library lib, Material mat) {
@@ -425,13 +432,32 @@ public class MaterialRestService implements RestReplyParser<Material> {
      * @param mat
      * @return array of required field values
      */
-    private JsonElement prepareFields(Material mat) {
+    private JsonArray prepareFields(Material mat) {
         JsonArray array = new JsonArray();
+
         for (FieldValue fieldValue : mat.getFieldValues()) {
+            String fieldId = fieldValue.getFieldId();
+
+            if (fieldId == null || fieldId.isEmpty()) {
+                logger.info("MRS:->Skipping FieldValue with missing fieldId");
+                continue;
+            }
+
+            if (fieldValue.getValue() == null || fieldValue.getValue().trim().isEmpty()) {
+                logger.info("Skipping field '{}' due to null or empty value", fieldId);
+            }
+
+            Field field = fieldValue.getField();
+            if (field == null) {
+                logger.warn("Skipping field '{}' because Field definition is NULL", fieldId);
+                continue;
+            }
+
             if (fieldValue.getField().getRequired()
                     || ((!fieldValue.getField().getCalculated())
                     && (!fieldValue.getField().getReadOnly()))) {
-                array.add(prepareFieldValue(fieldValue));
+                JsonObject fieldJson = prepareFieldValue(fieldValue);
+                array.add(fieldJson);
             }
         }
         return array;
@@ -444,7 +470,7 @@ public class MaterialRestService implements RestReplyParser<Material> {
      * @return JsonObject ready representing this field value formatted for
      * transmission to the REST endpoint.
      */
-    private JsonElement prepareFieldValue(FieldValue fieldValue) {
+    private JsonObject prepareFieldValue(FieldValue fieldValue) {
         JsonObject obj = new JsonObject();
         obj.addProperty(RestHelper.ATTR_ID, fieldValue.getFieldId());
         /*
@@ -462,6 +488,7 @@ public class MaterialRestService implements RestReplyParser<Material> {
                 Attachment attachment = fieldValue.getAttachment();
                 AttachmentRevision revision = attachment.getLatestRevision();
                 String fileAsString = storageService.getFileAsString(attachment.getFiles(revision.getId()));
+                logger.info("MRS-> ATTACHMENT fileAsString==============================> {}\n", fileAsString);
                 obj.addProperty(RestHelper.ATTR_VALUE, fileAsString);
                 break;
             default:

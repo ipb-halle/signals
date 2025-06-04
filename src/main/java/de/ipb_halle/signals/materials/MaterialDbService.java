@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 @Stateless
-@PersistenceElements(entities={MaterialEntity.class })
+@PersistenceElements(entities = {MaterialEntity.class})
 public class MaterialDbService {
 
     public final static String ENTITY_ID = "id";
@@ -93,7 +93,8 @@ public class MaterialDbService {
             loadSynonyms(mat, id);
         }
         if (entity.getMaterialId() != null) {
-            mat.setMaterial(loadById(entity.getMaterialId()));
+            Material material = loadById(entity.getMaterialId());
+            mat.setParentMaterial(material);
         }
         return mat;
     }
@@ -114,6 +115,21 @@ public class MaterialDbService {
     }
 
     public void save(Material mat) {
+        String materialId = mat.getId();
+        String parentId = (mat.getParentMaterial() != null ? mat.getParentMaterial().getId() : null);
+
+        if (materialId.startsWith(Material.MATERIAL_ASSET_PREFIX)) {
+            if (parentId != null) {
+                throw new IllegalArgumentException("Asset '" + materialId + "' must not have parent");
+            }
+        } else if (materialId.startsWith("batch: ")) {
+            if (parentId == null) {
+                throw new IllegalArgumentException("Batch '" + materialId + "' must have a parent");
+            }
+            if (em.find(MaterialEntity.class, parentId) == null) {
+                throw new IllegalArgumentException("Parent asset '" + parentId + "' not found");
+            }
+        }
 
         MaterialEntity entity = mat.createEntity();
         this.em.merge(entity);

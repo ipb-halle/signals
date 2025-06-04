@@ -38,6 +38,7 @@ public class Material implements IMaterial, IObjectMetaData {
     public final static String ATTR_BATCH = "batch";
     public final static String ATTR_SYNONYMS = "synonyms";
     public static final String MATERIAL_ASSET_PREFIX = "asset:" ;
+    public static final String MATERIAL_BATCH_PREFIX = "batch:";
     private Logger logger = LoggerFactory.getLogger(MaterialRestService.class);
 
     public final static String ENTITY_TYPE_ASSET = "asset";
@@ -270,13 +271,18 @@ public class Material implements IMaterial, IObjectMetaData {
         this.entityType = entityType;
     }
 
-    public IMaterial getMaterial() {
+    public IMaterial getParentMaterial() {
         return material;
     }
 
-    public void setMaterial(IMaterial material) {
+    public void setParentMaterial(IMaterial material) {
         this.material = material;
     }
+
+    public String getMaterialId() {
+        return (this.material != null) ? this.material.getId() : null;
+    }
+
 
     @Override
     public boolean equals(Object object) {
