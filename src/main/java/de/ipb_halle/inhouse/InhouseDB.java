@@ -17,52 +17,23 @@
  */
 package de.ipb_halle.inhouse;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
-import de.ipb_halle.signals.DateRangeParser;
 import de.ipb_halle.signals.Signals;
-import de.ipb_halle.signals.materials.Library;
+import de.ipb_halle.signals.field.FieldDbService;
 import de.ipb_halle.signals.materials.LibraryDbService;
 import de.ipb_halle.signals.materials.MaterialRestService;
 import de.ipb_halle.signals.rest.RestHelper;
 import jakarta.ejb.Local;
 import jakarta.inject.Inject;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.MissingArgumentException;
-import org.apache.commons.cli.MissingOptionException;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.UnrecognizedOptionException;
+import org.apache.commons.cli.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-/*
-import de.ipb_halle.lbac.material.common.entity.MaterialEntity;
-import de.ipb_halle.lbac.material.common.entity.index.MaterialIndexEntryEntity;
-import de.ipb_halle.lbac.material.structure.MoleculeEntity;
-import de.ipb_halle.lbac.material.structure.StructureEntity;
-import de.ipb_halle.lbac.search.lang.EntityGraph;
-import de.ipb_halle.lbac.search.lang.SqlInsertBuilder;
-*/
-
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Migration tool for the InhouseDB
@@ -99,6 +70,8 @@ import java.util.Map;
 @Local
 public class InhouseDB {
 
+    private final Logger logger = LogManager.getLogger(InhouseDB.class);
+
     @Inject
     private InhouseDbService inhouseDbService;
 
@@ -107,6 +80,9 @@ public class InhouseDB {
 
     @Inject
     private MaterialRestService materialRestService;
+
+    @Inject
+    private FieldDbService fieldDbService;
 
     @SuppressWarnings("static-access")
     private static final Option inhouseOpt = Option.builder("inhouse")
@@ -138,19 +114,25 @@ public class InhouseDB {
         return materialRestService;
     }
 
+    public FieldDbService getFieldDbService() {
+        return fieldDbService;
+    }
+
     private void importData(String configFile) throws Exception {
         readConfig(configFile);
         Compounds compounds = new Compounds(this);
-        Experiments experiments = new Experiments(this);
-        Taxonomy taxonomy = new Taxonomy(this);
-        Correlation correlation = new Correlation(this);
-        Samples samples = new Samples(this);
+        logger.info("IMPORT OF COMPOUNDS IS DONE, STARTING IMPORT OF EXPERIMENTS");
+        //      Experiments experiments = new Experiments(this);
 
-//        compounds.importData(this);
-//        experiments.importData(this);
+//        Taxonomy taxonomy = new Taxonomy(this);
+//        Correlation correlation = new Correlation(this);
+//        Samples samples = new Samples(this);
+
+        compounds.importData();
+        //       experiments.importData();
 
 //        taxonomy.importData();
-          correlation.importData();
+//        correlation.importData();
 //        samples.importData();
     }
 
@@ -192,11 +174,12 @@ public class InhouseDB {
             String configFile = cmdline.getOptionValue(inhouseOpt.getOpt());
             try {
                 signals.getInhouseDB().importData(configFile);
-            } catch(Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
+
 
 
 }

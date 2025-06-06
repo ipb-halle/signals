@@ -64,7 +64,7 @@ public class InhouseTaxon {
     @Column
     private String parent;                  // parent material from signals
 
-    @Column
+    @Column(name = "taxonomy_level")
     private String level;
 
     @Column

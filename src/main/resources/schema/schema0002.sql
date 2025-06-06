@@ -306,7 +306,7 @@ CREATE TABLE materials (
     name VARCHAR,
     owner VARCHAR /* NOT NULL REFERENCES users(id) */,
     entity_type INTEGER NOT NULL REFERENCES dyn_enums(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    material_id VARCHAR REFERENCES materials(id) ON UPDATE CASCADE ON DELETE CASCADE
+    material_id VARCHAR  REFERENCES materials(id)  ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE containers (
@@ -415,4 +415,82 @@ CREATE TABLE experiment_property_values (
     property_id VARCHAR NOT NULL REFERENCES experiment_properties(property_id) ON DELETE CASCADE,
     property_value VARCHAR,
     PRIMARY KEY (experiment_id, property_id)
+);
+
+CREATE TABLE inhouse_compounds(
+    id SERIAL PRIMARY KEY,
+    eid VARCHAR,
+    mol_id INTEGER,
+    casrn VARCHAR,
+    remarks TEXT,
+    ipb_code VARCHAR,
+    name VARCHAR
+);
+
+CREATE TABLE inhouse_container (
+    id SERIAL PRIMARY KEY,
+    eid VARCHAR,
+    sample_id INTEGER,
+    amount DOUBLE PRECISION,
+    tara DOUBLE PRECISION,
+    volume DOUBLE PRECISION,
+    concentration DOUBLE PRECISION,
+    sample_code VARCHAR,
+    purity INTEGER,
+    appearance VARCHAR,
+    remarks VARCHAR,
+    ipb_code VARCHAR,
+    last_solvent VARCHAR,
+    compound_correlation_id INTEGER,
+    organism_correlation_id INTEGER,
+    location VARCHAR,
+    location_id INTEGER,
+    row INTEGER,
+    container_column INTEGER
+);
+
+CREATE TABLE inhouse_correlation (
+    id SERIAL PRIMARY KEY,
+    context VARCHAR,
+    mol_id INTEGER,
+    procedure_id INTEGER,
+    organism_id INTEGER
+);
+
+CREATE TABLE inhouse_experiments (
+    id SERIAL PRIMARY KEY,
+    eid VARCHAR,
+    threelc VARCHAR,
+    code VARCHAR,
+    journal VARCHAR,
+    proc_id INTEGER,
+    remarks VARCHAR
+);
+
+CREATE TABLE inhouse_locations(
+    id SERIAL PRIMARY KEY,
+    eid VARCHAR,
+    name VARCHAR,
+    location_columns INTEGER,
+    location_rows INTEGER,
+    zero_based BOOLEAN
+);
+
+CREATE TABLE inhouse_synonyms(
+    id SERIAL PRIMARY KEY,
+    inhouse_id INTEGER,
+    type VARCHAR,
+    synonym VARCHAR
+);
+
+CREATE TABLE inhouse_taxonomy (
+    id SERIAL PRIMARY KEY,
+    eid VARCHAR,
+    inhouse_id INTEGER,
+    inhouse_parent_id INTEGER,
+    organism_id INTEGER,
+    parent VARCHAR,
+    taxonomy_level VARCHAR,
+    name VARCHAR
+
 );

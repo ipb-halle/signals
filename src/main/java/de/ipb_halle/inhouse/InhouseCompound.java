@@ -19,28 +19,15 @@
 
 package de.ipb_halle.inhouse;
 
-import de.ipb_halle.signals.entity.EntityType;
-import de.ipb_halle.signals.field.FieldValue;
-import de.ipb_halle.signals.materials.Material;
 import de.ipb_halle.signals.materials.Synonym;
-import de.ipb_halle.signals.users.UserReference;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name="inhouse_compounds")
+@Table(name = "inhouse_compounds")
 public class InhouseCompound {
 
     @Id
@@ -52,91 +39,27 @@ public class InhouseCompound {
 
     @Column(name = "mol_id")
     private Integer molId;
+
     @Column
     private String casrn;
+
     @Column
     private String remarks;
+
     @Column(name = "ipb_code")
     private String ipbCode;
+
     @Column
     private String name;
 
     private transient Set<Synonym> synonyms;
 
-
     public InhouseCompound() {
         synonyms = new HashSet<>();
     }
 
-    public Material createAsset(InhouseDB inhouseDB) throws IOException {
-        Material mat = new Material();
-        mat.setCreatedBy(new UserReference(inhouseDB.getConfigString(Compounds.COMPOUNDS_OWNER)));
-        mat.setDescription(remarks);
-        mat.setEntityType(EntityType.valueOf(Material.ENTITY_TYPE_ASSET));
-        mat.setLibraryId(inhouseDB.getConfigString(Compounds.COMPOUNDS_LIBRARY_ID));
-        mat.setOwner(new UserReference(inhouseDB.getConfigString(Compounds.COMPOUNDS_OWNER)));
-        mat.addAllSynonyms(synonyms);
-        createAssetFields(inhouseDB, mat);
-        addChemicalDrawing(inhouseDB, mat);
-        return mat;
-    }
-
-    public Material createBatch(InhouseDB inhouseDB) {
-        Material mat = new Material();
-        mat.setEntityType(EntityType.valueOf(Material.ENTITY_TYPE_BATCH));
-        createBatchFields(inhouseDB, mat);
-        return mat;
-    }
-
-    private void addChemicalDrawing(InhouseDB inhouseDB, Material mat) throws IOException {
-        FieldValue drawing = new FieldValue();
-        drawing.setFieldId(inhouseDB.getConfigString(Compounds.COMPOUNDS_FIELD_CHEMICAL_DRAWING));
-        drawing.setValue(Files.readString(Path.of(
-                String.format(inhouseDB.getConfigString(Compounds.COMPOUNDS_CHEMICAL_DRAWING), molId)
-                ), StandardCharsets.UTF_8));
-        mat.addFieldValue(drawing);
-    }
-
-    private void createAssetFields(InhouseDB inhouseDB, Material mat) {
-        if ((casrn != null) && (! casrn.isEmpty())) {
-            FieldValue fvCasrn = new FieldValue();
-            fvCasrn.setFieldId(inhouseDB.getConfigString(Compounds.COMPOUNDS_FIELD_CASRN));
-            fvCasrn.setValue(casrn);
-            mat.addFieldValue(fvCasrn);
-        }
-
-        if ((ipbCode != null) && (! ipbCode.isEmpty())) {
-            FieldValue fvIpbCode = new FieldValue();
-            fvIpbCode.setFieldId(inhouseDB.getConfigString(Compounds.COMPOUNDS_FIELD_IPBCODE));
-            fvIpbCode.setValue(ipbCode);
-            mat.addFieldValue(fvIpbCode);
-        }
-
-        FieldValue fvMolId = new FieldValue();
-        fvMolId.setFieldId(inhouseDB.getConfigString(Compounds.COMPOUNDS_FIELD_MOLID));
-        fvMolId.setValue(Integer.toString(molId));
-        mat.addFieldValue(fvMolId);
-
-        FieldValue fvAccess = new FieldValue();
-        fvAccess.setFieldId(inhouseDB.getConfigString(Compounds.COMPOUNDS_FIELD_ACCESS));
-        fvAccess.setValue(inhouseDB.getConfigString(Compounds.COMPOUNDS_ACCESS));
-        mat.addFieldValue(fvAccess);
-
-        FieldValue fvName = new FieldValue();
-        fvName.setFieldId(inhouseDB.getConfigString(Compounds.COMPOUNDS_FIELD_ASSET_NAME));
-        fvName.setValue(name);
-        mat.addFieldValue(fvName);
-    }
-
-    private void createBatchFields(InhouseDB inhouseDB, Material mat) {
-        FieldValue fvName = new FieldValue();
-        fvName.setFieldId(inhouseDB.getConfigString(Compounds.COMPOUNDS_FIELD_BATCH_NAME));
-        fvName.setValue(inhouseDB.getConfigString(Compounds.COMPOUNDS_BATCH_NAME));
-        mat.addFieldValue(fvName);
-    }
-
     public void addSynonyms(Collection<InhouseSynonym> synonyms) {
-        for(InhouseSynonym ics : synonyms) {
+        for (InhouseSynonym ics : synonyms) {
             this.synonyms.add(new Synonym("", ics.getSynonym()));
         }
     }
@@ -158,8 +81,9 @@ public class InhouseCompound {
         return id;
     }
 
-    public void setId(Integer id) {
+    public InhouseCompound setId(Integer id) {
         this.id = id;
+        return this;
     }
 
     public Integer getMolId() {
@@ -206,4 +130,6 @@ public class InhouseCompound {
         this.name = name;
         return this;
     }
+
+
 }

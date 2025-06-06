@@ -333,10 +333,10 @@ public class MaterialRestService implements RestReplyParser<Material> {
 
         if (asset.getEntityType().equals(EntityType.valueOf(Material.ENTITY_TYPE_ASSET))) {
             endpoint = String.format(ASSET_CREATE_ENDPOINT, lib.getName());
-            request = prepareAsset(lib, asset, batch);
+            request = prepareAsset(asset, batch);
         } else {
             endpoint = String.format(BATCH_CREATE_ENDPOINT, lib.getName(), batch.getParentMaterial().getId());
-            request = prepareBatch(lib, batch);
+            request = prepareBatch(batch);
         }
         try {
             restClient.reset()
@@ -346,7 +346,7 @@ public class MaterialRestService implements RestReplyParser<Material> {
                     .execute(RestClient.HTTP_CREATED);
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
-            Material result = parseReply(jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA));
+            Material result = parseReply(jsonResult);
             return result;
         } catch (UnexpectedResponseCodeException ue) {
             logger.warn("doCreateMaterial() got unexpected return code from API call: {}", request);
@@ -359,57 +359,52 @@ public class MaterialRestService implements RestReplyParser<Material> {
         return null;
     }
 
-    private JsonObject prepareAsset(Library lib, Material asset, Material batch) {
+    private JsonObject prepareAsset(Material asset, Material batch) {
+
+        // Dealing Attribute
         JsonObject attr = new JsonObject();
 
-        //Synonyms
+        // Add Synonyms to Attribute
         attr.add(Material.ATTR_SYNONYMS, prepareSynonyms(asset));
 
-        // Fields
+        // Add Fields to Attribute
         JsonArray fieldArray = prepareFields(asset);
         attr.add(RestHelper.ATTR_FIELDS, fieldArray);
 
-        // Basic Json structure
+        // Upper object data
         JsonObject data = new JsonObject();
 
-        // Signals allows null -> if ID ist not given, it will be generated automatically
-        if (asset.getStrippedId() != null) {
-            data.addProperty(RestHelper.ATTR_ID, asset.getStrippedId());
-        }
+        data.addProperty(RestHelper.ATTR_ID, asset.getId());
         data.addProperty(RestHelper.ATTR_TYPE, asset.getEntityType().getValue());
         data.add(RestHelper.ATTR_ATTRIBUTES, attr);
 
-        // Add batch to relationships if batch is present
+        // Optional dealing Relationships IF batch is present
         if (batch != null) {
             JsonObject relationships = new JsonObject();
-            relationships.add(Material.ATTR_BATCH, prepareBatch(lib, batch));
-            attr.add(RestHelper.ATTR_RELATIONSHIPS, relationships);
+            relationships.add(Material.ATTR_BATCH, prepareBatch(batch));
+            data.add(RestHelper.ATTR_RELATIONSHIPS, relationships);
         }
 
         // Wrap data into root
         JsonObject assetWrapper = new JsonObject();
         assetWrapper.add(RestHelper.ATTR_DATA, data);
 
-        // for debugging
-        logger.info("Prepared JSON for asset creation:\n{}", assetWrapper.toString());
-
-
         return assetWrapper;
     }
 
-    private JsonObject prepareBatch(Library lib, Material mat) {
+    private JsonObject prepareBatch(Material batch) {
 
         JsonObject attr = new JsonObject();
-        attr.add(RestHelper.ATTR_FIELDS, prepareFields(mat));
+        attr.add(RestHelper.ATTR_FIELDS, prepareFields(batch));
 
         JsonObject data = new JsonObject();
-        data.addProperty(RestHelper.ATTR_ID, mat.getStrippedId());
-        data.addProperty(RestHelper.ATTR_TYPE, mat.getEntityType().getValue());
+        data.addProperty(RestHelper.ATTR_ID, batch.getId());
+        data.addProperty(RestHelper.ATTR_TYPE, batch.getEntityType().getValue());
         data.add(RestHelper.ATTR_ATTRIBUTES, attr);
 
-        JsonObject batch = new JsonObject();
-        batch.add(RestHelper.ATTR_DATA, data);
-        return batch;
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.add(RestHelper.ATTR_DATA, data);
+        return jsonObject;
     }
 
     /**
@@ -456,7 +451,7 @@ public class MaterialRestService implements RestReplyParser<Material> {
             if (fieldValue.getField().getRequired()
                     || ((!fieldValue.getField().getCalculated())
                     && (!fieldValue.getField().getReadOnly()))) {
-                JsonObject fieldJson = prepareFieldValue(fieldValue);
+                JsonElement fieldJson = prepareFieldValue(fieldValue);
                 array.add(fieldJson);
             }
         }
@@ -473,32 +468,61 @@ public class MaterialRestService implements RestReplyParser<Material> {
     private JsonObject prepareFieldValue(FieldValue fieldValue) {
         JsonObject obj = new JsonObject();
         obj.addProperty(RestHelper.ATTR_ID, fieldValue.getFieldId());
-        /*
-         * ToDo: Handle Attachments including chemical drawings and
-         * sequences. Include the base64 encoded attachment file data.
-         */
+
+        //  Access library InhouseCompound
+        if (fieldValue.getFieldId().equalsIgnoreCase("684054eb8c750c1639c07969")) {
+            JsonArray array = new JsonArray();
+            array.add(fieldValue.getValue());
+            obj.add(RestHelper.ATTR_VALUE, array);
+            return obj;
+        }
+
+        // MASS field (Amount)  library InhouseCompound
+        if (fieldValue.getFieldId().equalsIgnoreCase("68400a843cf226635cc5649e")) {
+            JsonObject amount = new JsonObject();
+            amount.addProperty("rawValue", Double.parseDouble(fieldValue.getValue()));
+            amount.addProperty("displayValue", fieldValue.getValue() + " g");
+            amount.addProperty("unit", "g");
+            obj.add(RestHelper.ATTR_VALUE, amount);
+            return obj;
+        }
+
+        // PERCENTAGE field (Purity) library InhouseCompound
+        if (fieldValue.getFieldId().equalsIgnoreCase("68400a843cf226635cc564a0")) {
+            JsonObject purity = new JsonObject();
+            purity.addProperty("rawValue", Double.parseDouble(fieldValue.getValue()));
+            purity.addProperty("displayValue", fieldValue.getValue() + " %");
+            purity.addProperty("unit", "%");
+            obj.add(RestHelper.ATTR_VALUE, purity);
+            return obj;
+        }
+
+        // Special file handling
         switch (fieldValue.getField().getType().getValue().toUpperCase()) {
             case FieldType.ATTACHED_FILE:
             case FieldType.SEQUENCE_FILE:
                 obj.add(RestHelper.ATTR_VALUE, prepareAttachment(fieldValue));
-                // obj.add(RestHelper.ATTR_VALUE,
-                //        JsonParser.parseString("{\"filename\":\"hello.txt\", \"base64\":\"SGFsbG8gV2VsdCEK\"}"));
-                break;
+                return obj;
+
             case FieldType.CHEMICAL_DRAWING:
-                Attachment attachment = fieldValue.getAttachment();
-                AttachmentRevision revision = attachment.getLatestRevision();
-                String fileAsString = storageService.getFileAsString(attachment.getFiles(revision.getId()));
-                logger.info("MRS-> ATTACHMENT fileAsString==============================> {}\n", fileAsString);
+                String fileAsString = "";
+                if (fieldValue.getAttachment() != null) {
+                    Attachment attachment = fieldValue.getAttachment();
+                    AttachmentRevision revision = attachment.getLatestRevision();
+                    fileAsString = storageService.getFileAsString(attachment.getFiles(revision.getId()));
+                } else {
+                    fileAsString = fieldValue.getValue();
+                }
                 obj.addProperty(RestHelper.ATTR_VALUE, fileAsString);
-                break;
+                return obj;
+
             default:
-                // works, if fieldValue contains a simple String
-                // probably won't work if fieldValue contains array, number, measurement
-                // or otherwise complex value.
+                // Default: simple string field
                 obj.addProperty(RestHelper.ATTR_VALUE, fieldValue.getValue());
+                return obj;
         }
-        return obj;
     }
+
 
     /**
      * create a base64 representation of the attachment file

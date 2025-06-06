@@ -21,7 +21,10 @@
 package de.ipb_halle.signals.materials;
 
 
-import de.ipb_halle.signals.attachment.*;
+import de.ipb_halle.signals.attachment.Attachment;
+import de.ipb_halle.signals.attachment.AttachmentDbService;
+import de.ipb_halle.signals.attachment.AttachmentFile;
+import de.ipb_halle.signals.attachment.AttachmentRevision;
 import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldDbService;
@@ -105,6 +108,7 @@ public class MaterialProcessorBean {
         }
         processMaterialFields(fieldsByLibraryId, material);
 
+
         //3) Save materials in database
         materialDbService.save(material);
     }
@@ -127,6 +131,7 @@ public class MaterialProcessorBean {
                     || field.getType().getValue().equals(FieldType.SEQUENCE_FILE)) {
                 processAttachments(material, field, fieldValue);
             }
+
             material.addFieldValue(fieldValue);
         }
     }

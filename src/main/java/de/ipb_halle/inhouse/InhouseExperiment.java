@@ -38,7 +38,7 @@ public class InhouseExperiment {
     private Integer id;
 
     @Column
-    private String eid;     // we probably map multiple InhouseDB experiments to a single Signals Experiment
+    private String eid;
 
     @Column
     private String threelc;

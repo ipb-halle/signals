@@ -152,8 +152,9 @@ public class FieldValue {
                 ", fieldId='" + fieldId + '\'' +
                 ", fieldTitle='" + fieldTitle + '\'' +
                 ", value='" + value + '\'' +
-                ", linkType=" + linkType +'\'' +
-                ", adHocField=" + field+
+                ", linkType=" + linkType +
+                ", attachment=" + attachment +
+                ", field=" + field +
                 '}';
     }
 }

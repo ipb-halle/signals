@@ -17,6 +17,9 @@
  */
 package de.ipb_halle.inhouse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -37,6 +40,7 @@ public class Experiments {
 
     public final static String EXPERIMENTS_FILENAME = "experiments.filename";
     public final static String EXPERIMENTS_REJECTFILE = "experiments.rejectfile";
+    private final Logger logger = LogManager.getLogger(Experiments.class);
 
     private InhouseDB inhouseDB;
 

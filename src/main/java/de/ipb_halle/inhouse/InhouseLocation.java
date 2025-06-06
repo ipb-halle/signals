@@ -27,7 +27,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name="inhouse_locations")
+@Table(name = "inhouse_locations")
 public class InhouseLocation {
 
     @Id
@@ -40,13 +40,13 @@ public class InhouseLocation {
     @Column
     private String name;
 
-    @Column
+    @Column(name = "location_columns")
     private int columns;
 
-    @Column
+    @Column(name = "location_rows")
     private int rows;
 
-    @Column(name="zero_based")
+    @Column(name = "zero_based")
     private boolean zeroBased;
 
     public Integer getId() {

@@ -514,12 +514,23 @@
             <scope>test</scope>
         </dependency>
 
+
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
             <version>1.15.11</version>
-            <scope>test</scope>
+            <scope>runtime</scope>
         </dependency>
+
+        <!-- Extrahieren von dcxml aus reisen sdf Inhouse db datei File:Structure_20240912.sdf-->
+
+        <dependency>
+            <groupId>org.openscience.cdk</groupId>
+            <artifactId>cdk-bundle</artifactId>
+            <version>2.9</version>
+        </dependency>
+
+
     </dependencies>
     <dependencyManagement>
         <dependencies>

@@ -27,6 +27,7 @@ import de.ipb_halle.lbac.search.lang.SqlInsertBuilder;
 */
 
 import de.ipb_halle.signals.field.Field;
+import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.materials.Library;
 import de.ipb_halle.signals.materials.LibraryDbService;
 import de.ipb_halle.signals.materials.Material;
@@ -97,6 +98,8 @@ public class Compounds {
     public final static String COMPOUNDS_FIELD_CHEMICAL_DRAWING = "compounds.fields.chemicalDrawing";
     public final static String COMPOUNDS_FIELD_IPBCODE = "compounds.fields.ipbcode";
     public final static String COMPOUNDS_FIELD_MOLID = "compounds.fields.molid";
+    public final static String COMPOUNDS_FIELD_BATCH_AMOUNT = "compounds.fields.batchAmount";
+    public final static String COMPOUNDS_FIELD_BATCH_PURITY= "compounds.fields.batchPurity";
 
     private final Logger logger = LogManager.getLogger(Compounds.class);
     private InhouseDB inhouseDB;
@@ -133,22 +136,23 @@ public class Compounds {
         // 19.07.2004;710298-89-8;;;;;;;;;;24.11.2005;63;;25.05.2007
 
         // Regex pattern to parse each line of the data file with semicolon-separated fields
-        Pattern pattern = Pattern.compile("^([^;]*);"         //  1 Structure (SMILES)
-                + "([^;]*)?;"                    //  2 SciFinderDoneAt
-                + "([^;]*)?;"                    //  3 CAS-RN
-                + "([^;]*)?;"                    //  4 StructureCheckedAt
-                + "([^;]*)?;"                    //  5 StructureCheckedBy
-                + "([^;]*)?;"                    //  6 Correction
-                + "([^;]*)?;"                  //  7 MolTableRemarks
-                + "(IPB\\d+)?;"                  //  8 IPBCode
-                + "(\\d+(,\\d+)?)?;"             //  9 MolWeight
-                + "([^;]*)?;"                    // 10 Formula
-                + "([^;]*)?;"                    // 11 HighResolutionMS
-                + "([^;]*)?;"                    // 12 Reliability
-                + "([^;]*)?;"                    // 13 Date
-                + "(\\d+);"                      // 14 Mol_ID
-                + "([^;]*)?;"                    // 15 temporary mark
-                + "([^;]*)?$");                  // 16 modelling
+        Pattern pattern = Pattern.compile(
+                "^([^;]*);"               //  1 Structure (SMILES)
+                        + "([^;]*)?;"                    //  2 SciFinderDoneAt
+                        + "([^;]*)?;"                    //  3 CAS-RN
+                        + "([^;]*)?;"                    //  4 StructureCheckedAt
+                        + "([^;]*)?;"                    //  5 StructureCheckedBy
+                        + "([^;]*)?;"                    //  6 Correction
+                        + "([^;]*)?;"                    //  7 MolTableRemarks
+                        + "(IPB\\d+)?;"                  //  8 IPBCode
+                        + "(\\d+(,\\d+)?)?;"             //  9 MolWeight
+                        + "([^;]*)?;"                    // 10 Formula
+                        + "([^;]*)?;"                    // 11 HighResolutionMS
+                        + "([^;]*)?;"                    // 12 Reliability
+                        + "([^;]*)?;"                    // 13 Date
+                        + "(\\d+);"                      // 14 Mol_ID
+                        + "([^;]*)?;"                    // 15 temporary mark
+                        + "([^;]*)?$");                  // 16 modelling
 
         // to strip quotes
         Pattern quotePattern = Pattern.compile("^\"(.*)\"$");
@@ -191,7 +195,7 @@ public class Compounds {
     private void importCompoundNames() throws Exception {
         RTF rtf = new RTF(inhouseDB);
         rtf.readCompoundSynonym(inhouseDB.getConfigString(COMPOUNDS_SYNONYMS));
-        logger.info("COMPOUND NAMES SUCCESSFULLY IMPORTED");
+        logger.trace("COMPOUND NAMES SUCCESSFULLY IMPORTED");
     }
 
     /**
@@ -199,8 +203,8 @@ public class Compounds {
      * Parses data, loads configuration, and creates materials in Signals.
      */
     public void importData() throws Exception {
-        importCompounds();          // Step 1: parse and store compounds
-        importCompoundNames();      // Step 2: import synonyms
+        //  importCompounds();          // Step 1: parse and store compounds
+        //  importCompoundNames();      // Step 2: import synonyms
 
         Library library = loadTargetLibrary();                      // Step 3: load Signals Compound library
         List<InhouseCompound> compounds = loadInhouseCompounds();   // Step 4: load parsed compounds
@@ -217,7 +221,6 @@ public class Compounds {
     private Library loadTargetLibrary() {
         // Load target library for the compound import
         String configString = String.format("assetType:%s", inhouseDB.getConfigString(COMPOUNDS_LIBRARY_ID));
-        logger.info("LIBRARY FOR COMPOUND IS = {}", configString);
         return inhouseDB.getLibraryDbService().loadById(configString);
     }
 
@@ -234,26 +237,19 @@ public class Compounds {
     /**
      * Selects a subset of compounds (currently hardcoded for testing purposes).
      */
-    private List<InhouseCompound> selectSubset(List<InhouseCompound> compounds){
-        return compounds.subList(2,5);
+    private List<InhouseCompound> selectSubset(List<InhouseCompound> compounds) {
+        return compounds.subList(2, 5);
     }
 
     /**
      * Imports a single compound by transforming it into Signals Material and saving it via REST.
      */
     private void importCompound(InhouseCompound compound, Library library) throws IOException {
-        Material asset = compound.createAsset(inhouseDB);
-        Material batch = compound.createBatch(inhouseDB);
+        InhouseCompoundDTO compoundDTO = new InhouseCompoundDTO(compound);
+        compoundDTO.setInhouseDB(inhouseDB);
 
-        // Load all field definitions from DB and index by ID
-        Map<String, Field> fieldMap = inhouseDB.getFieldDbService()
-                .loadFields(new HashMap<>())
-                .stream()
-                .collect(Collectors.toMap(Field::getId, Function.identity()));
-
-        // Bind fields to asset and batch using fieldMap
-        compound.bindFieldDefinitions(fieldMap, asset);
-        compound.bindFieldDefinitions(fieldMap, batch);
+        Material asset = compoundDTO.createAsset();
+        Material batch = compoundDTO.createBatch();
 
         // Create material in Signals platform
         Material mat = inhouseDB.getMaterialRestService().doCreateMaterial(library, asset, batch);
@@ -262,4 +258,6 @@ public class Compounds {
         // Update the inhouse DB entry with new Signals entity ID
         inhouseDB.getInhouseDbService().save(compound);
     }
+
+
 }

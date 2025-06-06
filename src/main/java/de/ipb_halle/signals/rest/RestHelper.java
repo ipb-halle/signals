@@ -70,6 +70,10 @@ public class RestHelper {
     public static final String ATTR_WORK_ORDER = "workOrder";
     public static final String ATTR_SYSTEM_TEMPLATE = "systemTemplate";
     public static final String ATTR_UNIT = "unit";
+    public static final String ATTR_MEASURE = "measure";
+    public static final String ATTR_IS_RAW_VALUE = "isRawValue";
+    public static final String ATTR_USER = "user";
+    public static final String ATTR_DISPLAY_VALUE = "displayValue";
 
 
     public static String formatDate(Date d) {

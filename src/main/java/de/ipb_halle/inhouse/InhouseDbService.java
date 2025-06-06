@@ -20,6 +20,8 @@
 package de.ipb_halle.inhouse;
 
 import jakarta.ejb.Stateless;
+import jakarta.ejb.TransactionAttribute;
+import jakarta.ejb.TransactionAttributeType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.PersistenceContext;
@@ -38,6 +40,7 @@ public class InhouseDbService {
     @PersistenceContext
     private EntityManager em;
 
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public List<InhouseCompound> loadCompounds() {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<InhouseCompound> criteriaQuery = criteriaBuilder.createQuery(InhouseCompound.class);

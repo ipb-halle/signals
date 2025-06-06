@@ -89,7 +89,7 @@ public class InhouseContainer {
     @Column
     private Integer row;
 
-    @Column
+    @Column(name = "container_column")
     private Integer column;
 
     public Integer getId() {

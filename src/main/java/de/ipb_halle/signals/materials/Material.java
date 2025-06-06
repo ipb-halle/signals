@@ -89,7 +89,7 @@ public class Material implements IMaterial, IObjectMetaData {
         this.attachments = new HashSet<>();
         if (!(EntityType.valueOf(Material.ENTITY_TYPE_ASSET).equals(entityType)
                 || EntityType.valueOf(Material.ENTITY_TYPE_BATCH).equals(entityType))) {
-            throw new IllegalArgumentException("Attempt to create Material of inappropriate EntityType");
+            throw new IllegalArgumentException("MATERIAL-> Attempt to create Material of inappropriate EntityType");
         }
         this.entityType = entityType;
         if (materialEntity.getMaterialId() != null) {
