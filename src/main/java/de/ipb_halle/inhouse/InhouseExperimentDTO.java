@@ -22,7 +22,10 @@ package de.ipb_halle.inhouse;
 
 import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntity;
-import de.ipb_halle.signals.experiments.*;
+import de.ipb_halle.signals.experiments.Experiment;
+import de.ipb_halle.signals.experiments.ExperimentProperty;
+import de.ipb_halle.signals.experiments.ExperimentPropertyEntity;
+import de.ipb_halle.signals.experiments.ExperimentPropertyValue;
 import de.ipb_halle.signals.users.IUser;
 import de.ipb_halle.signals.users.UserReference;
 import org.apache.logging.log4j.LogManager;
@@ -33,6 +36,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * DTO (Data Transfer Object) class for representing an experiment from the Inhouse database.
+ * It serves as a converter between the old InhouseExperiment format and the Signals Experiment entity.
+ * Provides methods to create both Inhouse and Signals experiments based on its fields.
+ */
 public class InhouseExperimentDTO {
 
     public static final String TEMPLATE_ID_INHOUSE_EXPERIMENT = "experiment:834e6aee-0d59-4732-89d7-925edca09844";
@@ -49,7 +57,11 @@ public class InhouseExperimentDTO {
 
     private InhouseDB inhouseDB;
 
-    // Public Constructor
+    /**
+     * Constructs an InhouseExperimentDTO from an existing InhouseExperiment entity.
+     *
+     * @param inhouseExperiment the source experiment from the old Inhouse database
+     */
     public InhouseExperimentDTO(InhouseExperiment inhouseExperiment) {
         this.id = inhouseExperiment.getId();
         this.eid = inhouseExperiment.getEid();
@@ -60,6 +72,11 @@ public class InhouseExperimentDTO {
         this.remarks = inhouseExperiment.getRemarks();
     }
 
+    /**
+     * Reconstructs an InhouseExperiment entity from the DTO fields.
+     *
+     * @return a new InhouseExperiment object
+     */
     public InhouseExperiment createEntity() {
         return new InhouseExperiment()
                 .setId(id)
@@ -71,7 +88,12 @@ public class InhouseExperimentDTO {
                 .setRemarks(remarks);
     }
 
-    // Method to create Signals Experiment
+    /**
+     * Creates a new Signals Experiment object based on the DTO data.
+     * Assigns metadata such as template ID, user reference, timestamps, and field values.
+     *
+     * @return a populated Signals Experiment object
+     */
     public Experiment createExperiment() {
         logger.info("I AM IN InhouseExperimentDTO in method  createExperiment()\n");
 
@@ -108,7 +130,12 @@ public class InhouseExperimentDTO {
         return experiment;
     }
 
-    //toDo: ich muss felder generieren , zuerst in signals neue template anlegen, dann felder zuweisen
+    /**
+     * Populates the given Signals Experiment with specific property values.
+     * The values are taken from the DTO and matched to property IDs defined in the configuration.
+     *
+     * @param experiment the Signals Experiment to which properties are added
+     */
     private void createExperimentProperties(Experiment experiment) {
         // 1) Receive a property id in dependence of Experiment Property as a Hash Map
         Map<String, ExperimentProperty> fieldsOfExperimentTemplate = receiveAllFieldsFromTemplateId(experiment.getTemplateId());
@@ -142,6 +169,13 @@ public class InhouseExperimentDTO {
         experiment.addPropertyValue(fvProcId);
     }
 
+    /**
+     * Loads all experiment properties (fields) for a given template ID from the Signals database,
+     * using the InhouseDB’s ExperimentDbService.
+     *
+     * @param templateId the template ID of the experiment
+     * @return a map of property ID to ExperimentProperty
+     */
     private Map<String, ExperimentProperty> receiveAllFieldsFromTemplateId(String templateId) {
         // 1) Criteria HashMap for Querying Experiment Entities
         Map<String, Object> cmap = new HashMap<>();
