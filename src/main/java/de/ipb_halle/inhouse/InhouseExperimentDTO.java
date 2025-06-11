@@ -1,0 +1,239 @@
+/*
+ *
+ *  * IPB Signals client
+ *  * Copyright 2024 Leibniz-Institut f. Pflanzenbiochemie
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
+ *  *
+ *
+ */
+
+package de.ipb_halle.inhouse;
+
+import de.ipb_halle.signals.entity.EntityType;
+import de.ipb_halle.signals.entity.SignalsEntity;
+import de.ipb_halle.signals.experiments.*;
+import de.ipb_halle.signals.users.IUser;
+import de.ipb_halle.signals.users.UserReference;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class InhouseExperimentDTO {
+
+    public static final String TEMPLATE_ID_INHOUSE_EXPERIMENT = "experiment:834e6aee-0d59-4732-89d7-925edca09844";
+    public static final String JOURNAL_EID_WSE_AS_SAMPLE = "journal:cd3156be-4c87-4226-870b-821c949745b4";
+    private final Logger logger = LogManager.getLogger(InhouseExperimentDTO.class);
+
+    private Integer id;
+    private String eid;
+    private String threelc;
+    private String individualCode;
+    private String journal;
+    private int procId;
+    private String remarks;
+
+    private InhouseDB inhouseDB;
+
+    // Public Constructor
+    public InhouseExperimentDTO(InhouseExperiment inhouseExperiment) {
+        this.id = inhouseExperiment.getId();
+        this.eid = inhouseExperiment.getEid();
+        this.threelc = inhouseExperiment.getThreelc();
+        this.individualCode = inhouseExperiment.getIndividualCode();
+        this.journal = inhouseExperiment.getJournal();
+        this.procId = inhouseExperiment.getProcId();
+        this.remarks = inhouseExperiment.getRemarks();
+    }
+
+    public InhouseExperiment createEntity() {
+        return new InhouseExperiment()
+                .setId(id)
+                .setEid(eid)
+                .setThreelc(threelc)
+                .setIndividualCode(individualCode)
+                .setJournal(journal)
+                .setProcId(procId)
+                .setRemarks(remarks);
+    }
+
+    // Method to create Signals Experiment
+    public Experiment createExperiment() {
+        logger.info("I AM IN InhouseExperimentDTO in method  createExperiment()\n");
+
+        Experiment experiment = new Experiment();
+
+        experiment.setId(id == null ? "Currently not created" : id.toString());
+        experiment.setName(eid == null ? "Currently not created" : eid);
+
+        IUser iUser = new UserReference(threelc);
+        experiment.setCreatedBy(iUser);
+        experiment.setEditedBy(iUser);
+
+        Date date = new Date(System.currentTimeMillis());
+        experiment.setCreatedAt(date);
+        experiment.setEditedAt(date);
+
+        experiment.setDescription(remarks == null || remarks.isEmpty() ? "no remarks was present" : remarks);
+        experiment.setType(EntityType.valueOf(Experiment.ENTITY_TYPE_EXPERIMENT));
+
+        experiment.setTemplateId(TEMPLATE_ID_INHOUSE_EXPERIMENT);
+        experiment.setOwner(iUser);
+
+        logger.info(" =====> {}\n", experiment.toString());
+
+
+        //toDo its is neccessary first create an journal before otherwise use hardcoded ID!!
+        SignalsEntity journal = new SignalsEntity();
+        journal.setEid(JOURNAL_EID_WSE_AS_SAMPLE);
+        experiment.addAncestor(journal);
+
+
+        createExperimentProperties(experiment);
+        logger.info("EXPERIMENT => {}\n", experiment.toString());
+        return experiment;
+    }
+
+    //toDo: ich muss felder generieren , zuerst in signals neue template anlegen, dann felder zuweisen
+    private void createExperimentProperties(Experiment experiment) {
+        // 1) Receive a property id in dependence of Experiment Property as a Hash Map
+        Map<String, ExperimentProperty> fieldsOfExperimentTemplate = receiveAllFieldsFromTemplateId(experiment.getTemplateId());
+
+        // 2) Add Field Three_Letter_Code
+        ExperimentPropertyValue fvThreeLc = new ExperimentPropertyValue();
+        fvThreeLc.setPropertyId(inhouseDB.getConfigString(Experiments.EXPERIMENTS_FIELD_THREELC));
+        fvThreeLc.setPropertyValue(threelc);
+        fvThreeLc.setExperimentProperty(fieldsOfExperimentTemplate.get(fvThreeLc.getPropertyId()));
+        experiment.addPropertyValue(fvThreeLc);
+
+        // 3) Add Field Individual_code
+        ExperimentPropertyValue fvIndividualCode = new ExperimentPropertyValue();
+        fvIndividualCode.setPropertyId(inhouseDB.getConfigString(Experiments.EXPERIMENTS_FIELD_INDIVIDUAL_CODE));
+        fvIndividualCode.setPropertyValue(individualCode);
+        fvIndividualCode.setExperimentProperty(fieldsOfExperimentTemplate.get(fvIndividualCode.getPropertyId()));
+        experiment.addPropertyValue(fvIndividualCode);
+
+        // 4) Add Field Journal
+        ExperimentPropertyValue fvJournal = new ExperimentPropertyValue();
+        fvJournal.setPropertyId(inhouseDB.getConfigString(Experiments.EXPERIMENTS_FIELD_JOURNAL));
+        fvJournal.setPropertyValue(journal);
+        fvJournal.setExperimentProperty(fieldsOfExperimentTemplate.get(fvJournal.getPropertyId()));
+        experiment.addPropertyValue(fvJournal);
+
+        // 5) Add Field Procedure_id
+        ExperimentPropertyValue fvProcId = new ExperimentPropertyValue();
+        fvProcId.setPropertyId(inhouseDB.getConfigString(Experiments.EXPERIMENTS_FIELD_PROCEDURE_ID));
+        fvProcId.setPropertyValue(String.valueOf(procId));
+        fvProcId.setExperimentProperty(fieldsOfExperimentTemplate.get(fvProcId.getPropertyId()));
+        experiment.addPropertyValue(fvProcId);
+    }
+
+    private Map<String, ExperimentProperty> receiveAllFieldsFromTemplateId(String templateId) {
+        // 1) Criteria HashMap for Querying Experiment Entities
+        Map<String, Object> cmap = new HashMap<>();
+        cmap.put(ExperimentProperty.TEMPLATE_ID, templateId);
+
+        // 2) Loading of Experiment Property Entities from Database with the help of Experiment template id
+        List<ExperimentPropertyEntity> fields = inhouseDB.getExperimentDbService().loadExperimentPropertyValues(cmap);
+
+        // 3) Generation of property HashMap
+        Map<String, ExperimentProperty> propertyMap = new HashMap<>();
+
+        // 4) Transformation of Experiment Property Entities to Experiment Property POJO and putting in resulting HashMap
+        for (ExperimentPropertyEntity entity : fields) {
+            ExperimentProperty experimentProperty = new ExperimentProperty(entity);
+            propertyMap.put(experimentProperty.getPropertyId(), experimentProperty);
+        }
+        return propertyMap;
+    }
+
+
+    // Setters AND Getters
+    public Integer getId() {
+        return id;
+    }
+
+    public InhouseExperimentDTO setId(Integer id) {
+        this.id = id;
+        return this;
+    }
+
+    public String getEid() {
+        return eid;
+    }
+
+    public InhouseExperimentDTO setEid(String eid) {
+        this.eid = eid;
+        return this;
+    }
+
+    public String getThreelc() {
+        return threelc;
+    }
+
+    public InhouseExperimentDTO setThreelc(String threelc) {
+        this.threelc = threelc;
+        return this;
+    }
+
+    public String getIndividualCode() {
+        return individualCode;
+    }
+
+    public InhouseExperimentDTO setIndividualCode(String individualCode) {
+        this.individualCode = individualCode;
+        return this;
+    }
+
+    public String getJournal() {
+        return journal;
+    }
+
+    public InhouseExperimentDTO setJournal(String journal) {
+        this.journal = journal;
+        return this;
+    }
+
+    public int getProcId() {
+        return procId;
+    }
+
+    public InhouseExperimentDTO setProcId(int procId) {
+        this.procId = procId;
+        return this;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public InhouseExperimentDTO setRemarks(String remarks) {
+        this.remarks = remarks;
+        return this;
+    }
+
+    public InhouseDB getInhouseDB() {
+        return inhouseDB;
+    }
+
+    public InhouseExperimentDTO setInhouseDB(InhouseDB inhouseDB) {
+        this.inhouseDB = inhouseDB;
+        return this;
+    }
+
+
+}

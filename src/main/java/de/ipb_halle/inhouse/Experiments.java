@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.inhouse;
 
+import de.ipb_halle.signals.experiments.Experiment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,8 +25,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,6 +40,10 @@ public class Experiments {
 
     public final static String EXPERIMENTS_FILENAME = "experiments.filename";
     public final static String EXPERIMENTS_REJECTFILE = "experiments.rejectfile";
+    public static final String EXPERIMENTS_FIELD_THREELC = "experiments.fields.threelc";
+    public static final String EXPERIMENTS_FIELD_INDIVIDUAL_CODE = "experiments.fields.individualCode";
+    public static final String EXPERIMENTS_FIELD_JOURNAL = "experiments.fields.journal";
+    public static final String EXPERIMENTS_FIELD_PROCEDURE_ID= "experiments.fields.procId";
     private final Logger logger = LogManager.getLogger(Experiments.class);
 
     private InhouseDB inhouseDB;
@@ -90,7 +94,7 @@ public class Experiments {
                 InhouseExperiment exp = new InhouseExperiment()
                         .setJournal(matcher.group(1))
                         .setThreelc(matcher.group(2))
-                        .setCode(matcher.group(3))
+                        .setIndividualCode(matcher.group(3))
                         // file name never used
                         .setProcId(Integer.parseInt(matcher.group(6)));
                 if (remarkMatcher.matches()) {
@@ -112,7 +116,43 @@ public class Experiments {
     }
 
     public void importData() throws Exception {
-        importExperiments();
+        //   importExperiments();
+
+        List<InhouseExperiment> experiments = loadInhouseExperiments();
+
+        for (InhouseExperiment experiment : selectSubset(experiments)) {
+            importExperiment(experiment);
+        }
+    }
+
+    private List<InhouseExperiment> loadInhouseExperiments() {
+
+        List<InhouseExperiment> experiments = inhouseDB.getInhouseDbService().loadExperiments();
+        logger.info("Experiments ARRAY SIZE = {}", experiments.size());
+
+        return experiments;
+    }
+
+    private List<InhouseExperiment> selectSubset(List<InhouseExperiment> experiments) {
+        return experiments.subList(2, 5);
+    }
+
+    private void importExperiment(InhouseExperiment experiment) {
+        logger.info("EXPERIMENT={}\n", experiment.toString());
+
+        InhouseExperimentDTO experimentDTO = new InhouseExperimentDTO(experiment);
+        experimentDTO.setInhouseDB(inhouseDB);
+
+        logger.info("EXPERIMENT DTO = {}\n", experimentDTO);
+
+        Experiment experimentSignals = experimentDTO.createExperiment();
+
+        // Experiment exp = inhouseDB.getExperimentRestService().createNewExperiment(experimentSignals);
+        // experiment.setEid(exp.getId());
+        // String chemDrawId = inhouseDB.getExperimentRestService().createNewChemicalDrawingAsExperimentChild(exp.getId(),"chemDraw1", "");
+        //ToDo next step upon stoicRef add a reaction arrow to chemDraw as well as cdxml file
+
+        logger.trace("NOT IMPLEMENTED YET");
     }
 
 }

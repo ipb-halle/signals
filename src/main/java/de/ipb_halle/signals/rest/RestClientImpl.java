@@ -179,6 +179,16 @@ public class RestClientImpl implements RestClient {
         return method;
     }
 
+    public RestClient uploadChemicalDrawing(String parentId, String filename, String cdxmContent, String endpoint) {
+        return this.reset()
+                .setMethod(Method.POST)
+                .setContentType(CHEMICAL_CDXML)
+                .setEndpoint(endpoint)
+                .putUriParameter("force", "true")
+                .setRequestData(cdxmContent);
+    }
+
+
     protected String getRequestData() {
         return requestData;
     }

@@ -63,9 +63,10 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
     private static final String EXPERIMENT_GET_PROPERTY_VALUES_ENDPOINT = "/entities/%s/properties";
     private static final String EXPERIMENT_GET_PROPERTIES_ENDPOINT = "/entities/templates/%s/fields";
     public static final String CREATE_NEW_EXPERIMENT_ENDPOINT = "/entities?force=true";
+    public static final String APPEND_CHEMICAL_DRAWING_TO_EXPERIMENT = "/entities/%s/children/%s"; // eid, filename
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void createNewExperiment(Experiment experiment) {
+    public Experiment createNewExperiment(Experiment experiment) {
         JsonObject request = prepareExperiment(experiment);
 
         try {
@@ -74,16 +75,43 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
                     .setEndpoint(CREATE_NEW_EXPERIMENT_ENDPOINT)
                     .setRequestData(request.toString())
                     .execute(RestClient.HTTP_CREATED);
-        } catch (IOException | URISyntaxException | UnexpectedResponseCodeException e) {
+
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
+            Experiment result = parseReply(jsonResult);
+            return result;
+
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
     }
 
+    public String createNewChemicalDrawingAsExperimentChild(String experimentId, String filename, String cdxmlContent) {
+        try {
+            restClient.uploadChemicalDrawing(
+                            experimentId,
+                            filename,
+                            cdxmlContent,
+                            APPEND_CHEMICAL_DRAWING_TO_EXPERIMENT)
+                    .execute();
+
+            String reply = restClient.getResponse().toString();
+            JsonElement jsonResult = JsonParser.parseString(reply);
+            return jsonResult.getAsJsonObject()
+                    .getAsJsonObject(RestHelper.ATTR_DATA)
+                    .getAsJsonObject(RestHelper.ATTR_ID)
+                    .toString();
+
+
+        } catch (UnexpectedResponseCodeException | IOException | URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private JsonObject prepareExperiment(Experiment experiment) {
         JsonObject resultingJson = new JsonObject();
         JsonObject data = new JsonObject();
-        data.addProperty(RestHelper.ATTR_TYPE, Experiment.ATTR_TYPE_EXPERIMENT);
+        data.addProperty(RestHelper.ATTR_TYPE, Experiment.ENTITY_TYPE_EXPERIMENT);
         data.add(RestHelper.ATTR_ATTRIBUTES, prepareAttributes(experiment));
         data.add(RestHelper.ATTR_RELATIONSHIPS, prepareRelationships(experiment));
         resultingJson.add(RestHelper.ATTR_DATA, data);
@@ -135,8 +163,7 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
     private JsonElement prepareAttributes(Experiment experiment) {
         JsonObject attributes = new JsonObject();
         attributes.addProperty(RestHelper.ATTR_NAME, experiment.getName());
-
-        // attributes.add(RestHelper.ATTR_FIELDS, prepareFields(experiment));
+        attributes.add(RestHelper.ATTR_FIELDS, prepareFields(experiment));
 
         return attributes;
     }
@@ -335,4 +362,6 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
             }
         }
     }
+
+
 }

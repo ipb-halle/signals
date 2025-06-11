@@ -28,6 +28,7 @@ public class ExperimentPropertyValue {
     private String experimentId;
     private String propertyId;
     private String propertyValue;
+    private ExperimentProperty experimentProperty;
     public static final Logger logger = LogManager.getLogger(ExperimentPropertyValue.class);
 
     public ExperimentPropertyValue() {
@@ -55,7 +56,7 @@ public class ExperimentPropertyValue {
                 .setPropertyValue(propertyValue);
     }
 
-
+    // Setter and Getter
     public String getExperimentId() {
         return experimentId;
     }
@@ -80,6 +81,15 @@ public class ExperimentPropertyValue {
 
     public ExperimentPropertyValue setPropertyValue(String propertyValue) {
         this.propertyValue = propertyValue;
+        return this;
+    }
+
+    public ExperimentProperty getExperimentProperty() {
+        return experimentProperty;
+    }
+
+    public ExperimentPropertyValue setExperimentProperty(ExperimentProperty experimentProperty) {
+        this.experimentProperty = experimentProperty;
         return this;
     }
 

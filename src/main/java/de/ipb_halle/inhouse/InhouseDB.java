@@ -21,6 +21,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import de.ipb_halle.signals.Signals;
+import de.ipb_halle.signals.dynEnum.DynEnumManager;
+import de.ipb_halle.signals.experiments.ExperimentDbService;
+import de.ipb_halle.signals.experiments.ExperimentPropertyValue;
+import de.ipb_halle.signals.experiments.ExperimentRestService;
 import de.ipb_halle.signals.field.FieldDbService;
 import de.ipb_halle.signals.materials.LibraryDbService;
 import de.ipb_halle.signals.materials.MaterialRestService;
@@ -84,6 +88,15 @@ public class InhouseDB {
     @Inject
     private FieldDbService fieldDbService;
 
+    @Inject
+    private ExperimentRestService experimentRestService;
+
+    @Inject
+    private ExperimentDbService experimentDbService;
+
+    @Inject
+    private DynEnumManager dynEnumManager;
+
     @SuppressWarnings("static-access")
     private static final Option inhouseOpt = Option.builder("inhouse")
             .longOpt("importInhouse")
@@ -118,21 +131,38 @@ public class InhouseDB {
         return fieldDbService;
     }
 
+    public ExperimentRestService getExperimentRestService() {
+        return experimentRestService;
+    }
+
+    public ExperimentDbService getExperimentDbService() {
+        return experimentDbService;
+    }
+
+    public DynEnumManager getDynEnumManager() {
+        return dynEnumManager;
+    }
+
     private void importData(String configFile) throws Exception {
         readConfig(configFile);
+
+        logger.info("STARTING IMPORT OF COMPOUNDS");
         Compounds compounds = new Compounds(this);
-        logger.info("IMPORT OF COMPOUNDS IS DONE, STARTING IMPORT OF EXPERIMENTS");
-        //      Experiments experiments = new Experiments(this);
+
+        logger.info("STARTING IMPORT OF EXPERIMENTS");
+        Experiments experiments = new Experiments(this);
+
+        logger.info("STARTING IMPORT OF Table Correlations between structure and organism");
+        Correlation correlation = new Correlation(this);
 
 //        Taxonomy taxonomy = new Taxonomy(this);
-//        Correlation correlation = new Correlation(this);
 //        Samples samples = new Samples(this);
 
-        compounds.importData();
-        //       experiments.importData();
+//        compounds.importData();
+        experiments.importData();
+      //  correlation.importData();
 
 //        taxonomy.importData();
-//        correlation.importData();
 //        samples.importData();
     }
 
@@ -179,7 +209,6 @@ public class InhouseDB {
             }
         }
     }
-
 
 
 }

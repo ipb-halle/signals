@@ -48,7 +48,7 @@ public class InhouseDbService {
         criteriaQuery.select(root);
 
         List<InhouseCompound> result = this.em.createQuery(criteriaQuery).getResultList();
-        for(InhouseCompound mat : result) {
+        for (InhouseCompound mat : result) {
             mat.addSynonyms(loadSynonymsById(InhouseSynonym.SYNONYM_COMPOUND, mat.getMolId()));
         }
         return result;
@@ -59,7 +59,7 @@ public class InhouseDbService {
         CriteriaQuery<InhouseCompound> criteriaQuery = criteriaBuilder.createQuery(InhouseCompound.class);
         Root<InhouseCompound> root = criteriaQuery.from(InhouseCompound.class);
         criteriaQuery.select(root);
-        criteriaQuery.where(criteriaBuilder.equal(root.get("molId"),molId));
+        criteriaQuery.where(criteriaBuilder.equal(root.get("molId"), molId));
         List<InhouseCompound> result = this.em.createQuery(criteriaQuery).getResultList();
         if (result.size() != 1) {
             System.out.printf("loadCompoundByMolId(%d) - query returned %d instances\n", molId, result.size());
@@ -68,6 +68,17 @@ public class InhouseDbService {
         InhouseCompound compound = result.get(0);
         compound.addSynonyms(loadSynonymsById(InhouseSynonym.SYNONYM_COMPOUND, molId));
         return compound;
+    }
+
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+    public List<InhouseExperiment> loadExperiments() {
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<InhouseExperiment> criteriaQuery = criteriaBuilder.createQuery(InhouseExperiment.class);
+        Root<InhouseExperiment> root = criteriaQuery.from(InhouseExperiment.class);
+        criteriaQuery.select(root);
+
+        return em.createQuery(criteriaQuery).getResultList();
+
     }
 
     public List<InhouseTaxon> loadAllTaxa() {

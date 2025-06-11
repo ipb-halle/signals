@@ -77,4 +77,14 @@ public class ExperimentPropertyEntity {
         this.templateId = templateId;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "ExperimentPropertyEntity{" +
+                "propertyId='" + propertyId + '\'' +
+                ", propertyName='" + propertyName + '\'' +
+                ", propertyType='" + propertyType + '\'' +
+                ", templateId='" + templateId + '\'' +
+                '}';
+    }
 }

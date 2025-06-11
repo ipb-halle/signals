@@ -21,6 +21,7 @@
 package de.ipb_halle.signals.experiments;
 
 public class ExperimentProperty {
+    public static final String TEMPLATE_ID = "templateId";
     private String propertyId;
     private String propertyName;
     private String propertyType;

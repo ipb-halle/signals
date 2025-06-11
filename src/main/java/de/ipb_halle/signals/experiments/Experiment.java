@@ -28,13 +28,14 @@ import de.ipb_halle.signals.users.UserReference;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 public class Experiment {
     public static final Logger logger = LogManager.getLogger(Experiment.class);
-    public static final String ATTR_TYPE_EXPERIMENT = "experiment";
+    public static final String ENTITY_TYPE_EXPERIMENT = "experiment";
 
     private String id;
     private String name;
@@ -242,5 +243,27 @@ public class Experiment {
 
     public void addPropertyValue(ExperimentPropertyValue experimentPropertyValue) {
         propertyValues.add(experimentPropertyValue);
+    }
+
+    @Override
+    public String toString() {
+        return "Experiment{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", type=" + type +
+                ", createdAt=" + createdAt +
+                ", editedAt=" + editedAt +
+                ", createdBy=" + createdBy +
+                ", editedBy=" + editedBy +
+                ", owner=" + owner +
+                ", digest=" + digest +
+                ", ancestorId='" + ancestorId + '\'' +
+                ", templateId='" + templateId + '\'' +
+                ", ancestors=" + Arrays.toString(ancestors.toArray())+'\'' +
+                ", children=" + children +
+                ", properties=" + Arrays.toString(properties.toArray()) + '\'' +
+                ", propertyValues=" + Arrays.toString(propertyValues.toArray()) +
+                '}';
     }
 }

@@ -215,4 +215,23 @@ public class SignalsEntity {
         this.flags = flags;
     }
 */
+
+    @Override
+    public String toString() {
+        return "SignalsEntity{" +
+                "id='" + id + '\'' +
+                ", type=" + type +
+                ", eid='" + eid + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", createdAt=" + createdAt +
+                ", createdBy='" + createdBy + '\'' +
+                ", owner='" + owner + '\'' +
+                ", editedAt=" + editedAt +
+                ", editedBy='" + editedBy + '\'' +
+                ", digest=" + digest +
+                ", timeStamp=" + timeStamp +
+                ", template=" + template +
+                '}';
+    }
 }

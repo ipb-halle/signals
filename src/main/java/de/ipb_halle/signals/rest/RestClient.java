@@ -81,4 +81,6 @@ public interface RestClient {
     public RestClient setURI(String u) throws URISyntaxException;
 
     public RestClient setResponseType(RestType type);
+
+    public RestClient uploadChemicalDrawing(String parentId, String filename, String cdxmContent, String endpoint);
 }

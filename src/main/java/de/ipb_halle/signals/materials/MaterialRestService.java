@@ -480,9 +480,9 @@ public class MaterialRestService implements RestReplyParser<Material> {
         // MASS field (Amount)  library InhouseCompound
         if (fieldValue.getFieldId().equalsIgnoreCase("68400a843cf226635cc5649e")) {
             JsonObject amount = new JsonObject();
-            amount.addProperty("rawValue", Double.parseDouble(fieldValue.getValue()));
-            amount.addProperty("displayValue", fieldValue.getValue() + " g");
-            amount.addProperty("unit", "g");
+            amount.addProperty(RestHelper.ATTR_RAW_VALUE, Double.parseDouble(fieldValue.getValue()));
+            amount.addProperty(RestHelper.ATTR_DISPLAY_VALUE, fieldValue.getValue() + " g");
+            amount.addProperty(RestHelper.ATTR_UNIT, "g");
             obj.add(RestHelper.ATTR_VALUE, amount);
             return obj;
         }
@@ -490,9 +490,9 @@ public class MaterialRestService implements RestReplyParser<Material> {
         // PERCENTAGE field (Purity) library InhouseCompound
         if (fieldValue.getFieldId().equalsIgnoreCase("68400a843cf226635cc564a0")) {
             JsonObject purity = new JsonObject();
-            purity.addProperty("rawValue", Double.parseDouble(fieldValue.getValue()));
-            purity.addProperty("displayValue", fieldValue.getValue() + " %");
-            purity.addProperty("unit", "%");
+            purity.addProperty(RestHelper.ATTR_RAW_VALUE, Double.parseDouble(fieldValue.getValue()));
+            purity.addProperty(RestHelper.ATTR_DISPLAY_VALUE, fieldValue.getValue() + " %");
+            purity.addProperty(RestHelper.ATTR_UNIT, "%");
             obj.add(RestHelper.ATTR_VALUE, purity);
             return obj;
         }

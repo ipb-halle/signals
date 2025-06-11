@@ -93,7 +93,7 @@ public class InhouseCompoundDTO {
 
         mat.setLibraryId("assetType:" + inhouseDB.getConfigString(Compounds.COMPOUNDS_LIBRARY_ID));
         mat.setOwner(new UserReference(inhouseDB.getConfigString(Compounds.COMPOUNDS_OWNER)));
-        mat.setDigest(0L);
+        //mat.setDigest(0L);
 
         mat.addAllSynonyms(synonyms);
 
@@ -121,7 +121,7 @@ public class InhouseCompoundDTO {
         mat.setEntityType(EntityType.valueOf(Material.ENTITY_TYPE_BATCH));
 
         mat.setLibraryId("assetType:" + inhouseDB.getConfigString(Compounds.COMPOUNDS_LIBRARY_ID));
-        mat.setOwner(new UserReference(inhouseDB.getConfigString(Compounds.COMPOUNDS_OWNER)));
+        mat.setOwner(iUser);
         mat.setDigest(0L);
 
         createBatchFields(mat);

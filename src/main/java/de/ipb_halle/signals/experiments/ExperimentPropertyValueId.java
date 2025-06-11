@@ -23,8 +23,11 @@ package de.ipb_halle.signals.experiments;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
+import java.io.Serializable;
+import java.util.Objects;
+
 @Embeddable
-public class ExperimentPropertyValueId {
+public class ExperimentPropertyValueId implements Serializable {
 
     @Column(name="experiment_id")
     private String experimentId;
@@ -56,5 +59,18 @@ public class ExperimentPropertyValueId {
     public ExperimentPropertyValueId setPropertyId(String propertyId) {
         this.propertyId = propertyId;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        ExperimentPropertyValueId that = (ExperimentPropertyValueId) object;
+        return Objects.equals(experimentId, that.experimentId) && Objects.equals(propertyId, that.propertyId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(experimentId, propertyId);
     }
 }

@@ -20,18 +20,19 @@
 
 package de.ipb_halle.signals.experiments;
 
+import de.ipb_halle.signals.dynEnum.DynEnum;
 import de.ipb_halle.tda.PersistenceElements;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Stateless
 @PersistenceElements(entities = {ExperimentEntity.class, ExperimentPropertyEntity.class, ExperimentPropertyValueEntity.class})
@@ -82,10 +83,31 @@ public class ExperimentDbService {
 
         List<ExperimentPropertyValueEntity> results = entityManager.createQuery(query).getResultList();
 
+        logger.info("ExperimentPropertyValueEntity results ={}\n", Arrays.toString(results.toArray()));
+
         for (ExperimentPropertyValueEntity valueEntity : results) {
             ExperimentPropertyValue value = new ExperimentPropertyValue(valueEntity);
             experiment.addPropertyValue(value);
             experiment.addProperty(new ExperimentProperty(valueEntity.getProperty()));
         }
+    }
+
+    // Method to load the Experiment Property Entities by Experiment Template_Id
+    public List<ExperimentPropertyEntity> loadExperimentPropertyValues(Map<String, Object> cmap) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ExperimentPropertyEntity> criteriaQuery = criteriaBuilder.createQuery(ExperimentPropertyEntity.class);
+        Root<ExperimentPropertyEntity> root = criteriaQuery.from(ExperimentPropertyEntity.class);
+        criteriaQuery.select(root);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(criteriaBuilder.equal(
+                root.get(ExperimentProperty.TEMPLATE_ID),
+                cmap.get(ExperimentProperty.TEMPLATE_ID)));
+
+        criteriaQuery.where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
+
+        List<ExperimentPropertyEntity> resultList = entityManager.createQuery(criteriaQuery).getResultList();
+        logger.info("loadExperimentProperties= {}\n", Arrays.toString(resultList.toArray()));
+        return resultList;
     }
 }

@@ -26,25 +26,15 @@ import de.ipb_halle.lbac.search.lang.EntityGraph;
 import de.ipb_halle.lbac.search.lang.SqlInsertBuilder;
 */
 
-import de.ipb_halle.signals.field.Field;
-import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.materials.Library;
-import de.ipb_halle.signals.materials.LibraryDbService;
 import de.ipb_halle.signals.materials.Material;
-import jakarta.ejb.TransactionAttribute;
-import jakarta.ejb.TransactionAttributeType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 
 /**
@@ -99,7 +89,7 @@ public class Compounds {
     public final static String COMPOUNDS_FIELD_IPBCODE = "compounds.fields.ipbcode";
     public final static String COMPOUNDS_FIELD_MOLID = "compounds.fields.molid";
     public final static String COMPOUNDS_FIELD_BATCH_AMOUNT = "compounds.fields.batchAmount";
-    public final static String COMPOUNDS_FIELD_BATCH_PURITY= "compounds.fields.batchPurity";
+    public final static String COMPOUNDS_FIELD_BATCH_PURITY = "compounds.fields.batchPurity";
 
     private final Logger logger = LogManager.getLogger(Compounds.class);
     private InhouseDB inhouseDB;
@@ -203,8 +193,8 @@ public class Compounds {
      * Parses data, loads configuration, and creates materials in Signals.
      */
     public void importData() throws Exception {
-        //  importCompounds();          // Step 1: parse and store compounds
-        //  importCompoundNames();      // Step 2: import synonyms
+        importCompounds();          // Step 1: parse and store compounds
+        importCompoundNames();      // Step 2: import synonyms
 
         Library library = loadTargetLibrary();                      // Step 3: load Signals Compound library
         List<InhouseCompound> compounds = loadInhouseCompounds();   // Step 4: load parsed compounds

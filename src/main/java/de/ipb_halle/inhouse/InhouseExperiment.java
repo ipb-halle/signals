@@ -25,9 +25,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import org.apache.openjpa.persistence.jdbc.VersionColumns;
-
-import java.util.Date;
 
 @Entity
 @Table(name = "inhouse_experiments")
@@ -43,8 +40,8 @@ public class InhouseExperiment {
     @Column
     private String threelc;
 
-    @Column
-    private String code;
+    @Column(name="code")
+    private String individualCode;
 
     @Column
     private String journal;
@@ -82,12 +79,12 @@ public class InhouseExperiment {
         return this;
     }
 
-    public String getCode() {
-        return code;
+    public String getIndividualCode() {
+        return individualCode;
     }
 
-    public InhouseExperiment setCode(String code) {
-        this.code = code;
+    public InhouseExperiment setIndividualCode(String individualCode) {
+        this.individualCode = individualCode;
         return this;
     }
 
