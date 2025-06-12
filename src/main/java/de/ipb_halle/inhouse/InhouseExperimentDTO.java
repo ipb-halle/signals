@@ -100,7 +100,7 @@ public class InhouseExperimentDTO {
         Experiment experiment = new Experiment();
 
         experiment.setId(id == null ? "Currently not created" + System.currentTimeMillis() : id.toString());
-        experiment.setName(eid == null ? String.format("Experiment of %s", threelc) + System.currentTimeMillis() : eid);
+        experiment.setName(eid == null ? String.format("Experiment of %s ", threelc) + System.currentTimeMillis() : eid);
 
         IUser iUser = new UserReference(threelc);
         experiment.setCreatedBy(iUser);

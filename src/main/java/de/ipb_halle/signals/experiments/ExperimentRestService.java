@@ -41,7 +41,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-
 public class ExperimentRestService implements RestReplyParser<Experiment> {
 
     @Inject
@@ -100,7 +99,6 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
                     .execute();
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
-            logger.info("JSON RESULT=>{}\n", jsonResult);
             return jsonResult.getAsJsonObject()
                     .getAsJsonObject(RestHelper.ATTR_DATA)
                     .get(RestHelper.ATTR_ID)
@@ -125,14 +123,7 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
         JsonObject relationships = new JsonObject();
         relationships.add(RestHelper.ATTR_ANCESTORS, prepareAncestors(experiment));
         relationships.add(RestHelper.ATTR_TEMPLATE, prepareTemplate(experiment));
-        // relationships.add(RestHelper.ATTR_WORK_ORDER, prepareWorkOrder(experiment));
         return relationships;
-    }
-
-    private JsonElement prepareWorkOrder(Experiment experiment) {
-
-
-        return null;
     }
 
     private JsonElement prepareTemplate(Experiment experiment) {
@@ -189,7 +180,7 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
      * @return a JsonObject with Signals-compliant flat attributes
      */
     private JsonElement prepareAttributes(Experiment experiment) {
-
+        // Experiment Template InhouseExperiment
         Map<String, String> propertyIdToNameMap = Map.of(
                 "4003", "Three_Letter_Code",
                 "4001", "Name",
@@ -211,7 +202,6 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
                 attributes.addProperty(fieldName, val.getPropertyValue());
             }
         }
-
         return attributes;
     }
 

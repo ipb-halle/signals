@@ -154,6 +154,19 @@ public class InhouseDbService {
         return this.em.createQuery(criteriaQuery).getResultList();
     }
 
+    public InhouseCorrelation loadCorrelationByProcedureId(int procId) {
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<InhouseCorrelation> query = builder.createQuery(InhouseCorrelation.class);
+        Root<InhouseCorrelation> root = query.from(InhouseCorrelation.class);
+        query.select(root);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(builder.equal(root.get("procedureId"), procId));
+        query.where(builder.and(predicates.toArray(new Predicate[0])));
+
+        return em.createQuery(query).getSingleResult();
+    }
+
     public void save(InhouseCompound mat) {
         this.em.merge(mat);
     }

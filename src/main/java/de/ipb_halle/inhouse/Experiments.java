@@ -21,10 +21,10 @@ import de.ipb_halle.signals.experiments.Experiment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -138,22 +138,98 @@ public class Experiments {
     }
 
     private void importExperiment(InhouseExperiment experiment) {
+
+        // 1) Create Inhouse Experiment DTO
         InhouseExperimentDTO experimentDTO = new InhouseExperimentDTO(experiment);
         experimentDTO.setInhouseDB(inhouseDB);
 
+        // 2) Create a Signals Experiment JavaObject
+        //  Experiment experimentSignals = experimentDTO.createExperiment();
 
-        Experiment experimentSignals = experimentDTO.createExperiment();
+        // 3) Make a Rest Call to signals API in order to create an experiment entity in signals Notebook
+        // with field values for an Experiment Template InhouseExperiment (Template ID = experiment:834e6aee-0d59-4732-89d7-925edca09844)
+        //experimentSignals = inhouseDB.getExperimentRestService().createNewExperiment(experimentSignals);
 
-        Experiment exp = inhouseDB.getExperimentRestService().createNewExperiment(experimentSignals);
+        // 4) Set Id to Inhose Experiment
+        // experiment.setEid(experimentSignals.getId());
 
-        logger.info("EXPERIMENT after POST request = {}\n", exp.toString());
+        // 5) Make a Rest Call for Creation of an Experiment Child: empty ChemDrawing Entity for further import of a Structure
+//        String chemDrawId = inhouseDB.getExperimentRestService()
+//                .createNewChemicalDrawingAsExperimentChild(
+//                        experimentSignals.getId(),
+//                        "empty_structure.cdxml",
+//                        "");
+        //logger.trace("CHEM_DRAW WAS CREATED AND ITS ID IS= {}\n", chemDrawId);
 
-       experiment.setEid(exp.getId());
-
-        String chemDrawId = inhouseDB.getExperimentRestService().createNewChemicalDrawingAsExperimentChild(exp.getId(), "empty_structure.cdxml", "");
         //ToDo next step upon stoicRef add a reaction arrow to chemDraw as well as cdxml file
+        //ToDo first we need to map a Structure = InhouseCompound to Experiment through the InhouseCorrelation ProcedureID to MOL_ID
 
-        logger.trace("CEHMDRAW WAS CREATED AND ID = {}\n", chemDrawId);
+        // 6) Map a cdxml from Compound file to an experiment
+        String cdxmlString = loadCDXML_StringForGivenExperimentUponMolID(experimentDTO);
+
+        // 7) Make Rest Call to add a cdxml Structure as a product to reaction in chemicalDrawing entity
+    }
+
+    /**
+     * Loads the content of a CDXML file (chemical drawing) for a given experiment based on its molId,
+     * which is determined by looking up the corresponding {@link InhouseCorrelation} entry.
+     *
+     * <p>If the file does not exist on disk, the method logs a warning and returns an empty string.
+     * This allows the import process to continue even if no chemical structure is available for a given compound.</p>
+     *
+     * @param experimentDTO the DTO representing the inhouse experiment; must contain a valid procedure ID
+     * @return the CDXML content as a String, or an empty string if no corresponding file was found
+     * @throws RuntimeException if an unexpected I/O error occurs while reading the file
+     */
+    private String loadCDXML_StringForGivenExperimentUponMolID(InhouseExperimentDTO experimentDTO) {
+        // 1) Load the correlation entry to resolve the molId for the given experiment
+        InhouseCorrelation correlation = loadCorrelationByExperimentProcedureId(experimentDTO.getProcId());
+
+        // 2) Extract the molId from the correlation object
+        Integer molId = correlation.getMolId();
+
+        // 3) Resolve the full path to the CDXML file using the configured file path pattern and molId
+        Path filePath = Path.of(String.format(
+                inhouseDB.getConfigString(Compounds.COMPOUNDS_CHEMICAL_DRAWING),
+                molId));
+
+        // 4) If the file does not exist, log a warning and return an empty string
+        if (!Files.exists(filePath)) {
+            logger.warn("CDXML file does not exist for molId={}, skipping file: {}\n", molId, filePath);
+            return "";
+        }
+
+        try {
+            // 5) Read the file content as UTF-8 string
+            String fieldValueCdxml = Files.readString(filePath, StandardCharsets.UTF_8);
+            //logger.trace("EXPERIMENTS => fieldValueCdxml = {}", fieldValueCdxml);
+
+            // 6) Return the CDXML content
+            return fieldValueCdxml;
+
+        } catch (IOException e) {
+
+            // Rethrow any unexpected IO exception as a RuntimeException
+            throw new RuntimeException("Error reading CDXML file: " + filePath, e);
+        }
+    }
+
+    /**
+     * Retrieves the {@link InhouseCorrelation} entry associated with a given procedure ID
+     * by delegating the call to the inhouse database service.
+     *
+     * <p>This method acts as a simple wrapper that resolves the correlation between an experiment
+     * and its associated molecule IDs via the procedure ID. It is used during the import
+     * process to locate relevant CDXML or metadata for the experiment.</p>
+     *
+     * @param procId the procedure ID of the inhouse experiment
+     * @return the corresponding {@link InhouseCorrelation} object
+     * @throws jakarta.persistence.NoResultException if no correlation entry is found
+     */
+    private InhouseCorrelation loadCorrelationByExperimentProcedureId(int procId) {
+        return inhouseDB.
+                getInhouseDbService().
+                loadCorrelationByProcedureId(procId);
     }
 
 }
