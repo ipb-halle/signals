@@ -91,6 +91,23 @@ public class RestClientImpl implements RestClient {
         return execute(HttpURLConnection.HTTP_OK);
     }
 
+    /**
+     * Executes the HTTP request and validates the response code.
+     *
+     * <p>If the response code does not match the expected code, an
+     * {@link UnexpectedResponseCodeException} is thrown.</p>
+     *
+     * <p><b>Note:</b> For backwards compatibility with Signals API behavior,
+     * this method allows a {@code 201 Created} response code if {@code 200 OK}
+     * was expected. This is necessary because some endpoints (e.g. child entity uploads)
+     * respond with 201 instead of 200, which is valid per HTTP spec.</p>
+     *
+     * @param expectedResponseCode the expected HTTP response code (e.g. 200)
+     * @return this client instance with the response data stored
+     * @throws IOException if an I/O error occurs during communication
+     * @throws URISyntaxException if the URI is malformed
+     * @throws UnexpectedResponseCodeException if the response code is not as expected
+     */
     @Override
     public RestClient execute(int expectedResponseCode) throws IOException, URISyntaxException, UnexpectedResponseCodeException {
         BodyPublisher requestBody = BodyPublishers.noBody();
@@ -128,12 +145,15 @@ public class RestClientImpl implements RestClient {
             responseCode = 0;
         } finally {
             if (responseCode != expectedResponseCode) {
-                this.logger.debug("Obtained unexpected response code ({} vs {})", responseCode, expectedResponseCode);
-                this.logger.debug("Connection {} {}", method.toString(), getURI().toString());
-                if (response != null) {
-                    this.logger.debug("***** Dump of response *****\n{}\n***** End of response dump *****", response);
+                // Allow 201 as valid alternative to 200 (especially for POST calls like chemical drawings)
+                if (!(expectedResponseCode == 200 && responseCode == 201)) {
+                    this.logger.debug("Obtained unexpected response code ({} vs {})", responseCode, expectedResponseCode);
+                    this.logger.debug("Connection {} {}", method.toString(), getURI().toString());
+                    if (response != null) {
+                        this.logger.debug("***** Dump of response *****\n{}\n***** End of response dump *****", response);
+                    }
+                    throw new UnexpectedResponseCodeException(String.format("expected %d, got %d", expectedResponseCode, responseCode));
                 }
-                throw new UnexpectedResponseCodeException(String.format("expected %d, got %d", expectedResponseCode, responseCode));
             }
         }
         return this;
@@ -179,13 +199,13 @@ public class RestClientImpl implements RestClient {
         return method;
     }
 
-    public RestClient uploadChemicalDrawing(String parentId, String filename, String cdxmContent, String endpoint) {
+    public RestClient uploadChemicalDrawing(String parentId, String filename, String cdxmlContent, String endpoint) {
         return this.reset()
                 .setMethod(Method.POST)
                 .setContentType(CHEMICAL_CDXML)
                 .setEndpoint(endpoint)
                 .putUriParameter("force", "true")
-                .setRequestData(cdxmContent);
+                .setRequestData(cdxmlContent);
     }
 
 

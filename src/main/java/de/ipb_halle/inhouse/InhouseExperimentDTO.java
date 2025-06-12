@@ -95,12 +95,12 @@ public class InhouseExperimentDTO {
      * @return a populated Signals Experiment object
      */
     public Experiment createExperiment() {
-        logger.info("I AM IN InhouseExperimentDTO in method  createExperiment()\n");
+        //logger.info("I AM IN InhouseExperimentDTO in method  createExperiment()\n");
 
         Experiment experiment = new Experiment();
 
-        experiment.setId(id == null ? "Currently not created" : id.toString());
-        experiment.setName(eid == null ? "Currently not created" : eid);
+        experiment.setId(id == null ? "Currently not created" + System.currentTimeMillis() : id.toString());
+        experiment.setName(eid == null ? String.format("Experiment of %s", threelc) + System.currentTimeMillis() : eid);
 
         IUser iUser = new UserReference(threelc);
         experiment.setCreatedBy(iUser);
@@ -110,23 +110,21 @@ public class InhouseExperimentDTO {
         experiment.setCreatedAt(date);
         experiment.setEditedAt(date);
 
-        experiment.setDescription(remarks == null || remarks.isEmpty() ? "no remarks was present" : remarks);
+        experiment.setDescription(remarks == null || remarks.isEmpty() ? "no remarks was present" + System.currentTimeMillis() : remarks);
         experiment.setType(EntityType.valueOf(Experiment.ENTITY_TYPE_EXPERIMENT));
 
         experiment.setTemplateId(TEMPLATE_ID_INHOUSE_EXPERIMENT);
         experiment.setOwner(iUser);
 
-        logger.info(" =====> {}\n", experiment.toString());
-
-
-        //toDo its is neccessary first create an journal before otherwise use hardcoded ID!!
+        //toDo its necessary first to create a journal entity, otherwise use hardcoded ID!!
         SignalsEntity journal = new SignalsEntity();
         journal.setEid(JOURNAL_EID_WSE_AS_SAMPLE);
         experiment.addAncestor(journal);
+        experiment.setAncestorId(JOURNAL_EID_WSE_AS_SAMPLE);
 
 
         createExperimentProperties(experiment);
-        logger.info("EXPERIMENT => {}\n", experiment.toString());
+        //logger.info("EXPERIMENT => {}\n", experiment.toString());
         return experiment;
     }
 

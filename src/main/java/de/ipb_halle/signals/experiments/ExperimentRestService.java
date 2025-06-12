@@ -20,10 +20,7 @@
 
 package de.ipb_halle.signals.experiments;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntity;
@@ -40,10 +37,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 
 public class ExperimentRestService implements RestReplyParser<Experiment> {
@@ -77,7 +73,11 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
                     .execute(RestClient.HTTP_CREATED);
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
+
+            logger.info("EXperimentRestService:->create new Experiment jsonResult = {}\n", jsonResult);
+
             Experiment result = parseReply(jsonResult);
+
             return result;
 
         } catch (Exception e) {
@@ -87,21 +87,24 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
     }
 
     public String createNewChemicalDrawingAsExperimentChild(String experimentId, String filename, String cdxmlContent) {
+        String encodedEid = URLEncoder.encode(experimentId, StandardCharsets.UTF_8);
+        String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8);
+
+        String endpoint = String.format(APPEND_CHEMICAL_DRAWING_TO_EXPERIMENT, encodedEid, encodedFilename);
         try {
             restClient.uploadChemicalDrawing(
                             experimentId,
                             filename,
                             cdxmlContent,
-                            APPEND_CHEMICAL_DRAWING_TO_EXPERIMENT)
+                            endpoint)
                     .execute();
 
-            String reply = restClient.getResponse().toString();
-            JsonElement jsonResult = JsonParser.parseString(reply);
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
+            logger.info("JSON RESULT=>{}\n", jsonResult);
             return jsonResult.getAsJsonObject()
                     .getAsJsonObject(RestHelper.ATTR_DATA)
-                    .getAsJsonObject(RestHelper.ATTR_ID)
-                    .toString();
-
+                    .get(RestHelper.ATTR_ID)
+                    .getAsJsonPrimitive().getAsString();
 
         } catch (UnexpectedResponseCodeException | IOException | URISyntaxException e) {
             throw new RuntimeException(e);
@@ -153,46 +156,64 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
     }
 
     /**
-     * For experiment,
-     * the properties are not passed as "fields" during creation,
-     * but via separate PATCH or PUT (e.g. /properties or /attributes endpoint of signals)
+     * Prepares the "attributes" section of a Signals entity creation payload.
+     * <p>
+     * This method maps {@link ExperimentPropertyValue} items from the local experiment model
+     * to flat attribute key-value pairs, where keys are the human-readable property names
+     * (e.g. "Three_Letter_Code") as required by the Signals API.
+     * <p>
+     * <strong>Important:</strong> The Signals REST API <em>does not accept</em> a nested
+     * "fields" array inside the "attributes" block for entity creation (e.g. experiments).
+     * Although the response JSON from Signals contains an "attributes.fields" block,
+     * using this same structure in POST requests will result in the following error:
+     * <pre>
+     * HTTP 400 BadRequest
+     * {
+     *   "description": "Unrecognized data parameter name was specified: fields"
+     * }
+     * </pre>
+     * <p>
+     * Therefore, instead of using an array like:
+     * <pre>
+     * "fields": [
+     *   { "id": "4003", "content": { "value": "ADM" } }
+     * ]
+     * </pre>
+     * you must send:
+     * <pre>
+     * "Three_Letter_Code": "ADM"
+     * </pre>
+     * directly inside "attributes".
      *
-     * @param experiment
-     * @return
+     * @param experiment the experiment containing local property values
+     * @return a JsonObject with Signals-compliant flat attributes
      */
     private JsonElement prepareAttributes(Experiment experiment) {
+
+        Map<String, String> propertyIdToNameMap = Map.of(
+                "4003", "Three_Letter_Code",
+                "4001", "Name",
+                "4005", "Journal",
+                "4006", "Procedure_id",
+                "4004", "Individual_code",
+                "4002", "Description"
+        );
+
         JsonObject attributes = new JsonObject();
         attributes.addProperty(RestHelper.ATTR_NAME, experiment.getName());
-        attributes.add(RestHelper.ATTR_FIELDS, prepareFields(experiment));
-
-        return attributes;
-    }
-
-    //method is currently not in use
-    private JsonElement prepareFields(Experiment experiment) {
-        JsonArray fields = new JsonArray();
-        for (ExperimentProperty experimentProperty : experiment.getProperties()) {
-            for (ExperimentPropertyValue experimentPropertyValue : experiment.getPropertyValues()) {
-                if (experimentPropertyValue.getPropertyId().equalsIgnoreCase(experimentProperty.getPropertyId())) {
-                    fields.add(prepareField(experimentProperty, experimentPropertyValue));
-                }
+        if (experiment.getDescription() != null) {
+            attributes.addProperty(RestHelper.ATTR_DESCRIPTION, experiment.getDescription());
+        }
+        // Add field values to Experiment (Experiment Property Values)
+        for (ExperimentPropertyValue val : experiment.getPropertyValues()) {
+            String fieldName = propertyIdToNameMap.get(val.getPropertyId());
+            if (fieldName != null) {
+                attributes.addProperty(fieldName, val.getPropertyValue());
             }
         }
 
-        return fields;
+        return attributes;
     }
-
-    private JsonElement prepareField(ExperimentProperty experimentProperty, ExperimentPropertyValue experimentPropertyValue) {
-        JsonObject field = new JsonObject();
-        //experiment property id listed as key and in DB as property_key
-        field.addProperty(RestHelper.ATTR_ID, experimentProperty.getPropertyId());
-        JsonObject content = new JsonObject();
-
-        content.addProperty(RestHelper.ATTR_VALUE, experimentPropertyValue.getPropertyValue());
-        field.add(RestHelper.ATTR_CONTENT, content);
-        return field;
-    }
-
 
     public Experiment doGetExperiment(String experimentId) throws Exception {
         JsonElement object = fetchSample(RECEIVE_EXPERIMENT_ENDPOINT, experimentId);
@@ -214,16 +235,23 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
     }
 
     @Override
-    public Experiment parseReply(JsonElement j) throws Exception {
-
-        JsonObject data = j.getAsJsonObject();
-
-        JsonObject attributes = data.get(RestHelper.ATTR_ATTRIBUTES).getAsJsonObject();
-        JsonObject relationships = data.getAsJsonObject(RestHelper.ATTR_RELATIONSHIPS);
-
+    public Experiment parseReply(JsonElement json) throws Exception {
         Experiment experiment = new Experiment();
 
-        experiment.setId(RestHelper.parseString(data, RestHelper.ATTR_ID));
+        JsonObject attributes = null;
+        JsonObject experimentJson = null;
+        JsonObject relationships = null;
+
+        try {
+            experimentJson = json.getAsJsonObject().get(RestHelper.ATTR_DATA).getAsJsonObject();
+            attributes = experimentJson.get(RestHelper.ATTR_ATTRIBUTES).getAsJsonObject();
+            relationships = experimentJson.getAsJsonObject(RestHelper.ATTR_RELATIONSHIPS);
+
+        } catch (JsonSyntaxException | IllegalStateException e) {
+            logger.error("ERS:-> Invalid JSON structure: {}", e.getLocalizedMessage());
+        }
+
+        experiment.setId(RestHelper.parseString(experimentJson, RestHelper.ATTR_ID));
         experiment.setName(RestHelper.parseString(attributes, RestHelper.ATTR_NAME));
         experiment.setDescription(RestHelper.parseString(attributes, RestHelper.ATTR_DESCRIPTION));
 
@@ -233,7 +261,11 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
 
         experiment.setDigest(RestHelper.parseLong(attributes, RestHelper.ATTR_DIGEST));
 
-        parseRelationships(data, experiment);
+        parseRelationships(experimentJson, experiment);
+
+        if (attributes.has(RestHelper.ATTR_FIELDS)) {
+            parseFields(attributes, experiment);
+        }
 
         if (relationships.has(RestHelper.ATTR_ANCESTORS)) {
             parseAncestors(relationships, experiment);
@@ -242,10 +274,26 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
             parseChildren(relationships, experiment);
         }
         if (relationships.has(RestHelper.ATTR_TEMPLATE)) {
-            paresTemplate(relationships, experiment);
+            parseTemplate(relationships, experiment);
         }
 
         return experiment;
+    }
+
+    private void parseFields(JsonObject attributes, Experiment experiment) {
+        JsonObject fieldsJson = attributes.getAsJsonObject(RestHelper.ATTR_FIELDS);
+        Set<ExperimentPropertyValue> values = new HashSet<>();
+
+        for (Map.Entry<String, JsonElement> entry : fieldsJson.entrySet()) {
+            String propertyName = entry.getKey();
+            String value = entry.getValue().getAsJsonObject().get("value").getAsString();
+            ExperimentPropertyValue epv = new ExperimentPropertyValue();
+            epv.setExperimentId(experiment.getId());
+            epv.setPropertyId(propertyName);
+            epv.setPropertyValue(value);
+            values.add(epv);
+        }
+        experiment.setPropertyValues(values);
     }
 
     private void parseRelationships(JsonObject relationships, Experiment experiment) {
@@ -285,7 +333,7 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
         }
     }
 
-    private void paresTemplate(JsonElement relationships, Experiment experiment) {
+    private void parseTemplate(JsonElement relationships, Experiment experiment) {
         JsonObject data = relationships.getAsJsonObject()
                 .getAsJsonObject(RestHelper.ATTR_SYSTEM_TEMPLATE)
                 .getAsJsonObject(RestHelper.ATTR_DATA);

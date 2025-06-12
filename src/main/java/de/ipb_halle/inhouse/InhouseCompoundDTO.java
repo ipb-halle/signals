@@ -77,8 +77,8 @@ public class InhouseCompoundDTO {
     public Material createAsset() throws IOException {
         Material mat = new Material();
 
-        mat.setId(name == null || name.isEmpty() ? "no name record was found" : name);
-        mat.setName(name == null || name.isEmpty() ? "no name record was found" : name);
+        mat.setId(name == null || name.isEmpty() ? "no name record was found" + System.currentTimeMillis() : name);
+        mat.setName(name == null || name.isEmpty() ? "no name record was found" + System.currentTimeMillis() : name);
 
         IUser iUser = new UserReference(inhouseDB.getConfigString(Compounds.COMPOUNDS_OWNER));
         mat.setCreatedBy(iUser);
@@ -88,7 +88,7 @@ public class InhouseCompoundDTO {
         mat.setCreatedAt(date);
         mat.setEditedAt(date);
 
-        mat.setDescription(remarks == null || remarks.isEmpty() ? "no remarks was present" : remarks);
+        mat.setDescription(remarks == null || remarks.isEmpty() ? "no remarks was present" +System.currentTimeMillis() : remarks);
         mat.setEntityType(EntityType.valueOf(Material.ENTITY_TYPE_ASSET));
 
         mat.setLibraryId("assetType:" + inhouseDB.getConfigString(Compounds.COMPOUNDS_LIBRARY_ID));

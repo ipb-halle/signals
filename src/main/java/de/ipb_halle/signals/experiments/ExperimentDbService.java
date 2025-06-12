@@ -107,7 +107,7 @@ public class ExperimentDbService {
         criteriaQuery.where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
 
         List<ExperimentPropertyEntity> resultList = entityManager.createQuery(criteriaQuery).getResultList();
-        logger.info("loadExperimentProperties= {}\n", Arrays.toString(resultList.toArray()));
+       // logger.info("loadExperimentProperties= {}\n", Arrays.toString(resultList.toArray()));
         return resultList;
     }
 }

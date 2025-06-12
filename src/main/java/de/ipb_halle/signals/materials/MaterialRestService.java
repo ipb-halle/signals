@@ -346,6 +346,7 @@ public class MaterialRestService implements RestReplyParser<Material> {
                     .execute(RestClient.HTTP_CREATED);
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
+
             Material result = parseReply(jsonResult);
             return result;
         } catch (UnexpectedResponseCodeException ue) {

@@ -43,7 +43,7 @@ public class Experiments {
     public static final String EXPERIMENTS_FIELD_THREELC = "experiments.fields.threelc";
     public static final String EXPERIMENTS_FIELD_INDIVIDUAL_CODE = "experiments.fields.individualCode";
     public static final String EXPERIMENTS_FIELD_JOURNAL = "experiments.fields.journal";
-    public static final String EXPERIMENTS_FIELD_PROCEDURE_ID= "experiments.fields.procId";
+    public static final String EXPERIMENTS_FIELD_PROCEDURE_ID = "experiments.fields.procId";
     private final Logger logger = LogManager.getLogger(Experiments.class);
 
     private InhouseDB inhouseDB;
@@ -138,21 +138,22 @@ public class Experiments {
     }
 
     private void importExperiment(InhouseExperiment experiment) {
-        logger.info("EXPERIMENT={}\n", experiment.toString());
-
         InhouseExperimentDTO experimentDTO = new InhouseExperimentDTO(experiment);
         experimentDTO.setInhouseDB(inhouseDB);
 
-        logger.info("EXPERIMENT DTO = {}\n", experimentDTO);
 
         Experiment experimentSignals = experimentDTO.createExperiment();
 
-        // Experiment exp = inhouseDB.getExperimentRestService().createNewExperiment(experimentSignals);
-        // experiment.setEid(exp.getId());
-        // String chemDrawId = inhouseDB.getExperimentRestService().createNewChemicalDrawingAsExperimentChild(exp.getId(),"chemDraw1", "");
+        Experiment exp = inhouseDB.getExperimentRestService().createNewExperiment(experimentSignals);
+
+        logger.info("EXPERIMENT after POST request = {}\n", exp.toString());
+
+       experiment.setEid(exp.getId());
+
+        String chemDrawId = inhouseDB.getExperimentRestService().createNewChemicalDrawingAsExperimentChild(exp.getId(), "empty_structure.cdxml", "");
         //ToDo next step upon stoicRef add a reaction arrow to chemDraw as well as cdxml file
 
-        logger.trace("NOT IMPLEMENTED YET");
+        logger.trace("CEHMDRAW WAS CREATED AND ID = {}\n", chemDrawId);
     }
 
 }
