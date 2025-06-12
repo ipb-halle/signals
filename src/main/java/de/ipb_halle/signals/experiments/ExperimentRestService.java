@@ -59,6 +59,7 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
     private static final String EXPERIMENT_GET_PROPERTIES_ENDPOINT = "/entities/templates/%s/fields";
     public static final String CREATE_NEW_EXPERIMENT_ENDPOINT = "/entities?force=true";
     public static final String APPEND_CHEMICAL_DRAWING_TO_EXPERIMENT = "/entities/%s/children/%s"; // eid, filename
+    private static final String CHEMICAL_DRAWINGS_ADD_REACTION_CDXML = "/chemicaldrawings/%s/reaction/%s";
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public Experiment createNewExperiment(Experiment experiment) {
@@ -72,9 +73,6 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
                     .execute(RestClient.HTTP_CREATED);
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
-
-            logger.info("EXperimentRestService:->create new Experiment jsonResult = {}\n", jsonResult);
-
             Experiment result = parseReply(jsonResult);
 
             return result;
@@ -402,4 +400,38 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
     }
 
 
+    public void addReactionToExperiment(String chemicalDrawingEid, String position, String cdxmlString) {
+        JsonObject request = prepareReactionAppendJson(cdxmlString);
+        String encodedEid = URLEncoder.encode(chemicalDrawingEid, StandardCharsets.UTF_8);
+        String endpoint = String.format(CHEMICAL_DRAWINGS_ADD_REACTION_CDXML, encodedEid, position);
+
+        try {
+            restClient.reset()
+                    .setMethod(Method.POST)
+                    .setEndpoint(endpoint)
+                    .setRequestData(request.toString())
+                    .putUriParameter("force", "true")
+                    .execute(RestClient.HTTP_CREATED);
+
+            JsonElement response = JsonParser.parseString(restClient.getResponse().getString());
+            logger.info("Reaction append response = {}", response);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to append reaction to chemicalDrawing", e);
+        }
+    }
+
+    private JsonObject prepareReactionAppendJson(String cdxmlString) {
+        JsonObject root = new JsonObject();
+        JsonObject data = new JsonObject();
+        JsonObject attributes = new JsonObject();
+
+        attributes.addProperty(RestHelper.ATTR_DATA_TYPE, "cdxml");
+        attributes.addProperty(RestHelper.ATTR_DATA, cdxmlString);
+
+        data.add(RestHelper.ATTR_ATTRIBUTES, attributes);
+        root.add(RestHelper.ATTR_DATA, data);
+
+        return root;
+    }
 }

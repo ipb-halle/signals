@@ -75,6 +75,7 @@ public class RestHelper {
     public static final String ATTR_USER = "user";
     public static final String ATTR_DISPLAY_VALUE = "displayValue";
     public static final String ATTR_RAW_VALUE = "rawValue";
+    public static final String ATTR_DATA_TYPE = "dataType";
 
 
     public static String formatDate(Date d) {

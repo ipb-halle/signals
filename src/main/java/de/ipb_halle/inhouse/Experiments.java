@@ -144,21 +144,21 @@ public class Experiments {
         experimentDTO.setInhouseDB(inhouseDB);
 
         // 2) Create a Signals Experiment JavaObject
-        //  Experiment experimentSignals = experimentDTO.createExperiment();
+        Experiment experimentSignals = experimentDTO.createExperiment();
 
         // 3) Make a Rest Call to signals API in order to create an experiment entity in signals Notebook
         // with field values for an Experiment Template InhouseExperiment (Template ID = experiment:834e6aee-0d59-4732-89d7-925edca09844)
-        //experimentSignals = inhouseDB.getExperimentRestService().createNewExperiment(experimentSignals);
+        experimentSignals = inhouseDB.getExperimentRestService().createNewExperiment(experimentSignals);
 
         // 4) Set Id to Inhose Experiment
-        // experiment.setEid(experimentSignals.getId());
+        experiment.setEid(experimentSignals.getId());
 
         // 5) Make a Rest Call for Creation of an Experiment Child: empty ChemDrawing Entity for further import of a Structure
-//        String chemDrawId = inhouseDB.getExperimentRestService()
-//                .createNewChemicalDrawingAsExperimentChild(
-//                        experimentSignals.getId(),
-//                        "empty_structure.cdxml",
-//                        "");
+        String chemDrawId = inhouseDB.getExperimentRestService()
+                .createNewChemicalDrawingAsExperimentChild(
+                        experimentSignals.getId(),
+                        "empty_structure.cdxml",
+                        "");
         //logger.trace("CHEM_DRAW WAS CREATED AND ITS ID IS= {}\n", chemDrawId);
 
         //ToDo next step upon stoicRef add a reaction arrow to chemDraw as well as cdxml file
@@ -168,6 +168,10 @@ public class Experiments {
         String cdxmlString = loadCDXML_StringForGivenExperimentUponMolID(experimentDTO);
 
         // 7) Make Rest Call to add a cdxml Structure as a product to reaction in chemicalDrawing entity
+        // POSITIONS-> = reactants|products|reagents|grid
+        if (!cdxmlString.isEmpty()) {
+            inhouseDB.getExperimentRestService().addReactionToExperiment(chemDrawId, "products", cdxmlString);
+        }
     }
 
     /**
