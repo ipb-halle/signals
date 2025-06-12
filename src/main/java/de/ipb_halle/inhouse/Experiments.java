@@ -137,6 +137,31 @@ public class Experiments {
         return experiments.subList(2, 5);
     }
 
+    /**
+     * Imports an {@link InhouseExperiment} into the Signals platform by creating the corresponding
+     * experiment entity, assigning template-based field values, and attaching a chemical drawing
+     * as a child structure, including the ability to add a chemical structure to a reaction.
+     *
+     * <p>This method performs the following steps:
+     * <ol>
+     *   <li>Wraps the given {@code InhouseExperiment} into a DTO for data preparation and mapping.</li>
+     *   <li>Creates a new {@link Experiment} Java object using a predefined experiment template
+     *       (e.g., "InhouseExperiment" template).</li>
+     *   <li>Sends a REST request to the Signals API to create this experiment in the Signals Notebook backend.</li>
+     *   <li>Sets the returned experiment ID to the original inhouse experiment object for reference.</li>
+     *   <li>Creates an empty {@code chemicalDrawing} child entity for the experiment to hold the structure later.</li>
+     *   <li>Loads a CDXML structure file based on the experiment's associated molId via the correlation table.</li>
+     *   <li>If the CDXML is found and non-empty, it is appended to the experiment’s chemicalDrawing as a
+     *       reaction product via an API POST call to Signals.</li>
+     * </ol>
+     *
+     * <p><strong>Note:</strong> This method assumes a working mapping between
+     * {@code procedureId ↔ molId} via {@code InhouseCorrelation}, and the existence of a
+     * CDXML file on disk named accordingly (e.g., {@code mol_21248.cdxml}).
+     *
+     * @param experiment the {@link InhouseExperiment} instance to be imported into Signals
+     * @throws RuntimeException if any I/O or REST communication error occurs
+     */
     private void importExperiment(InhouseExperiment experiment) {
 
         // 1) Create Inhouse Experiment DTO

@@ -61,6 +61,24 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
     public static final String APPEND_CHEMICAL_DRAWING_TO_EXPERIMENT = "/entities/%s/children/%s"; // eid, filename
     private static final String CHEMICAL_DRAWINGS_ADD_REACTION_CDXML = "/chemicaldrawings/%s/reaction/%s";
 
+    /**
+     * Creates a new {@code Experiment} entity in the Signals platform by sending
+     * a POST request with the provided experiment data.
+     *
+     * <p>This method serializes the given {@link Experiment} object into a JSON structure
+     * expected by the Signals REST API. The resulting JSON is submitted to the endpoint
+     * responsible for creating new experiment entities. On success, the response is parsed
+     * and mapped back into a new {@code Experiment} object with the assigned EID and any
+     * additional properties set by the server.
+     *
+     * <p>The method is annotated with {@code @TransactionAttribute(REQUIRES_NEW)} to ensure
+     * that the experiment creation occurs in a new transactional context, independent of the
+     * surrounding transaction.
+     *
+     * @param experiment the {@link Experiment} object to create in the Signals system
+     * @return the newly created {@link Experiment} object, including its assigned ID and metadata
+     * @throws RuntimeException if any error occurs during REST communication or response parsing
+     */
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public Experiment createNewExperiment(Experiment experiment) {
         JsonObject request = prepareExperiment(experiment);
@@ -80,9 +98,27 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
     }
 
+    /**
+     * Creates a new {@code chemicalDrawing} entity as a child of the given experiment entity
+     * by uploading an optional CDXML structure to the Signals platform.
+     *
+     * <p>This method constructs the appropriate endpoint using the parent {@code experimentId}
+     * and a provided filename, and uploads the CDXML content (which can be empty).
+     * The Signals REST API is called via a {@code POST} request, and the ID of the newly
+     * created {@code chemicalDrawing} entity is returned.
+     *
+     * <p><strong>Note:</strong> This method expects a {@code 201 Created} response code from the API.
+     * If another code is returned, an {@link UnexpectedResponseCodeException} is thrown.
+     *
+     * @param experimentId the ID of the parent experiment entity (EID format)
+     * @param filename     the logical filename to assign to the uploaded CDXML (e.g., {@code "empty_structure.cdxml"})
+     * @param cdxmlContent the CDXML chemical structure to upload (may be an empty string)
+     * @return the ID of the created {@code chemicalDrawing} entity (in Signals EID format)
+     *
+     * @throws RuntimeException if any I/O, URI, or REST API errors occur
+     */
     public String createNewChemicalDrawingAsExperimentChild(String experimentId, String filename, String cdxmlContent) {
         String encodedEid = URLEncoder.encode(experimentId, StandardCharsets.UTF_8);
         String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8);
@@ -203,11 +239,34 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
         return attributes;
     }
 
+    /**
+     * Retrieves an {@link Experiment} entity from the Signals platform based on its EID.
+     *
+     * <p>This method sends a GET request to the defined experiment endpoint,
+     * receives the JSON representation of the experiment, and parses it into
+     * a {@link Experiment} object.
+     *
+     * @param experimentId the EID of the experiment to fetch (e.g., "experiment:abc123...")
+     * @return the {@link Experiment} object parsed from the response
+     * @throws Exception if any error occurs during the fetch or parsing process
+     */
     public Experiment doGetExperiment(String experimentId) throws Exception {
         JsonElement object = fetchSample(RECEIVE_EXPERIMENT_ENDPOINT, experimentId);
         return parseReply(object);
     }
 
+    /**
+     * Sends a GET request to retrieve experiment JSON from the specified endpoint.
+     *
+     * <p>This helper method builds and executes the GET call using {@code restClient},
+     * parses the HTTP response body into a JSON element, and extracts the 'data' section
+     * of the response.
+     *
+     * @param receiveExperimentEndpoint the endpoint URL template for fetching the experiment
+     * @param experimentId the ID of the experiment (will be used in endpoint formatting)
+     * @return the {@link JsonElement} containing the raw experiment data
+     * @throws RuntimeException if an error occurs during the request or parsing
+     */
     private JsonElement fetchSample(String receiveExperimentEndpoint, String experimentId) {
         try {
             restClient.setMethod(Method.GET)
@@ -222,6 +281,26 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
         }
     }
 
+    /**
+     * Parses a JSON representation of an experiment into a fully populated {@link Experiment} object.
+     *
+     * <p>This method extracts the 'attributes' and 'relationships' blocks from the JSON structure,
+     * and sets the appropriate fields in the {@code Experiment} entity. It supports parsing of:
+     * <ul>
+     *     <li>Basic metadata (name, description, ID, type)</li>
+     *     <li>Timestamps (createdAt, editedAt)</li>
+     *     <li>Digest for optimistic locking</li>
+     *     <li>Nested relationships like ancestors, children, template</li>
+     *     <li>Custom fields, if present</li>
+     * </ul>
+     *
+     * <p>If the JSON is malformed or incomplete, the method logs the error and returns a partially
+     * filled {@code Experiment}.
+     *
+     * @param json the JSON object containing the Signals experiment data
+     * @return the parsed {@link Experiment} instance
+     * @throws Exception if parsing fails critically
+     */
     @Override
     public Experiment parseReply(JsonElement json) throws Exception {
         Experiment experiment = new Experiment();
@@ -268,6 +347,16 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
         return experiment;
     }
 
+    /**
+     * Parses the 'fields' section from the experiment's JSON attributes and populates property values.
+     *
+     * <p>This method extracts key-value pairs from the 'fields' JSON object,
+     * where each key is treated as a property ID and its associated value is stored
+     * in an {@link ExperimentPropertyValue}. All parsed values are attached to the given {@link Experiment}.
+     *
+     * @param attributes the JSON object containing experiment attributes
+     * @param experiment the {@link Experiment} object to populate with parsed fields
+     */
     private void parseFields(JsonObject attributes, Experiment experiment) {
         JsonObject fieldsJson = attributes.getAsJsonObject(RestHelper.ATTR_FIELDS);
         Set<ExperimentPropertyValue> values = new HashSet<>();
@@ -284,12 +373,31 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
         experiment.setPropertyValues(values);
     }
 
+    /**
+     * Parses the basic relationship fields such as 'createdBy', 'editedBy', and 'owner' from the JSON structure.
+     *
+     * <p>This method extracts references to users responsible for creating and editing the experiment,
+     * as well as the current owner. These are stored in {@link UserReference} fields of the {@link Experiment}.
+     *
+     * @param relationships the 'relationships' JSON object of the experiment
+     * @param experiment the {@link Experiment} object to populate with relationship data
+     */
     private void parseRelationships(JsonObject relationships, Experiment experiment) {
         experiment.setCreatedBy(new UserReference(RestHelper.parseString(RestHelper.getPrimitiveFromPath(relationships, SignalsEntityDTO.ATTR_CREATED_BY), null)));
         experiment.setEditedBy(new UserReference(RestHelper.parseString(RestHelper.getPrimitiveFromPath(relationships, SignalsEntityDTO.ATTR_EDITED_BY), null)));
         experiment.setOwner(new UserReference(RestHelper.parseString(RestHelper.getPrimitiveFromPath(relationships, SignalsEntityDTO.ATTR_OWNER), null)));
     }
 
+    /**
+     * Parses the list of ancestor entities from the experiment's relationships and adds them to the experiment.
+     *
+     * <p>For each ancestor entity ID found in the JSON structure, the method fetches the corresponding
+     * full entity data from the server, parses it into a {@link SignalsEntity}, and attaches it to the
+     * experiment as an ancestor. The most recent ancestor (last in the list) is also set as the {@code ancestorId}.
+     *
+     * @param relationships the 'relationships' JSON object of the experiment
+     * @param experiment the {@link Experiment} to which the ancestors will be attached
+     */
     private void parseAncestors(JsonObject relationships, Experiment experiment) {
         JsonArray dataArray = relationships
                 .getAsJsonObject(RestHelper.ATTR_ANCESTORS)
@@ -309,6 +417,15 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
         }
     }
 
+    /**
+     * Parses the list of child entities from the experiment's relationships and adds them to the experiment.
+     *
+     * <p>This method extracts all child entity references from the JSON, then fetches and parses each child
+     * into a {@link SignalsEntity}, which is added to the experiment's internal child list.
+     *
+     * @param relationships the 'relationships' JSON object of the experiment
+     * @param experiment the {@link Experiment} object to which the children will be attached
+     */
     private void parseChildren(JsonObject relationships, Experiment experiment) {
         JsonObject children = relationships.get(RestHelper.ATTR_CHILDREN).getAsJsonObject();
         JsonArray dataArray = children.get(RestHelper.ATTR_DATA).getAsJsonArray();
@@ -321,6 +438,15 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
         }
     }
 
+    /**
+     * Parses the system template relationship of the experiment and sets its template ID.
+     *
+     * <p>This method accesses the 'systemTemplate' → 'data' → 'id' field from the relationships
+     * JSON and sets the extracted ID as the template reference for the experiment.
+     *
+     * @param relationships the 'relationships' JSON element containing the system template data
+     * @param experiment the {@link Experiment} to assign the template ID to
+     */
     private void parseTemplate(JsonElement relationships, Experiment experiment) {
         JsonObject data = relationships.getAsJsonObject()
                 .getAsJsonObject(RestHelper.ATTR_SYSTEM_TEMPLATE)
@@ -328,6 +454,15 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
         experiment.setTemplateId(data.get(RestHelper.ATTR_ID).getAsString());
     }
 
+    /**
+     * Fetches and parses the list of property definitions for a given experiment template.
+     *
+     * <p>This method uses the experiment's {@code templateId} to request the metadata of all
+     * properties defined by its template. The response is parsed and added to the experiment as
+     * {@link ExperimentProperty} objects.
+     *
+     * @param experiment the {@link Experiment} instance whose properties are to be populated
+     */
     public void doGetExperimentProperties(Experiment experiment) {
         JsonElement json = fetchSample(EXPERIMENT_GET_PROPERTIES_ENDPOINT, experiment.getTemplateId());
 
@@ -338,6 +473,15 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
         }
     }
 
+    /**
+     * Parses a single experiment property definition JSON object and adds it to the experiment.
+     *
+     * <p>Extracts ID, name, and type from the given JSON structure and maps it into
+     * an {@link ExperimentProperty} instance, which is added to the given {@link Experiment}.
+     *
+     * @param experiment the experiment to add the property to
+     * @param experimentPropertiesObject the JSON object representing a property definition
+     */
     private void parseExperimentProperties(Experiment experiment, JsonElement experimentPropertiesObject) {
         JsonObject propertiesObject = experimentPropertiesObject.getAsJsonObject();
         JsonObject definition = propertiesObject.get(RestHelper.ATTR_META).getAsJsonObject().get(RestHelper.ATTR_DEFINITION).getAsJsonObject();
@@ -361,7 +505,15 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
         experiment.addProperty(experimentProperty);
     }
 
-    // RECEIVE EXPERIMENT PROPERTY VALUES
+    /**
+     * Fetches and parses all property values of the given experiment instance.
+     *
+     * <p>This method requests the actual values assigned to properties for the given experiment
+     * (identified by its ID), and maps them into {@link ExperimentPropertyValue} objects,
+     * which are added to the experiment instance.
+     *
+     * @param experiment the {@link Experiment} to populate with property values
+     */
     public void doGetExperimentPropertyValues(Experiment experiment) {
         JsonElement json = fetchSample(EXPERIMENT_GET_PROPERTY_VALUES_ENDPOINT, experiment.getId());
 
@@ -372,6 +524,16 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
         }
     }
 
+    /**
+     * Parses a single property value entry and adds it to the corresponding property in the experiment.
+     *
+     * <p>Matches the property name from the JSON attributes to the experiment's property list.
+     * If a match is found, a new {@link ExperimentPropertyValue} is created and added to the experiment.
+     * If either the property name or value is missing, the field is defaulted to an empty string.
+     *
+     * @param experiment the {@link Experiment} instance to update
+     * @param experimentPropertiesObject the JSON element containing a property value
+     */
     private void parseExperimentPropertyValues(Experiment experiment, JsonElement experimentPropertiesObject) {
         JsonObject propertiesObject = experimentPropertiesObject.getAsJsonObject();
         JsonObject attributes = propertiesObject.get(RestHelper.ATTR_ATTRIBUTES).getAsJsonObject();
@@ -399,7 +561,24 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
         }
     }
 
-
+    /**
+     * Appends a chemical structure (in CDXML format) as a reaction component
+     * to a specified {@code chemicalDrawing} entity in the Signals platform.
+     *
+     * <p>The structure is added to the reaction diagram in the given position,
+     * which can be one of: {@code reactants}, {@code products}, {@code reagents}, or {@code grid}.
+     *
+     * <p>The method constructs the appropriate API endpoint, builds the JSON request body,
+     * and sends a POST request to the Signals REST API.
+     *
+     * <p>The request is made with {@code force=true} to bypass digest checks.
+     *
+     * @param chemicalDrawingEid the EID of the target {@code chemicalDrawing} entity
+     * @param position           the reaction position to append the structure to
+     *                           (valid values: {@code reactants}, {@code products}, {@code reagents}, {@code grid})
+     * @param cdxmlString        the CDXML-formatted chemical structure to be appended
+     * @throws RuntimeException if the REST call fails or an error occurs while building the request
+     */
     public void addReactionToExperiment(String chemicalDrawingEid, String position, String cdxmlString) {
         JsonObject request = prepareReactionAppendJson(cdxmlString);
         String encodedEid = URLEncoder.encode(chemicalDrawingEid, StandardCharsets.UTF_8);
@@ -421,6 +600,25 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
         }
     }
 
+    /**
+     * Prepares the JSON payload for appending a chemical structure in CDXML format
+     * to a reaction via the Signals REST API.
+     *
+     * <p>The resulting JSON structure follows this format:
+     * <pre>
+     * {
+     *   "data": {
+     *     "attributes": {
+     *       "dataType": "cdxml",
+     *       "data": "<CDXML content>"
+     *     }
+     *   }
+     * }
+     * </pre>
+     *
+     * @param cdxmlString the CDXML string to be embedded in the request body
+     * @return a {@link JsonObject} representing the request payload
+     */
     private JsonObject prepareReactionAppendJson(String cdxmlString) {
         JsonObject root = new JsonObject();
         JsonObject data = new JsonObject();
