@@ -131,6 +131,7 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
                             endpoint)
                     .execute();
 
+            // Return String id of generated experiment
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
             return jsonResult.getAsJsonObject()
                     .getAsJsonObject(RestHelper.ATTR_DATA)

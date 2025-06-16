@@ -39,9 +39,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class SampleRestService implements RestReplyParser<Sample> {
 
@@ -69,9 +67,8 @@ public class SampleRestService implements RestReplyParser<Sample> {
     public SampleRestService() {
     }
 
-
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void createNewSample(Sample sample) {
+    public String createNewSample(Sample sample) {
         JsonObject request = prepareSample(sample);
 
         try {
@@ -80,6 +77,14 @@ public class SampleRestService implements RestReplyParser<Sample> {
                     .setEndpoint(CREATE_NEW_SAMPLE_ENDPOINT)
                     .setRequestData(request.toString())
                     .execute(RestClient.HTTP_CREATED);
+
+            //Return String id of generated sample
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
+            return jsonResult.getAsJsonObject()
+                    .getAsJsonObject(RestHelper.ATTR_DATA)
+                    .get(RestHelper.ATTR_ID)
+                    .getAsJsonPrimitive().getAsString();
+
         } catch (IOException | URISyntaxException | UnexpectedResponseCodeException e) {
             throw new RuntimeException(e);
         }
@@ -138,7 +143,7 @@ public class SampleRestService implements RestReplyParser<Sample> {
             attributes.add(RestHelper.ATTR_STOIC_REF, prepareStoicRef(sample));
         }
 
-        /** cehmical sample structure
+        /** chemical sample structure
          * {
          *   "data": {
          *     "type": "entity",
@@ -368,6 +373,86 @@ public class SampleRestService implements RestReplyParser<Sample> {
         }
         sample.addProperty(sampleProperty);
         sample.addPropertyValue(samplePropertyValue);
+    }
+
+    /**
+     * Updates the property values of a given sample by sending a PATCH request to the
+     * Signals REST API endpoint "/samples/{sampleId}/properties".
+     * <p>
+     * This method constructs the appropriate JSON body with the given property-value pairs
+     * and performs the request using {@code force=true} to bypass digest validation.
+     * <p>
+     * Note: Only editable/open samples can be updated. Ensure that the sample is not closed.
+     *
+     * @param kvm      a map of property IDs to their new string values
+     * @param sampleId the Signals EID of the sample to be updated (e.g. "sample:abc123")
+     * @throws RuntimeException if the REST call fails or returns an unexpected response code
+     */
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public void updateSamplePropertyValues(HashMap<String, String> kvm, String sampleId) {
+        JsonObject request = prepareFieldValueJson(kvm);
+
+        try {
+            restClient.reset()
+                    .setMethod(Method.PATCH)
+                    .setEndpoint(String.format("/samples/%s/properties?force=true", sampleId))
+                    .setRequestData(request.toString())
+                    .execute(RestClient.HTTP_OK);
+
+        } catch (IOException | URISyntaxException | UnexpectedResponseCodeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Prepares the JSON request body for updating sample properties.
+     * <p>
+     * The generated JSON follows the expected structure for PATCH requests to
+     * the "/samples/{sampleId}/properties" endpoint, including required "type" and nested
+     * "attributes" and "content" fields for each property.
+     *
+     * @param kvm a map of property IDs to their desired string values
+     * @return a JsonObject representing the request payload
+     */
+    private JsonObject prepareFieldValueJson(HashMap<String, String> kvm) {
+        JsonObject root = new JsonObject();
+        JsonObject data = new JsonObject();
+        JsonObject attributes = new JsonObject();
+        JsonArray dataArray = new JsonArray();
+
+        for (Map.Entry<String, String> entry : kvm.entrySet()) {
+            JsonObject propertyObj = getJsonObject(entry);
+            dataArray.add(propertyObj);
+        }
+
+        attributes.add(RestHelper.ATTR_DATA, dataArray);
+        data.add(RestHelper.ATTR_ATTRIBUTES, attributes);
+        root.add(RestHelper.ATTR_DATA, data);
+
+        return root;
+    }
+
+    /**
+     * Builds a single JSON object representing one property update entry.
+     * <p>
+     * The object includes the property ID, type ("text"), and its new value
+     * in the required nested "attributes" -> "content" -> "value" structure.
+     *
+     * @param entry a key-value pair representing a property ID and its new value
+     * @return a JsonObject for this individual property update
+     */
+    private static JsonObject getJsonObject(Map.Entry<String, String> entry) {
+        JsonObject propertyObj = new JsonObject();
+        propertyObj.addProperty(RestHelper.ATTR_ID, entry.getKey());
+        propertyObj.addProperty(RestHelper.ATTR_TYPE, "text");
+
+        JsonObject propertyAttributes = new JsonObject();
+        JsonObject content = new JsonObject();
+        content.addProperty(RestHelper.ATTR_VALUE, entry.getValue());
+        propertyAttributes.add(RestHelper.ATTR_CONTENT, content);
+
+        propertyObj.add(RestHelper.ATTR_ATTRIBUTES, propertyAttributes);
+        return propertyObj;
     }
 
 }

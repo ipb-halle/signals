@@ -17,10 +17,8 @@
  */
 package de.ipb_halle.inhouse;
 
-import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntity;
 import de.ipb_halle.signals.experiments.Experiment;
-import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.sample.Sample;
 import de.ipb_halle.signals.sample.SamplePropertyValue;
 import de.ipb_halle.signals.sample.StoicRef;
@@ -31,6 +29,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -221,27 +220,63 @@ public class Experiments {
         }
     }
 
+    /**
+     * Creates a new chemical sample in the Signals platform based on a given chemical drawing.
+     * <p>
+     * The method performs the following steps:
+     * <ul>
+     *     <li>Initializes a new {@link Sample} object with the correct chemical sample template.</li>
+     *     <li>Sets the ancestor (parent) container or experiment by its Signals EID.</li>
+     *     <li>Assigns the stoichiometry reference (stoicRef) linking the sample to the chemical drawing and its row.</li>
+     *     <li>Sets initial sample property values such as molecule ID (molId).</li>
+     *     <li>Creates the sample via the REST API and retrieves the generated sample ID.</li>
+     *     <li>Updates the sample's properties using a PATCH request to the sample API endpoint.</li>
+     * </ul>
+     * <p>
+     * This method is used when importing data from the legacy database and linking it to a chemical drawing in Signals.
+     *
+     * @param chemDrawId the EID of the chemical drawing to which the sample should be linked
+     * @param rowId      the row index of the drawing’s stoichiometry table
+     * @param ancestorId the EID of the container or experiment to act as the sample's parent
+     * @param molId      the internal molecule ID from the legacy system, to be added as a sample property
+     */
     private void createSampleForChemicalDrawing(String chemDrawId, String rowId, String ancestorId, Integer molId) {
+        // Create a new Sample and assign the chemical sample template
         Sample sample = new Sample();
         sample.setTemplateId(CHEMICAL_SAMPLE_TEMPLATE_ID);
 
+        // Set the ancestor relationship (usually a sample container or experiment)
         SignalsEntity signals = new SignalsEntity();
         signals.setEid(ancestorId);
         sample.addAncestor(signals);
         sample.setAncestorId(ancestorId);
 
-
+        // Create the stoichiometry reference pointing to a row in the chemical drawing
         StoicRef stoicRef = new StoicRef();
         stoicRef.setEid(chemDrawId);
         stoicRef.setRowId(rowId);
         sample.setStoicRef(stoicRef);
 
+        // Add the molecule ID as a property to the sample
         SamplePropertyValue fvMolId = new SamplePropertyValue();
         fvMolId.setPropertyId("110");
         fvMolId.setPropertyValue(String.valueOf(molId));
 
+        // Create the sample via REST and store the returned Signals sample ID
         sample.addPropertyValue(fvMolId);
-        inhouseDB.getSampleRestService().createNewSample(sample);
+        String sampleId = inhouseDB.getSampleRestService().createNewSample(sample);
+        sample.setId(sampleId);
+        fvMolId.setSampleId(sampleId);
+
+        // Prepare properties as key-value pairs for PATCH update
+        HashMap<String, String> propertyKeyToValue = new HashMap<>();
+        for (SamplePropertyValue samplePropertyValue : sample.getPropertyValues()) {
+            // id                                  // value
+            propertyKeyToValue.put(samplePropertyValue.getPropertyId(), samplePropertyValue.getPropertyValue());
+        }
+
+        // Perform a PATCH request to update the properties of the newly created sample
+        inhouseDB.getSampleRestService().updateSamplePropertyValues(propertyKeyToValue, sampleId);
     }
 
     /**
