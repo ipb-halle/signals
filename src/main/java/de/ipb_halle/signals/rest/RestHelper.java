@@ -42,6 +42,7 @@ public class RestHelper {
     public final static String ATTR_EDITED_AT = "editedAt";
     public final static String ATTR_FIELDS = "fields";
     public final static String ATTR_ID = "id";
+    public final static String ATTR_EID = "eid";
     public final static String ATTR_NAME = "name";
     public final static String ATTR_TYPE = "type";
     public final static String ATTR_TYPE_ID = "typeId";
@@ -76,6 +77,8 @@ public class RestHelper {
     public static final String ATTR_DISPLAY_VALUE = "displayValue";
     public static final String ATTR_RAW_VALUE = "rawValue";
     public static final String ATTR_DATA_TYPE = "dataType";
+    public static final String ATTR_STOIC_REF = "stoicRef";
+    public static final String ATTR_ROW_ID = "rowId";
 
 
     public static String formatDate(Date d) {

@@ -116,12 +116,11 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
      * @param filename     the logical filename to assign to the uploaded CDXML (e.g., {@code "empty_structure.cdxml"})
      * @param cdxmlContent the CDXML chemical structure to upload (may be an empty string)
      * @return the ID of the created {@code chemicalDrawing} entity (in Signals EID format)
-     *
      * @throws RuntimeException if any I/O, URI, or REST API errors occur
      */
     public String createNewChemicalDrawingAsExperimentChild(String experimentId, String filename, String cdxmlContent) {
         String encodedEid = URLEncoder.encode(experimentId, StandardCharsets.UTF_8);
-        String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8);
+        String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8).replace("+", "%20");
 
         String endpoint = String.format(APPEND_CHEMICAL_DRAWING_TO_EXPERIMENT, encodedEid, encodedFilename);
         try {
@@ -263,7 +262,7 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
      * of the response.
      *
      * @param receiveExperimentEndpoint the endpoint URL template for fetching the experiment
-     * @param experimentId the ID of the experiment (will be used in endpoint formatting)
+     * @param experimentId              the ID of the experiment (will be used in endpoint formatting)
      * @return the {@link JsonElement} containing the raw experiment data
      * @throws RuntimeException if an error occurs during the request or parsing
      */
@@ -380,7 +379,7 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
      * as well as the current owner. These are stored in {@link UserReference} fields of the {@link Experiment}.
      *
      * @param relationships the 'relationships' JSON object of the experiment
-     * @param experiment the {@link Experiment} object to populate with relationship data
+     * @param experiment    the {@link Experiment} object to populate with relationship data
      */
     private void parseRelationships(JsonObject relationships, Experiment experiment) {
         experiment.setCreatedBy(new UserReference(RestHelper.parseString(RestHelper.getPrimitiveFromPath(relationships, SignalsEntityDTO.ATTR_CREATED_BY), null)));
@@ -396,7 +395,7 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
      * experiment as an ancestor. The most recent ancestor (last in the list) is also set as the {@code ancestorId}.
      *
      * @param relationships the 'relationships' JSON object of the experiment
-     * @param experiment the {@link Experiment} to which the ancestors will be attached
+     * @param experiment    the {@link Experiment} to which the ancestors will be attached
      */
     private void parseAncestors(JsonObject relationships, Experiment experiment) {
         JsonArray dataArray = relationships
@@ -424,7 +423,7 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
      * into a {@link SignalsEntity}, which is added to the experiment's internal child list.
      *
      * @param relationships the 'relationships' JSON object of the experiment
-     * @param experiment the {@link Experiment} object to which the children will be attached
+     * @param experiment    the {@link Experiment} object to which the children will be attached
      */
     private void parseChildren(JsonObject relationships, Experiment experiment) {
         JsonObject children = relationships.get(RestHelper.ATTR_CHILDREN).getAsJsonObject();
@@ -445,7 +444,7 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
      * JSON and sets the extracted ID as the template reference for the experiment.
      *
      * @param relationships the 'relationships' JSON element containing the system template data
-     * @param experiment the {@link Experiment} to assign the template ID to
+     * @param experiment    the {@link Experiment} to assign the template ID to
      */
     private void parseTemplate(JsonElement relationships, Experiment experiment) {
         JsonObject data = relationships.getAsJsonObject()
@@ -479,7 +478,7 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
      * <p>Extracts ID, name, and type from the given JSON structure and maps it into
      * an {@link ExperimentProperty} instance, which is added to the given {@link Experiment}.
      *
-     * @param experiment the experiment to add the property to
+     * @param experiment                 the experiment to add the property to
      * @param experimentPropertiesObject the JSON object representing a property definition
      */
     private void parseExperimentProperties(Experiment experiment, JsonElement experimentPropertiesObject) {
@@ -531,7 +530,7 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
      * If a match is found, a new {@link ExperimentPropertyValue} is created and added to the experiment.
      * If either the property name or value is missing, the field is defaulted to an empty string.
      *
-     * @param experiment the {@link Experiment} instance to update
+     * @param experiment                 the {@link Experiment} instance to update
      * @param experimentPropertiesObject the JSON element containing a property value
      */
     private void parseExperimentPropertyValues(Experiment experiment, JsonElement experimentPropertiesObject) {

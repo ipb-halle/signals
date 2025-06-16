@@ -88,9 +88,11 @@ public class SampleRestService implements RestReplyParser<Sample> {
     private JsonObject prepareSample(Sample sample) {
         JsonObject resultingJson = new JsonObject();
         JsonObject data = new JsonObject();
+
         data.addProperty(RestHelper.ATTR_TYPE, Sample.ATTR_SAMPLE);
         data.add(RestHelper.ATTR_ATTRIBUTES, prepareAttributes(sample));
         data.add(RestHelper.ATTR_RELATIONSHIPS, prepareRelationships(sample));
+
         resultingJson.add(RestHelper.ATTR_DATA, data);
         return resultingJson;
     }
@@ -106,6 +108,7 @@ public class SampleRestService implements RestReplyParser<Sample> {
         JsonObject ancestors = new JsonObject();
         JsonArray data = new JsonArray();
         JsonObject dataObject = new JsonObject();
+
         dataObject.addProperty(RestHelper.ATTR_TYPE, sample.getAncestorId().split(":")[0]);
         dataObject.addProperty(RestHelper.ATTR_ID, sample.getAncestorId());
         data.add(dataObject);
@@ -124,8 +127,55 @@ public class SampleRestService implements RestReplyParser<Sample> {
 
     private JsonElement prepareAttributes(Sample sample) {
         JsonObject attributes = new JsonObject();
-        attributes.add(RestHelper.ATTR_FIELDS, prepareFields(sample));
+
+        // For non-chemical sample case
+        if (!sample.isChemicalSample()) {
+            attributes.add(RestHelper.ATTR_FIELDS, prepareFields(sample));
+        }
+
+        // For chemical sample case
+        if (sample.isChemicalSample()) {
+            attributes.add(RestHelper.ATTR_STOIC_REF, prepareStoicRef(sample));
+        }
+
+        /** cehmical sample structure
+         * {
+         *   "data": {
+         *     "type": "entity",
+         *     "attributes": {
+         *       "type": "sample",
+         *       "stoicRef": {
+         *         "eid": "chemicalDrawing:abc12345",
+         *         "rowId": "1"
+         *       }
+         *     },
+         *     "relationships": {
+         *       "ancestors": {
+         *         "data": [
+         *           {
+         *             "type": "entity",
+         *             "id": "samplesContainer:xyz"
+         *           }
+         *         ]
+         *       },
+         *       "template": {
+         *         "data": {
+         *           "type": "template",
+         *           "id": "testcompound-template-id"
+         *         }
+         *       }
+         *     }
+         *   }
+         * }
+         */
         return attributes;
+    }
+
+    private JsonElement prepareStoicRef(Sample sample) {
+        JsonObject stoicRef = new JsonObject();
+        stoicRef.addProperty(RestHelper.ATTR_EID, sample.getStoicRef().getEid());
+        stoicRef.addProperty(RestHelper.ATTR_ROW_ID, sample.getStoicRef().getRowId());
+        return stoicRef;
     }
 
     private JsonArray prepareFields(Sample sample) {

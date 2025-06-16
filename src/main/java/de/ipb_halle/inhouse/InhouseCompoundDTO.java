@@ -60,7 +60,7 @@ public class InhouseCompoundDTO {
         synonyms = new HashSet<>();
         synonyms = inhouseCompound.getSynonyms();
 
-        logger.trace("InCoDTO is created: compound = {}\n", this.toString());
+        // logger.trace("InCoDTO is created: compound = {}\n", this.toString());
     }
 
     public InhouseCompound createEntity() {
@@ -88,16 +88,15 @@ public class InhouseCompoundDTO {
         mat.setCreatedAt(date);
         mat.setEditedAt(date);
 
-        mat.setDescription(remarks == null || remarks.isEmpty() ? "no remarks was present" +System.currentTimeMillis() : remarks);
+        mat.setDescription(remarks == null || remarks.isEmpty() ? "no remarks was present" + System.currentTimeMillis() : remarks);
         mat.setEntityType(EntityType.valueOf(Material.ENTITY_TYPE_ASSET));
 
         mat.setLibraryId("assetType:" + inhouseDB.getConfigString(Compounds.COMPOUNDS_LIBRARY_ID));
         mat.setOwner(new UserReference(inhouseDB.getConfigString(Compounds.COMPOUNDS_OWNER)));
-        //mat.setDigest(0L);
 
         mat.addAllSynonyms(synonyms);
 
-        logger.info("InCo_DTO-> createAsset(): material = {}\n", mat.toString());
+        // logger.trace("InCo_DTO-> createAsset(): material = {}\n", mat.toString());
 
         createAssetFields(mat);
         return mat;
@@ -122,7 +121,6 @@ public class InhouseCompoundDTO {
 
         mat.setLibraryId("assetType:" + inhouseDB.getConfigString(Compounds.COMPOUNDS_LIBRARY_ID));
         mat.setOwner(iUser);
-        mat.setDigest(0L);
 
         createBatchFields(mat);
         return mat;
@@ -219,7 +217,6 @@ public class InhouseCompoundDTO {
         fvPurity.setField(fieldMap.get(fvPurity.getFieldId()));
         fvPurity.setValue("99.9");
         mat.addFieldValue(fvPurity);
-
     }
 
     public void addSynonyms(Collection<InhouseSynonym> synonyms) {

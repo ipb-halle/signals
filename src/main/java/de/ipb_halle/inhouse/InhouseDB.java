@@ -29,6 +29,7 @@ import de.ipb_halle.signals.field.FieldDbService;
 import de.ipb_halle.signals.materials.LibraryDbService;
 import de.ipb_halle.signals.materials.MaterialRestService;
 import de.ipb_halle.signals.rest.RestHelper;
+import de.ipb_halle.signals.sample.SampleRestService;
 import jakarta.ejb.Local;
 import jakarta.inject.Inject;
 import org.apache.commons.cli.*;
@@ -97,6 +98,9 @@ public class InhouseDB {
     @Inject
     private DynEnumManager dynEnumManager;
 
+    @Inject
+    private SampleRestService sampleRestService;
+
     @SuppressWarnings("static-access")
     private static final Option inhouseOpt = Option.builder("inhouse")
             .longOpt("importInhouse")
@@ -143,6 +147,10 @@ public class InhouseDB {
         return dynEnumManager;
     }
 
+    public SampleRestService getSampleRestService(){
+        return sampleRestService;
+    }
+
     private void importData(String configFile) throws Exception {
         readConfig(configFile);
 
@@ -155,15 +163,17 @@ public class InhouseDB {
         logger.info("STARTING IMPORT OF Table Correlations between structure and organism");
         Correlation correlation = new Correlation(this);
 
+        logger.info("STARTING IMPORT OF SAMPLES");
+        Samples samples = new Samples(this);
+
 //        Taxonomy taxonomy = new Taxonomy(this);
-//        Samples samples = new Samples(this);
 
 //        compounds.importData();
         experiments.importData();
-      //  correlation.importData();
+        //  correlation.importData();
 
 //        taxonomy.importData();
-//        samples.importData();
+      //  samples.importData();
     }
 
 

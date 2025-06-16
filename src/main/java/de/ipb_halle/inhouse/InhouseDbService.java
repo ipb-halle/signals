@@ -167,6 +167,7 @@ public class InhouseDbService {
         return em.createQuery(query).getSingleResult();
     }
 
+
     public void save(InhouseCompound mat) {
         this.em.merge(mat);
     }

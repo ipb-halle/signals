@@ -17,7 +17,13 @@
  */
 package de.ipb_halle.inhouse;
 
+import de.ipb_halle.signals.entity.EntityType;
+import de.ipb_halle.signals.entity.SignalsEntity;
 import de.ipb_halle.signals.experiments.Experiment;
+import de.ipb_halle.signals.field.FieldValue;
+import de.ipb_halle.signals.sample.Sample;
+import de.ipb_halle.signals.sample.SamplePropertyValue;
+import de.ipb_halle.signals.sample.StoicRef;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -26,6 +32,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,7 +51,11 @@ public class Experiments {
     public static final String EXPERIMENTS_FIELD_INDIVIDUAL_CODE = "experiments.fields.individualCode";
     public static final String EXPERIMENTS_FIELD_JOURNAL = "experiments.fields.journal";
     public static final String EXPERIMENTS_FIELD_PROCEDURE_ID = "experiments.fields.procId";
+    public static final String CHEMICAL_SAMPLE_TEMPLATE_ID = "sample:0174e78c-0b95-49f9-8a57-39061bbc0050";
     private final Logger logger = LogManager.getLogger(Experiments.class);
+
+    private record ChemDrawData(Integer molId, String fieldValueCdxml) {
+    }
 
     private InhouseDB inhouseDB;
 
@@ -176,27 +187,61 @@ public class Experiments {
         experimentSignals = inhouseDB.getExperimentRestService().createNewExperiment(experimentSignals);
 
         // 4) Set Id to Inhose Experiment
-        experiment.setEid(experimentSignals.getId());
+        String id = experimentSignals.getId();
+        logger.info("EXPERIMENTS ======*************==id = {}\n", id);
+        experiment.setEid(id);
 
         // 5) Make a Rest Call for Creation of an Experiment Child: empty ChemDrawing Entity for further import of a Structure
         String chemDrawId = inhouseDB.getExperimentRestService()
                 .createNewChemicalDrawingAsExperimentChild(
                         experimentSignals.getId(),
-                        "empty_structure.cdxml",
+                        String.format("Procedure with id = %s", experimentDTO.getProcId()),
                         "");
         //logger.trace("CHEM_DRAW WAS CREATED AND ITS ID IS= {}\n", chemDrawId);
 
-        //ToDo next step upon stoicRef add a reaction arrow to chemDraw as well as cdxml file
-        //ToDo first we need to map a Structure = InhouseCompound to Experiment through the InhouseCorrelation ProcedureID to MOL_ID
-
         // 6) Map a cdxml from Compound file to an experiment
-        String cdxmlString = loadCDXML_StringForGivenExperimentUponMolID(experimentDTO);
+        Optional<ChemDrawData> optionalData = loadCDXML_StringForGivenExperimentUponMolID(experimentDTO);
 
-        // 7) Make Rest Call to add a cdxml Structure as a product to reaction in chemicalDrawing entity
-        // POSITIONS-> = reactants|products|reagents|grid
-        if (!cdxmlString.isEmpty()) {
-            inhouseDB.getExperimentRestService().addReactionToExperiment(chemDrawId, "products", cdxmlString);
+        if (optionalData.isPresent()) {
+            ChemDrawData chemDrawData = optionalData.get();
+
+            String cdxmlString = chemDrawData.fieldValueCdxml;
+            // 7) Make Rest Call to add a cdxml Structure as a product to reaction in chemicalDrawing entity
+            // POSITIONS-> = reactants|products|reagents|grid
+            if (!cdxmlString.isEmpty()) {
+                inhouseDB.getExperimentRestService().addReactionToExperiment(chemDrawId, "products", cdxmlString);
+            }
+
+            // 8) Create SampleContainer with sample from the chemical drawing. Will be added as stoicRef upon POST create entity type Sample
+            String rowId = "1";
+            createSampleForChemicalDrawing(chemDrawId, rowId, id, chemDrawData.molId);
+
+        } else {
+            logger.error("No data in ChemDrawData -> check loadCDXML_StringForGivenExperimentUponMolID()");
         }
+    }
+
+    private void createSampleForChemicalDrawing(String chemDrawId, String rowId, String ancestorId, Integer molId) {
+        Sample sample = new Sample();
+        sample.setTemplateId(CHEMICAL_SAMPLE_TEMPLATE_ID);
+
+        SignalsEntity signals = new SignalsEntity();
+        signals.setEid(ancestorId);
+        sample.addAncestor(signals);
+        sample.setAncestorId(ancestorId);
+
+
+        StoicRef stoicRef = new StoicRef();
+        stoicRef.setEid(chemDrawId);
+        stoicRef.setRowId(rowId);
+        sample.setStoicRef(stoicRef);
+
+        SamplePropertyValue fvMolId = new SamplePropertyValue();
+        fvMolId.setPropertyId("110");
+        fvMolId.setPropertyValue(String.valueOf(molId));
+
+        sample.addPropertyValue(fvMolId);
+        inhouseDB.getSampleRestService().createNewSample(sample);
     }
 
     /**
@@ -210,12 +255,13 @@ public class Experiments {
      * @return the CDXML content as a String, or an empty string if no corresponding file was found
      * @throws RuntimeException if an unexpected I/O error occurs while reading the file
      */
-    private String loadCDXML_StringForGivenExperimentUponMolID(InhouseExperimentDTO experimentDTO) {
+    private Optional<ChemDrawData> loadCDXML_StringForGivenExperimentUponMolID(InhouseExperimentDTO experimentDTO) {
         // 1) Load the correlation entry to resolve the molId for the given experiment
         InhouseCorrelation correlation = loadCorrelationByExperimentProcedureId(experimentDTO.getProcId());
 
         // 2) Extract the molId from the correlation object
         Integer molId = correlation.getMolId();
+
 
         // 3) Resolve the full path to the CDXML file using the configured file path pattern and molId
         Path filePath = Path.of(String.format(
@@ -225,7 +271,7 @@ public class Experiments {
         // 4) If the file does not exist, log a warning and return an empty string
         if (!Files.exists(filePath)) {
             logger.warn("CDXML file does not exist for molId={}, skipping file: {}\n", molId, filePath);
-            return "";
+            return Optional.empty();
         }
 
         try {
@@ -234,7 +280,7 @@ public class Experiments {
             //logger.trace("EXPERIMENTS => fieldValueCdxml = {}", fieldValueCdxml);
 
             // 6) Return the CDXML content
-            return fieldValueCdxml;
+            return Optional.of(new ChemDrawData(molId, fieldValueCdxml));
 
         } catch (IOException e) {
 

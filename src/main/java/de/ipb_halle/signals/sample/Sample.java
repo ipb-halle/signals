@@ -284,10 +284,14 @@ public class Sample {
     }
 
     public void setTemplateId(String templateId) {
-        this.templateId=templateId;
+        this.templateId = templateId;
     }
 
     public void addPropertyValue(SamplePropertyValue samplePropertyValue) {
         this.propertyValues.add(samplePropertyValue);
+    }
+
+    public boolean isChemicalSample() {
+        return templateId.equalsIgnoreCase("sample:0174e78c-0b95-49f9-8a57-39061bbc0050");
     }
 }
