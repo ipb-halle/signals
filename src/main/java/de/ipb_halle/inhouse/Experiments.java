@@ -29,9 +29,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,6 +40,8 @@ import java.util.regex.Pattern;
  *
  * @author fbroda
  */
+//toDo -> make all experiments to be in one upon 3LC
+//toDO ->  MolId: 27883, Experiment: WSE001, Journal: 01.023 as description in sample
 public class Experiments {
 
     public final static String EXPERIMENTS_FILENAME = "experiments.filename";
@@ -51,6 +51,7 @@ public class Experiments {
     public static final String EXPERIMENTS_FIELD_JOURNAL = "experiments.fields.journal";
     public static final String EXPERIMENTS_FIELD_PROCEDURE_ID = "experiments.fields.procId";
     public static final String CHEMICAL_SAMPLE_TEMPLATE_ID = "sample:0174e78c-0b95-49f9-8a57-39061bbc0050";
+    public static final String CHEMICAL_SAMPLE_PROPERTY_ID_DESCRIPTION = "2";
     private final Logger logger = LogManager.getLogger(Experiments.class);
 
     private record ChemDrawData(Integer molId, String fieldValueCdxml) {
@@ -126,53 +127,104 @@ public class Experiments {
     }
 
     public void importData() throws Exception {
+        //  1) import Experiments from csv table of inhouse data base
         //   importExperiments();
 
+        // 2) Load all procedures imported from inhouse db
         List<InhouseExperiment> experiments = loadInhouseExperiments();
 
-        for (InhouseExperiment experiment : selectSubset(experiments)) {
-            importExperiment(experiment);
+        // 3) Create an empty HashMap for sorting key = threeLC, value = List<InhouseExperiment> with selected threeLC
+        Map<String, List<InhouseExperiment>> threeLcGroupedMap = new HashMap<>();
+        String firstKey = null; //****test**** toDo delete
+
+        // 4) Iterate each instance in the experiments List
+        for (InhouseExperiment inhouseExperiment : experiments) {
+            // Get threeLc from experiment
+            String key = inhouseExperiment.getThreelc();
+            //logger.trace("EXPERIMENTS: -> importData() -> key (threeLc) = {}\n", key);
+
+            // 5) Check if experiment has 3LC and jump over if it not a case
+            if (key == null) {
+                logger.error("This procedure doesn't have 3LC InhouseExperiment = {}\n", inhouseExperiment.toString());
+                continue;
+            }
+
+            //****test**** toDo delete
+            if (firstKey == null) {
+                firstKey = key;
+                threeLcGroupedMap.put(firstKey, new ArrayList<>());
+            }
+
+//            // 6) Check if the key (threeLc) is already added to a Map
+//            if (!threeLcGroupedMap.containsKey(key)) {
+//                // If not, then add the key and new ArrayList
+//                threeLcGroupedMap.put(key, new ArrayList<>());
+//            }
+//
+//            // 7) Add an Experiment to a List for given key (threeLc)
+//            threeLcGroupedMap.get(key).add(inhouseExperiment);
+//            //logger.trace("Experiments -> importData() added experiment = {}\n", inhouseExperiment.toString());
+
+            //****test**** toDo delete
+            if (key.equals(firstKey)) {
+                threeLcGroupedMap.get(firstKey).add(inhouseExperiment);
+            }
+
+            //****test**** toDo delete
+            if (!key.equals(firstKey)) {
+                break;
+            }
+        }
+
+        // 8) Go through the map and create an experiment for each 3LC
+        for (Map.Entry<String, List<InhouseExperiment>> entry : threeLcGroupedMap.entrySet()) {
+            String threeLc = entry.getKey();
+            List<InhouseExperiment> listOfInhouseExperiments = entry.getValue();
+
+            // 9) Create Signals Experiment entity upon three-letter code
+            String idOfCreatedExperimentInSignals = createExperimentUpon3LC(threeLc, listOfInhouseExperiments);
+
+            // 10) Create ChemDrawing Entity For each inhouseExperiment (procedure)
+            String chemDrawId;
+            int count = 0;
+            for (InhouseExperiment inhouseExperiment : listOfInhouseExperiments) {
+                logger.info("EXPERIMENTS-> inouseExperiment {} of {} = {}\n", ++count, threeLc, listOfInhouseExperiments.size());
+
+                // 11) Receive a cdxml as String from compound, using experiment procedure id as a correlation key
+                // from class InhouseCorrelation between classes InhouseExperiment and InhouseCompound
+                Integer procedureId = inhouseExperiment.getProcId();
+                Optional<ChemDrawData> optionalData = loadCDXML_StringForGivenExperimentUponMolID(procedureId);
+                ChemDrawData chemDrawData;
+
+                if (optionalData.isPresent()) {
+                    chemDrawData = optionalData.get();
+                    String cdxml = chemDrawData.fieldValueCdxml;
+                    Integer molId = chemDrawData.molId;
+                    chemDrawId = createChemDrawForInhouseExperiment(molId, idOfCreatedExperimentInSignals);
+
+                    // 12) Make Rest Call to add a cdxml Structure as a product to reaction in chemicalDrawing entity
+                    // POSITIONS-> = reactants|products|reagents|grid
+                    if (!cdxml.isEmpty()) {
+                        inhouseDB.getExperimentRestService().addReactionToExperiment(chemDrawId, "products", cdxml);
+                    }
+
+                    // 13) Create SampleContainer with sample from the chemical drawing. Will be added as stoicRef upon POST create entity type Sample
+                    String rowId = "1";
+                    String propertyValueDescription = String.format("MolId: %s, Experiment: %s%s, Journal: %s", molId, threeLc, procedureId, inhouseExperiment.getJournal());
+
+                    createSampleForChemicalDrawing(chemDrawId, rowId, idOfCreatedExperimentInSignals, propertyValueDescription);
+
+                } else {
+                    logger.error("No data in ChemDrawData -> check loadCDXML_StringForGivenExperimentUponMolID()");
+                }
+            }
         }
     }
 
-    private List<InhouseExperiment> loadInhouseExperiments() {
 
-        List<InhouseExperiment> experiments = inhouseDB.getInhouseDbService().loadExperiments();
-        logger.info("Experiments ARRAY SIZE = {}", experiments.size());
-
-        return experiments;
-    }
-
-    private List<InhouseExperiment> selectSubset(List<InhouseExperiment> experiments) {
-        return experiments.subList(2, 5);
-    }
-
-    /**
-     * Imports an {@link InhouseExperiment} into the Signals platform by creating the corresponding
-     * experiment entity, assigning template-based field values, and attaching a chemical drawing
-     * as a child structure, including the ability to add a chemical structure to a reaction.
-     *
-     * <p>This method performs the following steps:
-     * <ol>
-     *   <li>Wraps the given {@code InhouseExperiment} into a DTO for data preparation and mapping.</li>
-     *   <li>Creates a new {@link Experiment} Java object using a predefined experiment template
-     *       (e.g., "InhouseExperiment" template).</li>
-     *   <li>Sends a REST request to the Signals API to create this experiment in the Signals Notebook backend.</li>
-     *   <li>Sets the returned experiment ID to the original inhouse experiment object for reference.</li>
-     *   <li>Creates an empty {@code chemicalDrawing} child entity for the experiment to hold the structure later.</li>
-     *   <li>Loads a CDXML structure file based on the experiment's associated molId via the correlation table.</li>
-     *   <li>If the CDXML is found and non-empty, it is appended to the experiment’s chemicalDrawing as a
-     *       reaction product via an API POST call to Signals.</li>
-     * </ol>
-     *
-     * <p><strong>Note:</strong> This method assumes a working mapping between
-     * {@code procedureId ↔ molId} via {@code InhouseCorrelation}, and the existence of a
-     * CDXML file on disk named accordingly (e.g., {@code mol_21248.cdxml}).
-     *
-     * @param experiment the {@link InhouseExperiment} instance to be imported into Signals
-     * @throws RuntimeException if any I/O or REST communication error occurs
-     */
-    private void importExperiment(InhouseExperiment experiment) {
+    private String createExperimentUpon3LC(String threeLc, List<InhouseExperiment> listOfInhouseExperiments) {
+        // 1) Load first experiment from the List (Fields -> threeLc, individual_code, Journal, procedure_id) last three values goes eventually to sample container
+        InhouseExperiment experiment = listOfInhouseExperiments.get(0);
 
         // 1) Create Inhouse Experiment DTO
         InhouseExperimentDTO experimentDTO = new InhouseExperimentDTO(experiment);
@@ -189,36 +241,32 @@ public class Experiments {
         String id = experimentSignals.getId();
         logger.info("EXPERIMENTS ======*************==id = {}\n", id);
         experiment.setEid(id);
-
-        // 5) Make a Rest Call for Creation of an Experiment Child: empty ChemDrawing Entity for further import of a Structure
-        String chemDrawId = inhouseDB.getExperimentRestService()
-                .createNewChemicalDrawingAsExperimentChild(
-                        experimentSignals.getId(),
-                        String.format("Procedure with id = %s", experimentDTO.getProcId()),
-                        "");
-        //logger.trace("CHEM_DRAW WAS CREATED AND ITS ID IS= {}\n", chemDrawId);
-
-        // 6) Map a cdxml from Compound file to an experiment
-        Optional<ChemDrawData> optionalData = loadCDXML_StringForGivenExperimentUponMolID(experimentDTO);
-
-        if (optionalData.isPresent()) {
-            ChemDrawData chemDrawData = optionalData.get();
-
-            String cdxmlString = chemDrawData.fieldValueCdxml;
-            // 7) Make Rest Call to add a cdxml Structure as a product to reaction in chemicalDrawing entity
-            // POSITIONS-> = reactants|products|reagents|grid
-            if (!cdxmlString.isEmpty()) {
-                inhouseDB.getExperimentRestService().addReactionToExperiment(chemDrawId, "products", cdxmlString);
-            }
-
-            // 8) Create SampleContainer with sample from the chemical drawing. Will be added as stoicRef upon POST create entity type Sample
-            String rowId = "1";
-            createSampleForChemicalDrawing(chemDrawId, rowId, id, chemDrawData.molId);
-
-        } else {
-            logger.error("No data in ChemDrawData -> check loadCDXML_StringForGivenExperimentUponMolID()");
-        }
+        return id;
     }
+
+    private String createChemDrawForInhouseExperiment(Integer molId, String idOfCreatedExperimentInSignals) {
+        // Make a Rest Call for Creation of an Experiment Child: empty ChemDrawing Entity for further import of a Structure
+        //logger.trace("CHEM_DRAW WAS CREATED AND ITS ID IS= {}\n", chemDrawId);
+        return inhouseDB.getExperimentRestService()
+                .createNewChemicalDrawingAsExperimentChild(
+                        idOfCreatedExperimentInSignals,
+                        String.format("MolId = %s", molId),
+                        "");
+    }
+
+
+    private List<InhouseExperiment> loadInhouseExperiments() {
+
+        List<InhouseExperiment> experiments = inhouseDB.getInhouseDbService().loadExperiments();
+        logger.info("Experiments ARRAY SIZE = {}", experiments.size());
+
+        return experiments;
+    }
+
+    private List<InhouseExperiment> selectSubset(List<InhouseExperiment> experiments) {
+        return experiments.subList(2, 5);
+    }
+
 
     /**
      * Creates a new chemical sample in the Signals platform based on a given chemical drawing.
@@ -238,9 +286,8 @@ public class Experiments {
      * @param chemDrawId the EID of the chemical drawing to which the sample should be linked
      * @param rowId      the row index of the drawing’s stoichiometry table
      * @param ancestorId the EID of the container or experiment to act as the sample's parent
-     * @param molId      the internal molecule ID from the legacy system, to be added as a sample property
      */
-    private void createSampleForChemicalDrawing(String chemDrawId, String rowId, String ancestorId, Integer molId) {
+    private void createSampleForChemicalDrawing(String chemDrawId, String rowId, String ancestorId, String propertyValueDescription) {
         // Create a new Sample and assign the chemical sample template
         Sample sample = new Sample();
         sample.setTemplateId(CHEMICAL_SAMPLE_TEMPLATE_ID);
@@ -258,15 +305,15 @@ public class Experiments {
         sample.setStoicRef(stoicRef);
 
         // Add the molecule ID as a property to the sample
-        SamplePropertyValue fvMolId = new SamplePropertyValue();
-        fvMolId.setPropertyId("110");
-        fvMolId.setPropertyValue(String.valueOf(molId));
+        SamplePropertyValue fvDescription = new SamplePropertyValue();
+        fvDescription.setPropertyId(CHEMICAL_SAMPLE_PROPERTY_ID_DESCRIPTION);
+        fvDescription.setPropertyValue(propertyValueDescription);
 
         // Create the sample via REST and store the returned Signals sample ID
-        sample.addPropertyValue(fvMolId);
+        sample.addPropertyValue(fvDescription);
         String sampleId = inhouseDB.getSampleRestService().createNewSample(sample);
         sample.setId(sampleId);
-        fvMolId.setSampleId(sampleId);
+        fvDescription.setSampleId(sampleId);
 
         // Prepare properties as key-value pairs for PATCH update
         HashMap<String, String> propertyKeyToValue = new HashMap<>();
@@ -286,13 +333,12 @@ public class Experiments {
      * <p>If the file does not exist on disk, the method logs a warning and returns an empty string.
      * This allows the import process to continue even if no chemical structure is available for a given compound.</p>
      *
-     * @param experimentDTO the DTO representing the inhouse experiment; must contain a valid procedure ID
      * @return the CDXML content as a String, or an empty string if no corresponding file was found
      * @throws RuntimeException if an unexpected I/O error occurs while reading the file
      */
-    private Optional<ChemDrawData> loadCDXML_StringForGivenExperimentUponMolID(InhouseExperimentDTO experimentDTO) {
+    private Optional<ChemDrawData> loadCDXML_StringForGivenExperimentUponMolID(Integer procedureId) {
         // 1) Load the correlation entry to resolve the molId for the given experiment
-        InhouseCorrelation correlation = loadCorrelationByExperimentProcedureId(experimentDTO.getProcId());
+        InhouseCorrelation correlation = loadCorrelationByExperimentProcedureId(procedureId);
 
         // 2) Extract the molId from the correlation object
         Integer molId = correlation.getMolId();

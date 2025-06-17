@@ -124,7 +124,6 @@ public class InhouseExperimentDTO {
 
 
         createExperimentProperties(experiment);
-        //logger.info("EXPERIMENT => {}\n", experiment.toString());
         return experiment;
     }
 
@@ -145,26 +144,26 @@ public class InhouseExperimentDTO {
         fvThreeLc.setExperimentProperty(fieldsOfExperimentTemplate.get(fvThreeLc.getPropertyId()));
         experiment.addPropertyValue(fvThreeLc);
 
-        // 3) Add Field Individual_code
-        ExperimentPropertyValue fvIndividualCode = new ExperimentPropertyValue();
-        fvIndividualCode.setPropertyId(inhouseDB.getConfigString(Experiments.EXPERIMENTS_FIELD_INDIVIDUAL_CODE));
-        fvIndividualCode.setPropertyValue(individualCode);
-        fvIndividualCode.setExperimentProperty(fieldsOfExperimentTemplate.get(fvIndividualCode.getPropertyId()));
-        experiment.addPropertyValue(fvIndividualCode);
-
-        // 4) Add Field Journal
-        ExperimentPropertyValue fvJournal = new ExperimentPropertyValue();
-        fvJournal.setPropertyId(inhouseDB.getConfigString(Experiments.EXPERIMENTS_FIELD_JOURNAL));
-        fvJournal.setPropertyValue(journal);
-        fvJournal.setExperimentProperty(fieldsOfExperimentTemplate.get(fvJournal.getPropertyId()));
-        experiment.addPropertyValue(fvJournal);
-
-        // 5) Add Field Procedure_id
-        ExperimentPropertyValue fvProcId = new ExperimentPropertyValue();
-        fvProcId.setPropertyId(inhouseDB.getConfigString(Experiments.EXPERIMENTS_FIELD_PROCEDURE_ID));
-        fvProcId.setPropertyValue(String.valueOf(procId));
-        fvProcId.setExperimentProperty(fieldsOfExperimentTemplate.get(fvProcId.getPropertyId()));
-        experiment.addPropertyValue(fvProcId);
+//        // 3) Add Field Individual_code
+//        ExperimentPropertyValue fvIndividualCode = new ExperimentPropertyValue();
+//        fvIndividualCode.setPropertyId(inhouseDB.getConfigString(Experiments.EXPERIMENTS_FIELD_INDIVIDUAL_CODE));
+//        fvIndividualCode.setPropertyValue(individualCode);
+//        fvIndividualCode.setExperimentProperty(fieldsOfExperimentTemplate.get(fvIndividualCode.getPropertyId()));
+//        experiment.addPropertyValue(fvIndividualCode);
+//
+//        // 4) Add Field Journal
+//        ExperimentPropertyValue fvJournal = new ExperimentPropertyValue();
+//        fvJournal.setPropertyId(inhouseDB.getConfigString(Experiments.EXPERIMENTS_FIELD_JOURNAL));
+//        fvJournal.setPropertyValue(journal);
+//        fvJournal.setExperimentProperty(fieldsOfExperimentTemplate.get(fvJournal.getPropertyId()));
+//        experiment.addPropertyValue(fvJournal);
+//
+//        // 5) Add Field Procedure_id
+//        ExperimentPropertyValue fvProcId = new ExperimentPropertyValue();
+//        fvProcId.setPropertyId(inhouseDB.getConfigString(Experiments.EXPERIMENTS_FIELD_PROCEDURE_ID));
+//        fvProcId.setPropertyValue(String.valueOf(procId));
+//        fvProcId.setExperimentProperty(fieldsOfExperimentTemplate.get(fvProcId.getPropertyId()));
+//        experiment.addPropertyValue(fvProcId);
     }
 
     /**

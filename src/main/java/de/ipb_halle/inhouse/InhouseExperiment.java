@@ -114,4 +114,17 @@ public class InhouseExperiment {
         this.remarks = remarks;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "InhouseExperiment{" +
+                "id=" + id +
+                ", eid='" + eid + '\'' +
+                ", threelc='" + threelc + '\'' +
+                ", individualCode='" + individualCode + '\'' +
+                ", journal='" + journal + '\'' +
+                ", procId=" + procId +
+                ", remarks='" + remarks + '\'' +
+                '}';
+    }
 }
