@@ -23,6 +23,7 @@ import jakarta.ejb.Stateless;
 import jakarta.ejb.TransactionAttribute;
 import jakarta.ejb.TransactionAttributeType;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -154,7 +155,7 @@ public class InhouseDbService {
         return this.em.createQuery(criteriaQuery).getResultList();
     }
 
-    public InhouseCorrelation loadCorrelationByProcedureId(int procId) {
+    public List<InhouseCorrelation> loadCorrelationByProcedureId(int procId) {
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<InhouseCorrelation> query = builder.createQuery(InhouseCorrelation.class);
         Root<InhouseCorrelation> root = query.from(InhouseCorrelation.class);
@@ -164,7 +165,16 @@ public class InhouseDbService {
         predicates.add(builder.equal(root.get("procedureId"), procId));
         query.where(builder.and(predicates.toArray(new Predicate[0])));
 
-        return em.createQuery(query).getSingleResult();
+        try {
+            return em.createQuery(query).getResultList();
+
+        } catch (NoResultException e) {
+           return null;
+        }
+    }
+
+    public void markAsSuccessfullyImported(InhouseExperiment inhouseExperiment) {
+        save(inhouseExperiment);
     }
 
 

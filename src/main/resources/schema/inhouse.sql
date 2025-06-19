@@ -28,6 +28,7 @@ CREATE TABLE inhouse_experiments (
     journal VARCHAR,
     proc_id INTEGER,
     remarks VARCHAR,
+    import_successful BOOLEAN DEFAULT FALSE,
     UNIQUE(threelc,code),
     UNIQUE(proc_id)
 );

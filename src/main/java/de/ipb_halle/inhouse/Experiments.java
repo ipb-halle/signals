@@ -22,6 +22,7 @@ import de.ipb_halle.signals.experiments.Experiment;
 import de.ipb_halle.signals.sample.Sample;
 import de.ipb_halle.signals.sample.SamplePropertyValue;
 import de.ipb_halle.signals.sample.StoicRef;
+import jakarta.persistence.NoResultException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -32,6 +33,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Migration tool for the InhouseDB
@@ -40,8 +42,11 @@ import java.util.regex.Pattern;
  *
  * @author fbroda
  */
-//toDo -> make all experiments to be in one upon 3LC
-//toDO ->  MolId: 27883, Experiment: WSE001, Journal: 01.023 as description in sample
+
+
+// toDo: die Liste von experimenten, die keine verbindung in correlationstabelle haben, sowie diejnige, die keine STruktur haben sollen, in eine Liste erfasst werden müssen
+// toDo: bufferWriter write
+//
 public class Experiments {
 
     public final static String EXPERIMENTS_FILENAME = "experiments.filename";
@@ -92,38 +97,41 @@ public class Experiments {
                 + "(.*)$");                                 // 6 Procedure
 
         Pattern quotePattern = Pattern.compile("\"(.*)\"");
-        BufferedReader reader = new BufferedReader(new FileReader(inhouseDB.getConfigString(EXPERIMENTS_FILENAME)));
-        BufferedWriter writer = new BufferedWriter(new FileWriter(inhouseDB.getConfigString(EXPERIMENTS_REJECTFILE)));
-        reader.readLine(); // discard header
-        int line = 1;
-        while (reader.ready()) {
-            String st = reader.readLine();
-            line++;
-            Matcher matcher = pattern.matcher(st);
-            if (matcher.matches()) {
-                Matcher remarkMatcher = quotePattern.matcher(matcher.group(5));
-                InhouseExperiment exp = new InhouseExperiment()
-                        .setJournal(matcher.group(1))
-                        .setThreelc(matcher.group(2))
-                        .setIndividualCode(matcher.group(3))
-                        // file name never used
-                        .setProcId(Integer.parseInt(matcher.group(6)));
-                if (remarkMatcher.matches()) {
-                    exp.setRemarks(remarkMatcher.group(1));
+        try (
+                BufferedReader reader = new BufferedReader(new FileReader(inhouseDB.getConfigString(EXPERIMENTS_FILENAME)));
+                BufferedWriter writer = new BufferedWriter(new FileWriter(inhouseDB.getConfigString(EXPERIMENTS_REJECTFILE)))
+        ) {
+            reader.readLine(); // discard header
+            int line = 1;
+            while (reader.ready()) {
+                String st = reader.readLine();
+                line++;
+                Matcher matcher = pattern.matcher(st);
+                if (matcher.matches()) {
+                    Matcher remarkMatcher = quotePattern.matcher(matcher.group(5));
+                    InhouseExperiment exp = new InhouseExperiment()
+                            .setJournal(matcher.group(1))
+                            .setThreelc(matcher.group(2))
+                            .setIndividualCode(matcher.group(3))
+                            // file name never used
+                            .setProcId(Integer.parseInt(matcher.group(6)));
+                    if (remarkMatcher.matches()) {
+                        exp.setRemarks(remarkMatcher.group(1));
+                    } else {
+                        exp.setRemarks(matcher.group(5));
+                    }
+                    inhouseDB.getInhouseDbService().save(exp);
                 } else {
-                    exp.setRemarks(matcher.group(5));
+                    writer.append(st);
+                    writer.newLine();
                 }
-                inhouseDB.getInhouseDbService().save(exp);
-            } else {
-                writer.append(st);
-                writer.newLine();
+                if ((line % 1000) == 0) {
+                    System.out.printf("imported %d experiments\n", line);
+                }
             }
-            if ((line % 1000) == 0) {
-                System.out.printf("imported %d experiments\n", line);
-            }
+            writer.close();
+            reader.close();
         }
-        reader.close();
-        writer.close();
     }
 
     public void importData() throws Exception {
@@ -132,28 +140,69 @@ public class Experiments {
 
         // 2) Load all procedures imported from inhouse db
         List<InhouseExperiment> experiments = loadInhouseExperiments();
+        logger.info("EXPERIMENTS-> importData()-> total amount of experiments = {}\n", experiments.size());
 
-        // 3) Create an empty HashMap for sorting key = threeLC, value = List<InhouseExperiment> with selected threeLC
-        Map<String, List<InhouseExperiment>> threeLcGroupedMap = new HashMap<>();
-        String firstKey = null; //****test**** toDo delete
+        Map<Integer, List<Optional<ChemDrawData>>> cdxmlCache = new HashMap<>();
+        Map<Integer, List<InhouseCorrelation>> correlationCache = new HashMap<>();
 
-        // 4) Iterate each instance in the experiments List
-        for (InhouseExperiment inhouseExperiment : experiments) {
-            // Get threeLc from experiment
-            String key = inhouseExperiment.getThreelc();
-            //logger.trace("EXPERIMENTS: -> importData() -> key (threeLc) = {}\n", key);
+        try (ErrorLogger errorLogger = new ErrorLogger("import_error.log")) {
+            int rejectedCount = 0;
 
-            // 5) Check if experiment has 3LC and jump over if it not a case
-            if (key == null) {
-                logger.error("This procedure doesn't have 3LC InhouseExperiment = {}\n", inhouseExperiment.toString());
-                continue;
+            // Filtration to only valid experiments
+            List<InhouseExperiment> validExperiments = new ArrayList<>();
+            for (InhouseExperiment exp : experiments) {
+                boolean isValid = true;
+
+                if (exp.getThreelc() == null) {
+                    errorLogger.log("Missing threeLC for experiment: " + exp);
+                    rejectedCount++;
+                    continue;
+                }
+                if (exp.getProcId() == 0) {
+                    errorLogger.log("Missing procedure ID for experiment: " + exp);
+                    rejectedCount++;
+                    continue;
+                }
+                int procId = exp.getProcId();
+
+                List<Optional<ChemDrawData>> cdxmlList = cdxmlCache.computeIfAbsent(
+                        procId,
+                        id -> loadCDXML_StringForGivenExperimentUponMolID_Cached(id, correlationCache)
+                );
+
+                if (cdxmlList.isEmpty() || cdxmlList.stream().allMatch(Optional::isEmpty)) {
+                    errorLogger.log("Missing ChemDrawData for procedureId=" + procId);
+                    rejectedCount++;
+                    continue;
+                }
+                validExperiments.add(exp);
             }
+            logger.info("Filtered valid inhouse experiments: {}", validExperiments.size());
+            logger.info("Rejected inhouse experiments: {}", rejectedCount);
 
-            //****test**** toDo delete
-            if (firstKey == null) {
-                firstKey = key;
-                threeLcGroupedMap.put(firstKey, new ArrayList<>());
-            }
+            // 3) Create an empty HashMap for sorting key = threeLC, value = List<InhouseExperiment> with selected threeLC
+            Map<String, List<InhouseExperiment>> threeLcGroupedMap = new HashMap<>();
+            String firstKey = null; //****test**** toDo delete
+
+            // 4) Iterate each instance in the experiments List
+            for (InhouseExperiment inhouseExperiment : validExperiments) {
+                // Get threeLc from experiment
+                String key = inhouseExperiment.getThreelc();
+                //logger.trace("EXPERIMENTS: -> importData() -> key (threeLc) = {}\n", key);
+
+                // 5) Check if experiment has 3LC and jump over if it not a case
+                if (key == null) {
+                    //toDo write in to logErrorFile!e
+                    errorLogger.log("Missing 3LC: " + inhouseExperiment.toString());
+                    logger.error("This procedure doesn't have 3LC InhouseExperiment = {}\n", inhouseExperiment.toString());
+                    continue;
+                }
+
+                //****test**** toDo delete
+                if (firstKey == null) {
+                    firstKey = key;
+                    threeLcGroupedMap.put(firstKey, new ArrayList<>());
+                }
 
 //            // 6) Check if the key (threeLc) is already added to a Map
 //            if (!threeLcGroupedMap.containsKey(key)) {
@@ -165,108 +214,98 @@ public class Experiments {
 //            threeLcGroupedMap.get(key).add(inhouseExperiment);
 //            //logger.trace("Experiments -> importData() added experiment = {}\n", inhouseExperiment.toString());
 
-            //****test**** toDo delete
-            if (key.equals(firstKey)) {
-                threeLcGroupedMap.get(firstKey).add(inhouseExperiment);
+                //****test**** toDo delete
+                if (key.equals(firstKey)) {
+                    threeLcGroupedMap.get(firstKey).add(inhouseExperiment);
+                }
+
+                //****test**** toDo delete
+                if (!key.equals(firstKey)) {
+                    break;
+                }
             }
 
-            //****test**** toDo delete
-            if (!key.equals(firstKey)) {
-                break;
-            }
-        }
+            // 8) Go through the map and create an experiment for each 3LC
+            for (Map.Entry<String, List<InhouseExperiment>> entry : threeLcGroupedMap.entrySet()) {
+                String threeLc = entry.getKey();
+                List<InhouseExperiment> experimentsBy3lc = entry.getValue();
+                int chunkSize = 10;
+                int experimentCounter = 1;
 
-        // 8) Go through the map and create an experiment for each 3LC
-        for (Map.Entry<String, List<InhouseExperiment>> entry : threeLcGroupedMap.entrySet()) {
-            String threeLc = entry.getKey();
-            List<InhouseExperiment> listOfInhouseExperiments = entry.getValue();
+                for (int i = 0; i < experimentsBy3lc.size(); i += chunkSize) {
+                    int toIndex = Math.min(i + chunkSize, experimentsBy3lc.size());
+                    List<InhouseExperiment> chunk = experimentsBy3lc.subList(i, toIndex);
 
-            // 9) Create Signals Experiment entity upon three-letter code
-            String idOfCreatedExperimentInSignals = createExperimentUpon3LC(threeLc, listOfInhouseExperiments);
+                    InhouseExperiment main = chunk.get(0);
+                    String experimentName = threeLc + "-" + experimentCounter++;
+                    String eid = createExperimentUpon3LC(experimentName, main);
 
-            // 10) Create ChemDrawing Entity For each inhouseExperiment (procedure)
-            String chemDrawId;
-            int count = 0;
-            for (InhouseExperiment inhouseExperiment : listOfInhouseExperiments) {
-                logger.info("EXPERIMENTS-> inouseExperiment {} of {} = {}\n", ++count, threeLc, listOfInhouseExperiments.size());
+                    for (InhouseExperiment exp : chunk) {
+                        Integer procId = exp.getProcId();
+                        if (procId == 0) {
+                            logger.error("No precedure Id foe exepriment  = {}\n", exp);
+                            continue;
+                        }
+                        List<Optional<ChemDrawData>> optionals = cdxmlCache.get(procId);
 
-                // 11) Receive a cdxml as String from compound, using experiment procedure id as a correlation key
-                // from class InhouseCorrelation between classes InhouseExperiment and InhouseCompound
-                Integer procedureId = inhouseExperiment.getProcId();
-                Optional<ChemDrawData> optionalData = loadCDXML_StringForGivenExperimentUponMolID(procedureId);
-                ChemDrawData chemDrawData;
+                        for (Optional<ChemDrawData> optional : optionals) {
+                            if (optional.isEmpty()) {
+                                errorLogger.log("Missing ChemDrawData (should not happen after filtering) for procedureId=" + procId);
+                                continue;
+                            }
 
-                if (optionalData.isPresent()) {
-                    chemDrawData = optionalData.get();
-                    String cdxml = chemDrawData.fieldValueCdxml;
-                    Integer molId = chemDrawData.molId;
-                    chemDrawId = createChemDrawForInhouseExperiment(molId, idOfCreatedExperimentInSignals);
+                            ChemDrawData data = optional.get();
+                            String chemDrawId = createChemDrawForInhouseExperiment(data.molId, eid);
 
-                    // 12) Make Rest Call to add a cdxml Structure as a product to reaction in chemicalDrawing entity
-                    // POSITIONS-> = reactants|products|reagents|grid
-                    if (!cdxml.isEmpty()) {
-                        inhouseDB.getExperimentRestService().addReactionToExperiment(chemDrawId, "products", cdxml);
+                            if (!data.fieldValueCdxml.isEmpty()) {
+                                inhouseDB.getExperimentRestService().addReactionToExperiment(chemDrawId, "products", data.fieldValueCdxml);
+                            }
+
+                            String desc = String.format("MolId: %s, Experiment: %s%s, Journal: %s", data.molId, threeLc, procId, exp.getJournal());
+                            createSampleForChemicalDrawing(chemDrawId, "1", eid, desc);
+
+                            exp.setEid(eid);
+                            exp.setImportSuccessful(true);
+                            inhouseDB.getInhouseDbService().markAsSuccessfullyImported(exp);
+                        }
                     }
-
-                    // 13) Create SampleContainer with sample from the chemical drawing. Will be added as stoicRef upon POST create entity type Sample
-                    String rowId = "1";
-                    String propertyValueDescription = String.format("MolId: %s, Experiment: %s%s, Journal: %s", molId, threeLc, procedureId, inhouseExperiment.getJournal());
-
-                    createSampleForChemicalDrawing(chemDrawId, rowId, idOfCreatedExperimentInSignals, propertyValueDescription);
-
-                } else {
-                    logger.error("No data in ChemDrawData -> check loadCDXML_StringForGivenExperimentUponMolID()");
                 }
             }
         }
     }
 
 
-    private String createExperimentUpon3LC(String threeLc, List<InhouseExperiment> listOfInhouseExperiments) {
-        // 1) Load first experiment from the List (Fields -> threeLc, individual_code, Journal, procedure_id) last three values goes eventually to sample container
-        InhouseExperiment experiment = listOfInhouseExperiments.get(0);
-
+    private String createExperimentUpon3LC(String experimentName, InhouseExperiment experiment) {
         // 1) Create Inhouse Experiment DTO
-        InhouseExperimentDTO experimentDTO = new InhouseExperimentDTO(experiment);
-        experimentDTO.setInhouseDB(inhouseDB);
-
+        InhouseExperimentDTO dto = new InhouseExperimentDTO(experiment);
+        dto.setInhouseDB(inhouseDB);
         // 2) Create a Signals Experiment JavaObject
-        Experiment experimentSignals = experimentDTO.createExperiment();
-
+        Experiment experimentSignals = dto.createExperiment(experimentName);
         // 3) Make a Rest Call to signals API in order to create an experiment entity in signals Notebook
         // with field values for an Experiment Template InhouseExperiment (Template ID = experiment:834e6aee-0d59-4732-89d7-925edca09844)
         experimentSignals = inhouseDB.getExperimentRestService().createNewExperiment(experimentSignals);
-
         // 4) Set Id to Inhose Experiment
         String id = experimentSignals.getId();
-        logger.info("EXPERIMENTS ======*************==id = {}\n", id);
         experiment.setEid(id);
-        return id;
+        return experiment.getEid();
+    }
+
+    private List<InhouseExperiment> loadInhouseExperiments() {
+        List<InhouseExperiment> experiments = inhouseDB.getInhouseDbService().loadExperiments();
+        logger.info("Experiments ARRAY SIZE = {}", experiments.size());
+        return experiments;
     }
 
     private String createChemDrawForInhouseExperiment(Integer molId, String idOfCreatedExperimentInSignals) {
         // Make a Rest Call for Creation of an Experiment Child: empty ChemDrawing Entity for further import of a Structure
         //logger.trace("CHEM_DRAW WAS CREATED AND ITS ID IS= {}\n", chemDrawId);
+        String fileName = "molId_" + molId;
         return inhouseDB.getExperimentRestService()
                 .createNewChemicalDrawingAsExperimentChild(
                         idOfCreatedExperimentInSignals,
-                        String.format("MolId = %s", molId),
+                        fileName,
                         "");
     }
-
-
-    private List<InhouseExperiment> loadInhouseExperiments() {
-
-        List<InhouseExperiment> experiments = inhouseDB.getInhouseDbService().loadExperiments();
-        logger.info("Experiments ARRAY SIZE = {}", experiments.size());
-
-        return experiments;
-    }
-
-    private List<InhouseExperiment> selectSubset(List<InhouseExperiment> experiments) {
-        return experiments.subList(2, 5);
-    }
-
 
     /**
      * Creates a new chemical sample in the Signals platform based on a given chemical drawing.
@@ -336,38 +375,59 @@ public class Experiments {
      * @return the CDXML content as a String, or an empty string if no corresponding file was found
      * @throws RuntimeException if an unexpected I/O error occurs while reading the file
      */
-    private Optional<ChemDrawData> loadCDXML_StringForGivenExperimentUponMolID(Integer procedureId) {
+    private List<Optional<ChemDrawData>> loadCDXML_StringForGivenExperimentUponMolID_Cached(
+            Integer procedureId,
+            Map<Integer, List<InhouseCorrelation>> correlationCache) {
+
+        List<InhouseCorrelation> correlations = correlationCache.computeIfAbsent(
+                procedureId,
+                this::loadCorrelationByExperimentProcedureId
+        );
+
+        List<Optional<ChemDrawData>> list = new ArrayList<>();
+        if (correlations == null) return list;
+
         // 1) Load the correlation entry to resolve the molId for the given experiment
-        InhouseCorrelation correlation = loadCorrelationByExperimentProcedureId(procedureId);
+        // List<InhouseCorrelation> inhouseCorrelations = loadCorrelationByExperimentProcedureId(procedureId);
 
-        // 2) Extract the molId from the correlation object
-        Integer molId = correlation.getMolId();
+        for (InhouseCorrelation correlation : correlations) {
 
+            // 2) Extract the molId from the correlation object
+            if (correlation == null || correlation.getMolId() == null) {
+                list.add(Optional.empty());
+                continue;
+            }
+            Integer molId = correlation.getMolId();
+            // 3) Resolve the full path to the CDXML file using the configured file path pattern and molId
+            Path filePath = Path.of(String.format(
+                    inhouseDB.getConfigString(Compounds.COMPOUNDS_CHEMICAL_DRAWING),
+                    molId));
+            // 4) If the file does not exist, log a warning and return an empty string
+            if (!Files.exists(filePath)) {
+                try (ErrorLogger errorLogger = new ErrorLogger("import_error_cdxml.log")) {
+                    errorLogger.log(String.format("CDXML file does not exist for molId=%s, skipping file: %s\n", molId, filePath));
+                    list.add(Optional.empty());
+                    continue;
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            try {
+                // 5) Read the file content as UTF-8 string
+                //String fieldValueCdxml = Files.readString(filePath, StandardCharsets.UTF_8);
+                byte[] bytes = Files.readAllBytes(filePath);
+                String fieldValueCdxml = new String(bytes, StandardCharsets.ISO_8859_1);
 
-        // 3) Resolve the full path to the CDXML file using the configured file path pattern and molId
-        Path filePath = Path.of(String.format(
-                inhouseDB.getConfigString(Compounds.COMPOUNDS_CHEMICAL_DRAWING),
-                molId));
-
-        // 4) If the file does not exist, log a warning and return an empty string
-        if (!Files.exists(filePath)) {
-            logger.warn("CDXML file does not exist for molId={}, skipping file: {}\n", molId, filePath);
-            return Optional.empty();
+                // 6) Return the CDXML content
+                list.add(Optional.of(new ChemDrawData(molId, fieldValueCdxml)));
+            } catch (IOException e) {
+                // Rethrow any unexpected IO exception as a RuntimeException
+                throw new RuntimeException("Error reading CDXML file: " + filePath, e);
+            }
         }
-
-        try {
-            // 5) Read the file content as UTF-8 string
-            String fieldValueCdxml = Files.readString(filePath, StandardCharsets.UTF_8);
-            //logger.trace("EXPERIMENTS => fieldValueCdxml = {}", fieldValueCdxml);
-
-            // 6) Return the CDXML content
-            return Optional.of(new ChemDrawData(molId, fieldValueCdxml));
-
-        } catch (IOException e) {
-
-            // Rethrow any unexpected IO exception as a RuntimeException
-            throw new RuntimeException("Error reading CDXML file: " + filePath, e);
-        }
+        return list;
     }
 
     /**
@@ -382,10 +442,16 @@ public class Experiments {
      * @return the corresponding {@link InhouseCorrelation} object
      * @throws jakarta.persistence.NoResultException if no correlation entry is found
      */
-    private InhouseCorrelation loadCorrelationByExperimentProcedureId(int procId) {
-        return inhouseDB.
-                getInhouseDbService().
-                loadCorrelationByProcedureId(procId);
+    private List<InhouseCorrelation> loadCorrelationByExperimentProcedureId(int procId) {
+        if (procId == 0) return null;
+        try {
+
+            return inhouseDB.
+                    getInhouseDbService().
+                    loadCorrelationByProcedureId(procId);
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
 }

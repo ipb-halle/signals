@@ -54,6 +54,7 @@ public class InhouseExperimentDTO {
     private String journal;
     private int procId;
     private String remarks;
+    private boolean importSuccessful;
 
     private InhouseDB inhouseDB;
 
@@ -70,6 +71,7 @@ public class InhouseExperimentDTO {
         this.journal = inhouseExperiment.getJournal();
         this.procId = inhouseExperiment.getProcId();
         this.remarks = inhouseExperiment.getRemarks();
+        this.importSuccessful = inhouseExperiment.isImportSuccessful();
     }
 
     /**
@@ -85,7 +87,8 @@ public class InhouseExperimentDTO {
                 .setIndividualCode(individualCode)
                 .setJournal(journal)
                 .setProcId(procId)
-                .setRemarks(remarks);
+                .setRemarks(remarks)
+                .setImportSuccessful(importSuccessful);
     }
 
     /**
@@ -94,13 +97,13 @@ public class InhouseExperimentDTO {
      *
      * @return a populated Signals Experiment object
      */
-    public Experiment createExperiment() {
+    public Experiment createExperiment(String experimentName) {
         //logger.info("I AM IN InhouseExperimentDTO in method  createExperiment()\n");
 
         Experiment experiment = new Experiment();
 
         experiment.setId(id == null ? "Currently not created" + System.currentTimeMillis() : id.toString());
-        experiment.setName(eid == null ? String.format("Experiment of %s ", threelc) + System.currentTimeMillis() : eid);
+        experiment.setName(eid == null ? String.format("Experiment of %s ", experimentName)  : eid);
 
         IUser iUser = new UserReference(threelc);
         experiment.setCreatedBy(iUser);
@@ -266,5 +269,12 @@ public class InhouseExperimentDTO {
         return this;
     }
 
+    public boolean isImportSuccessful() {
+        return importSuccessful;
+    }
 
+    public InhouseExperimentDTO setImportSuccessful(boolean importSuccessful) {
+        this.importSuccessful = importSuccessful;
+        return this;
+    }
 }

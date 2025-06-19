@@ -52,6 +52,9 @@ public class InhouseExperiment {
     @Column
     private String remarks;
 
+    @Column(name = "import_successful")
+    private boolean importSuccessful;
+
     public Integer getId() {
         return id;
     }
@@ -115,6 +118,15 @@ public class InhouseExperiment {
         return this;
     }
 
+    public boolean isImportSuccessful() {
+        return importSuccessful;
+    }
+
+    public InhouseExperiment setImportSuccessful(boolean importSuccessful) {
+        this.importSuccessful = importSuccessful;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "InhouseExperiment{" +
@@ -125,6 +137,7 @@ public class InhouseExperiment {
                 ", journal='" + journal + '\'' +
                 ", procId=" + procId +
                 ", remarks='" + remarks + '\'' +
+                ", importSuccessful=" + importSuccessful +
                 '}';
     }
 }
