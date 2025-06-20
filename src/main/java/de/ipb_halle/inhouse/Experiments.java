@@ -42,12 +42,13 @@ import java.util.regex.Pattern;
  * @author fbroda
  */
 
+// TODO: Detect import type (experiment, organism, extract) based on fields
+// TODO: Implement Strategy pattern to handle different import behaviors
+// TODO: Refactor importGroupedExperiments() to delegate by strategy
+// TODO: Create OrganismImportStrategy and ExtractImportStrategy
+// TODO: Add logic to mark organisms/extracts as successfully imported
 
-// toDo: man muss die richtige kommentare schreiben
-// toDo: errorLog muss 3 unershiedliche datein schreiben
-// toDo: die nicht valide ecperimente die nur keine CDMXL struktur haben können experimente sein,
-//  die sache muss man chekcen ob die org_id haben und wenn ja dann in die liste packen bzw HashMap 3lC -> experiemnt
-//todo: schreiben Sample object for ipb code
+
 public class Experiments {
 
     public final static String EXPERIMENTS_FILENAME = "experiments.filename";
@@ -164,7 +165,7 @@ public class Experiments {
             // Step 4: Filtration to only valid experiments
             List<InhouseExperiment> validExperiments = filterValidExperiments(experiments, errorLogger, cdxmlCache, correlationCache);
             // Step 5: Group valid experiments by their threeLC
-            Map<String, List<InhouseExperiment>> threeLcGroupedMap = groupByThreeLC(validExperiments, errorLogger);
+            Map<String, List<InhouseExperiment>> threeLcGroupedMap = groupByThreeLC(validExperiments, errorLogger, ImportMode.TESTING);
             // Step 6: For each threeLC group, create a Signals experiment and import data
             importGroupedExperiments(threeLcGroupedMap, cdxmlCache, errorLogger);
         }
@@ -261,48 +262,60 @@ public class Experiments {
         }
     }
 
-    private Map<String, List<InhouseExperiment>> groupByThreeLC(List<InhouseExperiment> validExperiments,
-                                                                ErrorLogger errorLogger) {
+    /**
+     * Group a list of {@link InhouseExperiment} objects by their Three Letter Code (3lC).
+     * <p>
+     * In TESTING mode, only the first encountered 3LC group will be returned
+     * (useful for focused development and debugging).
+     * In PRODUCTION mode, all valid experiments will be grouped by their 3LC.
+     *
+     * @param validExperiments  the list of experiments to group (must be non-null)
+     * @param errorLogger       the logger used to record missing 3LCs
+     * @param mode              the import mode (TESTING or PRODUCTION)
+     * @return a map where each key is a 3LC and the value is a list of experiments with that code
+     */
+    private Map<String, List<InhouseExperiment>> groupByThreeLC(
+            List<InhouseExperiment> validExperiments,
+            ErrorLogger errorLogger,
+            ImportMode mode) {
+
         Map<String, List<InhouseExperiment>> threeLcGroupedMap = new HashMap<>();
-        String firstKey = null; //****test**** toDo delete
+        String firstKey = null; // used in TESTING mode only
 
         for (InhouseExperiment inhouseExperiment : validExperiments) {
             String key = inhouseExperiment.getThreelc();
 
-            // Check if experiment has 3LC and jump over if it not a case
+            // Skip experiments without 3LC, log them for debugging
             if (key == null) {
-                //toDo write in to logErrorFile!e
                 errorLogger.log("Missing 3LC: " + inhouseExperiment.toString());
-                logger.error("This procedure doesn't have 3LC InhouseExperiment = {}\n", inhouseExperiment.toString());
+                logger.error("This procedure doesn't have 3LC InhouseExperiment = {}\n",
+                        inhouseExperiment.toString());
                 continue;
             }
 
-            //****test**** toDo delete
-            if (firstKey == null) {
-                firstKey = key;
-                threeLcGroupedMap.put(firstKey, new ArrayList<>());
-            }
+            switch (mode) {
+                case TESTING:
+                    // Keep only experiments with the first encountered 3LC
+                    if (firstKey == null) {
+                        firstKey = key;
+                        threeLcGroupedMap.put(firstKey, new ArrayList<>());
+                    }
 
-//            // 6) Check if the key (threeLc) is already added to a Map
-//            if (!threeLcGroupedMap.containsKey(key)) {
-//                // If not, then add the key and new ArrayList
-//                threeLcGroupedMap.put(key, new ArrayList<>());
-//            }
-//
-//            // 7) Add an Experiment to a List for given key (threeLc)
-//            threeLcGroupedMap.get(key).add(inhouseExperiment);
-//            //logger.trace("Experiments -> importData() added experiment = {}\n", inhouseExperiment.toString());
+                    if (key.equals(firstKey)) {
+                        threeLcGroupedMap.get(firstKey).add(inhouseExperiment);
+                    } else {
+                        // Stop as soon as a different 3LC is encountered
+                        return threeLcGroupedMap;
+                    }
+                    break;
 
-            //****test**** toDo delete
-            if (key.equals(firstKey)) {
-                threeLcGroupedMap.get(firstKey).add(inhouseExperiment);
-            }
-
-            //****test**** toDo delete
-            if (!key.equals(firstKey)) {
-                break;
+                case PRODUCTION:
+                    // Production mode: Full grouping: collect all experiments by their 3LC
+                    threeLcGroupedMap.computeIfAbsent(key, k -> new ArrayList<>()).add(inhouseExperiment);
+                    break;
             }
         }
+
         return threeLcGroupedMap;
     }
 
