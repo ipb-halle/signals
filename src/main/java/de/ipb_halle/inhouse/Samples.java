@@ -27,6 +27,9 @@ import de.ipb_halle.lbac.search.lang.EntityGraph;
 import de.ipb_halle.lbac.search.lang.SqlInsertBuilder;
 */
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -55,9 +58,9 @@ public class Samples {
 
     public final static String SAMPLES_INPUT = "samples.inputFile";
     public final static String SAMPLES_REJECT = "samples.rejectFile";
-
     public final static String CONTAINER_DEFAULT_LOCATION = "samples.defaultLocation";
 
+    private final Logger logger = LogManager.getLogger(Samples.class);
 
     private InhouseDB inhouseDB;
 
@@ -116,7 +119,7 @@ public class Samples {
         // 15 ExtractBarcode
         // 16 IPBCode
 
-        Pattern pattern = Pattern.compile( "^(\\d+);"   //  1 extractId
+        Pattern pattern = Pattern.compile("^(\\d+);"   //  1 extractId
                 + "(\\d+);"                             //  2 correlationId
                 + "(.*);"                               //  3 last solvent
                 + "(.*);"                               //  4 storage place
@@ -153,20 +156,21 @@ public class Samples {
         // 16 Isolated                          unused
         // 17 BiolDataAvailable                 unused
 
-        Pattern pattern = Pattern.compile("^(\\d+);"    //  1 sampleId
-                + "(\\d+);"                             //  2 molProcId
-                + "(.*)?;"                              //  3 last solvent
-                + "(\\d?);"                             //  4 permission
-                + "(.*)?;"                              //  5 storage place
-                + "(.*)?;"                              //  6 "Lerbs-Marker"
-                + "(.*)?;"                              //  7 sample code
-                + "([0-9,\\.])?;"                       //  8 amount [mg]
-                + "([0-9,\\.])?;"                       //  9 tara [mg]
-                + "(\\d+)?;"                            // 10 purity
-                + "(.*)?;"                              // 11 physical phase,
-                + "('\\d{10}')?;"                       // 12 CLAKS-Id / KICKS-Label
-                + "(.*)?;"                              // 13 remarks
-                + "0;0;0;0$");                          //  - unused fields
+        Pattern pattern = Pattern.compile(
+                "^(\\d+);"                        //  1 sampleId
+                        + "(\\d+);"                             //  2 molProcId
+                        + "(.*)?;"                              //  3 last solvent
+                        + "(\\d?);"                             //  4 permission
+                        + "(.*)?;"                              //  5 storage place
+                        + "(.*)?;"                              //  6 "Lerbs-Marker"
+                        + "(.*)?;"                              //  7 sample code
+                        + "([0-9,\\.])?;"                       //  8 amount [mg]
+                        + "([0-9,\\.])?;"                       //  9 tara [mg]
+                        + "(\\d+)?;"                            // 10 purity
+                        + "(.*)?;"                              // 11 physical phase,
+                        + "('\\d{10}')?;"                       // 12 CLAKS-Id / KICKS-Label
+                        + "(.*)?;"                              // 13 remarks
+                        + "0;0;0;0$");                          //  - unused fields
 
         BufferedReader reader = new BufferedReader(new FileReader(inhouseDB.getConfigString(SAMPLES_INPUT)));
         BufferedWriter writer = new BufferedWriter(new FileWriter(inhouseDB.getConfigString(SAMPLES_REJECT)));
@@ -183,12 +187,17 @@ public class Samples {
                         .setSampleCode(stripQuotes(matcher.group(7)))
                         .setAmount(parseDecimalString(matcher.group(8)))
                         .setTara(parseDecimalString(matcher.group(9)))
-                        .setPurity(Integer.parseInt(matcher.group(10)))
+                        .setPurity(Integer.parseInt(matcher.group(10) == null || matcher.group(10).isEmpty() ? "0" : matcher.group(10)))
                         .setAppearance(stripQuotes(matcher.group(11)))
                         .setRemarks(stripQuotes(matcher.group(13)));
 
-                parseLocation(container, matcher.group(5));
-                inhouseDB.getInhouseDbService().save(container);
+                if (matcher.group(5) == null || matcher.group(5).isEmpty()) {
+                    logger.info("location is not parsed = {}\n", matcher.group(5));
+                } else {
+                    logger.info("location is  parsed = {}\n", matcher.group(5));
+                    parseLocation(container, matcher.group(5));
+                    inhouseDB.getInhouseDbService().save(container);
+                }
             } else {
                 writer.append(line);
                 writer.newLine();
@@ -223,11 +232,18 @@ public class Samples {
                     .setColumn(parseColumn(location, matcher.group(5)));
         } else {
             // could not parse location, setting default location
-            location = locations.get(inhouseDB.getConfigString(CONTAINER_DEFAULT_LOCATION));
-            container.setLocationId(location.getId())
-                    .setLocation(loc);
+            logger.warn("Location '{}' does not match expected pattern. Assigning default location.", loc);
+            String defaultLocName = inhouseDB.getConfigString(CONTAINER_DEFAULT_LOCATION);
+            InhouseLocation defaultLoc = locations.get(defaultLocName);
+            if (defaultLoc != null) {
+                container.setLocation(defaultLoc.getName())
+                        .setLocationId(defaultLoc.getId());
+            } else {
+                logger.error("Default location '{}' is not configured or not found in cache.", defaultLocName);
+            }
         }
     }
+
 
     private InhouseLocation lookupOrCreateLocation(Matcher matcher) {
         String locationName = matcher.group(1);
@@ -247,11 +263,25 @@ public class Samples {
     }
 
     private int parseRow(String row) {
-        return "ABCDEFGHIJKLMNOPQRSTUVWXYZ".indexOf(row) + 1;
+        return safeParseInt("" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ".indexOf(row), 0, "row letter: " + row);
     }
 
     private int parseColumn(InhouseLocation location, String col) {
-        return (location.isZeroBased() ? 1 : 0) + Integer.parseInt(col);
+        int base = location.isZeroBased() ? 1 : 0;
+        return base + safeParseInt(col, 0, "column value: " + col);
+    }
+
+    private int safeParseInt(String input, int defaultValue, String context) {
+        try {
+            if (input == null || input.trim().isEmpty()) {
+                logger.warn("Empty input while parsing int for {}", context);
+                return defaultValue;
+            }
+            return Integer.parseInt(input.trim());
+        } catch (NumberFormatException e) {
+            logger.warn("Failed to parse int for {}: '{}'. Using default {}", context, input, defaultValue);
+            return defaultValue;
+        }
     }
 
     private String stripQuotes(String st) {

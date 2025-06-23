@@ -262,6 +262,12 @@ public class Experiments {
         }
     }
 
+
+    private String loadIpb_code(Integer mol_id){
+        InhouseCompound inhouseCompound = inhouseDB.getInhouseDbService().loadCompoundByMolId(mol_id);
+        return inhouseCompound.getIpbCode();
+    }
+
     /**
      * Group a list of {@link InhouseExperiment} objects by their Three Letter Code (3lC).
      * <p>
@@ -315,7 +321,6 @@ public class Experiments {
                     break;
             }
         }
-
         return threeLcGroupedMap;
     }
 
@@ -423,10 +428,13 @@ public class Experiments {
         stoicRef.setRowId(rowId);
         sample.setStoicRef(stoicRef);
 
-        // Add the molecule ID as a property to the sample
+        // Set the propertyValue description
         SamplePropertyValue fvDescription = new SamplePropertyValue();
         fvDescription.setPropertyId(CHEMICAL_SAMPLE_PROPERTY_ID_DESCRIPTION);
         fvDescription.setPropertyValue(propertyValueDescription);
+
+        //Create a custom object IPB_Code and set a reference as a propertyValue
+        String ipb_code = "";
 
         // Create the sample via REST and store the returned Signals sample ID
         sample.addPropertyValue(fvDescription);
