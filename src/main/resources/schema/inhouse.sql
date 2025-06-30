@@ -81,3 +81,32 @@ CREATE TABLE inhouse_containers (
     location_id INTEGER
 );
 
+CREATE TABLE inhouse_organisms (
+    id SERIAL PRIMARY KEY,
+    org_id INTEGER,
+    species_script_id VARCHAR,
+    strain_script_id VARCHAR,
+    remarks VARCHAR
+);
+
+CREATE TABLE inhouse_extract (
+    id SERIAL PRIMARY KEY,
+    eid VARCHAR,
+    extract_id INTEGER,
+    correlation_id VARCHAR,
+    last_solvent VARCHAR,
+    storage_place VARCHAR,
+    extract_code VARCHAR,
+    tara VARCHAR,
+    amount DECIMAL(10, 3),
+    volume DECIMAL(10, 3),
+    concentration DECIMAL(10, 3),
+    solution BOOLEAN,
+    remarks VARCHAR,
+    hplc VARCHAR,
+    extract_plate_id VARCHAR,
+    extract_position VARCHAR,
+    extract_barcode VARCHAR,
+    ipb_code VARCHAR
+);
+

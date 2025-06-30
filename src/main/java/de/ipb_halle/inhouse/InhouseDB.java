@@ -146,7 +146,7 @@ public class InhouseDB {
         return dynEnumManager;
     }
 
-    public SampleRestService getSampleRestService(){
+    public SampleRestService getSampleRestService() {
         return sampleRestService;
     }
 
@@ -165,14 +165,23 @@ public class InhouseDB {
         logger.info("STARTING IMPORT OF SAMPLES");
         Samples samples = new Samples(this);
 
+        logger.info("STARTING IMPORT ORGANISMS");
+        Organisms organisms = new Organisms(this);
+
+        logger.info("STARTING IMPORT EXTRACTS");
+        Extracts extracts = new Extracts(this);
+
 //        Taxonomy taxonomy = new Taxonomy(this);
 
 //        compounds.importData();
-  //      experiments.importData();
+        //      experiments.importData();
         //  correlation.importData();
 
 //        taxonomy.importData();
-       samples.importData();
+        //     samples.importData();
+
+        // organisms.importOrganisms();
+        extracts.importExtracts();
     }
 
 

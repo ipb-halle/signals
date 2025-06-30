@@ -61,8 +61,14 @@ public class Experiments {
     public static final String CHEMICAL_SAMPLE_PROPERTY_ID_DESCRIPTION = "2";
     private final Logger logger = LogManager.getLogger(Experiments.class);
 
-    private record ChemDrawData(Integer molId, String fieldValueCdxml) {
+    public record ChemDrawData(Integer molId, String fieldValueCdxml) {
     }
+
+    private final Map<InhouseImportType, InhouseImportStrategy> strategyMap = Map.of(
+            InhouseImportType.STRUCTURE, new StructureImportStrategy(),
+            InhouseImportType.ORGANISM, new OrganismImportStrategy()
+            //   InhouseImportType.EXTRACT, new ExtractImportStrategy()
+    );
 
     private InhouseDB inhouseDB;
 
@@ -155,21 +161,116 @@ public class Experiments {
         // Step 1: import Experiments from CSV table of inhouse database
         importExperiments();
         // Step 2: Load all procedures imported from inhouse db
-        List<InhouseExperiment> experiments = loadInhouseExperiments();
-        logger.info("EXPERIMENTS-> importData()-> total amount of experiments = {}\n", experiments.size());
+        List<InhouseExperiment> inhouseExperiments = loadInhouseExperiments();
+        logger.info("EXPERIMENTS-> importData()-> total amount of experiments = {}\n", inhouseExperiments.size());
+
         // Prepare caches for faster lookup
-        Map<Integer, List<Optional<ChemDrawData>>> cdxmlCache = new HashMap<>();
-        Map<Integer, List<InhouseCorrelation>> correlationCache = new HashMap<>();
+        Map<Integer, List<Optional<ChemDrawData>>> procId_MolId_cdxmlCache = new HashMap<>();
+        Map<Integer, List<InhouseCorrelation>> procId_correlationCache = new HashMap<>();
+
         // Step 3: Create error logger for capturing issues
-        try (ErrorLogger errorLogger = new ErrorLogger("import_error.log")) {
-            // Step 4: Filtration to only valid experiments
-            List<InhouseExperiment> validExperiments = filterValidExperiments(experiments, errorLogger, cdxmlCache, correlationCache);
-            // Step 5: Group valid experiments by their threeLC
-            Map<String, List<InhouseExperiment>> threeLcGroupedMap = groupByThreeLC(validExperiments, errorLogger, ImportMode.TESTING);
+        /** Step 4: Filtering of all loaded experiment in two groups ->
+         *
+         *  structure experiment with valid cdxml (procId points to valid molId)
+         *  and
+         *  organism experiment without cdxml (procId ponts to valid orgId) here should be added additional check if this organism has correlation to structure
+         *
+         *  returns Map.of(
+         *  <structure_experiments, List<InouseExperiments>
+         *  <organism_experiments, List<InhouseExperiments>
+         *      );
+         */
+        Map<InhouseImportType, List<InhouseExperiment>> filteredExperiments = filterExperiments(
+                inhouseExperiments,
+                procId_MolId_cdxmlCache,
+                procId_correlationCache);
+
+        // Step 5: Group valid experiments by their threeLC
+        for (InhouseImportType importType : InhouseImportType.values()) {
+            Map<String, List<InhouseExperiment>> threeLcGroupedMap = groupByThreeLC(
+                    filteredExperiments.get(importType),
+                    ImportMode.TESTING
+            );
+
             // Step 6: For each threeLC group, create a Signals experiment and import data
-            importGroupedExperiments(threeLcGroupedMap, cdxmlCache, errorLogger);
+            importGroupedExperiments(
+                    threeLcGroupedMap,
+                    procId_MolId_cdxmlCache,
+                    importType);
         }
     }
+
+    private Map<InhouseImportType, List<InhouseExperiment>> filterExperiments(
+            List<InhouseExperiment> experiments,
+            Map<Integer, List<Optional<ChemDrawData>>> cdxmlCache, // empty hashMap
+            Map<Integer, List<InhouseCorrelation>> correlationCache // empty hashMap
+    ) throws Exception {
+        ErrorLogger errorLogger = new ErrorLogger("error_log_filter_experiments.txt");
+        int missingThreeLc = 0;
+        int missingProceedId = 0;
+        int missingChemDraw = 0;
+        List<InhouseExperiment> structureExperiments = new ArrayList<>();
+        List<InhouseExperiment> organismExperiments = new ArrayList<>();
+        List<InhouseExperiment> structureExperimentsWithoutCdxml = new ArrayList<>();
+
+        for (InhouseExperiment exp : experiments) {
+
+            if (exp.getThreelc() == null) {
+                // errorLogger.log("Missing threeLC for experiment: " + exp);
+                missingThreeLc++;
+                continue;
+            }
+            if (exp.getProcId() == 0) {
+                // errorLogger.log("Missing procedure ID for experiment: " + exp);
+                missingProceedId++;
+                continue;
+            }
+
+            int procId = exp.getProcId();
+
+            // Get us all experiments which have cdxml upon procId
+            List<Optional<ChemDrawData>> cdxmlList = cdxmlCache.get(procId);
+            if (cdxmlList == null) {
+                cdxmlList = loadCDXML_StringForGivenExperimentUponMolID_Cached(procId, correlationCache);
+                cdxmlCache.put(procId, cdxmlList);
+            }
+
+            // Check wherever experiment structure without cdxml or organism
+            if (cdxmlList.isEmpty() || cdxmlList.stream().allMatch(Optional::isEmpty)) {
+                // errorLogger.log("Missing ChemDrawData for procedureId=" + procId);
+                missingChemDraw++;
+                // It is possible that one procedureId has two organismId
+                if (doesTheExperimentWithoutCdxmlHasOrgId(exp)) {
+                    organismExperiments.add(exp);
+                } else {
+                    structureExperimentsWithoutCdxml.add(exp);
+                }
+            } else {
+                structureExperiments.add(exp);
+            }
+        }
+
+        errorLogger.log(String.format("Experiments with missing threeLetterCode = %d", missingThreeLc));
+        errorLogger.log(String.format("Experiments with missing missingProceedId = %d", missingProceedId));
+        errorLogger.log(String.format("Experiments with missing missingChemDraw = %d", missingChemDraw));
+
+        return Map.of(
+                InhouseImportType.STRUCTURE, structureExperiments,
+                InhouseImportType.ORGANISM, organismExperiments
+        );
+    }
+
+    private boolean doesTheExperimentWithoutCdxmlHasOrgId(InhouseExperiment exp) {
+        Integer orgId = loadOrgId(exp.getProcId()).get(0);
+        return orgId != null;
+    }
+
+    private List<Integer> loadOrgId(int procId) {
+        List<InhouseCorrelation> inhouseCorrelations = inhouseDB.getInhouseDbService().loadCorrelationByProcedureId(procId);
+        List<Integer> list = inhouseCorrelations.stream().map(InhouseCorrelation::getOrganismId).toList();
+        return list;
+    }
+
 
     /**
      * Imports grouped inhouse experiments into the Signals platform.
@@ -193,77 +294,105 @@ public class Experiments {
      *
      * @param threeLcGroupedMap grouped valid experiments by 3LC code
      * @param cdxmlCache        cache mapping procedure ID to ChemDrawData
-     * @param errorLogger       logger to write import errors
      */
     private void importGroupedExperiments(
             Map<String, List<InhouseExperiment>> threeLcGroupedMap,
             Map<Integer, List<Optional<ChemDrawData>>> cdxmlCache,
-            ErrorLogger errorLogger) {
+            InhouseImportType importType) {
 
         for (Map.Entry<String, List<InhouseExperiment>> entry : threeLcGroupedMap.entrySet()) {
             String threeLc = entry.getKey();
             List<InhouseExperiment> experimentsBy3lc = entry.getValue();
-            int chunkSize = 10;
-            int experimentCounter = 1;
 
-            // Split experiments into chunks of fixed size (10 per experiment)
-            for (int i = 0; i < experimentsBy3lc.size(); i += chunkSize) {
-                int toIndex = Math.min(i + chunkSize, experimentsBy3lc.size());
-                List<InhouseExperiment> chunk = experimentsBy3lc.subList(i, toIndex);
-
-                // Use first experiment in the chunk to create Signals Experiment entity
-                InhouseExperiment main = chunk.get(0);
-                String experimentName = threeLc + "-" + experimentCounter++;
-                String eid = createExperimentUpon3LC(experimentName, main);
-
-                // Loop over each inhouse experiment in chunk
-                for (InhouseExperiment exp : chunk) {
-                    Integer procId = exp.getProcId();
-                    if (procId == 0) {
-                        logger.error("No precedure Id foe exepriment  = {}\n", exp);
-                        continue;
-                    }
-
-                    List<Optional<ChemDrawData>> optionals = cdxmlCache.get(procId);
-                    if (optionals == null || optionals.isEmpty()) {
-                        errorLogger.log("Empty ChemDraw list for procId=" + procId);
-                        continue;
-                    }
-
-                    // Create a ChemDraw entry for each structure
-                    for (Optional<ChemDrawData> chemDrawDataOptional : optionals) {
-                        if (chemDrawDataOptional.isEmpty()) {
-                            errorLogger.log("Missing ChemDrawData (should not happen after filtering) for procedureId=" + procId);
-                            continue;
-                        }
-                        ChemDrawData data = chemDrawDataOptional.get();
-
-                        // Create child chemical drawing entity in Signals
-                        String chemDrawId = createChemDrawForInhouseExperiment(data.molId, eid);
-
-                        // Add chemical drawing as product
-                        // POSITIONS-> = reactants|products|reagents|grid
-                        if (!data.fieldValueCdxml.isEmpty()) {
-                            inhouseDB.getExperimentRestService().addReactionToExperiment(chemDrawId, "products", data.fieldValueCdxml);
-                        }
-
-                        // Prepare description and create sample entity
-                        String desc = String.format("MolId: %s, Experiment: %s%s, Journal: %s",
-                                data.molId, threeLc, procId, exp.getJournal());
-                        createSampleForChemicalDrawing(chemDrawId, "1", eid, desc);
-
-                        // Mark Experiment as successfully imported
-                        exp.setEid(eid);
-                        exp.setImportSuccessful(true);
-                        inhouseDB.getInhouseDbService().markAsSuccessfullyImported(exp);
-                    }
+            try {
+                if (!cdxmlCache.isEmpty())
+                    strategyMap.get(importType).importGroup(
+                            inhouseDB,
+                            threeLc,
+                            experimentsBy3lc,
+                            cdxmlCache
+                    );
+                else {
+                    strategyMap.get(importType).importGroup(
+                            inhouseDB,
+                            threeLc,
+                            experimentsBy3lc
+                    );
                 }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
+
+//            int chunkSize = 10;
+//            int experimentCounter = 1;
+//
+//            // Split experiments into chunks of fixed size (10 per experiment)
+//            for (int i = 0; i < experimentsBy3lc.size(); i += chunkSize) {
+//                int toIndex = Math.min(i + chunkSize, experimentsBy3lc.size());
+//                List<InhouseExperiment> chunk = experimentsBy3lc.subList(i, toIndex);
+//
+//                // Use first experiment in the chunk to create Signals Experiment entity
+//                InhouseExperiment main = chunk.get(0);
+//                String experimentName = threeLc + "-" + experimentCounter++;
+//                String eid = createExperimentUpon3LC(experimentName, main);
+//
+//                // Loop over each inhouse experiment in chunk
+//                for (InhouseExperiment exp : chunk) {
+//                    Integer procId = exp.getProcId();
+//                    if (procId == 0) {
+//                        logger.error("No precedure Id foe exepriment  = {}\n", exp);
+//                        continue;
+//                    }
+//
+//                    List<Optional<ChemDrawData>> optionals = cdxmlCache.get(procId);
+//                    if (optionals == null || optionals.isEmpty()) {
+//                        errorLogger.log("Empty ChemDraw list for procId=" + procId);
+//                        continue;
+//                    }
+//
+//                    // Create a ChemDraw entry for each structure
+//                    for (Optional<ChemDrawData> chemDrawDataOptional : optionals) {
+//                        if (chemDrawDataOptional.isEmpty()) {
+//                            errorLogger.log("Missing ChemDrawData (should not happen after filtering) for procedureId=" + procId);
+//                            continue;
+//                        }
+//                        ChemDrawData data = chemDrawDataOptional.get();
+//
+//                        // Create child chemical drawing entity in Signals
+//                        String chemDrawId = createChemDrawForInhouseExperiment(data.molId, eid);
+//
+//                        // Add chemical drawing as product
+//                        // POSITIONS-> = reactants|products|reagents|grid
+//                        if (!data.fieldValueCdxml.isEmpty()) {
+//                            inhouseDB.getExperimentRestService().addReactionToExperiment(chemDrawId, "products", data.fieldValueCdxml);
+//                        }
+//
+//                        // Prepare description and create sample entity
+//                        String desc = String.format("MolId: %s, Experiment: %s%s, Journal: %s",
+//                                data.molId, threeLc, procId, exp.getJournal());
+//                        createSampleForChemicalDrawing(chemDrawId, "1", eid, desc);
+//
+//                        // Mark Experiment as successfully imported
+//                        exp.setEid(eid);
+//                        exp.setImportSuccessful(true);
+//                        inhouseDB.getInhouseDbService().markAsSuccessfullyImported(exp);
+//                    }
+//                }
+//            }
         }
     }
 
+    private InhouseImportType determineImportType(InhouseExperiment exp) {
+        boolean hasProc = exp.getProcId() != 0;
 
-    private String loadIpb_code(Integer mol_id){
+        //toDo: implement
+//        if (molId != null && procId != null) return EXPERIMENT;
+//        if (organismId != null && procId != null && molId == null) return ORGANISM;
+//        if (organismId != null && procId != null && есть extract в tblExtract) return EXTRACT;
+        return null;
+    }
+
+    private String loadIpb_code(Integer mol_id) {
         InhouseCompound inhouseCompound = inhouseDB.getInhouseDbService().loadCompoundByMolId(mol_id);
         return inhouseCompound.getIpbCode();
     }
@@ -275,15 +404,14 @@ public class Experiments {
      * (useful for focused development and debugging).
      * In PRODUCTION mode, all valid experiments will be grouped by their 3LC.
      *
-     * @param validExperiments  the list of experiments to group (must be non-null)
-     * @param errorLogger       the logger used to record missing 3LCs
-     * @param mode              the import mode (TESTING or PRODUCTION)
+     * @param validExperiments the list of experiments to group (must be non-null)
+     * @param mode             the import mode (TESTING or PRODUCTION)
      * @return a map where each key is a 3LC and the value is a list of experiments with that code
      */
     private Map<String, List<InhouseExperiment>> groupByThreeLC(
             List<InhouseExperiment> validExperiments,
-            ErrorLogger errorLogger,
-            ImportMode mode) {
+            ImportMode mode) throws Exception {
+        ErrorLogger errorLogger = new ErrorLogger("import_error.log"); // toDo set filepath
 
         Map<String, List<InhouseExperiment>> threeLcGroupedMap = new HashMap<>();
         String firstKey = null; // used in TESTING mode only
@@ -324,43 +452,8 @@ public class Experiments {
         return threeLcGroupedMap;
     }
 
-    private List<InhouseExperiment> filterValidExperiments(List<InhouseExperiment> experiments, ErrorLogger errorLogger, Map<Integer, List<Optional<ChemDrawData>>> cdxmlCache, Map<Integer, List<InhouseCorrelation>> correlationCache) {
 
-        int rejectedCount = 0;
-        List<InhouseExperiment> validExperiments = new ArrayList<>();
-        for (InhouseExperiment exp : experiments) {
-
-            if (exp.getThreelc() == null) {
-                errorLogger.log("Missing threeLC for experiment: " + exp);
-                rejectedCount++;
-                continue;
-            }
-            if (exp.getProcId() == 0) {
-                errorLogger.log("Missing procedure ID for experiment: " + exp);
-                rejectedCount++;
-                continue;
-            }
-            int procId = exp.getProcId();
-
-            List<Optional<ChemDrawData>> cdxmlList = cdxmlCache.computeIfAbsent(
-                    procId,
-                    id -> loadCDXML_StringForGivenExperimentUponMolID_Cached(id, correlationCache)
-            );
-
-            if (cdxmlList.isEmpty() || cdxmlList.stream().allMatch(Optional::isEmpty)) {
-                errorLogger.log("Missing ChemDrawData for procedureId=" + procId);
-                rejectedCount++;
-                continue;
-            }
-            validExperiments.add(exp);
-        }
-        logger.info("Filtered valid inhouse experiments: {}", validExperiments.size());
-        logger.info("Rejected inhouse experiments: {}", rejectedCount);
-        return validExperiments;
-    }
-
-
-    private String createExperimentUpon3LC(String experimentName, InhouseExperiment experiment) {
+    public String createExperimentUpon3LC(String experimentName, InhouseExperiment experiment) {
         // 1) Create Inhouse Experiment DTO
         InhouseExperimentDTO dto = new InhouseExperimentDTO(experiment);
         dto.setInhouseDB(inhouseDB);
@@ -381,7 +474,7 @@ public class Experiments {
         return experiments;
     }
 
-    private String createChemDrawForInhouseExperiment(Integer molId, String idOfCreatedExperimentInSignals) {
+    public String createChemDrawForInhouseExperiment(Integer molId, String idOfCreatedExperimentInSignals) {
         // Make a Rest Call for Creation of an Experiment Child: empty ChemDrawing Entity for further import of a Structure
         //logger.trace("CHEM_DRAW WAS CREATED AND ITS ID IS= {}\n", chemDrawId);
         String fileName = "molId_" + molId;
@@ -411,7 +504,7 @@ public class Experiments {
      * @param rowId      the row index of the drawing’s stoichiometry table
      * @param ancestorId the EID of the container or experiment to act as the sample's parent
      */
-    private void createSampleForChemicalDrawing(String chemDrawId, String rowId, String ancestorId, String propertyValueDescription) {
+    public void createSampleForChemicalDrawing(String chemDrawId, String rowId, String ancestorId, String propertyValueDescription) {
         // Create a new Sample and assign the chemical sample template
         Sample sample = new Sample();
         sample.setTemplateId(CHEMICAL_SAMPLE_TEMPLATE_ID);
@@ -537,4 +630,7 @@ public class Experiments {
         }
     }
 
+    public Logger getLogger() {
+        return logger;
+    }
 }

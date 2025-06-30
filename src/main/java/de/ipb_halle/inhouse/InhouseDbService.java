@@ -169,7 +169,7 @@ public class InhouseDbService {
             return em.createQuery(query).getResultList();
 
         } catch (NoResultException e) {
-           return null;
+            return null;
         }
     }
 
@@ -204,5 +204,13 @@ public class InhouseDbService {
 
     public void save(InhouseTaxon taxon) {
         this.em.merge(taxon);
+    }
+
+    public void save(InhouseOrganism organism) {
+        this.em.merge(organism);
+    }
+
+    public void save(InhouseExtract extract) {
+        this.em.merge(extract);
     }
 }

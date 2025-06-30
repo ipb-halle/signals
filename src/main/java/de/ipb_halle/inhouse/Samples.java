@@ -124,7 +124,7 @@ public class Samples {
                 + "(.*);"                               //  3 last solvent
                 + "(.*);"                               //  4 storage place
                 + "(.*);"                               //  5 extract code (= sample code)
-                + "(.*);"                               //  6 taga [mg], decimal
+                + "(.*);"                               //  6 tara [mg], decimal
                 + "(.*);"                               //  7 amount [mg], decimal
                 + "(.*);"                               //  8 volume [ml], decimal
                 + "(.*);"                               //  9 concentration [mg/ml], decimal
@@ -172,39 +172,43 @@ public class Samples {
                         + "(.*)?;"                              // 13 remarks
                         + "0;0;0;0$");                          //  - unused fields
 
-        BufferedReader reader = new BufferedReader(new FileReader(inhouseDB.getConfigString(SAMPLES_INPUT)));
-        BufferedWriter writer = new BufferedWriter(new FileWriter(inhouseDB.getConfigString(SAMPLES_REJECT)));
-        reader.readLine(); // discard header
-        while (reader.ready()) {
-            String line = reader.readLine();
+        try (
+                BufferedReader reader = new BufferedReader(new FileReader(inhouseDB.getConfigString(SAMPLES_INPUT)));
+                BufferedWriter writer = new BufferedWriter(new FileWriter(inhouseDB.getConfigString(SAMPLES_REJECT)));
+        ) {
+            reader.readLine(); // discard header
+            while (reader.ready()) {
+                String line = reader.readLine();
 
-            Matcher matcher = pattern.matcher(line);
-            if (matcher.matches()) {
-                InhouseContainer container = new InhouseContainer()
-                        .setSampleId(Integer.parseInt(matcher.group(1)))
-                        .setCompoundCorrelationId(Integer.parseInt(matcher.group(2)))
-                        .setLastSolvent(stripQuotes(matcher.group(3)))      // "acetic acid"
-                        .setSampleCode(stripQuotes(matcher.group(7)))
-                        .setAmount(parseDecimalString(matcher.group(8)))
-                        .setTara(parseDecimalString(matcher.group(9)))
-                        .setPurity(Integer.parseInt(matcher.group(10) == null || matcher.group(10).isEmpty() ? "0" : matcher.group(10)))
-                        .setAppearance(stripQuotes(matcher.group(11)))
-                        .setRemarks(stripQuotes(matcher.group(13)));
+                Matcher matcher = pattern.matcher(line);
+                if (matcher.matches()) {
+                    InhouseContainer container = new InhouseContainer()
+                            .setSampleId(Integer.parseInt(matcher.group(1)))
+                            .setCompoundCorrelationId(Integer.parseInt(matcher.group(2)))
+                            .setLastSolvent(stripQuotes(matcher.group(3)))      // "acetic acid"
+                            .setSampleCode(stripQuotes(matcher.group(7)))
+                            .setAmount(parseDecimalString(matcher.group(8)))
+                            .setTara(parseDecimalString(matcher.group(9)))
+                            .setPurity(Integer.parseInt(matcher.group(10) == null || matcher.group(10).isEmpty() ? "0" : matcher.group(10)))
+                            .setAppearance(stripQuotes(matcher.group(11)))
+                            .setRemarks(stripQuotes(matcher.group(13)));
 
-                if (matcher.group(5) == null || matcher.group(5).isEmpty()) {
-                    logger.info("location is not parsed = {}\n", matcher.group(5));
+                    if (matcher.group(5) == null || matcher.group(5).isEmpty()) {
+                        logger.info("location is not parsed = {}\n", matcher.group(5));
+                    } else {
+                        logger.info("location is  parsed = {}\n", matcher.group(5));
+                        parseLocation(container, matcher.group(5));
+                        inhouseDB.getInhouseDbService().save(container);
+                        logger.info("Samples are imported");
+                    }
                 } else {
-                    logger.info("location is  parsed = {}\n", matcher.group(5));
-                    parseLocation(container, matcher.group(5));
-                    inhouseDB.getInhouseDbService().save(container);
+                    writer.append(line);
+                    writer.newLine();
                 }
-            } else {
-                writer.append(line);
-                writer.newLine();
             }
+            reader.close();
+            writer.close();
         }
-        reader.close();
-        writer.close();
     }
 
     /**
