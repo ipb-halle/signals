@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.signals.entity;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -31,7 +32,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 
@@ -171,5 +174,70 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
             restClient.putUriParameter(PARAMETER_INCLUDE_OPTIONS,
                     (String) cmap.get(PARAMETER_INCLUDE_OPTIONS));
         }
+    }
+
+    public SignalsEntityDTO createIpbCodeCustomObjectSignalsEntity(String ancestorId, String name, String templateId) {
+        try {
+            JsonObject payload = new JsonObject();
+
+            // data
+            JsonObject data = new JsonObject();
+            data.addProperty("type", "ado");
+
+            // meta (adoTypeName)
+            JsonObject meta = new JsonObject();
+            meta.addProperty("adoTypeName", name);
+            data.add("meta", meta);
+
+            // attributes
+            JsonObject attributes = new JsonObject();
+            attributes.addProperty("name", name + "-example");
+            data.add("attributes", attributes);
+
+            // relationships
+            JsonObject relationships = new JsonObject();
+
+//            // ancestors
+//            JsonObject ancestors = new JsonObject();
+//            JsonArray ancestorsArray = new JsonArray();
+//            JsonObject ancestorData = new JsonObject();
+//            ancestorData.addProperty("type", "sample"); // ОБЯЗАТЕЛЬНО!
+//            ancestorData.addProperty("id", ancestorId);
+//            ancestorsArray.add(ancestorData);
+//            ancestors.add("data", ancestorsArray);
+//            relationships.add("ancestors", ancestors);
+
+            // template
+            JsonObject template = new JsonObject();
+            JsonObject templateData = new JsonObject();
+            templateData.addProperty("type", "ado");
+            templateData.addProperty("id", templateId);
+            template.add("data", templateData);
+            relationships.add("template", template);
+
+            data.add("relationships", relationships);
+
+            payload.add("data", data);
+
+            // send a request
+            restClient.reset()
+                    .setMethod(Method.POST)
+                    .setEndpoint(SignalsEntityRestService.SIGNALS_ENTITY_ENDPOINT)
+                    .setRequestData(payload.toString())
+                    .execute();
+
+            JsonElement jsonResponse = JsonParser.parseString(restClient.getResponse().getString());
+            return parseReply(jsonResponse.getAsJsonObject().get("data"));
+
+        } catch (IOException | URISyntaxException | UnexpectedResponseCodeException ex) {
+            logger.error("Failed to create custom object for ipbCode {}", name, ex);
+            return null;
+        }
+    }
+
+    private JsonElement wrapInArray(JsonObject obj) {
+        JsonArray array = new JsonArray();
+        array.add(obj);
+        return array;
     }
 }

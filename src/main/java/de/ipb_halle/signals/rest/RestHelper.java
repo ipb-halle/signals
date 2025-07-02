@@ -79,6 +79,7 @@ public class RestHelper {
     public static final String ATTR_DATA_TYPE = "dataType";
     public static final String ATTR_STOIC_REF = "stoicRef";
     public static final String ATTR_ROW_ID = "rowId";
+    public static final String ATTR_VALUES = "values";
 
 
     public static String formatDate(Date d) {

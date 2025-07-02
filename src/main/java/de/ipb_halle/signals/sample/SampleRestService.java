@@ -442,16 +442,37 @@ public class SampleRestService implements RestReplyParser<Sample> {
      * @return a JsonObject for this individual property update
      */
     private static JsonObject getJsonObject(Map.Entry<String, String> entry) {
-        JsonObject propertyObj = new JsonObject();
-        propertyObj.addProperty(RestHelper.ATTR_ID, entry.getKey());
-        propertyObj.addProperty(RestHelper.ATTR_TYPE, "text");
+        //Property is a field by sample
+        String propertyId = entry.getKey();
+        String value = entry.getValue();
 
+        JsonObject propertyObj = new JsonObject();
+        propertyObj.addProperty(RestHelper.ATTR_ID, propertyId);
+
+        // Define the type of the field depended on ID
+        String type = propertyId.equals("109") ? "link" : "text";
+        propertyObj.addProperty(RestHelper.ATTR_TYPE, type);
+
+        // Define content
         JsonObject propertyAttributes = new JsonObject();
         JsonObject content = new JsonObject();
-        content.addProperty(RestHelper.ATTR_VALUE, entry.getValue());
-        propertyAttributes.add(RestHelper.ATTR_CONTENT, content);
+        JsonArray valuesArray = new JsonArray();
+        JsonObject valueJson = new JsonObject();
 
+        //This property with id 109 is reference on custom object type "ada" which stands for IBP code (value consist of type, name, eid)
+        if (propertyId.equals("109")) {
+            valueJson.addProperty(RestHelper.ATTR_TYPE, value.split(";")[0]);
+            valueJson.addProperty(RestHelper.ATTR_NAME, value.split(";")[1]);
+            valueJson.addProperty(RestHelper.ATTR_EID, value.split(";")[2]);
+        } else {
+            valueJson.addProperty(RestHelper.ATTR_VALUE, value);
+        }
+        valuesArray.add(valueJson);
+        content.add(RestHelper.ATTR_VALUES, valuesArray);
+
+        propertyAttributes.add(RestHelper.ATTR_CONTENT, content);
         propertyObj.add(RestHelper.ATTR_ATTRIBUTES, propertyAttributes);
+
         return propertyObj;
     }
 

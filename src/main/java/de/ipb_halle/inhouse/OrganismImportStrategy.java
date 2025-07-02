@@ -26,6 +26,7 @@ import de.ipb_halle.signals.sample.SamplePropertyValue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,8 +37,10 @@ import java.util.Optional;
  * and a new Sample with container will be created in a new experiment
  */
 public class OrganismImportStrategy implements InhouseImportStrategy {
+
     public static final String CHEMICAL_SAMPLE_TEMPLATE_ID = "sample:0174e78c-0b95-49f9-8a57-39061bbc0050";
     public static final String CHEMICAL_SAMPLE_PROPERTY_ID_DESCRIPTION = "2";
+    public static final String CHEMICAL_SAMPLE_IPB_CODE_INTERNAL_REFERENCE_ID = "109";
 
 
     private final Logger logger = LogManager.getLogger(OrganismImportStrategy.class);
@@ -48,16 +51,16 @@ public class OrganismImportStrategy implements InhouseImportStrategy {
     }
 
     @Override
-    public void importGroup(
-            InhouseDB inhouseDB,
-            String threeLc,
-            List<InhouseExperiment> experimentsBy3lc) throws Exception {
+    public void importGroup(InhouseDB inhouseDB, String threeLc, List<InhouseExperiment> experimentsBy3lc) throws Exception {
+
+        logger.info("Ich bin in Organism import strategy\n");
+
         if (experimentsBy3lc.isEmpty()) {
             logger.warn("Empty experiment list grouped by threeLc {}\n", threeLc);
             return;
         }
-        Experiments helper = new Experiments(inhouseDB);
 
+        Experiments helper = new Experiments(inhouseDB);
         int chunkSize = 10;
         int experimentCounter = 1;
 
@@ -77,10 +80,10 @@ public class OrganismImportStrategy implements InhouseImportStrategy {
                     Integer orgId = correlation.getOrganismId();
                     if (orgId == null) continue;
 
-                    String desc = String.format("OrgId: %s, Experiment: %s%s, Journal: %s",
-                            orgId, threeLc, procId, exp.getJournal());
-
-                    createSampleForOrganism(inhouseDB, eid, orgId, desc);
+                    // setting description field value
+                    String desc = String.format("OrgId: %s, Experiment: %s%s, Journal: %s", orgId, threeLc, procId, exp.getJournal());
+                    // create non-chemical sample with field values in sampleContainer -> sample table -> rest call POST
+                    createSampleForOrganism(inhouseDB, eid, desc);
 
                     exp.setEid(eid);
                     exp.setImportSuccessful(true);
@@ -92,23 +95,38 @@ public class OrganismImportStrategy implements InhouseImportStrategy {
 
     }
 
-    private void createSampleForOrganism(InhouseDB inhouseDB, String experimentId, Integer organismId, String description) {
+    private void createSampleForOrganism(InhouseDB inhouseDB, String ancestorId, String propertyValueDescription) {
 
+        // Create a new Sample and assign the chemical sample template
         Sample sample = new Sample();
         sample.setTemplateId(CHEMICAL_SAMPLE_TEMPLATE_ID);
 
         SignalsEntity signals = new SignalsEntity();
-        signals.setEid(experimentId);
+        signals.setEid(ancestorId);
         sample.addAncestor(signals);
-        sample.setAncestorId(experimentId);
+        sample.setAncestorId(ancestorId);
 
-        SamplePropertyValue propertyDesc = new SamplePropertyValue();
-        propertyDesc.setPropertyId(CHEMICAL_SAMPLE_PROPERTY_ID_DESCRIPTION);
-        propertyDesc.setPropertyValue(description);
+        // Set the propertyValue description
+        SamplePropertyValue fvDescription = new SamplePropertyValue();
+        fvDescription.setPropertyId(CHEMICAL_SAMPLE_PROPERTY_ID_DESCRIPTION);
+        fvDescription.setPropertyValue(propertyValueDescription);
 
-        sample.addPropertyValue(propertyDesc);
+        // Create the sample via REST and store the returned Signals sample ID
+        sample.addPropertyValue(fvDescription);
+        String sampleId = inhouseDB.getSampleRestService().createNewSample(sample);
+        sample.setId(sampleId);
+        fvDescription.setSampleId(sampleId);
 
+        // Prepare properties as key-value pairs for PATCH update
+        HashMap<String, String> propertyKeyToValue = new HashMap<>();
+        for (SamplePropertyValue samplePropertyValue : sample.getPropertyValues()) {
+            //                      id                                  // value
+            propertyKeyToValue.put(samplePropertyValue.getPropertyId(), samplePropertyValue.getPropertyValue());
+        }
+
+        // Perform a PATCH request to update the properties of the newly created sample
+        inhouseDB.getSampleRestService().updateSamplePropertyValues(propertyKeyToValue, sampleId);
+
+        // no ipb_code for organisms
     }
-
-
 }
