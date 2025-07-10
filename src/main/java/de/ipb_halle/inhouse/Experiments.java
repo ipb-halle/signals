@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.inhouse;
 
+import de.ipb_halle.inhouse.imports.InhouseExperimentFilter;
 import de.ipb_halle.signals.experiments.Experiment;
 import jakarta.persistence.NoResultException;
 import org.apache.logging.log4j.LogManager;
@@ -29,21 +30,6 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-/**
- * Migration tool for the InhouseDB
- * <p>
- * Note: the procedures table needs extensive cleaning (invalid 3 letter codes, ...)
- *
- * @author fbroda
- */
-
-// TODO: Detect import type (experiment, organism, extract) based on fields
-// TODO: Implement Strategy pattern to handle different import behaviors
-// TODO: Refactor importGroupedExperiments() to delegate by strategy
-// TODO: Create OrganismImportStrategy and ExtractImportStrategy
-// TODO: Add logic to mark organisms/extracts as successfully imported
-
 
 public class Experiments {
 
@@ -130,62 +116,26 @@ public class Experiments {
         }
     }
 
-    /**
-     * Imports experiments from the legacy inhouse database and maps them to the Signals notebook.
-     *
-     * <p>Steps performed:</p>
-     * <ol>
-     *     <li>Loads and parses experiment data from  a CSV table.</li>
-     *     <li>Filters out invalid experiments (missing threeLC or procedureId, or missing ChemDraw data).</li>
-     *     <li>Groups experiments by their threeLC identifier.</li>
-     *     <li>For each group, ctreates an experiment in Signals and adds corresponding chemical drawings and samples.</li>
-     * </ol>
-     *
-     * <p>All errors are logged into a dedicated error log file.</p>
-     *
-     * @throws Exception if an unrecoverable error occurs during import.
-     */
+
     public void importData() throws Exception {
-
-        // Step 1: import Experiments from CSV table of inhouse database
-        //importExperiments();
-
-        // Step 2: Load all procedures imported from inhouse db
         List<InhouseExperiment> inhouseExperiments = loadInhouseExperiments();
+        logger.info("Total experiments loaded = {}", inhouseExperiments.size());
 
-        logger.info("EXPERIMENTS-> importData()-> total amount of experiments = {}\n", inhouseExperiments.size());
+        Map<Integer, List<Optional<ChemDrawData>>> cdxmlCache = new HashMap<>();
+        Map<Integer, List<InhouseCorrelation>> correlationCache = new HashMap<>();
 
-        // Prepare caches for faster lookup
-        Map<Integer, List<Optional<ChemDrawData>>> procId_MolId_cdxmlCache = new HashMap<>();
-        Map<Integer, List<InhouseCorrelation>> procId_correlationCache = new HashMap<>();
+        InhouseExperimentFilter filter = new InhouseExperimentFilter(inhouseDB);
+        ErrorLogger errorLogger = new ErrorLogger("error_log_filter_experiments.txt");
+        Map<InhouseImportType, List<InhouseExperiment>> filtered = filter.filter(
+                inhouseExperiments, cdxmlCache, correlationCache, errorLogger
+        );
 
-        // Step 3: Create error logger for capturing issues
-        /** Step 4: Filtering of all loaded experiment in two groups ->
-         *
-         *  structure experiment with valid cdxml (procId points to valid molId)
-         *  and
-         *  organism experiment without cdxml (procId ponts to valid orgId) here should be added additional check if this organism has correlation to structure
-         *
-         *  returns Map.of(
-         *  <structure_experiments, List<InouseExperiments>
-         *  <organism_experiments, List<InhouseExperiments>
-         *      );
-         */
-        Map<InhouseImportType, List<InhouseExperiment>> filteredExperiments = filterExperiments(inhouseExperiments, procId_MolId_cdxmlCache, procId_correlationCache);
-
-        // Step 5: Group valid experiments by their threeLC
-        for (InhouseImportType importType : InhouseImportType.values()) {
-            Map<String, List<InhouseExperiment>> threeLcGroupedMap = groupByThreeLC(filteredExperiments.get(importType), ImportMode.TESTING);
-
-            // Step 6: For each threeLC group, create a Signals experiment and import data
-            importGroupedExperiments(threeLcGroupedMap, procId_MolId_cdxmlCache, importType);
+        for (InhouseImportType type : InhouseImportType.values()) {
+            List<InhouseExperiment> list = filtered.getOrDefault(type, List.of());
+            Map<String, List<InhouseExperiment>> grouped = groupByThreeLC(list, ImportMode.TESTING);
+            importGroupedExperiments(grouped, cdxmlCache, type);
         }
     }
-
-
-
-
-
 
 
     private Map<InhouseImportType, List<InhouseExperiment>> filterExperiments(List<InhouseExperiment> experiments, Map<Integer, List<Optional<ChemDrawData>>> cdxmlCache, // empty hashMap
@@ -465,7 +415,7 @@ public class Experiments {
      * @return the CDXML content as a String, or an empty string if no corresponding file was found
      * @throws RuntimeException if an unexpected I/O error occurs while reading the file
      */
-    private List<Optional<ChemDrawData>> loadCDXML_StringForGivenExperimentUponMolID_Cached(Integer procedureId, Map<Integer, List<InhouseCorrelation>> correlationCache) {
+    public List<Optional<ChemDrawData>> loadCDXML_StringForGivenExperimentUponMolID_Cached(Integer procedureId, Map<Integer, List<InhouseCorrelation>> correlationCache) {
 
         List<InhouseCorrelation> correlations = correlationCache.computeIfAbsent(procedureId, this::loadCorrelationByExperimentProcedureId);
 
@@ -530,7 +480,6 @@ public class Experiments {
             return null;
         }
     }
-
 
 
     public Logger getLogger() {
