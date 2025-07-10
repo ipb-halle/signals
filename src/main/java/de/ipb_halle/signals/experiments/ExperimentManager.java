@@ -26,15 +26,16 @@ import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.entity.SignalsEntityDbService;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
-import de.ipb_halle.signals.sample.SampleEntity;
-import de.ipb_halle.signals.sample.SampleManager;
 import jakarta.ejb.TransactionAttribute;
 import jakarta.ejb.TransactionAttributeType;
 import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ExperimentManager {
     @Inject
@@ -64,7 +65,6 @@ public class ExperimentManager {
 
         // 2) loads Experiment Properties
         experimentDbService.loadExperimentPropertyValuesWithProperties(experiment);
-        logger.info("THE PROPERTIES WERE LOADED");
 
         // 3) create new experiment
         experimentRestService.createNewExperiment(experiment);
@@ -88,7 +88,8 @@ public class ExperimentManager {
 
         // 3) Process experiments
         for (SignalsEntityDTO dto : experiments) {
-            processExperiment(dto.getId());
+            String eid = dto.getEid();
+            processExperiment(eid);
         }
 
     }

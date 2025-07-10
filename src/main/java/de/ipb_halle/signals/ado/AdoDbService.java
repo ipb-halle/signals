@@ -20,5 +20,14 @@
 
 package de.ipb_halle.signals.ado;
 
+import java.util.List;
+
 public class AdoDbService {
+    public void saveAll(List<Ado> ipbAdoObjects) {
+
+    }
+
+    public List<Ado> loadAll() {
+        return null;
+    }
 }

@@ -146,11 +146,13 @@ public class Experiments {
      * @throws Exception if an unrecoverable error occurs during import.
      */
     public void importData() throws Exception {
+
         // Step 1: import Experiments from CSV table of inhouse database
         //importExperiments();
 
         // Step 2: Load all procedures imported from inhouse db
         List<InhouseExperiment> inhouseExperiments = loadInhouseExperiments();
+
         logger.info("EXPERIMENTS-> importData()-> total amount of experiments = {}\n", inhouseExperiments.size());
 
         // Prepare caches for faster lookup
@@ -179,6 +181,12 @@ public class Experiments {
             importGroupedExperiments(threeLcGroupedMap, procId_MolId_cdxmlCache, importType);
         }
     }
+
+
+
+
+
+
 
     private Map<InhouseImportType, List<InhouseExperiment>> filterExperiments(List<InhouseExperiment> experiments, Map<Integer, List<Optional<ChemDrawData>>> cdxmlCache, // empty hashMap
                                                                               Map<Integer, List<InhouseCorrelation>> correlationCache // empty hashMap
@@ -240,7 +248,7 @@ public class Experiments {
 
     private boolean doesTheExperimentWithoutCdxmlHasOrgId(InhouseExperiment exp) {
         List<Integer> integers = loadOrgId(exp.getProcId());
-        if(integers.isEmpty()){
+        if (integers.isEmpty()) {
             return false;
         }
         Integer orgId = integers.get(0);
@@ -287,8 +295,7 @@ public class Experiments {
                 if (!cdxmlCache.isEmpty()) {
                     logger.info("GEHE IN Structure import Strategy\n");
                     strategyMap.get(importType).importGroup(inhouseDB, threeLc, experimentsBy3lc, cdxmlCache);
-                }
-                else {
+                } else {
                     logger.info("GEHE IN ORGANISM import Strategy\n");
                     strategyMap.get(importType).importGroup(inhouseDB, threeLc, experimentsBy3lc);
                 }
@@ -364,7 +371,6 @@ public class Experiments {
 //        if (organismId != null && procId != null &&  extract в tblExtract) return EXTRACT;
         return null;
     }
-
 
 
     /**
@@ -524,6 +530,8 @@ public class Experiments {
             return null;
         }
     }
+
+
 
     public Logger getLogger() {
         return logger;

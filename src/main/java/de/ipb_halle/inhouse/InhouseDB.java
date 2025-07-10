@@ -21,6 +21,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import de.ipb_halle.signals.Signals;
+import de.ipb_halle.signals.ado.AdoManager;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
 import de.ipb_halle.signals.experiments.ExperimentDbService;
@@ -104,6 +105,9 @@ public class InhouseDB {
     @Inject
     private SignalsEntityRestService signalsEntityRestService;
 
+    @Inject
+    private AdoManager adoManager;
+
     @SuppressWarnings("static-access")
     private static final Option inhouseOpt = Option.builder("inhouse")
             .longOpt("importInhouse")
@@ -158,12 +162,16 @@ public class InhouseDB {
         return signalsEntityRestService;
     }
 
+    public AdoManager getAdoManager() {
+        return adoManager;
+    }
+
     private void importData(String configFile) throws Exception {
         readConfig(configFile);
 
-//        logger.info("STARTING IMPORT OF COMPOUNDS");
-//        Compounds compounds = new Compounds(this);
-//
+        logger.info("STARTING IMPORT OF COMPOUNDS");
+        Compounds compounds = new Compounds(this);
+
         logger.info("STARTING IMPORT OF EXPERIMENTS");
         Experiments experiments = new Experiments(this);
 //
@@ -181,7 +189,7 @@ public class InhouseDB {
 
 //        Taxonomy taxonomy = new Taxonomy(this);
 
-//        compounds.importData();
+      //  compounds.importData();
         experiments.importData();
         //  correlation.importData();
 

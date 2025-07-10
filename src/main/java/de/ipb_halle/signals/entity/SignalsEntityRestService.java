@@ -17,7 +17,6 @@
  */
 package de.ipb_halle.signals.entity;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -191,21 +190,11 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
 
             // attributes
             JsonObject attributes = new JsonObject();
-            attributes.addProperty("name", name + "-example");
+            attributes.addProperty("name", name);
             data.add("attributes", attributes);
 
             // relationships
             JsonObject relationships = new JsonObject();
-
-//            // ancestors
-//            JsonObject ancestors = new JsonObject();
-//            JsonArray ancestorsArray = new JsonArray();
-//            JsonObject ancestorData = new JsonObject();
-//            ancestorData.addProperty("type", "sample"); // ОБЯЗАТЕЛЬНО!
-//            ancestorData.addProperty("id", ancestorId);
-//            ancestorsArray.add(ancestorData);
-//            ancestors.add("data", ancestorsArray);
-//            relationships.add("ancestors", ancestors);
 
             // template
             JsonObject template = new JsonObject();
@@ -233,11 +222,5 @@ public class SignalsEntityRestService implements RestReplyParser<SignalsEntityDT
             logger.error("Failed to create custom object for ipbCode {}", name, ex);
             return null;
         }
-    }
-
-    private JsonElement wrapInArray(JsonObject obj) {
-        JsonArray array = new JsonArray();
-        array.add(obj);
-        return array;
     }
 }

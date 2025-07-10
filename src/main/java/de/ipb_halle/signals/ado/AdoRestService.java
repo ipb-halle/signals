@@ -20,5 +20,11 @@
 
 package de.ipb_halle.signals.ado;
 
+import java.util.List;
+
 public class AdoRestService {
+    public List<Ado> createAllIpbCustomObjects() {
+
+        return null;
+    }
 }

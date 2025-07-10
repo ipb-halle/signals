@@ -18,6 +18,8 @@
 package de.ipb_halle.signals;
 
 import de.ipb_halle.inhouse.InhouseDB;
+import de.ipb_halle.signals.ado.AdoConfig;
+import de.ipb_halle.signals.ado.AdoManager;
 import de.ipb_halle.signals.attribute.AttributeManager;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.element.ElementConfig;
@@ -99,6 +101,9 @@ public class Signals {
     @Inject
     private ElementManager elementManager;
 
+    @Inject
+    private AdoManager adoManager;
+
     private AccessConfig accessConfig;
     private MaterialsConfig materialsConfig;
     private InventoryConfig inventoryConfig;
@@ -107,6 +112,7 @@ public class Signals {
     private ElementConfig elementConfig;
     private RuntimeConfig runtimeConfig;
     private SignalsEntityConfig signalsEntityConfig;
+    private AdoConfig adoConfig;
     private boolean noMail;
 
     private Logger logger;
@@ -136,6 +142,7 @@ public class Signals {
         elementConfig = new ElementConfig(signalsConfig, runtimeConfig, elementManager);
         sampleConfig = new SampleConfig(sampleManager, runtimeConfig, signalsConfig);
         experimentConfig = new ExperimentConfig(experimentManager, runtimeConfig, signalsConfig);
+        adoConfig = new AdoConfig(adoManager, runtimeConfig, signalsConfig);
     }
 
     public void dumpEntities(Date[] dateRange) {
@@ -189,6 +196,10 @@ public class Signals {
         experimentConfig.manageExperiments(dates);
     }
 
+    public void manageAdos(Date[] dates) {
+        adoConfig.manageAdos(dates);
+    }
+
     @Deprecated // use getMaterialsConfig() instead
     public void manageMaterials(Date[] dateRange) {
         materialsConfig.manageMaterials(dateRange);
@@ -210,13 +221,19 @@ public class Signals {
         return sampleConfig;
     }
 
+
     public ExperimentConfig getExperimentConfig() {
         return experimentConfig;
+    }
+
+    public AdoConfig getAdoConfig() {
+        return adoConfig;
     }
 
     public void manageElements(Date[] dateRange) {
         elementConfig.manageElements(dateRange);
     }
+
 
     public static Signals getInstance(String fname) {
         Signals signals = null;
@@ -289,6 +306,7 @@ public class Signals {
             ElementConfig.processCommandLine(cmdline, options, signals);
             SampleConfig.processCommandLine(cmdline, options, signals);
             ExperimentConfig.processCommandLine(cmdline, options, signals);
+            AdoConfig.processCommandLine(cmdline,options,signals);
 
         } catch (MissingArgumentException mae) {
             printHelp("ERROR: " + mae.getMessage(), options);
@@ -315,6 +333,7 @@ public class Signals {
         InhouseDB.registerOptions(options);
         SampleConfig.registerOptions(options);
         ExperimentConfig.registerOptions(options);
+        AdoConfig.registerOptions(options);
         processCommandLine(argv, options);
     }
 

@@ -55,6 +55,7 @@ public class InhouseExperimentDTO {
     private int procId;
     private String remarks;
     private boolean importSuccessful;
+    private String ipbCode;
 
     private InhouseDB inhouseDB;
 
@@ -275,6 +276,15 @@ public class InhouseExperimentDTO {
 
     public InhouseExperimentDTO setImportSuccessful(boolean importSuccessful) {
         this.importSuccessful = importSuccessful;
+        return this;
+    }
+
+    public String getIpbCode() {
+        return ipbCode;
+    }
+
+    public InhouseExperimentDTO setIpbCode(String ipbCode) {
+        this.ipbCode = ipbCode;
         return this;
     }
 }

@@ -20,6 +20,8 @@
 
 package de.ipb_halle.inhouse;
 
+import de.ipb_halle.signals.ado.Ado;
+import de.ipb_halle.signals.ado.AdoManager;
 import de.ipb_halle.signals.entity.SignalsEntity;
 import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.sample.Sample;
@@ -28,10 +30,7 @@ import de.ipb_halle.signals.sample.StoicRef;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class StructureImportStrategy implements InhouseImportStrategy {
 
@@ -106,6 +105,15 @@ public class StructureImportStrategy implements InhouseImportStrategy {
                             ipbCode = "IPB code not assigned";
                         }
 
+
+                        // Step 2: Load all procedures imported from inhouse db
+                        List<InhouseExperiment> inhouseExperiments = inhouseDB.getInhouseDbService().loadExperiments();
+
+                        // step 0: createIpbCodes
+                       createAdoObjectsWithSetIpbCodes(inhouseExperiments, desc, inhouseDB);
+
+
+
                         // create non-chemical sample with field values in sampleContainer -> sample table -> rest call POST
                         createSampleForChemicalDrawing(inhouseDB, chemDrawId, "1", eid, desc, ipbCode);
 
@@ -117,31 +125,97 @@ public class StructureImportStrategy implements InhouseImportStrategy {
             }
         }
     }
+    private void createAdoObjectsWithSetIpbCodes(List<InhouseExperiment> inhouseExperiments, String description, InhouseDB inhouseDB) {
+        List<InhouseExperiment> experiments = collectTheInhouseExperimentsWithIpbCode(inhouseExperiments, inhouseDB);
+        int maxIpbCode = inhouseDB.getInhouseDbService().loadCompounds().stream()
+                .map(InhouseCompound::getIpbCode)
+                .filter(Objects::nonNull)
+                .mapToInt(Integer::parseInt)
+                .max()
+                .orElse(0);
+        List<Ado> ados = inhouseDB.getAdoManager().createAllIpbAdoObjects(experiments, maxIpbCode);
 
+    }
+
+    private List<InhouseExperiment> collectTheInhouseExperimentsWithIpbCode(List<InhouseExperiment> inhouseExperiments, InhouseDB inhouseDB) {
+        List<InhouseExperiment> inhouseExperimentListWithIpbCode = new ArrayList<>();
+        for (InhouseExperiment inhouseExperiment : inhouseExperiments) {
+            List<Integer> molIds = loadMolIdForInhouseExperiment(inhouseExperiment, inhouseDB);
+            if (!molIds.isEmpty() && molIds.size() == 1) {
+                Integer molId = molIds.get(0);
+                if (doesInhouseExprimentContainsIpbCode(molId, inhouseExperiment, inhouseExperimentListWithIpbCode , inhouseDB)) {
+                    inhouseExperimentListWithIpbCode.add(inhouseExperiment);
+                } else
+                    continue;
+            }
+            if (molIds.size() > 1) {
+                for (Integer molId : molIds) {
+                    if (doesInhouseExprimentContainsIpbCode(molId, inhouseExperiment, inhouseExperimentListWithIpbCode, inhouseDB)) {
+                        inhouseExperimentListWithIpbCode.add(inhouseExperiment);
+                    } else
+                        continue;
+                }
+            }
+
+        }
+
+
+        return inhouseExperimentListWithIpbCode;
+    }
+
+    private boolean doesInhouseExprimentContainsIpbCode(Integer molId,
+                                                        InhouseExperiment inhouseExperiment,
+                                                        List<InhouseExperiment> inhouseExperimentListWithIpbCode,
+                                                        InhouseDB inhouseDB) {
+        StructureImportStrategy importStrategy = new StructureImportStrategy();
+        String ipbCode = importStrategy.loadIpbCodeByMolId(molId, inhouseDB);
+        return ipbCode != null;
+    }
+
+    public List<Integer> loadMolIdForInhouseExperiment(InhouseExperiment experiment, InhouseDB inhouseDB) {
+        List<Integer> molIds = new ArrayList<>();
+        int procId = experiment.getProcId();
+        List<InhouseCorrelation> inhouseCorrelations = inhouseDB.getInhouseDbService().loadCorrelationByProcedureId(procId);
+        if (inhouseCorrelations.isEmpty()) {
+            return null;
+        }
+
+        if (inhouseCorrelations.size() == 1) {
+            InhouseCorrelation correlation = inhouseCorrelations.get(0);
+            Integer molId = correlation.getMolId();
+            molIds.add(molId);
+            return molIds;
+        } else {
+            for (InhouseCorrelation correlation : inhouseCorrelations) {
+                molIds.add(correlation.getMolId());
+            }
+            return molIds;
+        }
+    }
 
     /**
      * Creates a new chemical sample in the Signals platform based on a given chemical drawing.
      * <p>
-     *  This method links a new Sample, which situated in Sample Table (sampleContainer:abcdetc), to a chemical drawing
-     *  (CDXML structure), sets its parent (such as experiment) and fills in required information  in sample property values
-     *   like description and internal reference (IPB Code custom object of type "ado")
-     *
-     *   Especially it is important to pay attention to building of request JSON for the internal reference property as a link
-     *   by sample. For our non-chemical sample with library id -> "sample:0174e78c-0b95-49f9-8a57-39061bbc0050" the property ipb_code
-     *   has an id "109" and it needs obligatory in content following fields-> type: "ado" , name: "given name" and eid: "ado-1:abcdetc".
-     *   The creation of ado custom objects for IPB code processed as a signals entity and take place in SignalsEntityRestService class.
-     *   The PATCHing as a field value of sample take place in SampleRestService class.
-     *
-     *   The following structure of JSON for request of PATCHing will be accepted:
-     *   {"data":{"attributes":{"data":[
-     *   {"id":"2","type":"text","attributes":{"content":{"values":[{"value":"MolId: 21238, Experiment: ADM27869, Journal: 00.000"}]}}},
-     *   {"id":"109","type":"link","attributes":{"content":{"values":[{
-     *      "type":"ado",
-     *      "name":"some name",
-     *      "eid":"ado-1:abcdetc"}]}}}]}}}
-     *
-     *   Very important difference to the documentation provided by signals is JsonArray "Values" -> it is obligatory
-     *
+     * This method links a new Sample, which situated in Sample Table (sampleContainer:abcdetc), to a chemical drawing
+     * (CDXML structure), sets its parent (such as experiment) and fills in required information  in sample property values
+     * like description and internal reference (IPB Code custom object of type "ado")
+     * <p>
+     * Especially it is important to pay attention to building of request JSON for the internal reference property as a link
+     * by sample. For our non-chemical sample with library id -> "sample:0174e78c-0b95-49f9-8a57-39061bbc0050" the property ipb_code
+     * has an id "109" and it needs obligatory in content following fields-> type: "ado" , name: "given name" and eid: "ado-1:abcdetc".
+     * The creation of ado custom objects for IPB code processed as a signals entity and take place in SignalsEntityRestService class.
+     * The PATCHing as a field value of sample take place in SampleRestService class.
+     * <p>
+     * The following structure of JSON for request of PATCHing will be accepted:
+     * {"data":{"attributes":{"data":[
+     * {"id":"2","type":"text","attributes":{"content":{"values":[{"value":"MolId: 21238, Experiment: ADM27869, Journal: 00.000"}]}}},
+     * {"id":"109","type":"link","attributes":{"content":{"values":[{
+     * "type":"ado",
+     * "name":"some name",
+     * "eid":"ado-1:abcdetc"}]}}}]}}}
+     * <p>
+     * Very important difference to the documentation provided by signals is JsonArray "Values" -> it is obligatory
+     * <p>
      * The method performs the following steps:
      * <ul>
      *     <li>Initializes a new {@link Sample} object with the correct chemical sample template.</li>
@@ -154,13 +228,12 @@ public class StructureImportStrategy implements InhouseImportStrategy {
      * </ul>
      * <p>
      *
-     *
-     * @param inhouseDB   The object that provides access to services for interacting with Signals and the legacy system
-     * @param chemDrawId  The ID of the chemical drawing to which the sample should be linked
-     * @param rowId       The index of the row in the drawing’s stoichiometry table that this sample refers to
-     * @param ancestorId  The ID of the parent experiment
-     * @param desc        A description for the sample (used also as name for the internal IPB code reference)
-     * @param ipbCode     The internal IPB code used to track the compound or material in the legacy system
+     * @param inhouseDB  The object that provides access to services for interacting with Signals and the legacy system
+     * @param chemDrawId The ID of the chemical drawing to which the sample should be linked
+     * @param rowId      The index of the row in the drawing’s stoichiometry table that this sample refers to
+     * @param ancestorId The ID of the parent experiment
+     * @param desc       A description for the sample (used also as name for the internal IPB code reference)
+     * @param ipbCode    The internal IPB code used to track the compound or material in the legacy system
      */
     public void createSampleForChemicalDrawing(InhouseDB inhouseDB, String chemDrawId, String rowId, String ancestorId, String desc, String ipbCode) {
         // Create a new Sample and assign the chemical sample template
@@ -191,7 +264,7 @@ public class StructureImportStrategy implements InhouseImportStrategy {
         fvDescription.setSampleId(sampleId);
 
         // Create a custom object IPB code (as name for this custom object the desc will be used , because it contains all needed information for structure)
-        SignalsEntityDTO eidCustomObjectIpbCode = createCustomObjectIpbCodeAsSignalsEntity(sampleId, desc, inhouseDB);
+        Ado eidCustomObjectIpbCode = createCustomObjectIpbCodeAsSignalsEntity(sampleId, desc, ipbCode);
 
         //Add a custom object with IPB code
         SamplePropertyValue fvAdoRef = new SamplePropertyValue();
@@ -216,8 +289,9 @@ public class StructureImportStrategy implements InhouseImportStrategy {
         inhouseDB.getSampleRestService().updateSamplePropertyValues(propertyKeyToValue, sampleId);
     }
 
-    private SignalsEntityDTO createCustomObjectIpbCodeAsSignalsEntity(String ancestorId, String name, InhouseDB inhouseDB) {
-        return inhouseDB.getSignalsEntityRestService().createIpbCodeCustomObjectSignalsEntity(ancestorId, name, SIGNALS_ENTITY_CUSTOM_OBJECT_IPB_CODE);
+    private Ado createCustomObjectIpbCodeAsSignalsEntity(String ancestorId, String descriptionOfAncestorAsNameForAdo, String ipbCode) {
+        AdoManager adoManager = new AdoManager();
+        return adoManager.findIpbCodeAdoForInhouseExperiment(ancestorId, ipbCode, SIGNALS_ENTITY_CUSTOM_OBJECT_IPB_CODE);
     }
 
     public String loadIpbCodeByMolId(Integer mol_id, InhouseDB inhouseDB) {
