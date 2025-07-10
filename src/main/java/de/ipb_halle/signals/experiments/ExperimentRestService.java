@@ -252,7 +252,9 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
      */
     public Experiment doGetExperiment(String experimentId) throws Exception {
         JsonElement object = fetchSample(RECEIVE_EXPERIMENT_ENDPOINT, experimentId);
-        return parseReply(object);
+        Experiment experiment = parseReply(object);
+        logger.info("EXPERIMENT-> {}\n", experiment.toString());
+        return experiment;
     }
 
     /**
@@ -305,43 +307,56 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
     public Experiment parseReply(JsonElement json) throws Exception {
         Experiment experiment = new Experiment();
 
-        JsonObject attributes = null;
-        JsonObject experimentJson = null;
-        JsonObject relationships = null;
-
-        try {
-            experimentJson = json.getAsJsonObject().get(RestHelper.ATTR_DATA).getAsJsonObject();
-            attributes = experimentJson.get(RestHelper.ATTR_ATTRIBUTES).getAsJsonObject();
-            relationships = experimentJson.getAsJsonObject(RestHelper.ATTR_RELATIONSHIPS);
-
-        } catch (JsonSyntaxException | IllegalStateException e) {
-            logger.error("ERS:-> Invalid JSON structure: {}", e.getLocalizedMessage());
+        if (json == null || !json.isJsonObject()) {
+            logger.warn("ExperimentRestService: -> parseReply() -> Empty or invalid JSON root");
+            return experiment;
         }
 
-        experiment.setId(RestHelper.parseString(experimentJson, RestHelper.ATTR_ID));
-        experiment.setName(RestHelper.parseString(attributes, RestHelper.ATTR_NAME));
-        experiment.setDescription(RestHelper.parseString(attributes, RestHelper.ATTR_DESCRIPTION));
+        JsonObject root = json.getAsJsonObject();
+        JsonObject attributes = root.has(RestHelper.ATTR_ATTRIBUTES) ? root.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES) : null;
+        JsonObject relationships = root.has(RestHelper.ATTR_RELATIONSHIPS) ? root.getAsJsonObject(RestHelper.ATTR_RELATIONSHIPS) : null;
 
-        experiment.setType((EntityType) dynEnumManager.valueOf(EntityType.valueOf(RestHelper.parseString(attributes, RestHelper.ATTR_TYPE))));
-        experiment.setCreatedAt(RestHelper.parseDate(attributes, RestHelper.ATTR_CREATED_AT));
-        experiment.setEditedAt(RestHelper.parseDate(attributes, RestHelper.ATTR_EDITED_AT));
+        if (attributes != null) {
+            experiment.setId(RestHelper.parseString(attributes, RestHelper.ATTR_ID));
+            experiment.setName(RestHelper.parseString(attributes, RestHelper.ATTR_NAME));
+            experiment.setDescription(RestHelper.parseString(attributes, RestHelper.ATTR_DESCRIPTION));
 
-        experiment.setDigest(RestHelper.parseLong(attributes, RestHelper.ATTR_DIGEST));
 
-        parseRelationships(experimentJson, experiment);
+            String typeStr = RestHelper.parseString(attributes, RestHelper.ATTR_TYPE);
+            try {
+                EntityType type = typeStr != null ? EntityType.valueOf(typeStr) : null;
+                if (type != null) {
+                    experiment.setType((EntityType) dynEnumManager.valueOf(type));
+                }
+            } catch (IllegalStateException e) {
+                logger.warn("ExperimentRestService: -> parseReply() -> Unknown experiment type: {}", typeStr);
+            }
 
-        if (attributes.has(RestHelper.ATTR_FIELDS)) {
-            parseFields(attributes, experiment);
+            experiment.setCreatedAt(RestHelper.parseDate(attributes, RestHelper.ATTR_CREATED_AT));
+            experiment.setEditedAt(RestHelper.parseDate(attributes, RestHelper.ATTR_EDITED_AT));
+            experiment.setDigest(RestHelper.parseLong(attributes, RestHelper.ATTR_DIGEST));
+
+
+            if (attributes.has(RestHelper.ATTR_FIELDS)) {
+                parseFields(attributes, experiment);
+            }
+        } else {
+            logger.warn("ExperimentRestService: -> parseReply() -> No 'attributes' block in experiment JSON");
         }
+        if (relationships != null) {
+            parseRelationships(relationships, experiment);
 
-        if (relationships.has(RestHelper.ATTR_ANCESTORS)) {
-            parseAncestors(relationships, experiment);
-        }
-        if (relationships.has(RestHelper.ATTR_CHILDREN)) {
-            parseChildren(relationships, experiment);
-        }
-        if (relationships.has(RestHelper.ATTR_TEMPLATE)) {
-            parseTemplate(relationships, experiment);
+            if (relationships.has(RestHelper.ATTR_ANCESTORS)) {
+                parseAncestors(relationships, experiment);
+            }
+            if (relationships.has(RestHelper.ATTR_CHILDREN)) {
+                parseChildren(relationships, experiment);
+            }
+            if (relationships.has(RestHelper.ATTR_TEMPLATE)) {
+                parseTemplate(relationships, experiment);
+            }
+        } else {
+            logger.warn("ExperimentRestService: -> parseReply() -> No 'relationships' block in experiment JSON");
         }
 
         return experiment;
@@ -359,18 +374,28 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
      */
     private void parseFields(JsonObject attributes, Experiment experiment) {
         JsonObject fieldsJson = attributes.getAsJsonObject(RestHelper.ATTR_FIELDS);
+        if (fieldsJson == null) return;
+
         Set<ExperimentPropertyValue> values = new HashSet<>();
 
         for (Map.Entry<String, JsonElement> entry : fieldsJson.entrySet()) {
-            String propertyName = entry.getKey();
-            String value = entry.getValue().getAsJsonObject().get("value").getAsString();
-            ExperimentPropertyValue epv = new ExperimentPropertyValue();
-            epv.setExperimentId(experiment.getId());
-            epv.setPropertyId(propertyName);
-            epv.setPropertyValue(value);
-            values.add(epv);
+            try {
+                JsonObject fieldObj = fieldsJson.getAsJsonObject();
+                String value = fieldObj.has("value") ? fieldObj.get("value").getAsString() : null;
+
+                if (value != null) {
+                    ExperimentPropertyValue epv = new ExperimentPropertyValue();
+                    String propertyName = entry.getKey();
+                    epv.setExperimentId(experiment.getId());
+                    epv.setPropertyId(propertyName);
+                    epv.setPropertyValue(value);
+                    values.add(epv);
+                }
+            } catch (Exception e) {
+                logger.warn("ExperimentRestService: -> parseFields() -> Failed to parse field '{}': {}", entry.getKey(), e.getMessage());
+            }
+            experiment.setPropertyValues(values);
         }
-        experiment.setPropertyValues(values);
     }
 
     /**
@@ -399,19 +424,35 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
      * @param experiment    the {@link Experiment} to which the ancestors will be attached
      */
     private void parseAncestors(JsonObject relationships, Experiment experiment) {
-        JsonArray dataArray = relationships
-                .getAsJsonObject(RestHelper.ATTR_ANCESTORS)
-                .getAsJsonArray(RestHelper.ATTR_DATA);
+        if (!relationships.has(RestHelper.ATTR_ANCESTORS)) {
+            logger.warn("ExperimentRestService: -> parseAncestors() -> No 'ancestors' in relationships");
+            return;
+        }
+        JsonObject ancestorObj = relationships.getAsJsonObject(RestHelper.ATTR_ANCESTORS);
+        if (!ancestorObj.has(RestHelper.ATTR_DATA) || !ancestorObj.get(RestHelper.ATTR_DATA).isJsonArray()) {
+            logger.warn("ExperimentRestService: -> parseAncestors() -> 'ancestors' block missing or invalid");
+            return;
+        }
 
+        JsonArray dataArray = ancestorObj.getAsJsonArray(RestHelper.ATTR_DATA);
         List<SignalsEntity> entities = new ArrayList<>();
 
         for (JsonElement element : dataArray) {
-            String id = RestHelper.parseString(element.getAsJsonObject(), RestHelper.ATTR_ID);
-            JsonElement seJson = fetchSample(RECEIVE_EXPERIMENT_ENDPOINT, id);
-            SignalsEntity se = signalsEntityRestService.parseReply(seJson).createEntity();
-            entities.add(se);
-            experiment.addAncestor(se);
+            try {
+                JsonObject ancestorJson = element.getAsJsonObject();
+                String id = RestHelper.parseString(ancestorJson, RestHelper.ATTR_ID);
+
+                if (id != null) {
+                    JsonElement seJson = fetchSample(RECEIVE_EXPERIMENT_ENDPOINT, id);
+                    SignalsEntity se = signalsEntityRestService.parseReply(seJson).createEntity();
+                    entities.add(se);
+                    experiment.addAncestor(se);
+                }
+            } catch (Exception e) {
+                logger.warn("ExperimentRestService: -> parseAncestors() -> Failed to parse ancestor: {}", e.getMessage());
+            }
         }
+
         if (!entities.isEmpty()) {
             experiment.setAncestorId(entities.get(entities.size() - 1).getId());
         }
@@ -427,16 +468,33 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
      * @param experiment    the {@link Experiment} object to which the children will be attached
      */
     private void parseChildren(JsonObject relationships, Experiment experiment) {
-        JsonObject children = relationships.get(RestHelper.ATTR_CHILDREN).getAsJsonObject();
-        JsonArray dataArray = children.get(RestHelper.ATTR_DATA).getAsJsonArray();
-        Iterator<JsonElement> iter = dataArray.iterator();
-        while (iter.hasNext()) {
-            JsonObject object = iter.next().getAsJsonObject();
-            JsonElement seJson = fetchSample(RECEIVE_EXPERIMENT_ENDPOINT, RestHelper.parseString(object, RestHelper.ATTR_ID));
-            SignalsEntity se = signalsEntityRestService.parseReply(seJson).createEntity();
-            experiment.addChild(se);
+        if (!relationships.has(RestHelper.ATTR_CHILDREN)) {
+            logger.warn("ExperimentRestService: -> parseChildren() -> No 'children' in relationships");
+            return;
+        }
+
+        JsonObject children = relationships.getAsJsonObject(RestHelper.ATTR_CHILDREN);
+        if (!children.has(RestHelper.ATTR_DATA) || !children.get(RestHelper.ATTR_DATA).isJsonArray()) {
+            logger.warn("ExperimentRestService: -> parseChildren() -> 'children' block missing or invalid");
+            return;
+        }
+
+        JsonArray dataArray = children.getAsJsonArray(RestHelper.ATTR_DATA);
+        for (JsonElement element : dataArray) {
+            try {
+                JsonObject childJson = element.getAsJsonObject();
+                String id = RestHelper.parseString(childJson, RestHelper.ATTR_ID);
+                if (id != null) {
+                    JsonElement seJson = fetchSample(RECEIVE_EXPERIMENT_ENDPOINT, id);
+                    SignalsEntity se = signalsEntityRestService.parseReply(seJson).createEntity();
+                    experiment.addChild(se);
+                }
+            } catch (Exception e) {
+                logger.warn("ExperimentRestService: -> parseChildren() -> Failed to parse child entity: {}", e.getMessage());
+            }
         }
     }
+
 
     /**
      * Parses the system template relationship of the experiment and sets its template ID.
@@ -447,11 +505,29 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
      * @param relationships the 'relationships' JSON element containing the system template data
      * @param experiment    the {@link Experiment} to assign the template ID to
      */
-    private void parseTemplate(JsonElement relationships, Experiment experiment) {
-        JsonObject data = relationships.getAsJsonObject()
-                .getAsJsonObject(RestHelper.ATTR_SYSTEM_TEMPLATE)
-                .getAsJsonObject(RestHelper.ATTR_DATA);
-        experiment.setTemplateId(data.get(RestHelper.ATTR_ID).getAsString());
+    private void parseTemplate(JsonObject relationships, Experiment experiment) {
+        try {
+            if (!relationships.has(RestHelper.ATTR_SYSTEM_TEMPLATE)) {
+                logger.warn("ExperimentRestService: -> parseTemplate() -> No 'systemTemplate' in relationships");
+                return;
+            }
+
+            JsonObject systemTemplate = relationships.getAsJsonObject(RestHelper.ATTR_SYSTEM_TEMPLATE);
+            if (!systemTemplate.has(RestHelper.ATTR_DATA)) {
+                logger.warn("ExperimentRestService: -> parseTemplate() -> 'systemTemplate' has no 'data' block");
+                return;
+            }
+
+            JsonObject data = systemTemplate.getAsJsonObject(RestHelper.ATTR_DATA);
+            if (data.has(RestHelper.ATTR_ID)) {
+                experiment.setTemplateId(data.get(RestHelper.ATTR_ID).getAsString());
+            } else {
+                logger.warn("ExperimentRestService: -> parseTemplate() -> 'systemTemplate.data' has no 'id'");
+            }
+
+        } catch (Exception e) {
+            logger.warn("ExperimentRestService: -> parseTemplate() -> Failed to parse systemTemplate: {}", e.getMessage());
+        }
     }
 
     /**
