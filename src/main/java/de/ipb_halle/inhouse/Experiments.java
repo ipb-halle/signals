@@ -17,7 +17,9 @@
  */
 package de.ipb_halle.inhouse;
 
+import de.ipb_halle.inhouse.imports.ExperimentGrouper;
 import de.ipb_halle.inhouse.imports.InhouseExperimentFilter;
+import de.ipb_halle.inhouse.imports.InhouseExperimentLoader;
 import de.ipb_halle.signals.experiments.Experiment;
 import jakarta.persistence.NoResultException;
 import org.apache.logging.log4j.LogManager;
@@ -118,24 +120,30 @@ public class Experiments {
 
 
     public void importData() throws Exception {
-        List<InhouseExperiment> inhouseExperiments = loadInhouseExperiments();
-        logger.info("Total experiments loaded = {}", inhouseExperiments.size());
+        InhouseExperimentLoader loader = new InhouseExperimentLoader(inhouseDB);
+        List<InhouseExperiment> allExperiments = loader.loadExperiments();
 
         Map<Integer, List<Optional<ChemDrawData>>> cdxmlCache = new HashMap<>();
         Map<Integer, List<InhouseCorrelation>> correlationCache = new HashMap<>();
 
         InhouseExperimentFilter filter = new InhouseExperimentFilter(inhouseDB);
-        ErrorLogger errorLogger = new ErrorLogger("error_log_filter_experiments.txt");
+        ErrorLogger filterLogger = new ErrorLogger("error_log_filter_experiments.txt");
         Map<InhouseImportType, List<InhouseExperiment>> filtered = filter.filter(
-                inhouseExperiments, cdxmlCache, correlationCache, errorLogger
+                allExperiments, cdxmlCache, correlationCache, filterLogger
         );
+
+        ExperimentGrouper grouper = new ExperimentGrouper();
 
         for (InhouseImportType type : InhouseImportType.values()) {
             List<InhouseExperiment> list = filtered.getOrDefault(type, List.of());
-            Map<String, List<InhouseExperiment>> grouped = groupByThreeLC(list, ImportMode.TESTING);
+
+            ErrorLogger groupLogger = new ErrorLogger("grouping_errors.log");
+            Map<String, List<InhouseExperiment>> grouped = grouper.groupByThreeLC(list, ImportMode.TESTING, groupLogger);
+
             importGroupedExperiments(grouped, cdxmlCache, type);
         }
     }
+
 
 
     private Map<InhouseImportType, List<InhouseExperiment>> filterExperiments(List<InhouseExperiment> experiments, Map<Integer, List<Optional<ChemDrawData>>> cdxmlCache, // empty hashMap
