@@ -20,6 +20,7 @@
 
 package de.ipb_halle.inhouse;
 
+import de.ipb_halle.inhouse.imports.ExperimentCreator;
 import de.ipb_halle.signals.entity.SignalsEntity;
 import de.ipb_halle.signals.sample.Sample;
 import de.ipb_halle.signals.sample.SamplePropertyValue;
@@ -68,9 +69,10 @@ public class OrganismImportStrategy implements InhouseImportStrategy {
             int toIndex = Math.min(i + chunkSize, experimentsBy3lc.size());
             List<InhouseExperiment> chunk = experimentsBy3lc.subList(i, toIndex);
 
+            ExperimentCreator experimentCreator = new ExperimentCreator(inhouseDB);
             InhouseExperiment main = chunk.get(0);
             String experimentName = threeLc + "-ORG-" + experimentCounter++;
-            String eid = helper.createExperimentUpon3LC(experimentName, main);
+            String eid = experimentCreator.createExperiment(experimentName, main);
 
             for (InhouseExperiment exp : chunk) {
                 int procId = exp.getProcId();

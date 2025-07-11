@@ -66,8 +66,4 @@ public class InhouseExperimentFilter {
                 .anyMatch(c -> c.getOrganismId() != null);
     }
 
-    private List<Optional<Experiments.ChemDrawData>> loadCDXML(int procId,
-                                                               Map<Integer, List<InhouseCorrelation>> correlationCache) {
-        return new Experiments(inhouseDB).loadCDXML_StringForGivenExperimentUponMolID_Cached(procId, correlationCache);
-    }
 }
