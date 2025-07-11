@@ -1,6 +1,7 @@
 package de.ipb_halle.inhouse.imports;
 
 import de.ipb_halle.inhouse.*;
+
 import java.util.*;
 
 public class InhouseExperimentFilter {
@@ -11,10 +12,10 @@ public class InhouseExperimentFilter {
         this.inhouseDB = inhouseDB;
     }
 
-    public Map<InhouseImportType, List<InhouseExperiment>> filter(List<InhouseExperiment> experiments,
-                                                                  Map<Integer, List<Optional<Experiments.ChemDrawData>>> cdxmlCache,
-                                                                  Map<Integer, List<InhouseCorrelation>> correlationCache,
-                                                                  ErrorLogger errorLogger) throws Exception {
+    public Map<InhouseImportType, List<InhouseExperiment>> filter(
+            List<InhouseExperiment> experiments,
+            ChemDrawCacheService chemDrawCache,
+            ErrorLogger errorLogger) throws Exception {
 
         int missingThreeLc = 0;
         int missingProcId = 0;
@@ -35,8 +36,7 @@ public class InhouseExperimentFilter {
             }
 
             int procId = exp.getProcId();
-            List<Optional<Experiments.ChemDrawData>> cdxmlList = cdxmlCache.computeIfAbsent(procId,
-                    id -> loadCDXML(id, correlationCache));
+            List<Optional<Experiments.ChemDrawData>> cdxmlList = chemDrawCache.getChemDrawData(procId);
 
             if (cdxmlList.isEmpty() || cdxmlList.stream().allMatch(Optional::isEmpty)) {
                 missingChemDraw++;

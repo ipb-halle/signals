@@ -23,7 +23,6 @@ package de.ipb_halle.inhouse;
 import de.ipb_halle.signals.ado.Ado;
 import de.ipb_halle.signals.ado.AdoManager;
 import de.ipb_halle.signals.entity.SignalsEntity;
-import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.sample.Sample;
 import de.ipb_halle.signals.sample.SamplePropertyValue;
 import de.ipb_halle.signals.sample.StoicRef;

@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.inhouse;
 
+import de.ipb_halle.inhouse.imports.ChemDrawCacheService;
 import de.ipb_halle.inhouse.imports.ExperimentGrouper;
 import de.ipb_halle.inhouse.imports.InhouseExperimentFilter;
 import de.ipb_halle.inhouse.imports.InhouseExperimentLoader;
@@ -123,27 +124,22 @@ public class Experiments {
         InhouseExperimentLoader loader = new InhouseExperimentLoader(inhouseDB);
         List<InhouseExperiment> allExperiments = loader.loadExperiments();
 
-        Map<Integer, List<Optional<ChemDrawData>>> cdxmlCache = new HashMap<>();
-        Map<Integer, List<InhouseCorrelation>> correlationCache = new HashMap<>();
-
+        ChemDrawCacheService chemDrawCache = new ChemDrawCacheService(inhouseDB);
         InhouseExperimentFilter filter = new InhouseExperimentFilter(inhouseDB);
         ErrorLogger filterLogger = new ErrorLogger("error_log_filter_experiments.txt");
-        Map<InhouseImportType, List<InhouseExperiment>> filtered = filter.filter(
-                allExperiments, cdxmlCache, correlationCache, filterLogger
-        );
+
+        Map<InhouseImportType, List<InhouseExperiment>> filtered = filter.filter(allExperiments, chemDrawCache, filterLogger);
 
         ExperimentGrouper grouper = new ExperimentGrouper();
 
         for (InhouseImportType type : InhouseImportType.values()) {
             List<InhouseExperiment> list = filtered.getOrDefault(type, List.of());
-
             ErrorLogger groupLogger = new ErrorLogger("grouping_errors.log");
             Map<String, List<InhouseExperiment>> grouped = grouper.groupByThreeLC(list, ImportMode.TESTING, groupLogger);
 
-            importGroupedExperiments(grouped, cdxmlCache, type);
+            importGroupedExperiments(grouped, chemDrawCache, type);
         }
     }
-
 
 
     private Map<InhouseImportType, List<InhouseExperiment>> filterExperiments(List<InhouseExperiment> experiments, Map<Integer, List<Optional<ChemDrawData>>> cdxmlCache, // empty hashMap
@@ -219,38 +215,18 @@ public class Experiments {
         return list;
     }
 
-
-    /**
-     * Imports grouped inhouse experiments into the Signals platform.
-     *
-     * <p>For each 3LC group: </p>
-     * <ul>
-     *     <li>Splits the experiments into chunks (default: 10 items).</li>
-     *     <li>Create a new Signals experiment per chunk.</li>
-     *     <li>For each procedure in the chunk:
-     *      <ul>
-     *          <li>Retrieves ChemDraw structure (CDXML) and molId.</li>
-     *          <li>Creates a chemical drawing (reaction) in Signals.</li>
-     *          <li>Adds the CDXML structure as product to the reaction.</li>
-     *          <li>Creates a sample for the chemical drawing.</li>
-     *          <li>Updates inhouse experiment with Signals EID and import status in local DB</li>
-     *      </ul>
-     *     </li>
-     * </ul>
-     *
-     * <p>Logs missing ChemDrawData and skips invalid items.</p>
-     *
-     * @param threeLcGroupedMap grouped valid experiments by 3LC code
-     * @param cdxmlCache        cache mapping procedure ID to ChemDrawData
-     */
-    private void importGroupedExperiments(Map<String, List<InhouseExperiment>> threeLcGroupedMap, Map<Integer, List<Optional<ChemDrawData>>> cdxmlCache, InhouseImportType importType) {
+    private void importGroupedExperiments(
+            Map<String, List<InhouseExperiment>> threeLcGroupedMap,
+            ChemDrawCacheService chemDrawCache,
+            InhouseImportType importType) {
 
         for (Map.Entry<String, List<InhouseExperiment>> entry : threeLcGroupedMap.entrySet()) {
             String threeLc = entry.getKey();
             List<InhouseExperiment> experimentsBy3lc = entry.getValue();
 
+
             try {
-                if (!cdxmlCache.isEmpty()) {
+                if (!chemDrawCache.cdxmlCache.isEmpty()) {
                     logger.info("GEHE IN Structure import Strategy\n");
                     strategyMap.get(importType).importGroup(inhouseDB, threeLc, experimentsBy3lc, cdxmlCache);
                 } else {
