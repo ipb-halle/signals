@@ -141,6 +141,12 @@ public class Experiments {
         }
     }
 
+    public String loadIpbCodeByMolId(Integer mol_id, InhouseDB inhouseDB) {
+        InhouseCompound compound = inhouseDB.getInhouseDbService().loadCompoundByMolId(mol_id);
+        return (compound != null && compound.getIpbCode() != null && !compound.getIpbCode().trim().isEmpty())
+                ? compound.getIpbCode()
+                : "";
+    }
 
     private Map<InhouseImportType, List<InhouseExperiment>> filterExperiments(List<InhouseExperiment> experiments, Map<Integer, List<Optional<ChemDrawData>>> cdxmlCache, // empty hashMap
                                                                               Map<Integer, List<InhouseCorrelation>> correlationCache // empty hashMap
