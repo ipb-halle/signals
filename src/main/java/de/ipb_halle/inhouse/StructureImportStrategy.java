@@ -21,6 +21,7 @@
 package de.ipb_halle.inhouse;
 
 import de.ipb_halle.inhouse.imports.AdoCreator;
+import de.ipb_halle.inhouse.imports.ExperimentCreator;
 import de.ipb_halle.inhouse.imports.SampleCreator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,7 +44,7 @@ public class StructureImportStrategy implements InhouseImportStrategy {
         }
 
         // set the experiment for 10 samples
-        Experiments experimentHelper = new Experiments(inhouseDB);
+        ExperimentCreator experimentCreator = new ExperimentCreator(inhouseDB);
         AdoCreator adoCreator = new AdoCreator(inhouseDB.getAdoManager());
         SampleCreator sampleCreator = new SampleCreator(inhouseDB, adoCreator);
         ErrorLogger errorLogger = new ErrorLogger("errorLog_structure_import.txt");
@@ -57,7 +58,7 @@ public class StructureImportStrategy implements InhouseImportStrategy {
 
             InhouseExperiment main = chunk.get(0);
             String expName = threeLc + "-MOL-" + experimentCounter++;
-            String eid = experimentHelper.createExperimentUpon3LC(expName, main);
+            String eid = experimentCreator.createExperiment(expName, main);
 
             for (InhouseExperiment exp : chunk) {
                 Integer procId = exp.getProcId();
@@ -80,7 +81,7 @@ public class StructureImportStrategy implements InhouseImportStrategy {
 
                     // Create ChemDraw parent entity -> empty
                     Experiments.ChemDrawData data = cdxmlOpt.get();
-                    String chemDrawId = experimentHelper.createChemDrawForInhouseExperiment(data.molId(), eid);
+                    String chemDrawId = experimentCreator.createChemDraw(data.molId(), eid);
 
                     // Add a cdxml to empty chemDrawing entity as a product
                     if (!data.fieldValueCdxml().isEmpty()) {
@@ -93,7 +94,7 @@ public class StructureImportStrategy implements InhouseImportStrategy {
                     String desc = String.format("MolId: %s, Experiment: %s%s, Journal: %s", data.molId(), threeLc, procId, exp.getJournal());
 
                     // Load IpbCode
-                    String ipbCode = experimentHelper.loadIpbCodeByMolId(data.molId(), inhouseDB);
+                    String ipbCode = experimentCreator.loadIpbCodeByMolId(data.molId());
                     if (ipbCode == null || ipbCode.trim().isEmpty()) {
                         ipbCode = "IPB code not assigned";
                     }

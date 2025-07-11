@@ -313,17 +313,7 @@ public class Experiments {
     }
 
 
-    /**
-     * Group a list of {@link InhouseExperiment} objects by their Three Letter Code (3lC).
-     * <p>
-     * In TESTING mode, only the first encountered 3LC group will be returned
-     * (useful for focused development and debugging).
-     * In PRODUCTION mode, all valid experiments will be grouped by their 3LC.
-     *
-     * @param validExperiments the list of experiments to group (must be non-null)
-     * @param mode             the import mode (TESTING or PRODUCTION)
-     * @return a map where each key is a 3LC and the value is a list of experiments with that code
-     */
+
     private Map<String, List<InhouseExperiment>> groupByThreeLC(List<InhouseExperiment> validExperiments, ImportMode mode) throws Exception {
         ErrorLogger errorLogger = new ErrorLogger("import_error.log"); // toDo set filepath
 
@@ -394,17 +384,6 @@ public class Experiments {
         return inhouseDB.getExperimentRestService().createNewChemicalDrawingAsExperimentChild(idOfCreatedExperimentInSignals, fileName, "");
     }
 
-
-    /**
-     * Loads the content of a CDXML file (chemical drawing) for a given experiment based on its molId,
-     * which is determined by looking up the corresponding {@link InhouseCorrelation} entry.
-     *
-     * <p>If the file does not exist on disk, the method logs a warning and returns an empty string.
-     * This allows the import process to continue even if no chemical structure is available for a given compound.</p>
-     *
-     * @return the CDXML content as a String, or an empty string if no corresponding file was found
-     * @throws RuntimeException if an unexpected I/O error occurs while reading the file
-     */
     public List<Optional<ChemDrawData>> loadCDXML_StringForGivenExperimentUponMolID_Cached(Integer procedureId, Map<Integer, List<InhouseCorrelation>> correlationCache) {
 
         List<InhouseCorrelation> correlations = correlationCache.computeIfAbsent(procedureId, this::loadCorrelationByExperimentProcedureId);
@@ -449,18 +428,7 @@ public class Experiments {
         return list;
     }
 
-    /**
-     * Retrieves the {@link InhouseCorrelation} entry associated with a given procedure ID
-     * by delegating the call to the inhouse database service.
-     *
-     * <p>This method acts as a simple wrapper that resolves the correlation between an experiment
-     * and its associated molecule IDs via the procedure ID. It is used during the import
-     * process to locate relevant CDXML or metadata for the experiment.</p>
-     *
-     * @param procId the procedure ID of the inhouse experiment
-     * @return the corresponding {@link InhouseCorrelation} object
-     * @throws jakarta.persistence.NoResultException if no correlation entry is found
-     */
+
     private List<InhouseCorrelation> loadCorrelationByExperimentProcedureId(int procId) {
         if (procId == 0) return null;
         try {
