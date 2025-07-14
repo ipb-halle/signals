@@ -57,7 +57,7 @@ public class StructureImportStrategy implements InhouseImportStrategy {
             List<InhouseExperiment> chunk = group.subList(i, toIndex);
 
             InhouseExperiment main = chunk.get(0);
-            String expName = threeLc + "-MOL-" + experimentCounter++;
+            String expName = threeLc + "-" + experimentCounter++ + System.currentTimeMillis();
             String eid = experimentCreator.createExperiment(expName, main);
 
             for (InhouseExperiment exp : chunk) {
@@ -75,19 +75,23 @@ public class StructureImportStrategy implements InhouseImportStrategy {
 
                 for (Optional<Experiments.ChemDrawData> cdxmlOpt : structures) {
                     if (cdxmlOpt.isEmpty()) {
+                        logger.info("Empty ChemDrawData for procId= {}", procId);
                         errorLogger.log("Empty ChemDrawData for procId=" + procId);
                         continue;
                     }
-
                     // Create ChemDraw parent entity -> empty
                     Experiments.ChemDrawData data = cdxmlOpt.get();
+                    logger.info("SIS-> eid of created experiment Eid = {}, MolId =  {}\n", eid, data.molId());
                     String chemDrawId = experimentCreator.createChemDraw(data.molId(), eid);
+
+                    logger.info("SIS-> CHEMDRAW Eid = {}\n", chemDrawId);
 
                     // Add a cdxml to empty chemDrawing entity as a product
                     if (!data.fieldValueCdxml().isEmpty()) {
                         inhouseDB.getExperimentRestService().addReactionToExperiment(
                                 // POSITIONS-> = reactants|products|reagents|grid
                                 chemDrawId, "products", data.fieldValueCdxml());
+                        logger.info("SIS-> Reaction added to chemDraw");
                     }
 
                     // setting description field value
@@ -98,6 +102,7 @@ public class StructureImportStrategy implements InhouseImportStrategy {
                     if (ipbCode == null || ipbCode.trim().isEmpty()) {
                         ipbCode = "IPB code not assigned";
                     }
+                    logger.info("SIS-> starting creating sample");
                     sampleCreator.createSample(chemDrawId, "1", eid, desc, ipbCode);
 
                     exp.setEid(eid);

@@ -104,8 +104,8 @@ public class RestClientImpl implements RestClient {
      *
      * @param expectedResponseCode the expected HTTP response code (e.g. 200)
      * @return this client instance with the response data stored
-     * @throws IOException if an I/O error occurs during communication
-     * @throws URISyntaxException if the URI is malformed
+     * @throws IOException                     if an I/O error occurs during communication
+     * @throws URISyntaxException              if the URI is malformed
      * @throws UnexpectedResponseCodeException if the response code is not as expected
      */
     @Override
@@ -116,9 +116,13 @@ public class RestClientImpl implements RestClient {
                 .header("Accept", contentType)
                 .header("X-API-KEY", signalsConfig.getApiKey());
 
+        logger.debug("Executing {} request to URI: {}", method, getURI());
+
         if (requestData != null) {
             if ((method == Method.GET) || (method == Method.DELETE)) {
-                logger.warn("Unexpected request for write operation in HttpRequest: {}", method.toString());
+                //logger.warn("Unexpected request for write operation in HttpRequest: {}", method.toString());
+
+                throw new IllegalStateException("Cannot send requestData with HTTP method: " + method);
             }
             logger.trace("***** Dump of request *****\n{}\n***** End of request dump  *****", requestData);
 
@@ -151,6 +155,8 @@ public class RestClientImpl implements RestClient {
                     this.logger.debug("Connection {} {}", method.toString(), getURI().toString());
                     if (response != null) {
                         this.logger.debug("***** Dump of response *****\n{}\n***** End of response dump *****", response);
+                    } else {
+                        logger.debug("***** Dump of response *****\n{}\n***** End of response dump *****", response.toString());
                     }
                     throw new UnexpectedResponseCodeException(String.format("expected %d, got %d", expectedResponseCode, responseCode));
                 }

@@ -17,17 +17,20 @@
  */
 package de.ipb_halle.inhouse;
 
-import de.ipb_halle.inhouse.imports.*;
-import de.ipb_halle.signals.experiments.Experiment;
-import jakarta.persistence.NoResultException;
+import de.ipb_halle.inhouse.imports.ChemDrawCacheService;
+import de.ipb_halle.inhouse.imports.InhouseExperimentFilter;
+import de.ipb_halle.inhouse.imports.InhouseExperimentLoader;
+import de.ipb_halle.inhouse.imports.InhouseImportManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -85,7 +88,8 @@ public class Experiments {
                 + "(.*)$");                                 // 6 Procedure
 
         Pattern quotePattern = Pattern.compile("\"(.*)\"");
-        try (BufferedReader reader = new BufferedReader(new FileReader(inhouseDB.getConfigString(EXPERIMENTS_FILENAME))); BufferedWriter writer = new BufferedWriter(new FileWriter(inhouseDB.getConfigString(EXPERIMENTS_REJECTFILE)))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(inhouseDB.getConfigString(EXPERIMENTS_FILENAME)));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(inhouseDB.getConfigString(EXPERIMENTS_REJECTFILE)))) {
             reader.readLine(); // discard header
             int line = 1;
             while (reader.ready()) {
@@ -118,16 +122,18 @@ public class Experiments {
 
 
     public void importData() throws Exception {
-        var loader = new InhouseExperimentLoader(inhouseDB);
-        var experiments = loader.loadExperiments();
+        // importExperiments();
+        InhouseExperimentLoader loader = new InhouseExperimentLoader(inhouseDB);
+        List<InhouseExperiment> experiments = loader.loadExperiments(10);
+        logger.info("Loader size-> {}\n", experiments.size());
 
-        var chemDrawCache = new ChemDrawCacheService(inhouseDB);
-        var filter = new InhouseExperimentFilter(inhouseDB);
-        var errorLogger = new ErrorLogger("error_log_filter_experiments.txt");
+        ChemDrawCacheService chemDrawCache = new ChemDrawCacheService(inhouseDB);
+        InhouseExperimentFilter filter = new InhouseExperimentFilter(inhouseDB);
+        ErrorLogger errorLogger = new ErrorLogger("error_log_filter_experiments.txt");
 
-        var filtered = filter.filter(experiments, chemDrawCache, errorLogger);
+        Map<InhouseImportType, List<InhouseExperiment>> filtered = filter.filter(experiments, chemDrawCache, errorLogger);
 
-        var manager = new InhouseImportManager(inhouseDB);
+        InhouseImportManager manager = new InhouseImportManager(inhouseDB);
         manager.importAll(filtered, chemDrawCache);
     }
 }

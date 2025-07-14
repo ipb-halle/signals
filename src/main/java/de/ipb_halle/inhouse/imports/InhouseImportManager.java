@@ -24,6 +24,7 @@ import de.ipb_halle.inhouse.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class InhouseImportManager {
 
@@ -39,8 +40,8 @@ public class InhouseImportManager {
         );
     }
 
-    public void importAll(Map<InhouseImportType, List<InhouseExperiment>> experimentsByType,
-                          ChemDrawCacheService chemDrawCache) throws Exception {
+    public void importAll(Map<InhouseImportType, List<InhouseExperiment>> experimentsByType, ChemDrawCacheService chemDrawCache) throws Exception {
+
         for (InhouseImportType type : InhouseImportType.values()) {
             List<InhouseExperiment> list = experimentsByType.getOrDefault(type, List.of());
             if (list.isEmpty() || !strategies.containsKey(type)) continue;
@@ -50,11 +51,15 @@ public class InhouseImportManager {
             Map<String, List<InhouseExperiment>> grouped = grouper.groupByThreeLC(list, ImportMode.TESTING, logger);
 
             for (Map.Entry<String, List<InhouseExperiment>> entry : grouped.entrySet()) {
+
+                Map<Integer, List<Optional<Experiments.ChemDrawData>>> cdxmlCache =
+                        (type == InhouseImportType.STRUCTURE) ? chemDrawCache.getCdxmlCache() : Map.of();
+
                 strategies.get(type).importGroup(
                         inhouseDB,
                         entry.getKey(),
                         entry.getValue(),
-                        Map.of() // legacy compatibility for cdxmlCache
+                        cdxmlCache
                 );
             }
         }

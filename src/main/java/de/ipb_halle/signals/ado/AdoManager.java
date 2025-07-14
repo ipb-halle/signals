@@ -73,4 +73,7 @@ public class AdoManager {
         logger.info("Handlich ADO sychronization from {} to {}", dateRange[0], dateRange[1]);
     }
 
+    public void importAdo(String id) {
+
+    }
 }

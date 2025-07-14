@@ -20,7 +20,10 @@
 
 package de.ipb_halle.signals.experiments;
 
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntity;
@@ -91,8 +94,8 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
                     .execute(RestClient.HTTP_CREATED);
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
-            Experiment result = parseReply(jsonResult);
-
+            JsonObject data = jsonResult.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_DATA);
+            Experiment result = parseReply(data);
             return result;
 
         } catch (Exception e) {
@@ -124,21 +127,24 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
 
         String endpoint = String.format(APPEND_CHEMICAL_DRAWING_TO_EXPERIMENT, encodedEid, encodedFilename);
         try {
-            restClient.uploadChemicalDrawing(
+            RestClient execute = restClient
+                    .uploadChemicalDrawing(
                             experimentId,
                             filename,
                             cdxmlContent,
                             endpoint)
                     .execute();
 
+
             // Return String id of generated experiment
-            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
+            JsonElement jsonResult = JsonParser.parseString(execute.getResponse().getString());
             return jsonResult.getAsJsonObject()
                     .getAsJsonObject(RestHelper.ATTR_DATA)
                     .get(RestHelper.ATTR_ID)
                     .getAsJsonPrimitive().getAsString();
 
         } catch (UnexpectedResponseCodeException | IOException | URISyntaxException e) {
+            logger.info(" EXCEPTION By PARSING OR REQUEST = {}\n", e);
             throw new RuntimeException(e);
         }
     }
@@ -271,7 +277,8 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
      */
     private JsonElement fetchSample(String receiveExperimentEndpoint, String experimentId) {
         try {
-            restClient.setMethod(Method.GET)
+            restClient.reset()
+                    .setMethod(Method.GET)
                     .setEndpoint(String.format(receiveExperimentEndpoint, experimentId))
                     .execute();
 

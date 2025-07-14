@@ -45,7 +45,7 @@ public class SampleCreator {
 
     public void createSample(String chemDrawId, String rowId, String ancestorId, String description, String ipbCode) {
         Sample sample = new Sample();
-        sample.setTemplateId(TEMPLATE_ID);
+        sample.setTemplateId(inhouseDB.getConfigString(TEMPLATE_ID));
 
         SignalsEntity ancestor = new SignalsEntity();
         ancestor.setEid(ancestorId);

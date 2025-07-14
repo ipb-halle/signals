@@ -1,12 +1,15 @@
 package de.ipb_halle.inhouse.imports;
 
 import de.ipb_halle.inhouse.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
 
 import java.util.*;
 
 public class InhouseExperimentFilter {
 
     private final InhouseDB inhouseDB;
+    private final Logger logger = (Logger) LogManager.getLogger(InhouseExperimentFilter.class);
 
     public InhouseExperimentFilter(InhouseDB inhouseDB) {
         this.inhouseDB = inhouseDB;
@@ -51,8 +54,13 @@ public class InhouseExperimentFilter {
         }
 
         errorLogger.log("Experiments with missing threeLC = " + missingThreeLc);
+        logger.info("IEF-> MISSING THREELC = {}\n", missingThreeLc);
         errorLogger.log("Experiments with missing procedureId = " + missingProcId);
+        logger.info("IEF-> MISSING PROCID = {}\n", missingProcId);
         errorLogger.log("Experiments with missing ChemDraw = " + missingChemDraw);
+        logger.info("IEF-> MISSING CHEMDRAW = {}\n", missingChemDraw);
+
+        logger.info("IEF-> STRUCTURE ARRAY = {}\n, ORGANISM ARRAY ={}\n, UNKNOWN ARRAY = {}\n", structure.size(), organism.size(), unknown.size());
 
         return Map.of(
                 InhouseImportType.STRUCTURE, structure,

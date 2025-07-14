@@ -35,8 +35,16 @@ public class InhouseExperimentLoader {
         this.inhouseDB = inhouseDb;
     }
 
-    public List<InhouseExperiment> loadExperiments(){
-        List<InhouseExperiment> experiments = inhouseDB.getInhouseDbService().loadExperiments();
+    public List<InhouseExperiment> loadExperiments(int limit) {
+        List<InhouseExperiment> experiments = inhouseDB.getInhouseDbService()
+                .loadExperiments().stream().limit(limit).toList();
+        logger.info("Loaded {} experiments", experiments.size());
+        return experiments;
+    }
+
+    public List<InhouseExperiment> loadExperiments() {
+        List<InhouseExperiment> experiments = inhouseDB.getInhouseDbService()
+                .loadExperiments().stream().toList();
         logger.info("Loaded {} experiments", experiments.size());
         return experiments;
     }
