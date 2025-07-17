@@ -41,7 +41,8 @@ public class SampleProperty {
                 .setPropertyType(propertyType);
     }
 
-    //getter
+    // ——— getters ——— //
+
     public String getPropertyType() {
         return propertyType;
     }
@@ -55,7 +56,8 @@ public class SampleProperty {
     }
 
 
-    //setter
+    // ——— Setters ——— //
+
     public SampleProperty setPropertyId(String propertyId) {
         this.propertyId = propertyId;
         return this;

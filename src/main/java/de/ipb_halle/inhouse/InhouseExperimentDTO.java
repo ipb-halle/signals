@@ -23,9 +23,9 @@ package de.ipb_halle.inhouse;
 import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntity;
 import de.ipb_halle.signals.experiments.Experiment;
-import de.ipb_halle.signals.experiments.ExperimentProperty;
-import de.ipb_halle.signals.experiments.ExperimentPropertyEntity;
-import de.ipb_halle.signals.experiments.ExperimentPropertyValue;
+import de.ipb_halle.signals.experiments.properties.ExperimentProperty;
+import de.ipb_halle.signals.experiments.properties.ExperimentPropertyEntity;
+import de.ipb_halle.signals.experiments.properties.ExperimentPropertyValue;
 import de.ipb_halle.signals.users.IUser;
 import de.ipb_halle.signals.users.UserReference;
 import org.apache.logging.log4j.LogManager;
@@ -145,7 +145,7 @@ public class InhouseExperimentDTO {
         ExperimentPropertyValue fvThreeLc = new ExperimentPropertyValue();
         fvThreeLc.setPropertyId(inhouseDB.getConfigString(Experiments.EXPERIMENTS_FIELD_THREELC));
         fvThreeLc.setPropertyValue(threelc);
-        fvThreeLc.setExperimentProperty(fieldsOfExperimentTemplate.get(fvThreeLc.getPropertyId()));
+        fvThreeLc.setProperty(fieldsOfExperimentTemplate.get(fvThreeLc.getPropertyId()));
         experiment.addPropertyValue(fvThreeLc);
 
 //        // 3) Add Field Individual_code

@@ -18,12 +18,14 @@
  *
  */
 
-package de.ipb_halle.signals.experiments;
+package de.ipb_halle.signals.experiments.properties;
 
+import de.ipb_halle.signals.sample.SamplePropertyEntity;
+import de.ipb_halle.signals.sample.SamplePropertyValueId;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name="experiment_property_values")
+@Table(name = "experiment_property_values")
 public class ExperimentPropertyValueEntity {
 
     @EmbeddedId
@@ -33,16 +35,16 @@ public class ExperimentPropertyValueEntity {
     private String propertyValue;
 
     @ManyToOne
-    @JoinColumn(name="property_id", referencedColumnName = "property_id", insertable = false, updatable = false)
+    @JoinColumn(name = "property_id", referencedColumnName = "property_id", insertable = false, updatable = false)
     private ExperimentPropertyEntity property;
+
+    public ExperimentPropertyValueEntity() {
+    }
+
+    // ——— getters ——— //
 
     public ExperimentPropertyValueId getId() {
         return id;
-    }
-
-    public ExperimentPropertyValueEntity setId(ExperimentPropertyValueId id) {
-        this.id = id;
-        return this;
     }
 
     public String getPropertyValue() {
@@ -53,8 +55,22 @@ public class ExperimentPropertyValueEntity {
         return property;
     }
 
+    // ——— Setters ——— //
+
+    public ExperimentPropertyValueEntity setId(ExperimentPropertyValueId id) {
+        this.id = id;
+        return this;
+    }
+
+
     public ExperimentPropertyValueEntity setPropertyValue(String propertyValue) {
         this.propertyValue = propertyValue;
+        return this;
+    }
+
+
+    public ExperimentPropertyValueEntity setProperty(ExperimentPropertyEntity property) {
+        this.property = property;
         return this;
     }
 }

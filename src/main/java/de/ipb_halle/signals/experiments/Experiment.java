@@ -23,6 +23,8 @@ package de.ipb_halle.signals.experiments;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntity;
+import de.ipb_halle.signals.experiments.properties.ExperimentProperty;
+import de.ipb_halle.signals.experiments.properties.ExperimentPropertyValue;
 import de.ipb_halle.signals.users.IUser;
 import de.ipb_halle.signals.users.UserReference;
 import org.apache.logging.log4j.LogManager;

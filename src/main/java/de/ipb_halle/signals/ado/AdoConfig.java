@@ -40,7 +40,7 @@ public class AdoConfig {
     private final static Logger logger = LogManager.getLogger(AdoConfig.class);
 
     @SuppressWarnings("static-access")
-    private static final Option adoSyncOpt = Option.builder("adidaS")
+    private static final Option adoSyncOpt = Option.builder("adoS")
             .longOpt("adosSync")
             .hasArgs()
             .argName("=all | =START[:END]")

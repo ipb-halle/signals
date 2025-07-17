@@ -18,22 +18,13 @@
  *
  */
 
-package de.ipb_halle.inhouse.imports;
+package de.ipb_halle.signals.ado.properties;
 
-import de.ipb_halle.signals.ado.Ado;
-import de.ipb_halle.signals.ado.AdoManager;
+import de.ipb_halle.signals.properties.AbstractPropertyEntity;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
-public class AdoCreator {
-
-    private final AdoManager adoManager;
-
-    public AdoCreator(AdoManager adoManager) {
-        this.adoManager = adoManager;
-    }
-
-    public Ado createAdo(String ancestorId, String name, String ipbCode) {
-        Ado ipbCodeAdoForInhouseExperiment = adoManager.findIpbCodeAdoForInhouseExperiment(ipbCode);
-
-        return null;
-    }
+@Entity
+@Table(name = "ado_properties")
+public class AdoPropertyEntity extends AbstractPropertyEntity {
 }

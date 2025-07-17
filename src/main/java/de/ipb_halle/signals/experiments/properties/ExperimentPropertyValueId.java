@@ -18,7 +18,7 @@
  *
  */
 
-package de.ipb_halle.signals.sample;
+package de.ipb_halle.signals.experiments.properties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -27,39 +27,41 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
-public class SamplePropertyValueId  implements Serializable {
+public class ExperimentPropertyValueId implements Serializable {
 
-    @Column(name="sample_id")
-    private String sampleId;
+    @Column(name = "experiment_id")
+    private String experimentId;
 
-    @Column(name= "property_id")
+    @Column(name = "property_id")
     private String propertyId;
 
-    public SamplePropertyValueId() {
+    public ExperimentPropertyValueId() {
     }
 
-    public SamplePropertyValueId(String sampleId, String propertyId) {
-        this.sampleId = sampleId;
+    public ExperimentPropertyValueId(String experimentId, String propertyId) {
+        this.experimentId = experimentId;
         this.propertyId = propertyId;
     }
 
-    //getter and setter
+    // ——— getters ——— //
 
-    public String getSampleId() {
-        return sampleId;
-    }
-
-    public SamplePropertyValueId setSampleId(String sampleId) {
-        this.sampleId = sampleId;
-        return this;
+    public String getExperimentId() {
+        return experimentId;
     }
 
     public String getPropertyId() {
         return propertyId;
     }
 
-    public SamplePropertyValueId setPropertyId(String propertyId) {
+    // ——— Setters ——— //
+
+    public ExperimentPropertyValueId setPropertyId(String propertyId) {
         this.propertyId = propertyId;
+        return this;
+    }
+
+    public ExperimentPropertyValueId setExperimentId(String experimentId) {
+        this.experimentId = experimentId;
         return this;
     }
 
@@ -67,12 +69,12 @@ public class SamplePropertyValueId  implements Serializable {
     public boolean equals(Object object) {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
-        SamplePropertyValueId that = (SamplePropertyValueId) object;
-        return Objects.equals(sampleId, that.sampleId) && Objects.equals(propertyId, that.propertyId);
+        ExperimentPropertyValueId that = (ExperimentPropertyValueId) object;
+        return Objects.equals(experimentId, that.experimentId) && Objects.equals(propertyId, that.propertyId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sampleId, propertyId);
+        return Objects.hash(experimentId, propertyId);
     }
 }

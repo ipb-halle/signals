@@ -20,21 +20,30 @@
 
 package de.ipb_halle.signals.ado;
 
-import de.ipb_halle.inhouse.Experiments;
-import de.ipb_halle.inhouse.InhouseExperiment;
-import de.ipb_halle.inhouse.InhouseExperimentDTO;
+import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntityDTO;
-import jakarta.ejb.TransactionAttribute;
-import jakarta.ejb.TransactionAttributeType;
+import de.ipb_halle.signals.entity.SignalsEntityDbService;
+import de.ipb_halle.signals.entity.SignalsEntityRestService;
+import de.ipb_halle.signals.experiments.ExperimentEntity;
+import jakarta.ejb.*;
 import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
+@Stateless
+@LocalBean
 public class AdoManager {
+
+    @Inject
+    SignalsEntityDbService signalsEntityDbService;
+
+    @Inject
+    AdoProcessorBean adoProcessorBean;
 
     @Inject
     AdoRestService adoRestService;
@@ -45,35 +54,68 @@ public class AdoManager {
     private final Logger logger = LogManager.getLogger(AdoManager.class);
 
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
-    public List<Ado> createAllIpbAdoObjects(List<InhouseExperiment> experimentsWithIpbCode, int maxIpbCode) {
-        logger.info("creating all ADOs for ipb codes amount = {}\n",experimentsWithIpbCode.size());
-        List<Ado> ipbAdoObjects = adoRestService.createAllIpbCustomObjects();
-        adoDbService.saveAll(ipbAdoObjects);
-        return ipbAdoObjects;
-    }
+    public List<Ado> ensureAllIpbAdosExist() {
+        int maxIpbCode = adoDbService.findMaxIpbCode();
+        logger.info("Max IPB code: {}", maxIpbCode);
 
+        List<Ado> existingAdos = adoDbService.loadAll();
+        int missingCount = maxIpbCode - existingAdos.size();
 
-    public Ado findIpbCodeAdoForInhouseExperiment(String ancestorId,String descriptionOfAncestorAsNameForAdo, String ipbCode) {
-        List<Ado> ados = adoDbService.loadAll();
-
-        Optional<Ado> optionalAdo = ados.stream()
-                .filter(a -> (a.getIpbCode() != null && a.getIpbCode().equalsIgnoreCase(ipbCode)))
-                .findFirst();
-
-        if (optionalAdo.isEmpty()) {
-            logger.warn("No ADO found for IPB code '{}'\n", ipbCode);
-            return null;
+        if (missingCount <= 0) {
+            logger.info("All ADOs already present ({} of {}).", existingAdos.size(), maxIpbCode);
+            return existingAdos;
         }
 
-        Ado ado = optionalAdo.get();
-        return ado;
+        logger.info("Creating {} missing ADOs...", missingCount);
+        List<Ado> newAdos = adoRestService.createAllIpbCustomObjects(maxIpbCode);
+        adoDbService.saveAll(newAdos);
+        return newAdos;
     }
 
+
+    public Ado findIpbCodeAdoForInhouseExperiment(String ipbCode) {
+        List<Ado> ados = adoDbService.loadAll();
+
+        if (ados == null || ados.isEmpty()) {
+            ados = ensureAllIpbAdosExist();
+        }
+
+        return ados.stream()
+                .filter(a -> ipbCode.equalsIgnoreCase(a.getIpbCode()))
+                .findFirst()
+                .orElseGet(() -> {
+                    logger.warn("No ADO found for IPB code '{}'", ipbCode);
+                    return null;
+                });
+    }
+
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void manageAdos(Date[] dateRange) {
-        logger.info("Handlich ADO sychronization from {} to {}", dateRange[0], dateRange[1]);
+        logger.info("Handling ADO synchronization from {} to {}", dateRange[0], dateRange[1]);
+
+        EntityType entityTypes[] = {EntityType.valueOf(AdoEntity.ENTITY_TYPE_ADO)};
+        Map<String, Object> criteriaMap = new HashMap<>();
+
+        criteriaMap.put(SignalsEntityRestService.PARAMETER_START, dateRange[0]);
+        if (dateRange.length > 1) {
+            criteriaMap.put(SignalsEntityRestService.PARAMETER_END, dateRange[1]);
+        }
+        criteriaMap.put(SignalsEntityRestService.PARAMETER_INCLUDE_TYPES, entityTypes);
+
+        List<SignalsEntityDTO> signalsEntityDTOS = signalsEntityDbService.loadSE(criteriaMap);
+
+        for (SignalsEntityDTO dto : signalsEntityDTOS) {
+            String eid = dto.getEid();
+            processAdo(eid);
+        }
+
+    }
+
+    private void processAdo(String eid) {
+        adoProcessorBean.processSingleAdo(eid);
     }
 
     public void importAdo(String id) {
-
+// TODO: implementieren
     }
 }

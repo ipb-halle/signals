@@ -20,11 +20,11 @@
 
 package de.ipb_halle.signals.ado;
 
+import de.ipb_halle.signals.ado.properties.AdoProperty;
+import de.ipb_halle.signals.ado.properties.AdoPropertyValue;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntity;
-import de.ipb_halle.signals.experiments.ExperimentProperty;
-import de.ipb_halle.signals.experiments.ExperimentPropertyValue;
 import de.ipb_halle.signals.users.IUser;
 import de.ipb_halle.signals.users.UserReference;
 import org.apache.logging.log4j.LogManager;
@@ -39,6 +39,7 @@ import java.util.Set;
  */
 public class Ado {
     public static final Logger logger = LogManager.getLogger(Ado.class);
+    public final static String ENTITY_TYPE_ADO = "ado";
 
     private String id;
     private String eid;
@@ -58,8 +59,8 @@ public class Ado {
 
     private Set<SignalsEntity> ancestors;
     private Set<SignalsEntity> children;
-    private Set<ExperimentProperty> properties;
-    private Set<ExperimentPropertyValue> propertyValues;
+    private Set<AdoProperty> properties;
+    private Set<AdoPropertyValue> propertyValues;
 
     public Ado() {
         ancestors = new HashSet<>();
@@ -256,21 +257,37 @@ public class Ado {
         return this;
     }
 
-    public Set<ExperimentProperty> getProperties() {
+    public Set<AdoProperty> getProperties() {
         return properties;
     }
 
-    public Ado setProperties(Set<ExperimentProperty> properties) {
+    public Ado setProperties(Set<AdoProperty> properties) {
         this.properties = properties;
         return this;
     }
 
-    public Set<ExperimentPropertyValue> getPropertyValues() {
+    public Set<AdoPropertyValue> getPropertyValues() {
         return propertyValues;
     }
 
-    public Ado setPropertyValues(Set<ExperimentPropertyValue> propertyValues) {
+    public Ado setPropertyValues(Set<AdoPropertyValue> propertyValues) {
         this.propertyValues = propertyValues;
         return this;
     }
+
+    public void addAncestor(SignalsEntity se) {
+        this.ancestors.add(se);
+    }
+
+    public void addChild(SignalsEntity se) {
+        this.children.add(se);
+    }
+
+    public void addProperty(AdoProperty adoProperty) {
+        properties.add(adoProperty);
+    }
+    public void addPropertyValue(AdoPropertyValue adoPropertyValue) {
+        propertyValues.add(adoPropertyValue);
+    }
+
 }

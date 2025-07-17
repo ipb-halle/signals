@@ -18,46 +18,51 @@
  *
  */
 
-package de.ipb_halle.signals.sample;
+package de.ipb_halle.signals.ado.properties;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class SamplePropertyValue {
+public class AdoPropertyValue {
 
-    private String sampleId;
+    private String adoId;
     private String propertyId;
     private String propertyValue;
-    public static final Logger logger = LogManager.getLogger(SamplePropertyValue.class);
+    public static final Logger logger = LogManager.getLogger(AdoPropertyValue.class);
 
-    public SamplePropertyValue() {
+    // ——— constructors ——— //
+
+    public AdoPropertyValue() {
     }
 
-    public SamplePropertyValue(SamplePropertyValueEntity entity) {
-        this.sampleId = entity.getId().getSampleId();
+    public AdoPropertyValue(AdoPropertyValueEntity entity) {
+        this.adoId = entity.getId().getAdoId();
         this.propertyId = entity.getId().getPropertyId();
         this.propertyValue = entity.getPropertyValue();
     }
 
-    public SamplePropertyValueEntity createEntity() {
-        if (sampleId == null || propertyId == null) {
-            logger.warn("SamplePropertyValue:-> Skipping SamplePropertyValueEntity creation");
+    // ——— create Entity ——— //
+
+    public AdoPropertyValueEntity createEntity() {
+        if (adoId == null || propertyId == null) {
+            logger.warn("AdoPropertyValue:-> Skipping AdoPropertyValueEntity creation");
             return null;
         }
 
-        SamplePropertyValueId samplePropertyValueId = new SamplePropertyValueId();
-        samplePropertyValueId
-                .setSampleId(sampleId)
+        AdoPropertyValueId adoPropertyValueId = new AdoPropertyValueId();
+        adoPropertyValueId
+                .setAdoId(adoId)
                 .setPropertyId(propertyId);
 
-        return new SamplePropertyValueEntity()
-                .setId(samplePropertyValueId)
+        return new AdoPropertyValueEntity()
+                .setId(adoPropertyValueId)
                 .setPropertyValue(propertyValue);
     }
 
-    //getter
-    public String getSampleId() {
-        return sampleId;
+    // ——— getters ——— //
+
+    public String getAdoId() {
+        return adoId;
     }
 
     public String getPropertyId() {
@@ -68,23 +73,29 @@ public class SamplePropertyValue {
         return propertyValue;
     }
 
-    //setter
-    public void setSampleId(String sampleId) {
-        this.sampleId = sampleId;
+    // ——— Setters ——— //
+
+    public AdoPropertyValue setAdoId(String adoId) {
+        this.adoId = adoId;
+        return this;
     }
 
-    public void setPropertyId(String propertyId) {
+    public AdoPropertyValue setPropertyId(String propertyId) {
         this.propertyId = propertyId;
+        return this;
     }
 
-    public void setPropertyValue(String propertyValue) {
+    public AdoPropertyValue setPropertyValue(String propertyValue) {
         this.propertyValue = propertyValue;
+        return this;
     }
+
+    // ——— toString ——— //
 
     @Override
     public String toString() {
-        return "SamplePropertyValue{" +
-                "sampleId='" + sampleId + '\'' +
+        return "AdoPropertyValue{" +
+                "adoId='" + adoId + '\'' +
                 ", propertyId='" + propertyId + '\'' +
                 ", propertyValue='" + propertyValue + '\'' +
                 '}';

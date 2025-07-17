@@ -29,11 +29,12 @@ import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntity;
 import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
+import de.ipb_halle.signals.experiments.properties.ExperimentProperty;
+import de.ipb_halle.signals.experiments.properties.ExperimentPropertyValue;
 import de.ipb_halle.signals.rest.*;
 import de.ipb_halle.signals.sample.SampleRestService;
 import de.ipb_halle.signals.users.UserReference;
-import jakarta.ejb.TransactionAttribute;
-import jakarta.ejb.TransactionAttributeType;
+import jakarta.ejb.*;
 import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,6 +45,8 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+@LocalBean
+@Stateless
 public class ExperimentRestService implements RestReplyParser<Experiment> {
 
     @Inject
@@ -257,7 +260,7 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
      * @throws Exception if any error occurs during the fetch or parsing process
      */
     public Experiment doGetExperiment(String experimentId) throws Exception {
-        JsonElement object = fetchSample(RECEIVE_EXPERIMENT_ENDPOINT, experimentId);
+        JsonElement object = fetchExperiment(RECEIVE_EXPERIMENT_ENDPOINT, experimentId);
         Experiment experiment = parseReply(object);
         logger.info("EXPERIMENT-> {}\n", experiment.toString());
         return experiment;
@@ -275,7 +278,7 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
      * @return the {@link JsonElement} containing the raw experiment data
      * @throws RuntimeException if an error occurs during the request or parsing
      */
-    private JsonElement fetchSample(String receiveExperimentEndpoint, String experimentId) {
+    private JsonElement fetchExperiment(String receiveExperimentEndpoint, String experimentId) {
         try {
             restClient.reset()
                     .setMethod(Method.GET)
@@ -450,7 +453,7 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
                 String id = RestHelper.parseString(ancestorJson, RestHelper.ATTR_ID);
 
                 if (id != null) {
-                    JsonElement seJson = fetchSample(RECEIVE_EXPERIMENT_ENDPOINT, id);
+                    JsonElement seJson = fetchExperiment(RECEIVE_EXPERIMENT_ENDPOINT, id);
                     SignalsEntity se = signalsEntityRestService.parseReply(seJson).createEntity();
                     entities.add(se);
                     experiment.addAncestor(se);
@@ -492,7 +495,7 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
                 JsonObject childJson = element.getAsJsonObject();
                 String id = RestHelper.parseString(childJson, RestHelper.ATTR_ID);
                 if (id != null) {
-                    JsonElement seJson = fetchSample(RECEIVE_EXPERIMENT_ENDPOINT, id);
+                    JsonElement seJson = fetchExperiment(RECEIVE_EXPERIMENT_ENDPOINT, id);
                     SignalsEntity se = signalsEntityRestService.parseReply(seJson).createEntity();
                     experiment.addChild(se);
                 }
@@ -547,7 +550,7 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
      * @param experiment the {@link Experiment} instance whose properties are to be populated
      */
     public void doGetExperimentProperties(Experiment experiment) {
-        JsonElement json = fetchSample(EXPERIMENT_GET_PROPERTIES_ENDPOINT, experiment.getTemplateId());
+        JsonElement json = fetchExperiment(EXPERIMENT_GET_PROPERTIES_ENDPOINT, experiment.getTemplateId());
 
         Iterator<JsonElement> iter = json.getAsJsonArray().iterator();
         while (iter.hasNext()) {
@@ -598,12 +601,12 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
      * @param experiment the {@link Experiment} to populate with property values
      */
     public void doGetExperimentPropertyValues(Experiment experiment) {
-        JsonElement json = fetchSample(EXPERIMENT_GET_PROPERTY_VALUES_ENDPOINT, experiment.getId());
+        JsonElement json = fetchExperiment(EXPERIMENT_GET_PROPERTY_VALUES_ENDPOINT, experiment.getId());
 
         Iterator<JsonElement> iter = json.getAsJsonArray().iterator();
         while (iter.hasNext()) {
-            JsonElement experimentPropertiesObject = iter.next();
-            parseExperimentPropertyValues(experiment, experimentPropertiesObject);
+            JsonElement experimentPropertyValuesObject = iter.next();
+            parseExperimentPropertyValues(experiment, experimentPropertyValuesObject);
         }
     }
 

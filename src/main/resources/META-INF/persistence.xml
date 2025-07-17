@@ -16,6 +16,9 @@
         <class>de.ipb_halle.inhouse.InhouseLocation</class>
         <class>de.ipb_halle.inhouse.InhouseSynonym</class>
         <class>de.ipb_halle.inhouse.InhouseTaxon</class>
+        <class>de.ipb_halle.signals.ado.AdoEntity</class>
+        <class>de.ipb_halle.signals.ado.properties.AdoPropertyEntity</class>
+        <class>de.ipb_halle.signals.ado.properties.AdoPropertyValueEntity</class>
         <class>de.ipb_halle.signals.attachment.Attachment</class>
         <class>de.ipb_halle.signals.attachment.AttachmentRevision</class>
         <class>de.ipb_halle.signals.attachment.AttachmentFile</class>
@@ -26,8 +29,8 @@
         <class>de.ipb_halle.signals.entity.SignalsEntity</class>
         <class>de.ipb_halle.signals.entity.SignalsEntityChild</class>
         <class>de.ipb_halle.signals.experiments.ExperimentEntity</class>
-        <class>de.ipb_halle.signals.experiments.ExperimentPropertyEntity</class>
-        <class>de.ipb_halle.signals.experiments.ExperimentPropertyValueEntity</class>
+        <class>de.ipb_halle.signals.experiments.properties.ExperimentPropertyEntity</class>
+        <class>de.ipb_halle.signals.experiments.properties.ExperimentPropertyValueEntity</class>
         <class>de.ipb_halle.signals.field.FieldDefinition</class>
         <class>de.ipb_halle.signals.field.FieldMeasure</class>
         <class>de.ipb_halle.signals.field.FieldOption</class>

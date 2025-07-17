@@ -55,6 +55,7 @@ public class SamplePropertyEntity {
 
 
     // ——— Setters ——— //
+
     public SamplePropertyEntity setPropertyId(String propertyId) {
         this.propertyId = propertyId;
         return this;

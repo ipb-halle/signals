@@ -494,3 +494,40 @@ CREATE TABLE inhouse_taxonomy (
     name VARCHAR
 
 );
+
+CREATE TABLE ados (
+    id VARCHAR(255) PRIMARY KEY,
+    eid VARCHAR(255),
+    name VARCHAR(255),
+    description TEXT,
+    type INTEGER,
+    ipb_code VARCHAR(50),
+    mol_id VARCHAR(50),
+    proc_id INTEGER,
+    sample_id VARCHAR(255),
+    created_at TIMESTAMP,
+    created_by VARCHAR(255),
+    state VARCHAR(50),
+    ancestor_id VARCHAR(255),
+    template_id VARCHAR(255)
+);
+
+CREATE TABLE ado_properties (
+    property_id VARCHAR(64) PRIMARY KEY,
+    property_name VARCHAR(255),
+    property_type VARCHAR(64),
+    template_id VARCHAR(64)
+);
+
+CREATE TABLE ado_property_values (
+    ado_id VARCHAR(64),
+    property_id VARCHAR(64),
+    property_value TEXT,
+    PRIMARY KEY (ado_id, property_id),
+     CONSTRAINT fk_ado_prop_val_property FOREIGN KEY (property_id)
+           REFERENCES ado_properties(property_id)
+           ON DELETE CASCADE,
+       CONSTRAINT fk_ado_prop_val_entity FOREIGN KEY (ado_id)
+           REFERENCES ados(id)
+           ON DELETE CASCADE
+);

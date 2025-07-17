@@ -27,6 +27,9 @@ import java.util.Date;
 @Entity
 @Table(name = "ados")
 public class AdoEntity {
+
+    public static final String ENTITY_TYPE_ADO = "ado";
+
     @Id
     private String id;
     @Column

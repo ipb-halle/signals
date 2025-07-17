@@ -20,8 +20,12 @@
 
 package de.ipb_halle.signals.experiments;
 
-import de.ipb_halle.signals.dynEnum.DynEnum;
+import de.ipb_halle.signals.experiments.properties.ExperimentProperty;
+import de.ipb_halle.signals.experiments.properties.ExperimentPropertyEntity;
+import de.ipb_halle.signals.experiments.properties.ExperimentPropertyValue;
+import de.ipb_halle.signals.experiments.properties.ExperimentPropertyValueEntity;
 import de.ipb_halle.tda.PersistenceElements;
+import jakarta.ejb.LocalBean;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -35,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 @Stateless
+@LocalBean
 @PersistenceElements(entities = {ExperimentEntity.class, ExperimentPropertyEntity.class, ExperimentPropertyValueEntity.class})
 public class ExperimentDbService {
 
@@ -49,12 +54,11 @@ public class ExperimentDbService {
 
     public void save(Experiment experiment) {
         ExperimentEntity experimentEntity = experiment.createEntity();
-
         entityManager.merge(experimentEntity);
 
         for (ExperimentProperty experimentProperty : experiment.getProperties()) {
             if (experimentProperty.getPropertyId() == null || experimentProperty.getPropertyId().isBlank()) {
-                logger.warn("Skipping property with null or blank ID: {}", experimentProperty.getPropertyName());
+                logger.warn("ExperimentDbService -> Skipping property with null or blank ID: {}\n", experimentProperty.getPropertyName());
                 continue;
             }
             ExperimentPropertyEntity experimentPropertyEntity = experimentProperty.createEntity(); // no template version
@@ -63,7 +67,7 @@ public class ExperimentDbService {
 
         for (ExperimentPropertyValue experimentPropertyValue : experiment.getPropertyValues()) {
             if (experimentPropertyValue.getPropertyId() == null || experimentPropertyValue.getPropertyId().isBlank()) {
-                logger.warn("Skipping SamplePropertyValue with null or blank propertyId: experimentId={}", experimentPropertyValue.getExperimentId());
+                logger.warn("ExperimentDbService -> Skipping ExperimentPropertyValue with null or blank propertyId: experimentId={}\n", experimentPropertyValue.getExperimentId());
                 continue;
             }
             ExperimentPropertyValueEntity experimentPropertyValueEntity = experimentPropertyValue.createEntity();
@@ -79,11 +83,11 @@ public class ExperimentDbService {
         Root<ExperimentPropertyValueEntity> root = query.from(ExperimentPropertyValueEntity.class);
         root.fetch("property", JoinType.INNER);
 
-        query.select(root).where(cb.equal(root.get("id").get("experimentId"), experiment.getId()));
+        query.select(root).where(cb.equal(root.get("id").get("entityId"), experiment.getId()));
 
         List<ExperimentPropertyValueEntity> results = entityManager.createQuery(query).getResultList();
 
-        logger.info("ExperimentPropertyValueEntity results ={}\n", Arrays.toString(results.toArray()));
+        logger.info("ExperimentDbService -> ExperimentPropertyValueEntity results ={}\n", Arrays.toString(results.toArray()));
 
         for (ExperimentPropertyValueEntity valueEntity : results) {
             ExperimentPropertyValue value = new ExperimentPropertyValue(valueEntity);

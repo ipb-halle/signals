@@ -18,38 +18,33 @@
  *
  */
 
-package de.ipb_halle.signals.experiments;
+package de.ipb_halle.signals.properties;
 
-public class ExperimentProperty {
-    public static final String TEMPLATE_ID = "templateId";
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+
+@MappedSuperclass
+public abstract class AbstractPropertyEntity {
+
+    @Id
+    @Column(name = "property_id")
     private String propertyId;
+
+    @Column(name = "property_name")
     private String propertyName;
+
+    @Column(name = "property_type")
     private String propertyType;
+
+    @Column(name = "template_id")
     private String templateId;
-
-    public ExperimentProperty() {
-    }
-
-    public ExperimentProperty(ExperimentPropertyEntity experimentPropertyEntity) {
-        this.propertyId = experimentPropertyEntity.getPropertyId();
-        this.propertyName = experimentPropertyEntity.getPropertyName();
-        this.propertyType = experimentPropertyEntity.getPropertyType();
-        this.templateId = experimentPropertyEntity.getTemplateId();
-    }
-
-    public ExperimentPropertyEntity createEntity() {
-        return new ExperimentPropertyEntity()
-                .setPropertyId(propertyId)
-                .setPropertyName(propertyName)
-                .setPropertyType(propertyType)
-                .setTemplateId(templateId);
-    }
 
     public String getPropertyId() {
         return propertyId;
     }
 
-    public ExperimentProperty setPropertyId(String propertyId) {
+    public AbstractPropertyEntity setPropertyId(String propertyId) {
         this.propertyId = propertyId;
         return this;
     }
@@ -58,7 +53,7 @@ public class ExperimentProperty {
         return propertyName;
     }
 
-    public ExperimentProperty setPropertyName(String propertyName) {
+    public AbstractPropertyEntity setPropertyName(String propertyName) {
         this.propertyName = propertyName;
         return this;
     }
@@ -67,7 +62,7 @@ public class ExperimentProperty {
         return propertyType;
     }
 
-    public ExperimentProperty setPropertyType(String propertyType) {
+    public AbstractPropertyEntity setPropertyType(String propertyType) {
         this.propertyType = propertyType;
         return this;
     }
@@ -76,7 +71,7 @@ public class ExperimentProperty {
         return templateId;
     }
 
-    public ExperimentProperty setTemplateId(String templateId) {
+    public AbstractPropertyEntity setTemplateId(String templateId) {
         this.templateId = templateId;
         return this;
     }

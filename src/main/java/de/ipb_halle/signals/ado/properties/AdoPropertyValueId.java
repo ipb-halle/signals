@@ -18,37 +18,38 @@
  *
  */
 
-package de.ipb_halle.signals.experiments;
+package de.ipb_halle.signals.ado.properties;
 
+import de.ipb_halle.signals.properties.AbstractPropertyValueId;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.EmbeddedId;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
-public class ExperimentPropertyValueId implements Serializable {
+public class AdoPropertyValueId implements Serializable {
 
-    @Column(name="experiment_id")
-    private String experimentId;
+    @Column(name = "ado_id")
+    private String adoId;
 
-    @Column(name= "property_id")
+    @Column(name = "property_id")
     private String propertyId;
 
-    public ExperimentPropertyValueId() {
-    }
+    public AdoPropertyValueId() {}
 
-    public ExperimentPropertyValueId(String experimentId, String propertyId) {
-        this.experimentId = experimentId;
+    public AdoPropertyValueId(String adoId, String propertyId) {
+        this.adoId = adoId;
         this.propertyId = propertyId;
     }
 
-    public String getExperimentId() {
-        return experimentId;
+    public String getAdoId() {
+        return adoId;
     }
 
-    public ExperimentPropertyValueId setExperimentId(String experimentId) {
-        this.experimentId = experimentId;
+    public AdoPropertyValueId setAdoId(String adoId) {
+        this.adoId = adoId;
         return this;
     }
 
@@ -56,21 +57,21 @@ public class ExperimentPropertyValueId implements Serializable {
         return propertyId;
     }
 
-    public ExperimentPropertyValueId setPropertyId(String propertyId) {
+    public AdoPropertyValueId setPropertyId(String propertyId) {
         this.propertyId = propertyId;
         return this;
     }
 
     @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        ExperimentPropertyValueId that = (ExperimentPropertyValueId) object;
-        return Objects.equals(experimentId, that.experimentId) && Objects.equals(propertyId, that.propertyId);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AdoPropertyValueId that)) return false;
+        return Objects.equals(adoId, that.adoId) &&
+                Objects.equals(propertyId, that.propertyId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(experimentId, propertyId);
+        return Objects.hash(adoId, propertyId);
     }
 }
