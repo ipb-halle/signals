@@ -19,9 +19,11 @@ package de.ipb_halle.signals.users;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,10 +53,12 @@ public class MockLdapAdapter implements AutoCloseable, LdapAdapter {
         parseLdapData();
     }
 
+    @Override
     public void close() throws IOException {
     }
 
-    public Attributes getAttributes(String dn) throws Exception {
+    @Override
+    public Attributes getAttributes(String dn) {
         return objects.get(dn);
     }
 
@@ -64,7 +68,7 @@ public class MockLdapAdapter implements AutoCloseable, LdapAdapter {
             Reader reader = new InputStreamReader(is);
             JsonElement elem = JsonParser.parseReader(reader);
             parseObjects(elem);
-        } catch(Exception e) {
+        } catch(JsonIOException | JsonSyntaxException e) {
             e.printStackTrace();
         }
     }

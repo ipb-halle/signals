@@ -27,6 +27,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import jakarta.inject.Inject;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.naming.NamingException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,6 +46,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.fail;
 
 @RunWith(ApplicationComposer.class)
 public class UserManagerTest {
@@ -54,7 +59,7 @@ public class UserManagerTest {
     private final String TEST_KEY_2 =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/107";
     private final String TEST_RESOURCE_3 = "UserManagerTest003.json";
-    private final String TEST_KEY_3a = 
+    private final String TEST_KEY_3a =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/102/systemGroups";
     private final String TEST_KEY_3b =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/107/systemGroups";
@@ -62,7 +67,7 @@ public class UserManagerTest {
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users/122/systemGroups";
 
     private final String TEST_RESOURCE_4 = "UserManagerTest004.json";
-    private final String TEST_KEY_4 = 
+    private final String TEST_KEY_4 =
         "GET:https://endpoint.somewhere.invalid/api/rest/v1.0/users?page%5Blimit%5D=20&page%5Boffset%5D=0&enabled=false";
 
 
@@ -95,9 +100,9 @@ public class UserManagerTest {
 
     @Module
     @Classes(cdi = true, value = { LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class,
-        MockRestClient.class, SignalsConfig.class, 
+        MockRestClient.class, SignalsConfig.class,
         GroupDbService.class, GroupManager.class, GroupRestService.class,
-        RoleDbService.class, RoleManager.class, RoleRestService.class, 
+        RoleDbService.class, RoleManager.class, RoleRestService.class,
         UserDbService.class, UserManager.class, UserRestService.class })
     public EjbJar app() {
         return new EjbJar();
@@ -174,7 +179,17 @@ public class UserManagerTest {
         context.groupsByDN = new HashMap<> ();
         context.rolesByDN = new HashMap<> ();
         AccessManager.prepareReport(context,  new HtmlReport());
-        manager.syncUsersFromLdap(context);
+        try {
+            manager.syncUsersFromLdap(context);
+        } catch (LdapConnectionErrorException ex) {
+            fail("LdapConnectionErrorException");
+        } catch (NamingException ex) {
+            fail("NamingException");
+        } catch (MissingAttributeException ex) {
+            fail("MissingAttributeException");
+        } catch (IOException ex) {
+            fail("IOException");
+        }
         String html = context.report.render();
         // System.out.printf("\n******************************\n%s\n******************************\n", html);
         assertTrue("report contains 'ae@somewhere.invalid'", context.report.render().contains("ae@somewhere.invalid"));

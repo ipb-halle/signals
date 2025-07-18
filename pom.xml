@@ -24,7 +24,7 @@
  
  <groupId>de.ipb-halle</groupId>
  <artifactId>signals</artifactId>
- <version>1.0</version>
+ <version>1.0.2</version>
  <packaging>jar</packaging>
  
  <name>IPB signals client</name>

@@ -26,6 +26,8 @@ import jakarta.inject.Inject;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.openejb.jee.EjbJar;
 import org.apache.openejb.junit.ApplicationComposer;
@@ -42,6 +44,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.fail;
 
 @RunWith(ApplicationComposer.class)
 public class LdapClientTest {
@@ -79,12 +82,20 @@ public class LdapClientTest {
 
     @Test
     public void getGroupTest() {
-        assertEquals("Name of Group matches", TEST_ALL_USERS_NAME, ldapClient.getGroup(TEST_ALL_USERS_DN).getName());
+        try {
+            assertEquals("Name of Group matches", TEST_ALL_USERS_NAME, ldapClient.getGroup(TEST_ALL_USERS_DN).getName());
+        } catch (LdapConnectionErrorException ex) {
+            fail("LdapConnectionErrorException");
+        }
     }
 
     @Test
     public void getMembersTest() {
-        assertTrue("'All Users' has member 'Goethe'", ldapClient.getMembers(TEST_ALL_USERS_DN, true).contains(TEST_GOETHE_DN));
+        try {
+            assertTrue("'All Users' has member 'Goethe'", ldapClient.getMembers(TEST_ALL_USERS_DN, true).contains(TEST_GOETHE_DN));
+        } catch (LdapConnectionErrorException ex) {
+            fail("LdapConnectionErrorException");
+        }
     }
 
     @Test

@@ -80,7 +80,7 @@ public class GroupManager {
      * 
      * NOTE: currently, the flag ldapGroup cannot be cleared
      */
-    public void obtainLdapGroups(UserSynchronizationContext context) {
+    public void obtainLdapGroups(UserSynchronizationContext context) throws LdapConnectionErrorException {
         Map<String, Group> groupsByDN = new HashMap<> ();
         Set<String> groupDNs = new HashSet<> ();
         ldapClient.getMembers( new HashSet<> (), groupDNs, config.getLdapManagedGroups(), false);

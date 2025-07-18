@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 
 
 
-/** 
+/**
  * Manager for signals roles
  */
 
@@ -78,11 +78,14 @@ public class RoleManager {
      * NOTE: one cannot create or modify roles with this tool. Only
      * assigning roles to users (or removing from) is supported.
      *
-     * NOTE: it is currently not possible to remove the ldapFlag from 
+     * NOTE: it is currently not possible to remove the ldapFlag from
      * a role once it is no longer managed by LDAP
+     *
+     * @param context the UserSynchronizationContext for this operation
+     * @throws de.ipb_halle.signals.users.LdapConnectionErrorException
      */
-    public void obtainLdapRoles(UserSynchronizationContext context) {
-        Map<String, Role> rolesByDN = new HashMap<> (); 
+    public void obtainLdapRoles(UserSynchronizationContext context) throws LdapConnectionErrorException {
+        Map<String, Role> rolesByDN = new HashMap<> ();
         Set<String> roleDNs = new HashSet<> ();
         ldapClient.getMembers(new HashSet<> (), roleDNs, config.getLdapManagedRoles(), false);
         for (String dn : roleDNs) {
@@ -111,7 +114,8 @@ public class RoleManager {
     }
 
     /**
-     * @return standard user role as defined by signals config (or null if no match is found)
+     * Obtain roles configuration from SNB and store them in the DB.
+     * @param context the UserSynchronizationContext for this operation
      */
     public void syncDbRolesFromSnb(UserSynchronizationContext context) {
         Map<String, Role> rolesFromDb = roleDbService.loadMappedById(new HashMap<> ());
@@ -121,7 +125,7 @@ public class RoleManager {
             Role dbRole = rolesFromDb.remove(snbRole.getId());
             if (dbRole == null) {
                 logger.info("SNB role is NEW: {}", snbRole.getName());
-                dbRole = save(context.updateConfig, snbRole);
+                save(context.updateConfig, snbRole);
             } else {
                 if (snbRole.isModified(dbRole)) {
                     logger.debug("SNB role is modified: {}", snbRole.getName());

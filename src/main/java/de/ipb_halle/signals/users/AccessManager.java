@@ -29,6 +29,9 @@ import java.util.Map;
 import jakarta.annotation.Resource;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
+import java.io.IOException;
+import java.util.logging.Level;
+import javax.naming.NamingException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,8 +144,30 @@ public class AccessManager {
 
     private void syncSnbFromLdap(UserSynchronizationContext context) {
         roleManager.obtainStandardUserRole(context);
-        roleManager.obtainLdapRoles(context);
-        groupManager.obtainLdapGroups(context);
-        userManager.syncUsersFromLdap(context);
+        try {
+            roleManager.obtainLdapRoles(context);
+            groupManager.obtainLdapGroups(context);
+            userManager.syncUsersFromLdap(context);
+        } catch(LdapConnectionErrorException lcee) {
+            reportSyncSnbFromLdapException(context, lcee);
+        } catch (NamingException ne) {
+            reportSyncSnbFromLdapException(context, ne);
+        } catch (MissingAttributeException mae) {
+            reportSyncSnbFromLdapException(context, mae);
+        } catch (IOException ioe) {
+            reportSyncSnbFromLdapException(context, ioe);
+        }
     }
+
+    private void reportSyncSnbFromLdapException(UserSynchronizationContext context,
+            Throwable exception) {
+        logger.warn("syncUsersFromLdap() caught an exception: ", (Throwable) exception);
+        context.report.addContent(AccessManager.SECTION_ERRORS,
+                String.format("%s (see logs) during LDAP user synchronization: %s",
+                        exception.getClass().getName(),
+                        exception.getMessage()));
+        context.reportRecords++;
+        context.reportAlert = true;
+    }
+
 }

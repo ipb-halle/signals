@@ -70,7 +70,7 @@ public class LdapAdapterImpl implements LdapAdapter, AutoCloseable {
     }
 
 
-    public Attributes getAttributes(String dn) throws Exception {
+    public Attributes getAttributes(String dn) throws NamingException {
         for (int maxRepeat = 2; maxRepeat > 0; maxRepeat--) {
             try {
                 return context.getAttributes(dn);
@@ -84,9 +84,13 @@ public class LdapAdapterImpl implements LdapAdapter, AutoCloseable {
              * We do it in rare error cases only until we better understand
              * what causes this condition and how to avoid it.
              */
-            Thread.sleep(200);
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                logger.warn("getAttributes() caught InterrputedException while sleeping");
+            }
         }
-        throw new Exception("getAttributes() repeatedly unable to obtain attributes");
+        throw new NamingException("getAttributes() repeatedly unable to obtain attributes");
     }
 
     protected void initEnv() {
@@ -100,7 +104,7 @@ public class LdapAdapterImpl implements LdapAdapter, AutoCloseable {
         ldapEnv.put(Context.SECURITY_CREDENTIALS, signalsConfig.getLdapSecurityCredentials());
     }
 
-    protected void initContext() throws Exception {
+    protected void initContext() throws NamingException, IOException {
         context = new InitialLdapContext(ldapEnv, null);
 
         // Start TLS

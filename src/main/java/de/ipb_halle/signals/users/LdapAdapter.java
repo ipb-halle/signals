@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Hashtable;
 
 import javax.naming.Context;
+import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
@@ -42,9 +43,11 @@ public interface LdapAdapter extends AutoCloseable {
 
     /**
      * close the  LDAP Context and the StartTlsResponse
+     * @throws java.io.IOException
      */
+    @Override
     public void close() throws IOException;
 
-    public Attributes getAttributes(String dn) throws Exception;
+    public Attributes getAttributes(String dn) throws NamingException;
 
 }

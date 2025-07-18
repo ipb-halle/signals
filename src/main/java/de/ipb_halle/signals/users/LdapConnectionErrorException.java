@@ -1,6 +1,6 @@
 /*
  * IPB Signals client
- * Copyright 2022 Leibniz-Institut f. Pflanzenbiochemie
+ * Copyright 2025 Leibniz-Institut f. Pflanzenbiochemie
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,17 @@
  */
 package de.ipb_halle.signals.users;
 
-import de.ipb_halle.signals.SignalsConfig;
-import jakarta.ejb.LocalBean;
+/**
+ * This exception is thrown if the Signals Manager is unable to make a
+ * LDAP connection. The Signals Manager must stop any attempts to synchronize
+ * users, groups or roles from LDAP if this exception is thrown. Otherwise
+ * the tool would disable all mutable users.
+ *
+ * @author fblocal
+ */
+public class LdapConnectionErrorException extends Exception {
 
-@LocalBean
-public class MockLdapAdapterFactory implements LdapAdapterFactory {
-
-    @Override
-    public LdapAdapter getAdapter(SignalsConfig cfg) {
-        return new MockLdapAdapter();
+    public LdapConnectionErrorException(String msg) {
+        super(msg);
     }
 }

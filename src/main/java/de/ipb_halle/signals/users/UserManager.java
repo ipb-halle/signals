@@ -31,6 +31,8 @@ import java.util.Set;
 import jakarta.annotation.Resource;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
+import java.io.IOException;
+import javax.naming.NamingException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -175,35 +177,29 @@ public class UserManager {
     /**
      * syncronize multiple users from LDAP
      */
-    public void syncUsersFromLdap(UserSynchronizationContext context) {
-        try {
-            Set<String> userDNs = new HashSet<> ();
-            Set<String> deniedUsers = new HashSet<> ();
-            ldapClient.getMembers(deniedUsers, new HashSet<> (), config.getLdapDeniedUsers(), true);
+    public void syncUsersFromLdap(UserSynchronizationContext context) throws LdapConnectionErrorException, NamingException, MissingAttributeException, IOException {
 
-            Map<String, Object> cmap = new HashMap<> ();
-            cmap.put(User.USER_MUTABLE, Boolean.TRUE);
-            cmap.put(User.USER_ENABLED, Boolean.TRUE);
-            Map<String, User> removeMap = userDbService.loadMappedById(cmap);
+        Set<String> userDNs = new HashSet<> ();
+        Set<String> deniedUsers = new HashSet<> ();
+        ldapClient.getMembers(deniedUsers, new HashSet<> (), config.getLdapDeniedUsers(), true);
 
-            // nesting allowed here, i.e. we can assign entire groups to SNB
-            ldapClient.getMembers(userDNs, new HashSet<> (), config.getLdapManagedUsers(), true);
-            for (String dn : userDNs) {
-                if (! deniedUsers.contains(dn)) {
-                    logger.trace("Processing LDAP user DN: {}", dn);
-                    syncUserFromLdap(context, removeMap, dn);
-                } else {
-                    logger.trace("Skipping denied user: {}", dn);
-                }
+        Map<String, Object> cmap = new HashMap<> ();
+        cmap.put(User.USER_MUTABLE, Boolean.TRUE);
+        cmap.put(User.USER_ENABLED, Boolean.TRUE);
+        Map<String, User> removeMap = userDbService.loadMappedById(cmap);
+
+        // nesting allowed here, i.e. we can assign entire groups to SNB
+        ldapClient.getMembers(userDNs, new HashSet<> (), config.getLdapManagedUsers(), true);
+        for (String dn : userDNs) {
+            if (! deniedUsers.contains(dn)) {
+                logger.trace("Processing LDAP user DN: {}", dn);
+                syncUserFromLdap(context, removeMap, dn);
+            } else {
+                logger.trace("Skipping denied user: {}", dn);
             }
-            // disable remaining mutable users
-            disableMutableUsers(context, removeMap.values());
-        } catch (Exception e) {
-            logger.warn("syncUsersFromLdap() caught an exception: ", (Throwable) e);
-            context.report.addContent(AccessManager.SECTION_ERRORS, "LDAP user synchronization failed: " + e.getMessage());
-            context.reportRecords++;
-            context.reportAlert = true;
         }
+        // disable remaining mutable users
+        disableMutableUsers(context, removeMap.values());
     }
 
     private void disableMutableUsers(UserSynchronizationContext context, Collection<User> mutableUsers) {
@@ -219,7 +215,7 @@ public class UserManager {
     private void syncUserFromLdap(
             UserSynchronizationContext context,
             Map<String, User> removeMap,
-            String userDN) throws Exception {
+            String userDN) throws LdapConnectionErrorException, NamingException, MissingAttributeException, IOException {
 
         User ldapUser = loadUserFromLdap(context, userDN);
         if (ldapUser.isEnabled()) {
@@ -242,7 +238,7 @@ public class UserManager {
 
     private User loadUserFromLdap(
                 UserSynchronizationContext context,
-                String userDN) throws Exception {
+                String userDN) throws LdapConnectionErrorException, MissingAttributeException, NamingException, IOException {
 
         User ldapUser = ldapClient.getUser(userDN);
         if (context.standardUserRole != null) {
