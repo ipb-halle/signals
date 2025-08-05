@@ -22,18 +22,20 @@ package de.ipb_halle.inhouse.imports;
 
 import de.ipb_halle.signals.ado.Ado;
 import de.ipb_halle.signals.ado.AdoManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class AdoCreator {
 
     private final AdoManager adoManager;
+    private final static Logger logger = LogManager.getLogger(AdoCreator.class);
 
     public AdoCreator(AdoManager adoManager) {
         this.adoManager = adoManager;
     }
 
-    public Ado createAdo(String ancestorId, String name, String ipbCode) {
-        Ado ipbCodeAdoForInhouseExperiment = adoManager.findIpbCodeAdoForInhouseExperiment(ipbCode);
-
-        return null;
+    public Ado createAdo( String name, String ipbCode, String templateId) {
+        logger.info("AdoCreator:-> I am in method CretaeAdo");
+        return adoManager.findIpbCodeAdoForInhouseExperiment(ipbCode, templateId);
     }
 }

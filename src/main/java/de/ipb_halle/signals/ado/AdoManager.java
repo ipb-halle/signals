@@ -24,16 +24,15 @@ import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.entity.SignalsEntityDbService;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
-import de.ipb_halle.signals.experiments.ExperimentEntity;
-import jakarta.ejb.*;
+import jakarta.ejb.LocalBean;
+import jakarta.ejb.Stateless;
+import jakarta.ejb.TransactionAttribute;
+import jakarta.ejb.TransactionAttributeType;
 import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Stateless
 @LocalBean
@@ -73,21 +72,61 @@ public class AdoManager {
     }
 
 
-    public Ado findIpbCodeAdoForInhouseExperiment(String ipbCode) {
-        List<Ado> ados = adoDbService.loadAll();
+    public Ado findIpbCodeAdoForInhouseExperiment(String ipbCode, String templateId) {
+        int maxIpbCode = adoDbService.findMaxIpbCode();
+        logger.info("Max IPB code: {}", maxIpbCode);
+        List<Ado> ados = adoDbService.loadByTemplateIdSorted(templateId);
 
-        if (ados == null || ados.isEmpty()) {
-            ados = ensureAllIpbAdosExist();
+        // Быстрая проверка — есть ли нужный
+        Optional<Ado> found = ados.stream()
+                .filter(a -> ipbCode.equalsIgnoreCase(a.getIpbCode()))
+                .findFirst();
+        if (found.isPresent()) {
+            return found.get();
         }
 
-        return ados.stream()
+        // ipbCode типа "IPB55" -> достаём номер 55
+        int wantedNumber = extractNumeric(ipbCode);
+        int highestExisting = ados.stream()
+                .map(Ado::getIpbCode)
+                .mapToInt(this::extractNumeric)
+                .max()
+                .orElse(0);
+
+        // если уже есть все вплоть до wantedNumber — ошибка
+        if (highestExisting >= wantedNumber) {
+            logger.warn("ADO with ipbCode '{}' not found, but ADOs up to this number exist. Possible DB inconsistency.", ipbCode);
+            return null;
+        }
+
+        // Если надо — создать недостающие ADO (до wantedNumber, но не превышая max)
+        int toCreate = Math.min(wantedNumber - highestExisting, maxIpbCode - highestExisting);
+        if (toCreate <= 0) {
+            logger.warn("Cannot create more ADOs. Limit reached. Wanted={}, Max={}", wantedNumber, maxIpbCode);
+            return null;
+        }
+
+        logger.info("Creating {} ADOs from {} to {} for templateId={}", toCreate, highestExisting + 1, highestExisting + toCreate, templateId);
+        List<Ado> newAdos = adoRestService.createAllIpbCustomObjects(highestExisting + toCreate);
+        adoDbService.saveAll(newAdos);
+
+        // повторы не исключаем — просто ищем заново
+        List<Ado> updatedAdos = adoDbService.loadByTemplateIdSorted(templateId);
+        return updatedAdos.stream()
                 .filter(a -> ipbCode.equalsIgnoreCase(a.getIpbCode()))
                 .findFirst()
-                .orElseGet(() -> {
-                    logger.warn("No ADO found for IPB code '{}'", ipbCode);
-                    return null;
-                });
+                .orElse(null);
     }
+
+    private int extractNumeric(String ipbCode) {
+        try {
+            return Integer.parseInt(ipbCode.replaceAll("\\D+", ""));
+        } catch (Exception e) {
+            logger.warn("Failed to extract numeric from IPB code '{}'", ipbCode);
+            return 0;
+        }
+    }
+
 
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void manageAdos(Date[] dateRange) {

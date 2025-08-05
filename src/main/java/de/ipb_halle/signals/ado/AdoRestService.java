@@ -95,8 +95,16 @@ public class AdoRestService implements RestReplyParser<Ado> {
                     .execute(RestClient.HTTP_CREATED);
 
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
+
             JsonObject data = jsonResult.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_DATA);
-            return parseReply(data);
+            logger.info(data.toString());
+
+            Ado parsedAdo = parseReply(data);
+            if (parsedAdo == null || parsedAdo.getEid() == null || parsedAdo.getType() == null) {
+                logger.error("Created ADO is invalid or incomplete: {}", parsedAdo.toString());
+                return null;
+            }
+            return parsedAdo;
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -106,6 +114,7 @@ public class AdoRestService implements RestReplyParser<Ado> {
     private JsonObject prepareAdo(Ado ado) {
         JsonObject resultingJson = new JsonObject();
         JsonObject data = new JsonObject();
+
         data.addProperty(RestHelper.ATTR_TYPE, Ado.ENTITY_TYPE_ADO);
         data.add(RestHelper.ATTR_ATTRIBUTES, prepareAttributes(ado));
         data.add(RestHelper.ATTR_RELATIONSHIPS, prepareRelationships(ado));
@@ -166,14 +175,15 @@ public class AdoRestService implements RestReplyParser<Ado> {
             ado.setDescription(RestHelper.parseString(attributes, RestHelper.ATTR_DESCRIPTION));
 
 
-            String typeStr = RestHelper.parseString(attributes, RestHelper.ATTR_TYPE);
             try {
-                EntityType type = typeStr != null ? EntityType.valueOf(typeStr) : null;
-                if (type != null) {
+                String typeStr = RestHelper.parseString(attributes, RestHelper.ATTR_TYPE);
+                logger.info("AdoRestService-> typeStr = {}\n", typeStr);
+                if (typeStr != null) {
+                    EntityType type = EntityType.valueOf(typeStr);
                     ado.setType((EntityType) dynEnumManager.valueOf(type));
                 }
             } catch (IllegalStateException e) {
-                logger.warn("ExperimentRestService: -> parseReply() -> Unknown experiment type: {}", typeStr);
+                logger.warn("ExperimentRestService: -> parseReply() -> Unknown experiment type: {}", e.getMessage());
             }
 
             ado.setCreatedAt(RestHelper.parseDate(attributes, RestHelper.ATTR_CREATED_AT));
@@ -211,7 +221,7 @@ public class AdoRestService implements RestReplyParser<Ado> {
 
         for (Map.Entry<String, JsonElement> entry : fieldsJson.entrySet()) {
             try {
-                JsonObject fieldObj = fieldsJson.getAsJsonObject();
+                JsonObject fieldObj = entry.getValue().getAsJsonObject();
                 String value = fieldObj.has("value") ? fieldObj.get("value").getAsString() : null;
 
                 if (value != null) {

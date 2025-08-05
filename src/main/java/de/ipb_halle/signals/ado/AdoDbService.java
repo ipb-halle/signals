@@ -98,6 +98,40 @@ public class AdoDbService {
         return adoList;
     }
 
+    public List<Ado> loadByTemplateId(String templateId) {
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<AdoEntity> criteriaQuery = criteriaBuilder.createQuery(AdoEntity.class);
+
+        Root<AdoEntity> root = criteriaQuery.from(AdoEntity.class);
+        criteriaQuery.select(root)
+                .where(criteriaBuilder.equal(root.get("templateId"), templateId));
+
+        List<AdoEntity> entities = em.createQuery(criteriaQuery).getResultList();
+        List<Ado> adoList = new ArrayList<>();
+        for (AdoEntity entity : entities) {
+            adoList.add(new Ado(entity, dynEnumManager));
+        }
+        return adoList;
+    }
+
+    public List<Ado> loadByTemplateIdSorted(String templateId) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<AdoEntity> cq = cb.createQuery(AdoEntity.class);
+        Root<AdoEntity> root = cq.from(AdoEntity.class);
+
+        cq.select(root)
+                .where(cb.equal(root.get("templateId"), templateId))
+                .orderBy(cb.asc(root.get("ipbCode")));
+
+        List<AdoEntity> entities = em.createQuery(cq).getResultList();
+        List<Ado> adoList = new ArrayList<>();
+        for (AdoEntity entity : entities) {
+            adoList.add(new Ado(entity, dynEnumManager));
+        }
+        return adoList;
+    }
+
+
     public int findMaxIpbCode() {
         String sql = """
                 SELECT MAX(CAST(REGEXP_REPLACE(ipb_code, '\\D', '', 'g') AS INTEGER))

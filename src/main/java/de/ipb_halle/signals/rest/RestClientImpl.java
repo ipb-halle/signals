@@ -124,7 +124,7 @@ public class RestClientImpl implements RestClient {
 
                 throw new IllegalStateException("Cannot send requestData with HTTP method: " + method);
             }
-            logger.trace("***** Dump of request *****\n{}\n***** End of request dump  *****", requestData);
+           // logger.trace("***** Dump of request *****\n{}\n***** End of request dump  *****", requestData);
 
             requestBody = BodyPublishers.ofString(requestData);
             builder = builder.header("Content-Type", contentType);

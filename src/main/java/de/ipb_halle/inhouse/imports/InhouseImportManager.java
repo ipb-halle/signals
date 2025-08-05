@@ -40,11 +40,13 @@ public class InhouseImportManager {
         );
     }
 
-    public void importAll(Map<InhouseImportType, List<InhouseExperiment>> experimentsByType, ChemDrawCacheService chemDrawCache) throws Exception {
+    public void importAll(Map<InhouseImportType, List<InhouseExperiment>> experimentsByType,
+                          ChemDrawCacheService chemDrawCache) throws Exception {
 
         for (InhouseImportType type : InhouseImportType.values()) {
             List<InhouseExperiment> list = experimentsByType.getOrDefault(type, List.of());
             if (list.isEmpty() || !strategies.containsKey(type)) continue;
+
 
             ExperimentGrouper grouper = new ExperimentGrouper();
             ErrorLogger logger = new ErrorLogger("grouping_" + type.name().toLowerCase() + ".log");

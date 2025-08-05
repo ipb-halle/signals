@@ -49,6 +49,7 @@ public class SampleRestService implements RestReplyParser<Sample> {
     //?force=true if we don't want to send a digest
     public static final String CREATE_NEW_SAMPLE_ENDPOINT = "/entities?force=true";
     //public static final String CREATE_NEW_SAMPLE_ENDPOINT = "/entities?digest=%s";
+    private  static final String PATCH_UPDATE_SAMPLE_PROPERTIES = "/samples/%s/properties?force=true";
     @Inject
     private RestClient restClient;
 
@@ -395,9 +396,12 @@ public class SampleRestService implements RestReplyParser<Sample> {
         try {
             restClient.reset()
                     .setMethod(Method.PATCH)
-                    .setEndpoint(String.format("/samples/%s/properties?force=true", sampleId))
+                    .setEndpoint(String.format(PATCH_UPDATE_SAMPLE_PROPERTIES, sampleId))
                     .setRequestData(request.toString())
                     .execute(RestClient.HTTP_OK);
+
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
+            logger.info("SampleRestService=> jsonresult = {}\n", jsonResult.toString());
 
         } catch (IOException | URISyntaxException | UnexpectedResponseCodeException e) {
             throw new RuntimeException(e);
@@ -464,11 +468,11 @@ public class SampleRestService implements RestReplyParser<Sample> {
             valueJson.addProperty(RestHelper.ATTR_TYPE, value.split(";")[0]);
             valueJson.addProperty(RestHelper.ATTR_NAME, value.split(";")[1]);
             valueJson.addProperty(RestHelper.ATTR_EID, value.split(";")[2]);
+            valuesArray.add(valueJson);
+            content.add(RestHelper.ATTR_VALUES, valuesArray);
         } else {
-            valueJson.addProperty(RestHelper.ATTR_VALUE, value);
+            content.addProperty(RestHelper.ATTR_VALUE, value);
         }
-        valuesArray.add(valueJson);
-        content.add(RestHelper.ATTR_VALUES, valuesArray);
 
         propertyAttributes.add(RestHelper.ATTR_CONTENT, content);
         propertyObj.add(RestHelper.ATTR_ATTRIBUTES, propertyAttributes);

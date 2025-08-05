@@ -19,6 +19,7 @@
 
 package de.ipb_halle.inhouse;
 
+import de.ipb_halle.inhouse.imports.ExperimentCreator;
 import jakarta.ejb.Stateless;
 import jakarta.ejb.TransactionAttribute;
 import jakarta.ejb.TransactionAttributeType;
@@ -31,8 +32,11 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Stateless
@@ -40,6 +44,8 @@ public class InhouseDbService {
 
     @PersistenceContext
     private EntityManager em;
+
+    private static final Logger logger = LogManager.getLogger(ExperimentCreator.class);
 
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public List<InhouseCompound> loadCompounds() {
@@ -62,6 +68,8 @@ public class InhouseDbService {
         criteriaQuery.select(root);
         criteriaQuery.where(criteriaBuilder.equal(root.get("molId"), molId));
         List<InhouseCompound> result = this.em.createQuery(criteriaQuery).getResultList();
+        logger.info("INHOUSE_DB_SERVICE loadCompoundByMolId List result = {}\n", Arrays.toString(result.toArray()));
+
         if (result.size() != 1) {
             System.out.printf("loadCompoundByMolId(%d) - query returned %d instances\n", molId, result.size());
             return null;

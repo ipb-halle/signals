@@ -290,4 +290,23 @@ public class Ado {
         propertyValues.add(adoPropertyValue);
     }
 
+    @Override
+    public String toString() {
+        return "Ado{" +
+                "id='" + id + '\'' +
+                ", eid='" + eid + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", type=" + type +
+                ", ipbCode='" + ipbCode + '\'' +
+                ", molId='" + molId + '\'' +
+                ", procId=" + procId +
+                ", sampleId='" + sampleId + '\'' +
+                ", createdAt=" + createdAt +
+                ", createdBy=" + createdBy +
+                ", state='" + state + '\'' +
+                ", ancestorId='" + ancestorId + '\'' +
+                ", templateId='" + templateId + '\'' +
+                '}';
+    }
 }

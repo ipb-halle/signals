@@ -262,7 +262,6 @@ public class ExperimentRestService implements RestReplyParser<Experiment> {
     public Experiment doGetExperiment(String experimentId) throws Exception {
         JsonElement object = fetchExperiment(RECEIVE_EXPERIMENT_ENDPOINT, experimentId);
         Experiment experiment = parseReply(object);
-        logger.info("EXPERIMENT-> {}\n", experiment.toString());
         return experiment;
     }
 

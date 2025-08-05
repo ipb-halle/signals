@@ -294,4 +294,29 @@ public class Sample {
     public boolean isChemicalSample() {
         return templateId.equalsIgnoreCase("sample:0174e78c-0b95-49f9-8a57-39061bbc0050");
     }
+
+    @Override
+    public String toString() {
+        return "Sample{" +
+                "logger=" + logger +
+                ", id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", type=" + type +
+                ", createdAt=" + createdAt +
+                ", editedAt=" + editedAt +
+                ", createdBy=" + createdBy +
+                ", editedBy=" + editedBy +
+                ", owner=" + owner +
+                ", digest=" + digest +
+                ", ancestorId='" + ancestorId + '\'' +
+                ", stoicRef=" + stoicRef +
+                ", parentContainerId='" + parentContainerId + '\'' +
+                ", templateId='" + templateId + '\'' +
+                ", ancestors=" + ancestors +
+                ", children=" + children +
+                ", properties=" + properties +
+                ", propertyValues=" + propertyValues +
+                '}';
+    }
 }

@@ -32,11 +32,11 @@ import java.util.Optional;
 
 public class StructureImportStrategy implements InhouseImportStrategy {
 
-    public static final String SIGNALS_ENTITY_CUSTOM_OBJECT_IPB_CODE = "ado-1:4b98a234-e223-4c67-b6b1-f9df67958460";
     private final Logger logger = LogManager.getLogger(StructureImportStrategy.class);
 
     @Override
-    public void importGroup(InhouseDB inhouseDB, String threeLc, List<InhouseExperiment> group, Map<Integer, List<Optional<Experiments.ChemDrawData>>> cdxmlCache) throws Exception {
+    public void importGroup(InhouseDB inhouseDB, String threeLc, List<InhouseExperiment> group,
+                            Map<Integer, List<Optional<Experiments.ChemDrawData>>> cdxmlCache) throws Exception {
         logger.info("StructureImportStrategy started for group: {}", threeLc);
         if (group.isEmpty()) {
             logger.warn("StructureImportStrategy:-> Empty experiment list grouped by threeLc {}\n", threeLc);
@@ -96,18 +96,22 @@ public class StructureImportStrategy implements InhouseImportStrategy {
 
                     // setting description field value
                     String desc = String.format("MolId: %s, Experiment: %s%s, Journal: %s", data.molId(), threeLc, procId, exp.getJournal());
-
                     // Load IpbCode
+                    logger.info("SIS-> molId={}\n", data.molId());
                     String ipbCode = experimentCreator.loadIpbCodeByMolId(data.molId());
+                    logger.info("SIS-> load ipb code by mol id = {}\n", ipbCode);
+
+
                     if (ipbCode == null || ipbCode.trim().isEmpty()) {
                         ipbCode = "IPB code not assigned";
                     }
-                    logger.info("SIS-> starting creating sample");
+                    logger.info("SIS-> starting create sample");
                     sampleCreator.createSample(chemDrawId, "1", eid, desc, ipbCode);
+                    logger.info("SIS-> sample created ");
 
                     exp.setEid(eid);
                     exp.setImportSuccessful(true);
-                    inhouseDB.getInhouseDbService().markAsSuccessfullyImported(exp);
+                    //inhouseDB.getInhouseDbService().markAsSuccessfullyImported(exp);
                 }
             }
         }

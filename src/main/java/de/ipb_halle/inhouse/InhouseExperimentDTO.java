@@ -44,7 +44,7 @@ import java.util.Map;
 public class InhouseExperimentDTO {
 
     public static final String TEMPLATE_ID_INHOUSE_EXPERIMENT = "experiment:834e6aee-0d59-4732-89d7-925edca09844";
-    public static final String JOURNAL_EID_WSE_AS_SAMPLE = "journal:cd3156be-4c87-4226-870b-821c949745b4";
+    public static final String JOURNAL_EID_WSE_AS_SAMPLE = "journal.templateId";
     private final Logger logger = LogManager.getLogger(InhouseExperimentDTO.class);
 
     private Integer id;
@@ -122,9 +122,9 @@ public class InhouseExperimentDTO {
 
         //toDo its necessary first to create a journal entity, otherwise use hardcoded ID!!
         SignalsEntity journal = new SignalsEntity();
-        journal.setEid(JOURNAL_EID_WSE_AS_SAMPLE);
+        journal.setEid(inhouseDB.getConfigString(JOURNAL_EID_WSE_AS_SAMPLE));
         experiment.addAncestor(journal);
-        experiment.setAncestorId(JOURNAL_EID_WSE_AS_SAMPLE);
+        experiment.setAncestorId(inhouseDB.getConfigString(JOURNAL_EID_WSE_AS_SAMPLE));
 
 
         createExperimentProperties(experiment);
