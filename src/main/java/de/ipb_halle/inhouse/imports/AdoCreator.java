@@ -25,6 +25,13 @@ import de.ipb_halle.signals.ado.AdoManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Responsible for retrieving or creating ADOs by IPB code.
+ * Delegates logic to AdoManager.
+ */
 public class AdoCreator {
 
     private final AdoManager adoManager;
@@ -34,8 +41,24 @@ public class AdoCreator {
         this.adoManager = adoManager;
     }
 
-    public Ado createAdo( String name, String ipbCode, String templateId) {
-        logger.info("AdoCreator:-> I am in method CretaeAdo");
-        return adoManager.findIpbCodeAdoForInhouseExperiment(ipbCode, templateId);
+    /**
+     * For Development
+     * Returns ADO with the given IPB code. If not found, tries to generate it.
+     *
+     * @param ipbCode    IPB code to search
+     * @param templateId ADO template
+     * @return Optional of ADO if found or created
+     */
+    public Optional<Ado> findOrCreateAdoByIpbCode(String ipbCode, String templateId) {
+        return adoManager.findOrCreateAdoByIpbCode(ipbCode, templateId);
+    }
+
+    /**
+     * For Production
+     * Generates all ADOs up to a given max IPB code.
+     */
+    public void ensureAllAdoGenerated() {
+        List<Ado> all = adoManager.createAllMissingAdosTillMaxIpbCode();
+        logger.info("ensureAllAdosGenerated -> total ADOs ensured: {}\n", all.size());
     }
 }

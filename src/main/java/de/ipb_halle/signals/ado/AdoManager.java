@@ -52,70 +52,37 @@ public class AdoManager {
 
     private final Logger logger = LogManager.getLogger(AdoManager.class);
 
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
-    public List<Ado> ensureAllIpbAdosExist() {
-        int maxIpbCode = adoDbService.findMaxIpbCode();
-        logger.info("Max IPB code: {}", maxIpbCode);
+    public Optional<Ado> findOrCreateAdoByIpbCode(String ipbCode, String templateId) {
+        List<Ado> existing = adoDbService.loadByTemplateIdSorted(templateId);
 
-        List<Ado> existingAdos = adoDbService.loadAll();
-        int missingCount = maxIpbCode - existingAdos.size();
-
-        if (missingCount <= 0) {
-            logger.info("All ADOs already present ({} of {}).", existingAdos.size(), maxIpbCode);
-            return existingAdos;
-        }
-
-        logger.info("Creating {} missing ADOs...", missingCount);
-        List<Ado> newAdos = adoRestService.createAllIpbCustomObjects(maxIpbCode);
-        adoDbService.saveAll(newAdos);
-        return newAdos;
-    }
-
-
-    public Ado findIpbCodeAdoForInhouseExperiment(String ipbCode, String templateId) {
-        int maxIpbCode = adoDbService.findMaxIpbCode();
-        logger.info("Max IPB code: {}", maxIpbCode);
-        List<Ado> ados = adoDbService.loadByTemplateIdSorted(templateId);
-
-        // Быстрая проверка — есть ли нужный
-        Optional<Ado> found = ados.stream()
+        Optional<Ado> found = existing.stream()
                 .filter(a -> ipbCode.equalsIgnoreCase(a.getIpbCode()))
                 .findFirst();
-        if (found.isPresent()) {
-            return found.get();
-        }
 
-        // ipbCode типа "IPB55" -> достаём номер 55
-        int wantedNumber = extractNumeric(ipbCode);
-        int highestExisting = ados.stream()
+        if (found.isPresent()) return found;
+
+        int targetNumber = extractNumeric(ipbCode);
+        int maxNumber = adoDbService.findMaxIpbCode();
+
+        int highestExisting = existing.stream()
                 .map(Ado::getIpbCode)
                 .mapToInt(this::extractNumeric)
-                .max()
-                .orElse(0);
+                .max().orElse(0);
 
-        // если уже есть все вплоть до wantedNumber — ошибка
-        if (highestExisting >= wantedNumber) {
-            logger.warn("ADO with ipbCode '{}' not found, but ADOs up to this number exist. Possible DB inconsistency.", ipbCode);
-            return null;
+        if (targetNumber <= highestExisting) {
+            logger.warn("ADO '{}' not found, the ipb_codes in db is not consistent", ipbCode);
+            return Optional.empty();
         }
 
-        // Если надо — создать недостающие ADO (до wantedNumber, но не превышая max)
-        int toCreate = Math.min(wantedNumber - highestExisting, maxIpbCode - highestExisting);
-        if (toCreate <= 0) {
-            logger.warn("Cannot create more ADOs. Limit reached. Wanted={}, Max={}", wantedNumber, maxIpbCode);
-            return null;
-        }
+        int toCreate = Math.min(targetNumber - highestExisting, maxNumber - highestExisting);
+        if (toCreate <= 0) return Optional.empty();
 
-        logger.info("Creating {} ADOs from {} to {} for templateId={}", toCreate, highestExisting + 1, highestExisting + toCreate, templateId);
-        List<Ado> newAdos = adoRestService.createAllIpbCustomObjects(highestExisting + toCreate);
+        List<Ado> newAdos = adoRestService.createAllMissingAdos(toCreate);
         adoDbService.saveAll(newAdos);
 
-        // повторы не исключаем — просто ищем заново
-        List<Ado> updatedAdos = adoDbService.loadByTemplateIdSorted(templateId);
-        return updatedAdos.stream()
+        return adoDbService.loadByTemplateIdSorted(templateId).stream()
                 .filter(a -> ipbCode.equalsIgnoreCase(a.getIpbCode()))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     private int extractNumeric(String ipbCode) {
@@ -127,6 +94,29 @@ public class AdoManager {
         }
     }
 
+    /**
+     * Creates all ADOs up to the specified max IPB code.
+     *
+     * @return List of all existing + newly created ADOs
+     */
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+    public List<Ado> createAllMissingAdosTillMaxIpbCode() {
+        int maxIpbCode = adoDbService.findMaxIpbCode();
+        logger.info("AdoManager: -> Max IPB code: {}", maxIpbCode);
+
+        List<Ado> existingAdos = adoDbService.loadAll();
+        int missingCount = maxIpbCode - existingAdos.size();
+
+        if (missingCount <= 0) {
+            logger.info("All ADOs already present ({} of {}).", existingAdos.size(), maxIpbCode);
+            return existingAdos;
+        }
+
+        logger.info("Creating {} missing ADOs...", missingCount);
+        List<Ado> newAdos = adoRestService.createAllMissingAdos(missingCount);
+        adoDbService.saveAll(newAdos);
+        return adoDbService.loadAll();
+    }
 
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void manageAdos(Date[] dateRange) {
