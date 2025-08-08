@@ -41,19 +41,46 @@ import org.apache.logging.log4j.core.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service class for handling persistence operations for Ado objects in the Signals database.
+ * <p>
+ * This stateless EJB provides methods to save, load, and query {@link Ado} instances,
+ * their properties, and property values. It uses JPA for database access and
+ * {@link DynEnumManager} for handling dynamic enumerations related to Ado entities.
+ * </p>
+ *
+ * <p>Supported operations:</p>
+ * <ul>
+ *     <li>Saving single or multiple Ado objects along with their properties and property values</li>
+ *     <li>Loading Ado objects by template ID or retrieving all</li>
+ *     <li>Retrieving sorted results by IPB code</li>
+ *     <li>Finding the maximum numeric IPB code value in the database</li>
+ * </ul>
+ *
+ * @author swittche
+ * @version 1.0
+ * @since 2025
+ */
 @Stateless
 @LocalBean
 @PersistenceElements(entities = {InhouseCompound.class, AdoEntity.class, AdoPropertyEntity.class, AdoPropertyValueEntity.class, DynEnumManager.class})
 public class AdoDbService {
 
     private static final Logger logger = (Logger) LogManager.getLogger(AdoDbService.class);
-
     @PersistenceContext(unitName = "signalsDB")
     private EntityManager em;
-
     @Inject
     private DynEnumManager dynEnumManager;
 
+    /**
+     * Saves a single {@link Ado} object to the database, including its properties and property values.
+     * <p>
+     * If any {@link AdoProperty} or {@link AdoPropertyValue} has a {@code null} propertyId,
+     * it will be skipped and a warning will be logged.
+     * </p>
+     *
+     * @param ado The Ado object to be persisted.
+     */
     public void save(Ado ado) {
         AdoEntity entity = ado.createEntity();
         // Save Ado
@@ -85,12 +112,25 @@ public class AdoDbService {
         }
     }
 
+    /**
+     * Saves a list of {@link Ado} objects to the database by calling {@link #save(Ado)} for each.
+     *
+     * @param ipbAdoObjects List of Ado objects to persist.
+     */
     public void saveAll(List<Ado> ipbAdoObjects) {
         for (Ado ado : ipbAdoObjects) {
             this.save(ado);
         }
     }
 
+    /**
+     * Loads all {@link Ado} objects from the database.
+     * <p>
+     * This method retrieves all {@link AdoEntity} records and converts them into {@link Ado} instances.
+     * </p>
+     *
+     * @return A list of all Ado objects found in the database.
+     */
     public List<Ado> loadAll() {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<AdoEntity> criteriaQuery = criteriaBuilder.createQuery(AdoEntity.class);
@@ -106,6 +146,16 @@ public class AdoDbService {
         return adoList;
     }
 
+    /**
+     * Loads all {@link Ado} objects that match the given template ID.
+     * <p>
+     * This method retrieves all {@link AdoEntity} records where {@code templateId} matches
+     * the given value and converts them into {@link Ado} instances.
+     * </p>
+     *
+     * @param templateId The template ID used to filter Ado objects.
+     * @return A list of matching Ado objects.
+     */
     public List<Ado> loadByTemplateId(String templateId) {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<AdoEntity> criteriaQuery = criteriaBuilder.createQuery(AdoEntity.class);
@@ -122,6 +172,12 @@ public class AdoDbService {
         return adoList;
     }
 
+    /**
+     * Loads all {@link Ado} objects with the given template ID, sorted by their IPB code in ascending order.
+     *
+     * @param templateId The template ID used to filter Ado objects.
+     * @return A sorted list of matching Ado objects.
+     */
     public List<Ado> loadByTemplateIdSorted(String templateId) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<AdoEntity> cq = cb.createQuery(AdoEntity.class);
@@ -139,7 +195,15 @@ public class AdoDbService {
         return adoList;
     }
 
-
+    /**
+     * Finds the maximum numeric value of the IPB code in the {@code inhouse_compounds} table.
+     * <p>
+     * The IPB code is expected to follow the pattern {@code IPB<number>}.
+     * Non-digit characters are stripped before parsing the number.
+     * </p>
+     *
+     * @return The maximum numeric IPB code found, or {@code 0} if none exists.
+     */
     public int findMaxIpbCode() {
         String sql = """
                 SELECT MAX(CAST(REGEXP_REPLACE(ipb_code, '\\D', '', 'g') AS INTEGER))
