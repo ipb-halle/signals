@@ -20,6 +20,8 @@
 
 package de.ipb_halle.signals.ado;
 
+import de.ipb_halle.signals.ado.properties.AdoProperty;
+import de.ipb_halle.signals.ado.properties.AdoPropertyValue;
 import jakarta.annotation.Resource;
 import jakarta.ejb.LocalBean;
 import jakarta.ejb.Stateless;
@@ -60,12 +62,19 @@ public class AdoProcessorBean {
 
         try {
             Ado ado = adoRestService.doGetAdo(eid);
+            logger.info("ADO templateId= {}, eid = {}\n", ado.getTemplateId(), ado.getEid());
 
-            if (ado.getTemplateId() != null){
-                adoRestService.doGetAdoProperties(ado);
+            if (ado.getTemplateId() != null) {
+                adoRestService.fetchAdoTemplateFields(ado);
             }
 
-            adoRestService.doGetAdoPropertyValues(ado);
+            for (AdoProperty property : ado.getProperties()) {
+                logger.info("ADO PROPERTIES propertyID = {}, propertyName = {}\n", property.getPropertyId(), property.getPropertyName());
+            }
+
+            for (AdoPropertyValue pv : ado.getPropertyValues()) {
+                logger.info("ADO PROPERTIES VALUES propertyID = {}, propertyValue= {}\n", pv.getPropertyId(), pv.getPropertyValue());
+            }
 
             adoDbService.save(ado);
 

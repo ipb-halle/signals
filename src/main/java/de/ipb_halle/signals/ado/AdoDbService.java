@@ -56,23 +56,31 @@ public class AdoDbService {
 
     public void save(Ado ado) {
         AdoEntity entity = ado.createEntity();
+        // Save Ado
         em.merge(entity);
 
+        // Save Properties
         for (AdoProperty adoProperty : ado.getProperties()) {
             if (adoProperty.getPropertyId() == null) {
                 logger.warn("AdoDbService:-> Skipping ado with null id: {}\n", adoProperty.getPropertyName());
                 continue;
             }
             AdoPropertyEntity adoPropertyEntity = adoProperty.createEntity();
+            logger.debug("Saving AdoProperty: propertyId = {}", adoProperty.getPropertyId());
+
             em.merge(adoPropertyEntity);
         }
 
+        //this part of code should be disabled by first synchronization or by generating new ado types like ado-3 where new id of field can appear
         for (AdoPropertyValue adoPropertyValue : ado.getPropertyValues()) {
             if (adoPropertyValue.getPropertyId() == null) {
                 logger.warn("Skipping AdoPropertyValue with null propertyId: adoId = {} \n", ado.getId());
                 continue;
             }
             AdoPropertyValueEntity adoPropertyValueEntity = (AdoPropertyValueEntity) adoPropertyValue.createEntity();
+            logger.debug("Trying to save AdoPropertyValue: propertyId = {}, adoId = {}",
+                    adoPropertyValue.getPropertyId(), ado.getId());
+
             em.merge(adoPropertyValueEntity);
         }
     }

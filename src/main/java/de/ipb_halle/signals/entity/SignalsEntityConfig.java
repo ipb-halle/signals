@@ -115,7 +115,10 @@ public class SignalsEntityConfig {
                 EntityType.valueOf("experiment"),
                 EntityType.valueOf("journal"),
                 EntityType.valueOf("location"),
-                EntityType.valueOf("sample")
+                EntityType.valueOf("sample"),
+                EntityType.valueOf("ado"),
+                EntityType.valueOf("ado-1"),
+                EntityType.valueOf("ado-2")
         };
     }
 

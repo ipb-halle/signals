@@ -23,7 +23,6 @@ package de.ipb_halle.signals.ado.properties;
 import de.ipb_halle.signals.properties.AbstractProperty;
 
 public class AdoProperty extends AbstractProperty<AdoPropertyEntity> {
-    public static final String TEMPLATE_ID = "templateId";
 
     public AdoProperty() {
     }

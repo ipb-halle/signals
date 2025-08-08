@@ -1,22 +1,9 @@
-/*
- *
- *  * IPB Signals client
- *  * Copyright 2024 Leibniz-Institut f. Pflanzenbiochemie
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  * you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  *     http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
- *  *
- *
- */
+// Refactored AdoRestService.java
+// Main goals:
+// - Clean Code principles
+// - Better naming and responsibility separation
+// - Remove unused endpoint (/entities/{eid}/properties)
+// - Group responsibilities logically
 
 package de.ipb_halle.signals.ado;
 
@@ -33,7 +20,6 @@ import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.entity.SignalsEntityRestService;
 import de.ipb_halle.signals.rest.*;
 import de.ipb_halle.signals.users.UserReference;
-import jakarta.ejb.Local;
 import jakarta.ejb.LocalBean;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
@@ -48,358 +34,248 @@ import java.util.*;
 @Stateless
 public class AdoRestService implements RestReplyParser<Ado> {
 
-    @Inject
-    RestClient restClient;
+    private static final Logger logger = LogManager.getLogger(AdoRestService.class);
 
+    private static final String ENDPOINT_GET_ADO = "/entities/%s";
+    private static final String ENDPOINT_CREATE_ADO = "/entities?force=true";
+    private static final String ENDPOINT_GET_TEMPLATE_FIELDS = "/entities/templates/%s/fields";
+    private static final String ENDPOINT_GET_PROPERTIES = "/entities/%s/properties?force=true";
+
+    @Inject
+    private RestClient restClient;
     @Inject
     private DynEnumManager dynEnumManager;
-
     @Inject
-    private AdoDbService adoDbService;
+    private SignalsEntityRestService signalsEntityRestService;
 
-    @Inject
-    SignalsEntityRestService signalsEntityRestService;
-
-    private final Logger logger = LogManager.getLogger(AdoRestService.class);
-
-    private static final String RECEIVE_ADO_ENDPOINT = "/entities/%s";
-    public static final String CREATE_NEW_ADO_ENDPOINT = "/entities?force=true";
-    private static final String ADO_GET_PROPERTIES_ENDPOINT = "/entities/templates/%s/fields";
-    private static final String ADO_GET_PROPERTY_VALUES_ENDPOINT = "/entities/%s/properties";
-
-    public List<Ado> createAllIpbCustomObjects(int limit) {
-        List<Ado> existingAdos = adoDbService.loadAll();
-        int missingCount = limit - existingAdos.size();
-
-        if (missingCount <= 0) {
-            return existingAdos;
+    public List<Ado> createAllMissingAdos(int toCreate, int targetNumber, String templateId) {
+        List<Ado> generated = new ArrayList<>(toCreate);
+        for (int i = 0; i < toCreate; i++) {
+            String code = String.format("IPB%06d", targetNumber - toCreate + 1 + i);
+            generated.add(createSingleAdo(code, templateId));
         }
-
-        List<Ado> generatedAdos = new ArrayList<>(missingCount);
-        for (int i = 0; i < missingCount; i++) {
-            generatedAdos.add(createSingleAdo());
-        }
-        existingAdos.addAll(generatedAdos);
-        return existingAdos;
+        return generated;
     }
 
-    private Ado createSingleAdo() {
+    private Ado createSingleAdo(String code, String templateId) {
         Ado ado = new Ado();
-        JsonObject request = prepareAdo(ado);
+        ado.setTemplateId(templateId);
+        JsonObject request = buildAdoJsonPayload(ado, code);
 
         try {
             restClient.reset()
                     .setMethod(Method.POST)
-                    .setEndpoint(CREATE_NEW_ADO_ENDPOINT)
+                    .setEndpoint(ENDPOINT_CREATE_ADO)
                     .setRequestData(request.toString())
                     .execute(RestClient.HTTP_CREATED);
 
-            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
+            JsonObject data = JsonParser.parseString(restClient.getResponse().getString())
+                    .getAsJsonObject()
+                    .getAsJsonObject(RestHelper.ATTR_DATA);
 
-            JsonObject data = jsonResult.getAsJsonObject().getAsJsonObject(RestHelper.ATTR_DATA);
-            logger.info(data.toString());
-
-            Ado parsedAdo = parseReply(data);
-            if (parsedAdo == null || parsedAdo.getEid() == null || parsedAdo.getType() == null) {
-                logger.error("Created ADO is invalid or incomplete: {}", parsedAdo.toString());
+            Ado created = parseReply(data);
+            if (created == null || created.getEid() == null || created.getType() == null) {
+                logger.error("Invalid ADO created: {}", created);
                 return null;
             }
-            return parsedAdo;
+            return created;
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to create ADO", e);
         }
     }
 
-    private JsonObject prepareAdo(Ado ado) {
-        JsonObject resultingJson = new JsonObject();
+    private JsonObject buildAdoJsonPayload(Ado ado, String code) {
         JsonObject data = new JsonObject();
-
         data.addProperty(RestHelper.ATTR_TYPE, Ado.ENTITY_TYPE_ADO);
-        data.add(RestHelper.ATTR_ATTRIBUTES, prepareAttributes(ado));
-        data.add(RestHelper.ATTR_RELATIONSHIPS, prepareRelationships(ado));
-        resultingJson.add(RestHelper.ATTR_DATA, data);
-        return resultingJson;
+
+        JsonObject meta = new JsonObject();
+        meta.addProperty("adoTypeName", "IPB_Code");
+        data.add("meta", meta);
+
+        data.add(RestHelper.ATTR_ATTRIBUTES, buildAttributes(code));
+        data.add(RestHelper.ATTR_RELATIONSHIPS, new JsonObject());
+
+        JsonObject root = new JsonObject();
+        root.add(RestHelper.ATTR_DATA, data);
+        return root;
     }
 
-    private JsonElement prepareRelationships(Ado ado) {
-        return null;
+    private JsonObject buildAttributes(String code) {
+        JsonObject attributes = new JsonObject();
+        String name = code + System.currentTimeMillis(); //toDo -> Wegmachen milliseconds
+        attributes.addProperty(RestHelper.ATTR_NAME, name);
+
+        JsonObject fields = new JsonObject();
+        fields.add("Name", propertyValue(name));
+        fields.add("IPB_Code", propertyValue(code));
+        fields.add("Description", propertyValue("Autogenerated ADO"));
+
+        attributes.add("fields", fields);
+        return attributes;
     }
 
-    private JsonElement prepareAttributes(Ado ado) {
-
-
-        return null;
+    private JsonObject propertyValue(String value) {
+        JsonObject obj = new JsonObject();
+        obj.addProperty("value", value);
+        return obj;
     }
 
-
-    public Ado doGetAdo(String eid) throws Exception {
-        JsonElement object = fetchAdo(RECEIVE_ADO_ENDPOINT, eid);
-        Ado ado = parseReply(object);
-        logger.info("Ado->{}\n", ado.toString());
-        return ado;
-    }
-
-    private JsonElement fetchAdo(String receiveAdoEndpoint, String eid) {
+    public Ado doGetAdo(String eid) {
+        JsonElement data = fetchJson(String.format(ENDPOINT_GET_ADO, eid));
         try {
-            restClient.reset()
-                    .setMethod(Method.GET)
-                    .setEndpoint(String.format(receiveAdoEndpoint, eid))
-                    .execute();
-
-            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
-            return jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA);
-
-        } catch (UnexpectedResponseCodeException | IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
+            return parseReply(data);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse ADO", e);
         }
     }
 
+    private JsonElement fetchJson(String endpoint) {
+        try {
+            restClient.reset().setMethod(Method.GET).setEndpoint(endpoint).execute();
+            return JsonParser.parseString(restClient.getResponse().getString())
+                    .getAsJsonObject()
+                    .get(RestHelper.ATTR_DATA);
+        } catch (IOException | URISyntaxException | UnexpectedResponseCodeException e) {
+            throw new RuntimeException("Failed to fetch JSON from: " + endpoint, e);
+        }
+    }
 
     @Override
     public Ado parseReply(JsonElement j) throws Exception {
-        Ado ado = new Ado();
-
-        if (j == null || !j.isJsonObject()) {
-            logger.warn("AdoRestService: -> parseReply() -> Empty or invalid JSON root");
-            return ado;
-        }
+        if (j == null || !j.isJsonObject()) return null;
 
         JsonObject root = j.getAsJsonObject();
-        JsonObject attributes = root.has(RestHelper.ATTR_ATTRIBUTES) ? root.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES) : null;
-        JsonObject relationships = root.has(RestHelper.ATTR_RELATIONSHIPS) ? root.getAsJsonObject(RestHelper.ATTR_RELATIONSHIPS) : null;
+        Ado ado = new Ado();
 
+        JsonObject attributes = root.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
         if (attributes != null) {
             ado.setId(RestHelper.parseString(attributes, RestHelper.ATTR_ID));
+            ado.setEid(RestHelper.parseString(attributes, RestHelper.ATTR_EID));
             ado.setName(RestHelper.parseString(attributes, RestHelper.ATTR_NAME));
             ado.setDescription(RestHelper.parseString(attributes, RestHelper.ATTR_DESCRIPTION));
-
-
-            try {
-                String typeStr = RestHelper.parseString(attributes, RestHelper.ATTR_TYPE);
-                logger.info("AdoRestService-> typeStr = {}\n", typeStr);
-                if (typeStr != null) {
-                    EntityType type = EntityType.valueOf(typeStr);
-                    ado.setType((EntityType) dynEnumManager.valueOf(type));
-                }
-            } catch (IllegalStateException e) {
-                logger.warn("ExperimentRestService: -> parseReply() -> Unknown experiment type: {}", e.getMessage());
-            }
-
             ado.setCreatedAt(RestHelper.parseDate(attributes, RestHelper.ATTR_CREATED_AT));
+            ado.setState(RestHelper.parseString(attributes, RestHelper.ATTR_STATE));
+
+            String typeStr = RestHelper.parseString(attributes, RestHelper.ATTR_TYPE);
+            if (typeStr != null) {
+                ado.setType((EntityType) dynEnumManager.valueOf(EntityType.valueOf(typeStr)));
+            }
 
             if (attributes.has(RestHelper.ATTR_FIELDS)) {
-                parseFields(attributes, ado);
+                parseFieldValues(attributes.getAsJsonObject(RestHelper.ATTR_FIELDS), ado);
             }
-        } else {
-            logger.warn("ExperimentRestService: -> parseReply() -> No 'attributes' block in experiment JSON");
         }
+
+        JsonObject relationships = root.getAsJsonObject(RestHelper.ATTR_RELATIONSHIPS);
         if (relationships != null) {
             parseRelationships(relationships, ado);
-
-            if (relationships.has(RestHelper.ATTR_ANCESTORS)) {
-                parseAncestors(relationships, ado);
-            }
-            if (relationships.has(RestHelper.ATTR_CHILDREN)) {
-                parseChildren(relationships, ado);
-            }
-            if (relationships.has(RestHelper.ATTR_TEMPLATE)) {
-                parseTemplate(relationships, ado);
-            }
-        } else {
-            logger.warn("ExperimentRestService: -> parseReply() -> No 'relationships' block in experiment JSON");
         }
 
         return ado;
     }
 
-    private void parseFields(JsonObject attributes, Ado ado) {
-        JsonObject fieldsJson = attributes.getAsJsonObject(RestHelper.ATTR_FIELDS);
-        if (fieldsJson == null) return;
-
+    private void parseFieldValues(JsonObject fieldsJson, Ado ado) {
+        logger.info("ADO_REST_SERVICE_PARSE_FIELDS:=> {}\n", fieldsJson.toString());
         Set<AdoPropertyValue> values = new HashSet<>();
 
         for (Map.Entry<String, JsonElement> entry : fieldsJson.entrySet()) {
-            try {
-                JsonObject fieldObj = entry.getValue().getAsJsonObject();
-                String value = fieldObj.has("value") ? fieldObj.get("value").getAsString() : null;
+            //logger.info("ADO_REST_SERVICE_PARSSE_FIELDS:=> ENTRY.getKey() ={}, ENTRY.getValue()={}\n", entry.getKey(), entry.getValue());
+            String fieldName = entry.getKey(); // e.g. Name, Description, IPB_Code
+            JsonObject field = entry.getValue().getAsJsonObject(); // e.g. {"value":"IPB_000001"} for field IPB_Code (auto generated)
 
-                if (value != null) {
-                    AdoPropertyValue apv = new AdoPropertyValue();
-                    String propertyName = entry.getKey();
-                    apv.setAdoId(ado.getId());
-                    apv.setPropertyId(propertyName);
-                    apv.setPropertyValue(value);
-                    values.add(apv);
+            if (field.has("value")) {
+
+                String val = field.get("value").getAsString();
+                //logger.info("ARS-> VALUE OF FIELD AS STRING = {}\n ", val); // e.g String IPB_000001 or name like fff
+                if (fieldName.equalsIgnoreCase("IPB_Code")) {
+                    ado.setIpbCode(val);
                 }
-            } catch (Exception e) {
-                logger.warn("AdoRestService: -> parseFields() -> Failed to parse field '{}': {}", entry.getKey(), e.getMessage());
+                AdoPropertyValue apv = new AdoPropertyValue();
+                apv.setAdoId(ado.getId());
+                apv.setPropertyId(fieldName); // Later mapped to real ID
+                apv.setPropertyValue(val);
+                values.add(apv);
             }
-            ado.setPropertyValues(values);
         }
+        ado.setPropertyValues(values);
     }
 
     private void parseRelationships(JsonObject relationships, Ado ado) {
-        ado.setCreatedBy(new UserReference(RestHelper.parseString(RestHelper.getPrimitiveFromPath(relationships, SignalsEntityDTO.ATTR_CREATED_BY), null)));
-        // ado.setEditedBy(new UserReference(RestHelper.parseString(RestHelper.getPrimitiveFromPath(relationships, SignalsEntityDTO.ATTR_EDITED_BY), null)));
-        // ado.setOwner(new UserReference(RestHelper.parseString(RestHelper.getPrimitiveFromPath(relationships, SignalsEntityDTO.ATTR_OWNER), null)));
+        ado.setCreatedBy(new UserReference(RestHelper.parseString(
+                RestHelper.getPrimitiveFromPath(relationships, SignalsEntityDTO.ATTR_CREATED_BY), null)));
+
+        if (relationships.has(RestHelper.ATTR_ANCESTORS)) {
+            parseEntityReferences(relationships.getAsJsonObject(RestHelper.ATTR_ANCESTORS), ado::addAncestor, ado::setAncestorId);
+        }
+        if (relationships.has(RestHelper.ATTR_CHILDREN)) {
+            parseEntityReferences(relationships.getAsJsonObject(RestHelper.ATTR_CHILDREN), ado::addChild, null);
+        }
+        if (relationships.has(RestHelper.ATTR_SYSTEM_TEMPLATE)) {
+            JsonObject templateData = relationships.getAsJsonObject(RestHelper.ATTR_SYSTEM_TEMPLATE).getAsJsonObject(RestHelper.ATTR_DATA);
+            if (templateData.has(RestHelper.ATTR_ID)) {
+                ado.setTemplateId(templateData.get(RestHelper.ATTR_ID).getAsString());
+            }
+        }
     }
 
-    private void parseAncestors(JsonObject relationships, Ado ado) {
-        if (!relationships.has(RestHelper.ATTR_ANCESTORS)) {
-            logger.warn("AdoRestService: -> parseAncestors() -> No 'ancestors' in relationships");
-            return;
-        }
-        JsonObject ancestorObj = relationships.getAsJsonObject(RestHelper.ATTR_ANCESTORS);
-        if (!ancestorObj.has(RestHelper.ATTR_DATA) || !ancestorObj.get(RestHelper.ATTR_DATA).isJsonArray()) {
-            logger.warn("AdoRestService: -> parseAncestors() -> 'ancestors' block missing or invalid");
-            return;
-        }
-
-        JsonArray dataArray = ancestorObj.getAsJsonArray(RestHelper.ATTR_DATA);
-        List<SignalsEntity> entities = new ArrayList<>();
-
-        for (JsonElement element : dataArray) {
+    private void parseEntityReferences(JsonObject relationship, java.util.function.Consumer<SignalsEntity> consumer, java.util.function.Consumer<String> idSetter) {
+        JsonArray data = relationship.getAsJsonArray(RestHelper.ATTR_DATA);
+        for (JsonElement el : data) {
+            logger.info("ARS => parseEntityReferences=> {}\n", el.toString());
             try {
-                JsonObject ancestorJson = element.getAsJsonObject();
-                String id = RestHelper.parseString(ancestorJson, RestHelper.ATTR_ID);
-
-                if (id != null) {
-                    JsonElement seJson = fetchAdo(RECEIVE_ADO_ENDPOINT, id);
-                    SignalsEntity se = signalsEntityRestService.parseReply(seJson).createEntity();
-                    entities.add(se);
-                    ado.addAncestor(se);
-                }
+                String id = RestHelper.parseString(el.getAsJsonObject(), RestHelper.ATTR_ID);
+                JsonElement json = fetchJson(String.format(ENDPOINT_GET_ADO, id));
+                SignalsEntity entity = signalsEntityRestService.parseReply(json).createEntity();
+                consumer.accept(entity);
+                if (idSetter != null) idSetter.accept(entity.getId());
             } catch (Exception e) {
-                logger.warn("AdoRestService: -> parseAncestors() -> Failed to parse ancestor: {}", e.getMessage());
-            }
-        }
-
-        if (!entities.isEmpty()) {
-            ado.setAncestorId(entities.get(entities.size() - 1).getId());
-        }
-    }
-
-    private void parseChildren(JsonObject relationships, Ado ado) {
-        if (!relationships.has(RestHelper.ATTR_CHILDREN)) {
-            logger.warn("AdoRestService: -> parseChildren() -> No 'children' in relationships");
-            return;
-        }
-
-        JsonObject children = relationships.getAsJsonObject(RestHelper.ATTR_CHILDREN);
-        if (!children.has(RestHelper.ATTR_DATA) || !children.get(RestHelper.ATTR_DATA).isJsonArray()) {
-            logger.warn("AdoRestService: -> parseChildren() -> 'children' block missing or invalid");
-            return;
-        }
-
-        JsonArray dataArray = children.getAsJsonArray(RestHelper.ATTR_DATA);
-        for (JsonElement element : dataArray) {
-            try {
-                JsonObject childJson = element.getAsJsonObject();
-                String id = RestHelper.parseString(childJson, RestHelper.ATTR_ID);
-                if (id != null) {
-                    JsonElement seJson = fetchAdo(RECEIVE_ADO_ENDPOINT, id);
-                    SignalsEntity se = signalsEntityRestService.parseReply(seJson).createEntity();
-                    ado.addChild(se);
-                }
-            } catch (Exception e) {
-                logger.warn("AdoRestService: -> parseChildren() -> Failed to parse child entity: {}", e.getMessage());
+                logger.warn("Failed to parse related entity", e);
             }
         }
     }
 
-    private void parseTemplate(JsonObject relationships, Ado ado) {
-        try {
-            if (!relationships.has(RestHelper.ATTR_SYSTEM_TEMPLATE)) {
-                logger.warn("AdoRestService: -> parseTemplate() -> No 'systemTemplate' in relationships");
-                return;
-            }
-
-            JsonObject systemTemplate = relationships.getAsJsonObject(RestHelper.ATTR_SYSTEM_TEMPLATE);
-            if (!systemTemplate.has(RestHelper.ATTR_DATA)) {
-                logger.warn("AdoRestService: -> parseTemplate() -> 'systemTemplate' has no 'data' block");
-                return;
-            }
-
-            JsonObject data = systemTemplate.getAsJsonObject(RestHelper.ATTR_DATA);
-            if (data.has(RestHelper.ATTR_ID)) {
-                ado.setTemplateId(data.get(RestHelper.ATTR_ID).getAsString());
-            } else {
-                logger.warn("AdoRestService: -> parseTemplate() -> 'systemTemplate.data' has no 'id'");
-            }
-
-        } catch (Exception e) {
-            logger.warn("AdoRestService: -> parseTemplate() -> Failed to parse systemTemplate: {}", e.getMessage());
+    public void fetchAdoTemplateFields(Ado ado) {
+        // Hier we receive an array consisting of 3 elements (3 properties: name, description, ipb_code)
+        JsonElement json = fetchJson(String.format(ENDPOINT_GET_TEMPLATE_FIELDS, ado.getTemplateId()));
+        //logger.info("ARS:=> fetchAdoTemplateFields = {}\n", json.toString());
+        for (JsonElement field : json.getAsJsonArray()) {
+            parseTemplateField(ado, field);
         }
     }
 
-    public void doGetAdoProperties(Ado ado) {
-        JsonElement json = fetchAdo(ADO_GET_PROPERTIES_ENDPOINT, ado.getTemplateId());
+    private void parseTemplateField(Ado ado, JsonElement fieldElement) {
+        JsonObject field = fieldElement.getAsJsonObject();
+        JsonObject def = field.getAsJsonObject(RestHelper.ATTR_META).getAsJsonObject(RestHelper.ATTR_DEFINITION);
+        JsonObject attr = field.getAsJsonObject(RestHelper.ATTR_ATTRIBUTES);
 
-        Iterator<JsonElement> iter = json.getAsJsonArray().iterator();
-        while (iter.hasNext()) {
-            JsonElement experimentPropertiesObject = iter.next();
-            parseAdoProperties(ado, experimentPropertiesObject);
-        }
+        AdoProperty prop = new AdoProperty();
+        prop.setPropertyId(field.get(RestHelper.ATTR_ID).getAsString());
+        prop.setPropertyName(attr.get(RestHelper.ATTR_NAME).getAsString());
+        prop.setPropertyType(def.get(RestHelper.ATTR_TYPE).getAsString());
+        prop.setTemplateId(ado.getTemplateId());
+
+        ado.addProperty(prop);
+        ado.getPropertyValues().stream()
+                .forEach(apv -> {
+                    if (apv.getPropertyId().equalsIgnoreCase(prop.getPropertyName())) {
+                        apv.setPropertyId(prop.getPropertyId());
+                    }
+                });
     }
 
-    private void parseAdoProperties(Ado ado, JsonElement adoPropertiesObject) {
-        JsonObject propertiesObject = adoPropertiesObject.getAsJsonObject();
-        JsonObject definition = propertiesObject.get(RestHelper.ATTR_META).getAsJsonObject().get(RestHelper.ATTR_DEFINITION).getAsJsonObject();
-        JsonObject attributes = propertiesObject.get(RestHelper.ATTR_ATTRIBUTES).getAsJsonObject();
 
-        AdoProperty adoProperty = new AdoProperty();
+    // Its make no sense to make this call, because the id are the same as the name, and autogenerated field is not there (IPB_Code)
 
-        //get property id
-        adoProperty.setPropertyId(propertiesObject.get(RestHelper.ATTR_ID).getAsString());
-
-        //get property name
-        if (attributes.has(RestHelper.ATTR_NAME)) {
-            adoProperty.setPropertyName(attributes.get(RestHelper.ATTR_NAME).getAsString());
-        }
-
-        //get property type
-        adoProperty.setPropertyType(definition.get(RestHelper.ATTR_TYPE).getAsString());
-
-        //set template id
-        adoProperty.setTemplateId(ado.getTemplateId());
-        ado.addProperty(adoProperty);
-    }
-
-    public void doGetAdoPropertyValues(Ado ado) {
-        JsonElement json = fetchAdo(ADO_GET_PROPERTY_VALUES_ENDPOINT, ado.getId());
-
-        Iterator<JsonElement> iter = json.getAsJsonArray().iterator();
-        while (iter.hasNext()) {
-            JsonElement adoPropertyValuesObject = iter.next();
-            parseAdoPropertyValues(ado, adoPropertyValuesObject);
-        }
-    }
-
-    private void parseAdoPropertyValues(Ado ado, JsonElement adoPropertyValuesObject) {
-        JsonObject propertiesObject = adoPropertyValuesObject.getAsJsonObject();
-        JsonObject attributes = propertiesObject.get(RestHelper.ATTR_ATTRIBUTES).getAsJsonObject();
-
-
-        String name = Optional.ofNullable(attributes.get(RestHelper.ATTR_NAME))
-                .map(JsonElement::getAsString)
-                .orElse("");
-
-        String value = Optional.ofNullable(attributes.get(RestHelper.ATTR_VALUE))
-                .map(JsonElement::getAsString)
-                .orElse("");
-
-        AdoPropertyValue propertyValue = new AdoPropertyValue();
-
-        for (AdoProperty property : ado.getProperties()) {
-            if (property.getPropertyName().equalsIgnoreCase(name)) {
-
-                propertyValue.setAdoId(ado.getId());
-                propertyValue.setPropertyId(property.getPropertyId());
-                propertyValue.setPropertyValue(value);
-
-                ado.addPropertyValue(propertyValue);
-            }
-        }
-    }
+//    public void fetchAdoProperties(Ado ado) {
+//        JsonElement json = fetchJson(String.format(ENDPOINT_GET_PROPERTIES, ado.getTemplateId()));
+//        logger.info("ARS:=> fetchAdoProperties = {}\n", json.toString());
+//        for (JsonElement field : json.getAsJsonArray()) {
+//            parseAdoProperty(ado, field);
+//        }
+//    }
+//
+//    private void parseAdoProperty(Ado ado, JsonElement field) {
+//        logger.info("ARS=>PARSE_PROPERTIES PROPERTY JSON = {}\n", field);
+//    }
 }

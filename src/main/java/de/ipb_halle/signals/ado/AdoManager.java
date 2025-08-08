@@ -77,7 +77,7 @@ public class AdoManager {
         int toCreate = Math.min(targetNumber - highestExisting, maxNumber - highestExisting);
         if (toCreate <= 0) return Optional.empty();
 
-        List<Ado> newAdos = adoRestService.createAllMissingAdos(toCreate);
+        List<Ado> newAdos = adoRestService.createAllMissingAdos(toCreate, targetNumber, templateId);
         adoDbService.saveAll(newAdos);
 
         return adoDbService.loadByTemplateIdSorted(templateId).stream()
@@ -100,20 +100,21 @@ public class AdoManager {
      * @return List of all existing + newly created ADOs
      */
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
-    public List<Ado> createAllMissingAdosTillMaxIpbCode() {
+    public List<Ado> createAllMissingAdosTillMaxIpbCode(String templateId) {
         int maxIpbCode = adoDbService.findMaxIpbCode();
         logger.info("AdoManager: -> Max IPB code: {}", maxIpbCode);
 
         List<Ado> existingAdos = adoDbService.loadAll();
-        int missingCount = maxIpbCode - existingAdos.size();
+        logger.info("LOADED ADOS:-> {}\n", Arrays.toString(existingAdos.toArray()));
+        int toCreate = maxIpbCode - existingAdos.size();
 
-        if (missingCount <= 0) {
+        if (toCreate <= 0) {
             logger.info("All ADOs already present ({} of {}).", existingAdos.size(), maxIpbCode);
             return existingAdos;
         }
 
-        logger.info("Creating {} missing ADOs...", missingCount);
-        List<Ado> newAdos = adoRestService.createAllMissingAdos(missingCount);
+        logger.info("Creating {} missing ADOs...", toCreate);
+        List<Ado> newAdos = adoRestService.createAllMissingAdos(toCreate, maxIpbCode, templateId);
         adoDbService.saveAll(newAdos);
         return adoDbService.loadAll();
     }
