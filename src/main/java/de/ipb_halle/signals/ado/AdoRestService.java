@@ -30,6 +30,31 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
 
+/**
+ * REST service for interacting with ADO (Abstract Data Object) entities in the Signals platform.
+ * <p>
+ * Provides methods for creating new ADOs, retrieving existing ones, parsing JSON replies from the
+ * Signals REST API, fetching template field definitions, and mapping REST data to domain objects.
+ * </p>
+ *
+ * <p>Main responsibilities:</p>
+ * <ul>
+ *   <li>Create missing ADOs in bulk or individually</li>
+ *   <li>Fetch ADOs and their relationships via REST calls</li>
+ *   <li>Parse JSON responses into {@link Ado} domain objects</li>
+ *   <li>Fetch and apply template field definitions to ADOs</li>
+ *   <li>Maintain separation between JSON parsing and REST communication</li>
+ * </ul>
+ *
+ * <p>Implements {@link RestReplyParser} for Ado objects, enabling standardized parsing logic.</p>
+ *
+ * <p>Depends on:</p>
+ * <ul>
+ *   <li>{@link RestClient} — low-level HTTP client for REST communication</li>
+ *   <li>{@link DynEnumManager} — for converting string-based type fields to enum instances</li>
+ *   <li>{@link SignalsEntityRestService} — for parsing related Signals entities</li>
+ * </ul>
+ */
 @LocalBean
 @Stateless
 public class AdoRestService implements RestReplyParser<Ado> {
@@ -48,6 +73,15 @@ public class AdoRestService implements RestReplyParser<Ado> {
     @Inject
     private SignalsEntityRestService signalsEntityRestService;
 
+    /**
+     * Creates multiple missing ADOs by generating codes and sending creation requests to the Signals REST API.
+     *
+     * @param toCreate     Number of ADOs to create.
+     * @param targetNumber Target final sequential number; used to generate proper IPB codes.
+     * @param templateId   Template ID to associate with the new ADOs.
+     * @return List of successfully created {@link Ado} objects.
+     * @throws RuntimeException if creation of any ADO fails.
+     */
     public List<Ado> createAllMissingAdos(int toCreate, int targetNumber, String templateId) {
         List<Ado> generated = new ArrayList<>(toCreate);
         for (int i = 0; i < toCreate; i++) {
@@ -57,6 +91,17 @@ public class AdoRestService implements RestReplyParser<Ado> {
         return generated;
     }
 
+    /**
+     * Creates a single ADO with the given code and template ID.
+     * <p>
+     * Builds the request JSON payload, executes the POST request, and parses the reply into an {@link Ado} object.
+     * </p>
+     *
+     * @param code       Unique IPB code for the ADO.
+     * @param templateId Template ID to assign.
+     * @return The created {@link Ado}, or {@code null} if creation failed validation.
+     * @throws RuntimeException if the REST call fails or the reply cannot be parsed.
+     */
     private Ado createSingleAdo(String code, String templateId) {
         Ado ado = new Ado();
         ado.setTemplateId(templateId);
@@ -85,6 +130,13 @@ public class AdoRestService implements RestReplyParser<Ado> {
         }
     }
 
+    /**
+     * Builds the JSON payload for creating an ADO via the Signals REST API.
+     *
+     * @param ado  Ado instance with basic attributes set.
+     * @param code IPB code for the ADO.
+     * @return JSON object ready to be sent as the request body.
+     */
     private JsonObject buildAdoJsonPayload(Ado ado, String code) {
         JsonObject data = new JsonObject();
         data.addProperty(RestHelper.ATTR_TYPE, Ado.ENTITY_TYPE_ADO);
@@ -101,6 +153,12 @@ public class AdoRestService implements RestReplyParser<Ado> {
         return root;
     }
 
+    /**
+     * Constructs the 'attributes' JSON object containing core fields for a new ADO.
+     *
+     * @param code IPB code for the ADO.
+     * @return JSON object with 'name', 'IPB_Code', and 'Description' fields.
+     */
     private JsonObject buildAttributes(String code) {
         JsonObject attributes = new JsonObject();
         String name = code + System.currentTimeMillis(); //toDo -> Wegmachen milliseconds
@@ -115,12 +173,25 @@ public class AdoRestService implements RestReplyParser<Ado> {
         return attributes;
     }
 
+    /**
+     * Helper method to wrap a string value in the JSON format expected for Signals field values.
+     *
+     * @param value Field value.
+     * @return JSON object containing the 'value' property.
+     */
     private JsonObject propertyValue(String value) {
         JsonObject obj = new JsonObject();
         obj.addProperty("value", value);
         return obj;
     }
 
+    /**
+     * Retrieves an ADO by its EID from the Signals REST API.
+     *
+     * @param eid Entity identifier (EID) of the ADO.
+     * @return Parsed {@link Ado} object.
+     * @throws RuntimeException if the REST call or parsing fails.
+     */
     public Ado doGetAdo(String eid) {
         JsonElement data = fetchJson(String.format(ENDPOINT_GET_ADO, eid));
         try {
@@ -130,6 +201,13 @@ public class AdoRestService implements RestReplyParser<Ado> {
         }
     }
 
+    /**
+     * Executes a GET request to the given endpoint and parses the 'data' element from the JSON response.
+     *
+     * @param endpoint REST endpoint relative to the base URL.
+     * @return JSON element representing the 'data' node.
+     * @throws RuntimeException if the request fails or the response cannot be parsed.
+     */
     private JsonElement fetchJson(String endpoint) {
         try {
             restClient.reset().setMethod(Method.GET).setEndpoint(endpoint).execute();
@@ -141,6 +219,13 @@ public class AdoRestService implements RestReplyParser<Ado> {
         }
     }
 
+    /**
+     * Parses a JSON element representing an ADO into a fully initialized {@link Ado} object.
+     *
+     * @param j JSON element containing ADO data.
+     * @return The parsed {@link Ado} instance, or {@code null} if the input is invalid.
+     * @throws Exception if parsing fails.
+     */
     @Override
     public Ado parseReply(JsonElement j) throws Exception {
         if (j == null || !j.isJsonObject()) return null;
@@ -175,6 +260,13 @@ public class AdoRestService implements RestReplyParser<Ado> {
         return ado;
     }
 
+    /**
+     * Parses the 'fields' section of an ADO JSON object, creating {@link AdoPropertyValue} instances
+     * and populating the {@link Ado}'s property values.
+     *
+     * @param fieldsJson JSON object containing field name/value mappings.
+     * @param ado        Target {@link Ado} object to populate.
+     */
     private void parseFieldValues(JsonObject fieldsJson, Ado ado) {
         logger.info("ADO_REST_SERVICE_PARSE_FIELDS:=> {}\n", fieldsJson.toString());
         Set<AdoPropertyValue> values = new HashSet<>();
@@ -201,6 +293,18 @@ public class AdoRestService implements RestReplyParser<Ado> {
         ado.setPropertyValues(values);
     }
 
+    /**
+     * Parses the 'relationships' section of an ADO JSON object, including:
+     * <ul>
+     *     <li>Created by user reference</li>
+     *     <li>Ancestor entities</li>
+     *     <li>Child entities</li>
+     *     <li>System template</li>
+     * </ul>
+     *
+     * @param relationships JSON object with relationship data.
+     * @param ado            Target {@link Ado} to populate.
+     */
     private void parseRelationships(JsonObject relationships, Ado ado) {
         ado.setCreatedBy(new UserReference(RestHelper.parseString(
                 RestHelper.getPrimitiveFromPath(relationships, SignalsEntityDTO.ATTR_CREATED_BY), null)));
@@ -219,6 +323,13 @@ public class AdoRestService implements RestReplyParser<Ado> {
         }
     }
 
+    /**
+     * Parses an array of entity references and applies them to an ADO via provided consumers.
+     *
+     * @param relationship JSON object containing 'data' array of related entities.
+     * @param consumer     Consumer to process each parsed {@link SignalsEntity}.
+     * @param idSetter     Optional consumer to set the entity ID.
+     */
     private void parseEntityReferences(JsonObject relationship, java.util.function.Consumer<SignalsEntity> consumer, java.util.function.Consumer<String> idSetter) {
         JsonArray data = relationship.getAsJsonArray(RestHelper.ATTR_DATA);
         for (JsonElement el : data) {
@@ -235,6 +346,12 @@ public class AdoRestService implements RestReplyParser<Ado> {
         }
     }
 
+    /**
+     * Fetches the template fields for the given ADO from the Signals REST API and
+     * updates the ADO's {@link AdoProperty} list accordingly.
+     *
+     * @param ado The {@link Ado} whose template fields are to be fetched.
+     */
     public void fetchAdoTemplateFields(Ado ado) {
         // Hier we receive an array consisting of 3 elements (3 properties: name, description, ipb_code)
         JsonElement json = fetchJson(String.format(ENDPOINT_GET_TEMPLATE_FIELDS, ado.getTemplateId()));
@@ -244,6 +361,13 @@ public class AdoRestService implements RestReplyParser<Ado> {
         }
     }
 
+    /**
+     * Parses a single template field definition and adds it as an {@link AdoProperty} to the ADO.
+     * Also updates property values to reference the correct property IDs.
+     *
+     * @param ado          The {@link Ado} being updated.
+     * @param fieldElement JSON element representing a template field definition.
+     */
     private void parseTemplateField(Ado ado, JsonElement fieldElement) {
         JsonObject field = fieldElement.getAsJsonObject();
         JsonObject def = field.getAsJsonObject(RestHelper.ATTR_META).getAsJsonObject(RestHelper.ATTR_DEFINITION);
