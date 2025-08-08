@@ -22,6 +22,7 @@ package de.ipb_halle.inhouse.imports;
 
 import de.ipb_halle.inhouse.InhouseDB;
 import de.ipb_halle.signals.ado.Ado;
+import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.SignalsEntity;
 import de.ipb_halle.signals.sample.Sample;
 import de.ipb_halle.signals.sample.SamplePropertyValue;
@@ -30,23 +31,25 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 public class SampleCreator {
+
 
     public static final String CHEMICAL_SAMPLE_TEMPLATE_ID = "samples.templateIdChemicalSample";
     public static final String FIELD_DESCRIPTION = "samples.fields.description";
     public static final String FIELD_IPB_CODE = "samples.fields.ipbCode";
     public static final String ADO_TEMPLATE_ID = "ados.templateAdo2";
-    public static final String FIELD_ADO_IPB_CODE = "ados.fields.ipbCode";
-    public static final String FIELD_ADO_NAME = "ados.fields.name";
 
     private final InhouseDB inhouseDB;
     private final AdoCreator adoCreator;
     private final static Logger logger = (Logger) LogManager.getLogger(SampleCreator.class);
+    private final DynEnumManager dynEnumManager;
 
     public SampleCreator(InhouseDB inhouseDB, AdoCreator adoCreator) {
         this.inhouseDB = inhouseDB;
         this.adoCreator = adoCreator;
+        this.dynEnumManager = inhouseDB.getDynEnumManager();
     }
 
     public void createSample(String chemDrawId, String rowId, String ancestorId, String description, String ipbCode) {
@@ -66,45 +69,47 @@ public class SampleCreator {
         ref.setRowId(rowId);
         sample.setStoicRef(ref);
 
+
+        // Create the sample via REST and store the returned Signals sample ID
+        String sampleId = inhouseDB.getSampleRestService().createNewSample(sample);
+        logger.info("SC-> sample = {}\n", sample.toString());
+
         // Description property
         SamplePropertyValue desc = new SamplePropertyValue();
         desc.setPropertyId(inhouseDB.getConfigString(FIELD_DESCRIPTION));
         desc.setPropertyValue(description);
         sample.addPropertyValue(desc);
 
-
-//        // Create ADO
-//        logger.info("SampleCreator:-> Starting create Ados");
-//        String adoTemplateId = inhouseDB.getConfigString(ADO_TEMPLATE_ID);
-//
-//        Ado ado = adoCreator.createAdo( description, ipbCode, adoTemplateId);
-//        if(ado == null){
-//            logger.error("Failed to create or load ADO for IPB code '{}'", ipbCode);
-//            return;
-//        }else {
-//            logger.info("SampleCreator-> ADO created = {}\n", ado.toString());
-//        }
-//
-//
-//        SamplePropertyValue adoRef = new SamplePropertyValue();
-//        adoRef.setPropertyId(inhouseDB.getConfigString(FIELD_IPB_CODE));
-//        adoRef.setPropertyValue(ado.getType() + ";" + ado.getName() + ";" + ado.getEid());
-//        sample.addPropertyValue(adoRef);
-
-        // Create the sample via REST and store the returned Signals sample ID
-        sample.addPropertyValue(desc);
-      //  sample.addPropertyValue(adoRef);
-        String sampleId = inhouseDB.getSampleRestService().createNewSample(sample);
-        logger.info("SC-> sample = {}\n", sample.toString());
+        // Set eif from generated sample
         sample.setId(sampleId);
         desc.setSampleId(sampleId);
-       // adoRef.setSampleId(sampleId);
+        // Add Fields (Field Values to sample)
+        sample.addPropertyValue(desc);
 
+        // === ADO link (optional) ===
+        // Load or create ADO
+        if (ipbCode != null) {
+            logger.info("SampleCreator:-> Starting create Ados");
+            String adoTemplateId = inhouseDB.getConfigString(ADO_TEMPLATE_ID);
+            Optional<Ado> maybeAdo = adoCreator.findOrCreateAdoByIpbCode(ipbCode, adoTemplateId);
+            if (maybeAdo.isPresent()) {
+                Ado ado = maybeAdo.get();
+                SamplePropertyValue adoRef = new SamplePropertyValue();
+                adoRef.setPropertyId(inhouseDB.getConfigString(FIELD_IPB_CODE));
+                adoRef.setPropertyValue(ado.getType() + ";" + ado.getName() + ";" + ado.getEid());
+                sample.addPropertyValue(adoRef);
+                adoRef.setSampleId(sampleId);
+            } else {
+                logger.info("Skipping ADO link: not found/created for ipbCode={}", ipbCode);
+            }
+        } else {
+            logger.info("Skipping ADO link: missing IPB code");
+        }
 
         // Prepare properties as key-value pairs for PATCH update
         HashMap<String, String> propertyKeyToValue = new HashMap<>();
         for (SamplePropertyValue samplePropertyValue : sample.getPropertyValues()) {
-            // id                                  // value
+            //                          id                                  value
             propertyKeyToValue.put(samplePropertyValue.getPropertyId(), samplePropertyValue.getPropertyValue());
         }
 

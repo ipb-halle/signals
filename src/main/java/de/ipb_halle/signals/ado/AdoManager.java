@@ -20,6 +20,7 @@
 
 package de.ipb_halle.signals.ado;
 
+import de.ipb_halle.inhouse.util.IpbCodeNormalizer;
 import de.ipb_halle.signals.entity.EntityType;
 import de.ipb_halle.signals.entity.SignalsEntityDTO;
 import de.ipb_halle.signals.entity.SignalsEntityDbService;
@@ -52,21 +53,31 @@ public class AdoManager {
 
     private final Logger logger = LogManager.getLogger(AdoManager.class);
 
-    public Optional<Ado> findOrCreateAdoByIpbCode(String ipbCode, String templateId) {
+    public Optional<Ado> findOrCreateAdoByIpbCode(String ipbCodeRaw, String templateId) {
+        Optional<String> normOpt = IpbCodeNormalizer.normalize(ipbCodeRaw);
+        if (normOpt.isEmpty()) {
+            logger.info("ADO lookup skipped: missing/invalid IPB code: {}", ipbCodeRaw);
+            return Optional.empty();
+        }
+        String ipbCode = normOpt.get();
+
+        // 1) load upon templateId all existing Ados
         List<Ado> existing = adoDbService.loadByTemplateIdSorted(templateId);
 
+        // 2) search in List existing if searched ado exists
         Optional<Ado> found = existing.stream()
                 .filter(a -> ipbCode.equalsIgnoreCase(a.getIpbCode()))
                 .findFirst();
-
         if (found.isPresent()) return found;
 
-        int targetNumber = extractNumeric(ipbCode);
-        int maxNumber = adoDbService.findMaxIpbCode();
-
+        // 3) if not calculating range for ados creation till needed IPB code number
+        int targetNumber = IpbCodeNormalizer.extractNumeric(ipbCode).orElse(0);
         int highestExisting = existing.stream()
                 .map(Ado::getIpbCode)
-                .mapToInt(this::extractNumeric)
+                .filter(Objects::nonNull)
+                .map(IpbCodeNormalizer::extractNumeric)
+                .flatMap(Optional::stream)
+                .mapToInt(Integer::intValue)
                 .max().orElse(0);
 
         if (targetNumber <= highestExisting) {
@@ -74,24 +85,21 @@ public class AdoManager {
             return Optional.empty();
         }
 
-        int toCreate = Math.min(targetNumber - highestExisting, maxNumber - highestExisting);
-        if (toCreate <= 0) return Optional.empty();
+        int maxNumber = adoDbService.findMaxIpbCode();
+        int last = Math.min(targetNumber, maxNumber);
+        int first = highestExisting + 1;
+        if(last < first) {
+            logger.info("Nothing to generate: first={}, last={}", first, last);
+            return Optional.empty();
+        }
 
-        List<Ado> newAdos = adoRestService.createAllMissingAdos(toCreate, targetNumber, templateId);
+        // 4) generating ados in set range, names == ipb codes
+        List<Ado> newAdos = adoRestService.createAdosRange(first, last, templateId);
         adoDbService.saveAll(newAdos);
 
         return adoDbService.loadByTemplateIdSorted(templateId).stream()
                 .filter(a -> ipbCode.equalsIgnoreCase(a.getIpbCode()))
                 .findFirst();
-    }
-
-    private int extractNumeric(String ipbCode) {
-        try {
-            return Integer.parseInt(ipbCode.replaceAll("\\D+", ""));
-        } catch (Exception e) {
-            logger.warn("Failed to extract numeric from IPB code '{}'", ipbCode);
-            return 0;
-        }
     }
 
     /**
@@ -114,7 +122,7 @@ public class AdoManager {
         }
 
         logger.info("Creating {} missing ADOs...", toCreate);
-        List<Ado> newAdos = adoRestService.createAllMissingAdos(toCreate, maxIpbCode, templateId);
+        List<Ado> newAdos = adoRestService.createAdosRange(toCreate, maxIpbCode, templateId);
         adoDbService.saveAll(newAdos);
         return adoDbService.loadAll();
     }
@@ -146,6 +154,6 @@ public class AdoManager {
     }
 
     public void importAdo(String id) {
-// TODO: implementieren
+        // TODO: implementieren
     }
 }

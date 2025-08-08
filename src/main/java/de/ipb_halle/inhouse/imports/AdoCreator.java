@@ -57,8 +57,8 @@ public class AdoCreator {
      * For Production
      * Generates all ADOs up to a given max IPB code.
      */
-    public void ensureAllAdoGenerated() {
-        List<Ado> all = adoManager.createAllMissingAdosTillMaxIpbCode();
+    public void ensureAllAdoGenerated(String templateId) {
+        List<Ado> all = adoManager.createAllMissingAdosTillMaxIpbCode(templateId);
         logger.info("ensureAllAdosGenerated -> total ADOs ensured: {}\n", all.size());
     }
 }

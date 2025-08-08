@@ -73,20 +73,19 @@ public class AdoRestService implements RestReplyParser<Ado> {
     @Inject
     private SignalsEntityRestService signalsEntityRestService;
 
-    /**
-     * Creates multiple missing ADOs by generating codes and sending creation requests to the Signals REST API.
-     *
-     * @param toCreate     Number of ADOs to create.
-     * @param targetNumber Target final sequential number; used to generate proper IPB codes.
-     * @param templateId   Template ID to associate with the new ADOs.
-     * @return List of successfully created {@link Ado} objects.
-     * @throws RuntimeException if creation of any ADO fails.
-     */
-    public List<Ado> createAllMissingAdos(int toCreate, int targetNumber, String templateId) {
-        List<Ado> generated = new ArrayList<>(toCreate);
-        for (int i = 0; i < toCreate; i++) {
-            String code = String.format("IPB%06d", targetNumber - toCreate + 1 + i);
-            generated.add(createSingleAdo(code, templateId));
+
+    public List<Ado> createAdosRange(int startInclusive, int endInclusive, String templateId) {
+        if(endInclusive< startInclusive) return Collections.emptyList();
+
+        List<Ado> generated = new ArrayList<>(endInclusive -startInclusive +1);
+        for (int n = startInclusive; n <= endInclusive; n++) {
+            String code = String.format("IPB_%06d", n);
+            Ado created = createSingleAdo(code, templateId);
+            if (created != null) {
+                generated.add(created);
+            } else {
+                logger.warn("Failed to create ADO for code {}", code);
+            }
         }
         return generated;
     }
@@ -161,7 +160,8 @@ public class AdoRestService implements RestReplyParser<Ado> {
      */
     private JsonObject buildAttributes(String code) {
         JsonObject attributes = new JsonObject();
-        String name = code + System.currentTimeMillis(); //toDo -> Wegmachen milliseconds
+        String name = code;
+
         attributes.addProperty(RestHelper.ATTR_NAME, name);
 
         JsonObject fields = new JsonObject();
@@ -303,7 +303,7 @@ public class AdoRestService implements RestReplyParser<Ado> {
      * </ul>
      *
      * @param relationships JSON object with relationship data.
-     * @param ado            Target {@link Ado} to populate.
+     * @param ado           Target {@link Ado} to populate.
      */
     private void parseRelationships(JsonObject relationships, Ado ado) {
         ado.setCreatedBy(new UserReference(RestHelper.parseString(
