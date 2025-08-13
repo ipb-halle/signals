@@ -37,12 +37,4 @@ public interface InhouseImportStrategy {
             Map<Integer, List<Optional<Experiments.ChemDrawData>>> cdxmlCache
     ) throws Exception;
 
-    default void importGroup(
-            InhouseDB inhouseDB,
-            String threeLc,
-            List<InhouseExperiment> experimentsBy3lc
-    ) throws Exception {
-        importGroup(inhouseDB, threeLc, experimentsBy3lc, Map.of());
-    }
-
 }

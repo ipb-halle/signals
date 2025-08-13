@@ -60,7 +60,7 @@ public class StructureImportStrategy implements InhouseImportStrategy {
             List<InhouseExperiment> chunk = group.subList(i, toIndex);
 
             InhouseExperiment main = chunk.get(0);
-            String expName = threeLc + "-" + experimentCounter++ + System.currentTimeMillis();
+            String expName = threeLc + "-" + experimentCounter++;
             String eid = experimentCreator.createExperiment(expName, main);
 
             for (InhouseExperiment exp : chunk) {

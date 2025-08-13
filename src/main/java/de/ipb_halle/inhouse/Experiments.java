@@ -33,6 +33,52 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Handles importing experiment records from the old Inhouse database into
+ * the Signals platform.
+ *
+ * <p>This class is responsible for:
+ * <ul>
+ *   <li>Reading experiment data from a CSV-like export file of the old
+ *       Inhouse database</li>
+ *   <li>Parsing each line using regular expressions and mapping it to an
+ *       {@link InhouseExperiment} object</li>
+ *   <li>Saving successfully parsed experiments into the InhouseDB service</li>
+ *   <li>Writing any lines that fail parsing into a reject file for review</li>
+ *   <li>Filtering loaded experiments and importing them into Signals
+ *       using appropriate strategies</li>
+ * </ul>
+ *
+ * <p>The import process can run in two main steps:
+ * <ol>
+ *   <li>{@link #importExperiments()} – Reads a raw text file and stores
+ *       parsed experiments in the local database</li>
+ *   <li>{@link #importData()} – Loads experiments from the database, applies
+ *       filtering, and imports them into Signals using
+ *       {@link InhouseImportManager}</li>
+ * </ol>
+ *
+ * <p>Import behavior for different entity types (e.g. STRUCTURE, ORGANISM)
+ * is controlled by strategies stored in {@code strategyMap}.
+ *
+ *
+ * <p>Typical usage:
+ * <pre>{@code
+ * InhouseDB db = new InhouseDB(config);
+ * Experiments importer = new Experiments(db);
+ * importer.importData();
+ * }</pre>
+ *
+ * <p>Dependencies:
+ * <ul>
+ *   <li>{@link InhouseDB} – Database configuration and services</li>
+ *   <li>{@link InhouseExperimentLoader} – Loads inhouse experiments from the DB</li>
+ *   <li>{@link InhouseExperimentFilter} – Applies filtering rules</li>
+ *   <li>{@link ChemDrawCacheService} – Caches ChemDraw structure data (rpocId, molId, cdxml)</li>
+ *   <li>{@link InhouseImportManager} – Executes the import into Signals</li>
+ * </ul>
+ */
+
 public class Experiments {
 
     public final static String EXPERIMENTS_FILENAME = "experiments.filename";
@@ -45,6 +91,12 @@ public class Experiments {
 
     private final Logger logger = LogManager.getLogger(Experiments.class);
 
+    /**
+     * A simple record for holding ChemDraw structure data linked to a molecule.
+     *
+     * @param molId           the molecule ID from the Inhouse database
+     * @param fieldValueCdxml the ChemDraw structure as CDXML text
+     */
     public record ChemDrawData(Integer molId, String fieldValueCdxml) {
     }
 
@@ -58,6 +110,29 @@ public class Experiments {
         this.inhouseDB = inhouseDB;
     }
 
+    /**
+     * Imports experiment records from a configured file into the Inhouse database.
+     *
+     * <p>This method:
+     * <ol>
+     *   <li>Opens the experiments file defined in {@link #EXPERIMENTS_FILENAME}</li>
+     *   <li>Parses each line using a regular expression to extract:
+     *       <ul>
+     *         <li>Lab Journal name</li>
+     *         <li>Three-letter code (ThreeLC)</li>
+     *         <li>Individual experiment code</li>
+     *         <li>Procedure remarks</li>
+     *         <li>Procedure ID</li>
+     *       </ul>
+     *   </li>
+     *   <li>Creates an {@link InhouseExperiment} object for each valid line</li>
+     *   <li>Saves valid experiments into the database via {@link InhouseDB#getInhouseDbService()}</li>
+     *   <li>Writes invalid or unparseable lines into the reject file defined in {@link #EXPERIMENTS_REJECTFILE}</li>
+     *   <li>Logs progress every 1000 imported experiments</li>
+     * </ol>
+     *
+     * @throws Exception if file reading/writing fails or if parsing errors occur
+     */
     private void importExperiments() throws Exception {
         System.out.println("Importing experiments");
 /*
@@ -120,6 +195,23 @@ public class Experiments {
     }
 
 
+    /**
+     * Loads experiments from the Inhouse database, applies filtering rules,
+     * and imports them into the Signals platform.
+     *
+     * <p>Steps:
+     * <ol>
+     *   <li>Uses {@link InhouseExperimentLoader} to retrieve a batch of experiments</li>
+     *   <li>Initializes a {@link ChemDrawCacheService} for caching structure data (procId, molId, cdxml)</li>
+     *   <li>Applies {@link InhouseExperimentFilter} to separate experiments
+     *       into categories by {@link InhouseImportType}</li>
+     *   <li>Logs filtering errors to an {@link ErrorLogger}</li>
+     *   <li>Uses {@link InhouseImportManager#importAll(Map, ChemDrawCacheService)} to
+     *       import the filtered experiments into Signals</li>
+     * </ol>
+     *
+     * @throws Exception if loading, filtering, or importing fails
+     */
     public void importData() throws Exception {
         // importExperiments();
         InhouseExperimentLoader loader = new InhouseExperimentLoader(inhouseDB);

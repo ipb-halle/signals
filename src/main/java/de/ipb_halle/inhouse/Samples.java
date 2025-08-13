@@ -102,22 +102,23 @@ public class Samples {
     private void importExtracts(String fileName) throws Exception {
         System.out.println("Importing extract samples");
 
-        // 01 ExtractID
-        // 02 RefCorrOrganisms_ProcedureID
-        // 03 RefLastSolventUsed
-        // 04 StorePlace
-        // 05 Extract
-        // 06 Tara
-        // 07 Amount
-        // 08 Volume
-        // 09 Concentration
-        // 10 Solution
-        // 11 ExtractRemarks
-        // 12 HPLC
-        // 13 ExtractPlateID
-        // 14 ExtractPosition
-        // 15 ExtractBarcode
-        // 16 IPBCode
+        // Table field                              Signals-Mapping
+        // 01 ExtractID                             -
+        // 02 RefCorrOrganisms_ProcedureID          Sample (taxonomic reference)
+        // 03 RefLastSolventUsed                    (Sample?)
+        // 04 StorePlace                            Container
+        // 05 Extract                               (Sample)
+        // 06 Tara                                  Container
+        // 07 Amount                                Container
+        // 08 Volume                                Container
+        // 09 Concentration                         (Container)
+        // 10 Solution                              ENTFÄLLT
+        // 11 ExtractRemarks                        Sample
+        // 12 HPLC                                  ENTFÄLLT?
+        // 13 ExtractPlateID                        ENTFÄLLT?
+        // 14 ExtractPosition                       ENTFÄLLT?
+        // 15 ExtractBarcode                        ENTFÄLLT?
+        // 16 IPBCode                               Sample
 
         Pattern pattern = Pattern.compile("^(\\d+);"   //  1 extractId
                 + "(\\d+);"                             //  2 correlationId

@@ -20,7 +20,9 @@
 
 package de.ipb_halle.inhouse;
 
+import de.ipb_halle.inhouse.imports.AdoCreator;
 import de.ipb_halle.inhouse.imports.ExperimentCreator;
+import de.ipb_halle.inhouse.imports.SampleCreator;
 import de.ipb_halle.signals.entity.SignalsEntity;
 import de.ipb_halle.signals.sample.Sample;
 import de.ipb_halle.signals.sample.SamplePropertyValue;
@@ -39,57 +41,79 @@ import java.util.Optional;
  */
 public class OrganismImportStrategy implements InhouseImportStrategy {
 
-    public static final String CHEMICAL_SAMPLE_TEMPLATE_ID = "sample:0174e78c-0b95-49f9-8a57-39061bbc0050";
-    public static final String CHEMICAL_SAMPLE_PROPERTY_ID_DESCRIPTION = "2";
-    public static final String CHEMICAL_SAMPLE_IPB_CODE_INTERNAL_REFERENCE_ID = "109";
-
-
     private final Logger logger = LogManager.getLogger(OrganismImportStrategy.class);
 
     @Override
-    public void importGroup(InhouseDB inhouseDB, String threeLc, List<InhouseExperiment> experimentsBy3lc, Map<Integer, List<Optional<Experiments.ChemDrawData>>> cdxmlCache) throws Exception {
-        importGroup(inhouseDB, threeLc, experimentsBy3lc);
-    }
+    public void importGroup(InhouseDB inhouseDB,
+                            String threeLc,
+                            List<InhouseExperiment> group,
+                            Map<Integer, List<Optional<Experiments.ChemDrawData>>> cdxmlCache) throws Exception {
 
-    @Override
-    public void importGroup(InhouseDB inhouseDB, String threeLc, List<InhouseExperiment> experimentsBy3lc) throws Exception {
-
-        logger.info("Ich bin in Organism import strategy\n");
-
-        if (experimentsBy3lc.isEmpty()) {
-            logger.warn("Empty experiment list grouped by threeLc {}\n", threeLc);
+        logger.info("OrganismImportStrategy started for group: {}", threeLc);
+        if (group == null || group.isEmpty()) {
+            logger.warn("OrganismImportStrategy: empty list for threeLc={}", threeLc);
             return;
         }
 
-        Experiments helper = new Experiments(inhouseDB);
-        int chunkSize = 10;
+        final int chunkSize = 10;
         int experimentCounter = 1;
 
-        for (int i = 0; i < experimentsBy3lc.size(); i += chunkSize) {
-            int toIndex = Math.min(i + chunkSize, experimentsBy3lc.size());
-            List<InhouseExperiment> chunk = experimentsBy3lc.subList(i, toIndex);
+        ExperimentCreator experimentCreator = new ExperimentCreator(inhouseDB);
+        AdoCreator adoCreator = new AdoCreator(inhouseDB.getAdoManager());
+        SampleCreator sampleCreator = new SampleCreator(inhouseDB, adoCreator);
+        ErrorLogger errorLogger = new ErrorLogger("errorLog_organism_import.txt");
 
-            ExperimentCreator experimentCreator = new ExperimentCreator(inhouseDB);
+
+        for (int i = 0; i < group.size(); i += chunkSize) {
+            int toIndex = Math.min(i + chunkSize, group.size());
+            List<InhouseExperiment> chunk = group.subList(i, toIndex);
+
             InhouseExperiment main = chunk.get(0);
             String experimentName = threeLc + "-ORG-" + experimentCounter++;
             String eid = experimentCreator.createExperiment(experimentName, main);
+            logger.info("OIS-> created experiment: {} (eid={})", experimentName, eid);
 
             for (InhouseExperiment exp : chunk) {
-                int procId = exp.getProcId();
-                List<InhouseCorrelation> correlations = inhouseDB.getInhouseDbService().loadCorrelationByProcedureId(procId);
+                Integer procId = exp.getProcId();
+                if (procId == null || procId == 0) {
+                    errorLogger.log("Missing procId for: " + exp);
+                    continue;
+                }
+                List<InhouseCorrelation> correlations =
+                        inhouseDB.getInhouseDbService().loadCorrelationByProcedureId(procId);
+
+                if (correlations == null || correlations.isEmpty()) {
+                    logger.info("No correlations for procId={}", procId);
+                    errorLogger.log("No correlations for procId=" + procId);
+                    continue;
+                }
 
                 for (InhouseCorrelation correlation : correlations) {
                     Integer orgId = correlation.getOrganismId();
-                    if (orgId == null) continue;
-
+                    if (orgId == null) {
+                        logger.debug("Skip correlation without organismId for procId={}", procId);
+                        continue;
+                    }
                     // setting description field value
-                    String desc = String.format("OrgId: %s, Experiment: %s%s, Journal: %s", orgId, threeLc, procId, exp.getJournal());
+                    String desc = String.format(
+                            "OrgId: %s, Experiment: %s%s, Journal: %s",
+                            orgId, threeLc, procId, exp.getJournal()
+                    );
                     // create non-chemical sample with field values in sampleContainer -> sample table -> rest call POST
-                    createSampleForOrganism(inhouseDB, eid, desc);
+                    try {
+                        // создаём sample без ChemDraw и без IPB-кода
+                        sampleCreator.createOrganismSample(eid, desc);
+                        logger.info("OIS-> organism sample created: procId={}, orgId={}", procId, orgId);
 
-                    exp.setEid(eid);
-                    exp.setImportSuccessful(true);
-                    inhouseDB.getInhouseDbService().markAsSuccessfullyImported(exp);
+                        exp.setEid(eid);
+                        exp.setImportSuccessful(true);
+                        // если нужно — раскомментить для реального флага в Access
+                        // inhouseDB.getInhouseDbService().markAsSuccessfullyImported(exp);
+                    } catch (Exception ex) {
+                        errorLogger.log("Failed to create organism sample for procId=" + procId +
+                                ", orgId=" + orgId + " -> " + ex.getMessage());
+                        logger.error("Failed to create organism sample", ex);
+                    }
                 }
             }
         }
