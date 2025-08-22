@@ -25,11 +25,9 @@ import jakarta.ejb.TransactionAttribute;
 import jakarta.ejb.TransactionAttributeType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
-import jakarta.persistence.OrderBy;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.apache.logging.log4j.LogManager;
@@ -220,5 +218,23 @@ public class InhouseDbService {
 
     public void save(InhouseExtract extract) {
         this.em.merge(extract);
+    }
+
+    public List<InhouseExtract> loadExtractByCorrOrgProcId(Integer corrOrgProcId) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<InhouseExtract> cq = cb.createQuery(InhouseExtract.class);
+        Root<InhouseExtract> root = cq.from(InhouseExtract.class);
+        cq.select(root);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(cb.equal(root.get("correlationOrgProcId"), corrOrgProcId));
+        cq.where(cb.and(predicates.toArray(new Predicate[0])));
+
+        try {
+            return em.createQuery(cq).getResultList();
+
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 }

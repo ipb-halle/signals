@@ -34,16 +34,19 @@ public class InhouseCorrelation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "corr_id")
+    private Integer corrId;
+
     @Column
     private String context;
 
     @Column(name = "mol_id")
     private Integer molId;
 
-    @Column(name = "procedure_id")
+    @Column(name = "proc_id")
     private Integer procedureId;
 
-    @Column(name = "organism_id")
+    @Column(name = "org_id")
     private Integer organismId;
 
     public Integer getId() {
@@ -88,6 +91,15 @@ public class InhouseCorrelation {
 
     public InhouseCorrelation setOrganismId(Integer organismId) {
         this.organismId = organismId;
+        return this;
+    }
+
+    public Integer getCorrId() {
+        return corrId;
+    }
+
+    public InhouseCorrelation setCorrId(Integer corrId) {
+        this.corrId = corrId;
         return this;
     }
 }

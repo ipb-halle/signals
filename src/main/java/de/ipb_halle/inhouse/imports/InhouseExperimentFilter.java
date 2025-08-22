@@ -79,7 +79,7 @@ public class InhouseExperimentFilter {
         int missingChemDraw = 0;
 
         List<InhouseExperiment> structure = new ArrayList<>();
-        List<InhouseExperiment> organism = new ArrayList<>();
+        List<InhouseExperiment> extrakt = new ArrayList<>();
         List<InhouseExperiment> unknown = new ArrayList<>();
 
         for (InhouseExperiment exp : experiments) {
@@ -97,8 +97,8 @@ public class InhouseExperimentFilter {
 
             if (cdxmlList.isEmpty() || cdxmlList.stream().allMatch(Optional::isEmpty)) {
                 missingChemDraw++;
-                if (hasOrgId(procId)) {
-                    organism.add(exp);
+                if (hasOrgId(procId) && hasExtract(procId)) {
+                    extrakt.add(exp);
                 } else {
                     unknown.add(exp);
                 }
@@ -114,13 +114,27 @@ public class InhouseExperimentFilter {
         errorLogger.log("Experiments with missing ChemDraw = " + missingChemDraw);
         logger.info("IEF-> MISSING CHEMDRAW = {}\n", missingChemDraw);
 
-        logger.info("IEF-> STRUCTURE ARRAY = {}\n, ORGANISM ARRAY ={}\n, UNKNOWN ARRAY = {}\n", structure.size(), organism.size(), unknown.size());
+        logger.info("IEF-> STRUCTURE ARRAY = {}\n, ORGANISM ARRAY ={}\n, UNKNOWN ARRAY = {}\n", structure.size(), extrakt.size(), unknown.size());
 
         return Map.of(
                 InhouseImportType.STRUCTURE, structure,
-                InhouseImportType.ORGANISM, organism,
+                InhouseImportType.ORGANISM, extrakt,
                 InhouseImportType.UNKNOWN, unknown
         );
+    }
+
+    // toDo: test schreiben!!!!
+    private boolean hasExtract(int procId) {
+        List<InhouseCorrelation> correlations = inhouseDB.getInhouseDbService().loadCorrelationByProcedureId(procId);
+        for (InhouseCorrelation ic : correlations) {
+            if (ic.getContext().equalsIgnoreCase("orgproc")) {
+                List<InhouseExtract> inhouseExtracts = inhouseDB.getInhouseDbService().loadExtractByCorrOrgProcId(ic.getCorrId());
+                if (!inhouseExtracts.isEmpty()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

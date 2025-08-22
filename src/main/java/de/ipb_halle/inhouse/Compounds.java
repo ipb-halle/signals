@@ -68,7 +68,7 @@ import java.util.regex.Pattern;
  * {@code importCompoundNames()}, and {@code importData()} for the high-level
  * processing flow.</p>
  */
-public class Compounds {
+public class  Compounds {
 
     // Configuration keys for reading compound-related files and fields
     public final static String COMPOUNDS_ACCESS = "compounds.access";

@@ -114,7 +114,7 @@ public class InhouseExperimentDTO {
         experiment.setCreatedAt(date);
         experiment.setEditedAt(date);
 
-        experiment.setDescription(remarks == null || remarks.isEmpty() ? "no remarks was present" + System.currentTimeMillis() : remarks);
+        //experiment.setDescription(remarks == null || remarks.isEmpty() ? "no remarks was present" : remarks);
         experiment.setType(EntityType.valueOf(Experiment.ENTITY_TYPE_EXPERIMENT));
 
         experiment.setTemplateId(TEMPLATE_ID_INHOUSE_EXPERIMENT);

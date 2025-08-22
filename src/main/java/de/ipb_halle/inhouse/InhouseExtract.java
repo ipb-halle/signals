@@ -36,8 +36,8 @@ public class InhouseExtract {
     @Column(name = "extract_id")
     private Integer extractId;
 
-    @Column(name = "correlation_id")
-    private String correlationId;
+    @Column(name = "corr_orgproc_id")
+    private Integer correlationOrgProcId;
 
     @Column(name = "last_solvent")
     private String lastSolvent;
@@ -109,12 +109,12 @@ public class InhouseExtract {
         return this;
     }
 
-    public String getCorrelationId() {
-        return correlationId;
+    public Integer getCorrelationOrgProcId() {
+        return correlationOrgProcId;
     }
 
-    public InhouseExtract setCorrelationId(String correlationId) {
-        this.correlationId = correlationId;
+    public InhouseExtract setCorrelationOrgProcId(Integer correlationOrgProcId) {
+        this.correlationOrgProcId = correlationOrgProcId;
         return this;
     }
 
@@ -250,7 +250,7 @@ public class InhouseExtract {
                 "id=" + id +
                 ", eid='" + eid + '\'' +
                 ", extractId=" + extractId +
-                ", correlationId='" + correlationId + '\'' +
+                ", correlationId='" + correlationOrgProcId + '\'' +
                 ", lastSolvent='" + lastSolvent + '\'' +
                 ", storagePlace='" + storagePlace + '\'' +
                 ", extractCode='" + extractCode + '\'' +

@@ -36,7 +36,7 @@ import java.util.Optional;
 public class SampleCreator {
 
 
-    public static final String CHEMICAL_SAMPLE_TEMPLATE_ID = "samples.templateIdChemicalSample";
+
     public static final String FIELD_DESCRIPTION = "samples.fields.description";
     public static final String FIELD_IPB_CODE = "samples.fields.ipbCode";
     public static final String ADO_TEMPLATE_ID = "ados.templateAdo2";
@@ -52,16 +52,15 @@ public class SampleCreator {
         this.dynEnumManager = inhouseDB.getDynEnumManager();
     }
 
-    public void createSample(String chemDrawId, String rowId, String ancestorId, String description, String ipbCode) {
-        // Create a new Sample and assign the chemical sample template
-        Sample sample = new Sample();
-        sample.setTemplateId(inhouseDB.getConfigString(CHEMICAL_SAMPLE_TEMPLATE_ID));
+    public void createChemicalSample(String sampleTemplateId,
+                                     String chemDrawId,
+                                     String rowId,
+                                     String ancestorId,
+                                     String description,
+                                     String ipbCode) {
 
-        // Set the ancestor relationship (usually a sample container or experiment)
-        SignalsEntity ancestor = new SignalsEntity();
-        ancestor.setEid(ancestorId);
-        sample.addAncestor(ancestor);
-        sample.setAncestorId(ancestorId);
+        // 1) Create a new Sample and assign the chemical sample template
+        Sample sample = baseSample(sampleTemplateId, ancestorId);
 
         // Create the stoichiometry reference pointing to a row in the chemical drawing
         StoicRef ref = new StoicRef();
@@ -69,25 +68,54 @@ public class SampleCreator {
         ref.setRowId(rowId);
         sample.setStoicRef(ref);
 
-
         // Create the sample via REST and store the returned Signals sample ID
         String sampleId = inhouseDB.getSampleRestService().createNewSample(sample);
-        logger.info("SC-> sample = {}\n", sample.toString());
 
         // Description property
-        SamplePropertyValue desc = new SamplePropertyValue();
-        desc.setPropertyId(inhouseDB.getConfigString(FIELD_DESCRIPTION));
-        desc.setPropertyValue(description);
-        sample.addPropertyValue(desc);
-
-        // Set eif from generated sample
-        sample.setId(sampleId);
-        desc.setSampleId(sampleId);
-        // Add Fields (Field Values to sample)
-        sample.addPropertyValue(desc);
+        SamplePropertyValue desc = attachDescription(sample, sampleId, description);
 
         // === ADO link (optional) ===
         // Load or create ADO
+        attachIPB_CodeAdo( sample, sampleId, ipbCode);
+
+        // Prepare properties as key-value pairs for PATCH update
+        patch(sample, sampleId);
+    }
+
+    public void createExtractSample(String templateId, String ancestorId, String description, String ipbCode){
+        Sample sample = baseSample(templateId, ancestorId);
+
+        String sampleId = inhouseDB.getSampleRestService().createNewSample(sample);
+        attachDescription(sample, sampleId, description);
+        attachIPB_CodeAdo(sample, sampleId, ipbCode);
+        //attachOrganism()
+        //attachChemDraw()
+        patch(sample, sampleId);
+    }
+
+    private Sample baseSample(String sampleTemplateId, String ancestorId) {
+        Sample sample = new Sample();
+        sample.setTemplateId(inhouseDB.getConfigString(sampleTemplateId));
+
+        // Set the ancestor relationship (usually a sample container or experiment)
+        SignalsEntity ancestor = new SignalsEntity();
+        ancestor.setEid(ancestorId);
+        sample.addAncestor(ancestor);
+        sample.setAncestorId(ancestorId);
+        return sample;
+    }
+
+    private SamplePropertyValue attachDescription(Sample sample, String sampleId, String description) {
+        SamplePropertyValue desc = new SamplePropertyValue();
+        desc.setPropertyId(inhouseDB.getConfigString(FIELD_DESCRIPTION));
+        desc.setPropertyValue(description);
+        sample.setId(sampleId);
+        desc.setSampleId(sampleId);
+        sample.addPropertyValue(desc);
+        return desc;
+    }
+
+    private void attachIPB_CodeAdo( Sample sample, String sampleId, String ipbCode) {
         if (ipbCode != null) {
             logger.info("SampleCreator:-> Starting create Ados");
             String adoTemplateId = inhouseDB.getConfigString(ADO_TEMPLATE_ID);
@@ -105,8 +133,9 @@ public class SampleCreator {
         } else {
             logger.info("Skipping ADO link: missing IPB code");
         }
+    }
 
-        // Prepare properties as key-value pairs for PATCH update
+    private void patch(Sample sample, String sampleId) {
         HashMap<String, String> propertyKeyToValue = new HashMap<>();
         for (SamplePropertyValue samplePropertyValue : sample.getPropertyValues()) {
             //                          id                                  value

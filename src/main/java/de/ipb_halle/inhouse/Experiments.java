@@ -21,6 +21,8 @@ import de.ipb_halle.inhouse.imports.ChemDrawCacheService;
 import de.ipb_halle.inhouse.imports.InhouseExperimentFilter;
 import de.ipb_halle.inhouse.imports.InhouseExperimentLoader;
 import de.ipb_halle.inhouse.imports.InhouseImportManager;
+import de.ipb_halle.inhouse.OrganismImportStrategy;
+import de.ipb_halle.inhouse.StructureImportStrategy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -172,8 +174,10 @@ public class Experiments {
                 Matcher matcher = pattern.matcher(st);
                 if (matcher.matches()) {
                     Matcher remarkMatcher = quotePattern.matcher(matcher.group(5));
-                    InhouseExperiment exp = new InhouseExperiment().setJournal(matcher.group(1)).setThreelc(matcher.group(2)).setIndividualCode(matcher.group(3))
-                            // file name never used
+                    InhouseExperiment exp = new InhouseExperiment()
+                            .setJournal(matcher.group(1))
+                            .setThreelc(matcher.group(2))
+                            .setIndividualCode(matcher.group(3))
                             .setProcId(Integer.parseInt(matcher.group(6)));
                     if (remarkMatcher.matches()) {
                         exp.setRemarks(remarkMatcher.group(1));
@@ -215,7 +219,7 @@ public class Experiments {
     public void importData() throws Exception {
         // importExperiments();
         InhouseExperimentLoader loader = new InhouseExperimentLoader(inhouseDB);
-        List<InhouseExperiment> experiments = loader.loadExperiments(10);
+        List<InhouseExperiment> experiments = loader.loadExperiments(500);
         logger.info("Loader size-> {}\n", experiments.size());
 
         ChemDrawCacheService chemDrawCache = new ChemDrawCacheService(inhouseDB);

@@ -219,12 +219,6 @@ public class InhouseCompoundDTO {
         mat.addFieldValue(fvPurity);
     }
 
-    public void addSynonyms(Collection<InhouseSynonym> synonyms) {
-        for (InhouseSynonym ics : synonyms) {
-            this.synonyms.add(new Synonym("", ics.getSynonym()));
-        }
-    }
-
     public Integer getId() {
         return id;
     }

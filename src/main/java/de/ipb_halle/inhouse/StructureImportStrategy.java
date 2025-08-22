@@ -20,7 +20,6 @@
 
 package de.ipb_halle.inhouse;
 
-import de.ipb_halle.inhouse.imports.AdoCreator;
 import de.ipb_halle.inhouse.imports.ExperimentCreator;
 import de.ipb_halle.inhouse.imports.SampleCreator;
 import de.ipb_halle.inhouse.util.IpbCodeNormalizer;
@@ -31,90 +30,58 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class StructureImportStrategy implements InhouseImportStrategy {
-
+public class StructureImportStrategy extends AbstractBatchImportStrategy {
+    public static final String CHEMICAL_SAMPLE_TEMPLATE_ID = "samples.templateIdChemicalSample";
     private final Logger logger = LogManager.getLogger(StructureImportStrategy.class);
 
     @Override
-    public void importGroup(InhouseDB inhouseDB,
-                            String threeLc,
-                            List<InhouseExperiment> group,
-                            Map<Integer, List<Optional<Experiments.ChemDrawData>>> cdxmlCache) throws Exception {
-        logger.info("StructureImportStrategy started for group: {}", threeLc);
-        if (group.isEmpty()) {
-            logger.warn("StructureImportStrategy:-> Empty experiment list grouped by threeLc {}\n", threeLc);
+    protected String experimentNamePrefix() {
+        return "STRUCT";
+    }
+
+    @Override
+    protected void processItem(InhouseDB inhouseDB,
+                               ExperimentCreator experimentCreator,
+                               SampleCreator sampleCreator,
+                               InhouseExperiment exp,
+                               String eid,
+                               Map<Integer, List<Optional<Experiments.ChemDrawData>>> cdxmlCahce,
+                               ErrorLogger errorLogger) throws Exception {
+
+        Integer procId = exp.getProcId();
+        if (procId == null || procId == 0) {
+            errorLogger.log("Missing procId for: " + exp);
             return;
         }
 
-        // set the experiment for 10 samples
-        ExperimentCreator experimentCreator = new ExperimentCreator(inhouseDB);
-        AdoCreator adoCreator = new AdoCreator(inhouseDB.getAdoManager());
-        SampleCreator sampleCreator = new SampleCreator(inhouseDB, adoCreator);
-        ErrorLogger errorLogger = new ErrorLogger("errorLog_structure_import.txt");
+        List<Optional<Experiments.ChemDrawData>> structures = cdxmlCahce.get(procId);
+        if (structures == null || structures.isEmpty()) {
+            errorLogger.log("No ChenDraw for procId=" + procId);
+            return;
+        }
 
-        int chunkSize = 10;
-        int experimentCounter = 1;
-
-        for (int i = 0; i < group.size(); i += chunkSize) {
-            int toIndex = Math.min(i + chunkSize, group.size());
-            List<InhouseExperiment> chunk = group.subList(i, toIndex);
-
-            InhouseExperiment main = chunk.get(0);
-            String expName = threeLc + "-" + experimentCounter++;
-            String eid = experimentCreator.createExperiment(expName, main);
-
-            for (InhouseExperiment exp : chunk) {
-                Integer procId = exp.getProcId();
-                if (procId == 0) {
-                    errorLogger.log("Missing procId for: " + exp);
-                    continue;
-                }
-
-                List<Optional<Experiments.ChemDrawData>> structures = cdxmlCache.get(procId);
-                if (structures == null || structures.isEmpty()) {
-                    errorLogger.log("No ChemDraw for procId=" + procId);
-                    continue;
-                }
-
-                for (Optional<Experiments.ChemDrawData> cdxmlOpt : structures) {
-                    if (cdxmlOpt.isEmpty()) {
-                        logger.info("Empty ChemDrawData for procId= {}", procId);
-                        errorLogger.log("Empty ChemDrawData for procId=" + procId);
-                        continue;
-                    }
-                    // Create ChemDraw parent entity -> empty
-                    Experiments.ChemDrawData data = cdxmlOpt.get();
-                    logger.info("SIS-> eid of created experiment Eid = {}, MolId =  {}\n", eid, data.molId());
-                    String chemDrawId = experimentCreator.createChemDraw(data.molId(), eid);
-
-                    logger.info("SIS-> CHEMDRAW Eid = {}\n", chemDrawId);
-
-                    // Add a cdxml to empty chemDrawing entity as a product
-                    if (!data.fieldValueCdxml().isEmpty()) {
-                        inhouseDB.getExperimentRestService().addReactionToExperiment(
-                                // POSITIONS-> = reactants|products|reagents|grid
-                                chemDrawId, "products", data.fieldValueCdxml());
-                        logger.info("SIS-> Reaction added to chemDraw");
-                    }
-
-                    // setting description field value
-                    String desc = String.format("MolId: %s, Experiment: %s%s, Journal: %s", data.molId(), threeLc, procId, exp.getJournal());
-                    // Load IpbCode
-                    logger.info("SIS-> molId={}\n", data.molId());
-
-                    String ipbCodeRaw = experimentCreator.loadIpbCodeByMolId(data.molId());
-                    Optional<String> ipbCodeNorm = IpbCodeNormalizer.normalize(ipbCodeRaw); //Optional<String>
-                    logger.info("SIS -> molId={}, ipbCodeRaw={}, normalized={}", data.molId(), ipbCodeRaw, ipbCodeNorm.orElse("<none>"));
-
-                    logger.info("SIS-> starting create sample");
-                    sampleCreator.createSample(chemDrawId, "1", eid, desc, ipbCodeNorm.orElse(null));
-                    logger.info("SIS-> sample created ");
-
-                    exp.setEid(eid);
-                    exp.setImportSuccessful(true);
-                    //inhouseDB.getInhouseDbService().markAsSuccessfullyImported(exp);
-                }
+        for (Optional<Experiments.ChemDrawData> cdxmlOpt : structures) {
+            if (cdxmlOpt.isEmpty()) {
+                logger.info("Empty ChemDrawData for procId={}", procId);
+                errorLogger.log("Empty ChemDrawData for procId=" + procId);
+                continue;
             }
+
+            Experiments.ChemDrawData data = cdxmlOpt.get();
+            String chemDrawId = experimentCreator.createChemDraw(data.molId(), eid);
+
+            if (!data.fieldValueCdxml().isEmpty()) {
+                inhouseDB.getExperimentRestService()
+                        .addReactionToExperiment(chemDrawId, "products", data.fieldValueCdxml());
+            }
+
+            String ipbCodeRaw = experimentCreator.loadIpbCodeByMolId(data.molId());
+            String ipbCodeNorm = IpbCodeNormalizer.normalize(ipbCodeRaw).orElse(null);
+
+            String desc = String.format("MolId: %s, Experiment: %s%s, Journal: %s",
+                    data.molId(), exp.getThreelc(), procId, exp.getJournal());
+
+            sampleCreator.createChemicalSample(CHEMICAL_SAMPLE_TEMPLATE_ID, chemDrawId, "1", eid, desc, ipbCodeNorm);
         }
     }
 }

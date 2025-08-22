@@ -176,7 +176,7 @@ public class InhouseDB {
         Experiments experiments = new Experiments(this);
 //
 //        logger.info("STARTING IMPORT OF Table Correlations between structure and organism");
-//        Correlation correlation = new Correlation(this);
+       Correlation correlation = new Correlation(this);
 
         logger.info("STARTING IMPORT OF SAMPLES");
         Samples samples = new Samples(this);
@@ -191,13 +191,13 @@ public class InhouseDB {
 
       //  compounds.importData();
         experiments.importData();
-        //  correlation.importData();
+       // correlation.importData();
 
 //        taxonomy.importData();
         //     samples.importData();
 
         // organisms.importOrganisms();
-        // extracts.importExtracts();
+        //extracts.importExtracts();
     }
 
 

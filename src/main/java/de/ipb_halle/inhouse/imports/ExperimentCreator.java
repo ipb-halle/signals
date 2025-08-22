@@ -41,6 +41,7 @@ public class ExperimentCreator {
 
         // 2) Create a Signals Experiment JavaObject
         Experiment signalsExp = dto.createExperiment(experimentName);
+        signalsExp.setDescription(experiment.getThreelc());
 
         // 3) Make a Rest Call to signals API in order to create an experiment entity in signals Notebook
         // with field values for an Experiment Template InhouseExperiment (Template ID = experiment:834e6aee-0d59-4732-89d7-925edca09844)
@@ -64,4 +65,5 @@ public class ExperimentCreator {
                 ? compound.getIpbCode()
                 : "";
     }
+    
 }

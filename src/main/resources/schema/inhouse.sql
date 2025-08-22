@@ -13,12 +13,6 @@ CREATE TABLE inhouse_compounds (
     UNIQUE (mol_id)
 );
 
-CREATE TABLE inhouse_synonyms (
-    id  SERIAL NOT NULL PRIMARY KEY,
-    inhouse_id INTEGER NOT NULL,
-    type VARCHAR,
-    synonym VARCHAR,
-);
 
 CREATE TABLE inhouse_experiments (
     id SERIAL NOT NULL PRIMARY KEY,
@@ -33,53 +27,7 @@ CREATE TABLE inhouse_experiments (
     UNIQUE(proc_id)
 );
 
-CREATE TABLE inhouse_taxonomy (
-    id SERIAL NOT NULL PRIMARY KEY,
-    eid VARCHAR,
-    inhouse_id INTEGER,
-    inhouse_parent_id INTEGER,
-    organism_id INTEGER,
-    parent VARCHAR,
-    level VARCHAR,
-    name VARCHAR
-);
 
-CREATE TABLE inhouse_correlation (
-    id SERIAL NOT NULL PRIMARY KEY,
-    context VARCHAR,
-    mol_id INTEGER,
-    organism_id INTEGER,
-    procedure_id INTEGER
-);
-
-CREATE TABLE inhouse_locations (
-    id SERIAL NOT NULL PRIMARY KEY,
-    eid VARCHAR,
-    name VARCHAR,
-    columns INTEGER,
-    rows INTEGER,
-    zerobased BOOLEAN DEFAULT FALSE
-);
-
-CREATE TABLE inhouse_containers (
-    id SERIAL NOT NULL PRIMARY KEY,
-    eid VARCHAR,
-    sample_id INTEGER,
-    amount FLOAT,
-    tara FLOAT,
-    volume FLOAT,
-    concentration FLOAT,
-    sample_code VARCHAR,
-    purity INTEGER,
-    appearance VARCHAR,
-    remarks VARCHAR,
-    ipb_code VARCHAR,
-    last_solvent VARCHAR,
-    compound_correlation_id INTEGER,
-    organism_correlation_id INTEGER,
-    location VARCHAR,
-    location_id INTEGER
-);
 
 CREATE TABLE inhouse_organisms (
     id SERIAL PRIMARY KEY,
@@ -93,7 +41,7 @@ CREATE TABLE inhouse_extract (
     id SERIAL PRIMARY KEY,
     eid VARCHAR,
     extract_id INTEGER,
-    correlation_id VARCHAR,
+    corr_orgproc_id INTEGER,
     last_solvent VARCHAR,
     storage_place VARCHAR,
     extract_code VARCHAR,
@@ -108,5 +56,66 @@ CREATE TABLE inhouse_extract (
     extract_position VARCHAR,
     extract_barcode VARCHAR,
     ipb_code VARCHAR
+);
+
+
+CREATE TABLE inhouse_container (
+    id SERIAL PRIMARY KEY,
+    eid VARCHAR,
+    sample_id INTEGER,
+    amount DOUBLE PRECISION,
+    tara DOUBLE PRECISION,
+    volume DOUBLE PRECISION,
+    concentration DOUBLE PRECISION,
+    sample_code VARCHAR,
+    purity INTEGER,
+    appearance VARCHAR,
+    remarks VARCHAR,
+    ipb_code VARCHAR,
+    last_solvent VARCHAR,
+    compound_correlation_id INTEGER,
+    organism_correlation_id INTEGER,
+    location VARCHAR,
+    location_id INTEGER,
+    row INTEGER,
+    container_column INTEGER
+);
+
+CREATE TABLE inhouse_correlation (
+    id SERIAL PRIMARY KEY,
+    corr_id INTEGER,
+    context VARCHAR,
+    mol_id INTEGER,
+    proc_id INTEGER,
+    org_id INTEGER
+);
+
+
+CREATE TABLE inhouse_locations(
+    id SERIAL PRIMARY KEY,
+    eid VARCHAR,
+    name VARCHAR,
+    location_columns INTEGER,
+    location_rows INTEGER,
+    zero_based BOOLEAN
+);
+
+CREATE TABLE inhouse_synonyms(
+    id SERIAL PRIMARY KEY,
+    inhouse_id INTEGER,
+    type VARCHAR,
+    synonym VARCHAR
+);
+
+CREATE TABLE inhouse_taxonomy (
+    id SERIAL PRIMARY KEY,
+    eid VARCHAR,
+    inhouse_id INTEGER,
+    inhouse_parent_id INTEGER,
+    organism_id INTEGER,
+    parent VARCHAR,
+    taxonomy_level VARCHAR,
+    name VARCHAR
+
 );
 

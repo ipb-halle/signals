@@ -53,7 +53,9 @@ public class Correlation {
     private void importCorrelation(String context, String filename) throws Exception {
         System.out.println("Importing correlation table organism / experiment");
 
-        Pattern pattern = Pattern.compile("^(\\d+);(\\d+);(\\d+)$");
+        Pattern pattern = Pattern.compile("^(\\d+);" +  // CorrOrganisms_ProcedureID
+                "(\\d+);" +                                    // RefOrganismID (org_id)
+                "(\\d+)$");                                    // RefProcedureID (proc_id)
 
         BufferedReader reader = new BufferedReader(new FileReader(filename));
         BufferedWriter writer = new BufferedWriter(new FileWriter(inhouseDB.getConfigString(REJECTFILE)));
@@ -66,16 +68,20 @@ public class Correlation {
                 int correlationId = Integer.parseInt(matcher.group(1));
                 InhouseCorrelation corr = new InhouseCorrelation()
                         .setContext(context);
+
                 switch(context) {
                     case MOLORG:
+                        corr.setCorrId(correlationId);
                         corr.setMolId(Integer.parseInt(matcher.group(2)));
                         corr.setOrganismId(Integer.parseInt(matcher.group(3)));
                         break;
                     case MOLPROC:
+                        corr.setCorrId(correlationId);
                         corr.setMolId(Integer.parseInt(matcher.group(2)));
                         corr.setProcedureId(Integer.parseInt(matcher.group(3)));
                         break;
                     case ORGPROC:
+                        corr.setCorrId(correlationId);
                         corr.setOrganismId(Integer.parseInt(matcher.group(2)));
                         corr.setProcedureId(Integer.parseInt(matcher.group(3)));
                         break;

@@ -75,7 +75,7 @@ public class Extracts {
                 if (m.matches()) {
                     InhouseExtract extracts = new InhouseExtract()
                             .setExtractId(Integer.parseInt(m.group(1)))
-                            .setCorrelationId(m.group(2))
+                            .setCorrelationOrgProcId(Integer.parseInt(m.group(2)))
                             .setLastSolvent(m.group(3))
                             .setStoragePlace(m.group(4))
                             .setExtractCode(m.group(5))
@@ -92,7 +92,7 @@ public class Extracts {
                             .setIpbCode(m.group(16).isEmpty() ? "no record" : m.group(16));
 
                     inhouseDB.getInhouseDbService().save(extracts);
-                }else {
+                } else {
                     writer.write(line);
                     writer.newLine();
                 }

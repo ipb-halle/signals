@@ -67,7 +67,7 @@ public class InhouseImportManager {
     public InhouseImportManager(InhouseDB inhouseDB) {
         this.inhouseDB = inhouseDB;
         this.strategies = Map.of(
-                InhouseImportType.STRUCTURE, new StructureImportStrategy(),
+               // InhouseImportType.STRUCTURE, new StructureImportStrategy(),
                 InhouseImportType.ORGANISM, new OrganismImportStrategy()
         );
     }
