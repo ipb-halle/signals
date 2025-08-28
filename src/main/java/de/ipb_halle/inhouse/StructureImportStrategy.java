@@ -81,7 +81,7 @@ public class StructureImportStrategy extends AbstractBatchImportStrategy {
             String desc = String.format("MolId: %s, Experiment: %s%s, Journal: %s",
                     data.molId(), exp.getThreelc(), procId, exp.getJournal());
 
-            sampleCreator.createChemicalSample(CHEMICAL_SAMPLE_TEMPLATE_ID, chemDrawId, "1", eid, desc, ipbCodeNorm);
+            sampleCreator.createChemicalSample(CHEMICAL_SAMPLE_TEMPLATE_ID, chemDrawId, "1", eid, desc, ipbCodeNorm, procId);
         }
     }
 }

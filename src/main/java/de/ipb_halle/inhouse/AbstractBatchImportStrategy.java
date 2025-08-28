@@ -61,9 +61,10 @@ public abstract class AbstractBatchImportStrategy implements InhouseImportStrate
         }
 
         ExperimentCreator experimentCreator = new ExperimentCreator(inhouseDB);
-        SampleCreator sampleCreator = new SampleCreator(inhouseDB, inhouseDB.getAdoManager() != null
-                ? new AdoCreator(inhouseDB.getAdoManager())
-                : null);
+        SampleCreator sampleCreator = new SampleCreator(inhouseDB,
+                inhouseDB.getAdoManager() != null ?
+                        new AdoCreator(inhouseDB.getAdoManager())
+                        : null);
         ErrorLogger errorLogger = new ErrorLogger("errorLog_" + experimentNamePrefix().toLowerCase() + "_import.txt");
 
         int experimentCounter = 1;
@@ -73,6 +74,7 @@ public abstract class AbstractBatchImportStrategy implements InhouseImportStrate
 
             InhouseExperiment main = chunk.get(0);
             String expName = threeLc + "-" + experimentNamePrefix() + "-" + experimentCounter++;
+            //Postrequest for creation of experiment
             String eid = experimentCreator.createExperiment(expName, main);
             logger.info("Created experiment {} (eid={})", expName, eid);
 

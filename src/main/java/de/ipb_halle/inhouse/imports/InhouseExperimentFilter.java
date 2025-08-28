@@ -78,8 +78,8 @@ public class InhouseExperimentFilter {
         int missingProcId = 0;
         int missingChemDraw = 0;
 
-        List<InhouseExperiment> structure = new ArrayList<>();
-        List<InhouseExperiment> extrakt = new ArrayList<>();
+        List<InhouseExperiment> structures = new ArrayList<>();
+        List<InhouseExperiment> extracts = new ArrayList<>();
         List<InhouseExperiment> unknown = new ArrayList<>();
 
         for (InhouseExperiment exp : experiments) {
@@ -98,12 +98,12 @@ public class InhouseExperimentFilter {
             if (cdxmlList.isEmpty() || cdxmlList.stream().allMatch(Optional::isEmpty)) {
                 missingChemDraw++;
                 if (hasOrgId(procId) && hasExtract(procId)) {
-                    extrakt.add(exp);
+                    extracts.add(exp);
                 } else {
                     unknown.add(exp);
                 }
             } else {
-                structure.add(exp);
+                structures.add(exp);
             }
         }
 
@@ -114,11 +114,11 @@ public class InhouseExperimentFilter {
         errorLogger.log("Experiments with missing ChemDraw = " + missingChemDraw);
         logger.info("IEF-> MISSING CHEMDRAW = {}\n", missingChemDraw);
 
-        logger.info("IEF-> STRUCTURE ARRAY = {}\n, ORGANISM ARRAY ={}\n, UNKNOWN ARRAY = {}\n", structure.size(), extrakt.size(), unknown.size());
+        logger.info("IEF-> STRUCTURE ARRAY = {}\n, ORGANISM ARRAY ={}\n, UNKNOWN ARRAY = {}\n", structures.size(), extracts.size(), unknown.size());
 
         return Map.of(
-                InhouseImportType.STRUCTURE, structure,
-                InhouseImportType.ORGANISM, extrakt,
+                InhouseImportType.STRUCTURE, structures,
+                InhouseImportType.ORGANISM, extracts,
                 InhouseImportType.UNKNOWN, unknown
         );
     }

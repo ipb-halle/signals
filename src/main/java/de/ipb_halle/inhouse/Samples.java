@@ -31,17 +31,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -185,7 +175,7 @@ public class Samples {
                 if (matcher.matches()) {
                     InhouseContainer container = new InhouseContainer()
                             .setSampleId(Integer.parseInt(matcher.group(1)))
-                            .setCompoundCorrelationId(Integer.parseInt(matcher.group(2)))
+                            .setMolProcId(Integer.parseInt(matcher.group(2)))
                             .setLastSolvent(stripQuotes(matcher.group(3)))      // "acetic acid"
                             .setSampleCode(stripQuotes(matcher.group(7)))
                             .setAmount(parseDecimalString(matcher.group(8)))

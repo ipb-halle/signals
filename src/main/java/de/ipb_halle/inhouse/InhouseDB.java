@@ -27,6 +27,7 @@ import de.ipb_halle.signals.entity.SignalsEntityRestService;
 import de.ipb_halle.signals.experiments.ExperimentDbService;
 import de.ipb_halle.signals.experiments.ExperimentRestService;
 import de.ipb_halle.signals.field.FieldDbService;
+import de.ipb_halle.signals.inventory.ContainerRestService;
 import de.ipb_halle.signals.materials.LibraryDbService;
 import de.ipb_halle.signals.materials.MaterialRestService;
 import de.ipb_halle.signals.rest.RestHelper;
@@ -108,6 +109,9 @@ public class InhouseDB {
     @Inject
     private AdoManager adoManager;
 
+    @Inject
+    private ContainerRestService containerRestService;
+
     @SuppressWarnings("static-access")
     private static final Option inhouseOpt = Option.builder("inhouse")
             .longOpt("importInhouse")
@@ -166,6 +170,10 @@ public class InhouseDB {
         return adoManager;
     }
 
+    public ContainerRestService getContainerRestService() {
+        return containerRestService;
+    }
+
     private void importData(String configFile) throws Exception {
         readConfig(configFile);
 
@@ -176,7 +184,7 @@ public class InhouseDB {
         Experiments experiments = new Experiments(this);
 //
 //        logger.info("STARTING IMPORT OF Table Correlations between structure and organism");
-       Correlation correlation = new Correlation(this);
+        Correlation correlation = new Correlation(this);
 
         logger.info("STARTING IMPORT OF SAMPLES");
         Samples samples = new Samples(this);
@@ -189,9 +197,9 @@ public class InhouseDB {
 
 //        Taxonomy taxonomy = new Taxonomy(this);
 
-      //  compounds.importData();
+        //  compounds.importData();
         experiments.importData();
-       // correlation.importData();
+        // correlation.importData();
 
 //        taxonomy.importData();
         //     samples.importData();

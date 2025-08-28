@@ -31,6 +31,7 @@ import de.ipb_halle.signals.field.FieldParser;
 import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.materials.MaterialReference;
 import de.ipb_halle.signals.rest.*;
+import de.ipb_halle.signals.sample.Sample;
 import de.ipb_halle.signals.sample.SampleProcessorBean;
 import de.ipb_halle.signals.users.UserReference;
 import jakarta.ejb.Local;
@@ -243,7 +244,7 @@ public class ContainerRestService implements RestReplyParser<Container> {
     }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void doCreateContainer(ContainerType containerType, Container container) {
+    public String doCreateContainer(ContainerType containerType, Container container) {
 
         JsonObject request = prepareContainer(containerType, container);
 
@@ -257,6 +258,7 @@ public class ContainerRestService implements RestReplyParser<Container> {
         } catch (Exception e) {
             throw new RuntimeException("something went wrong", e);
         }
+        return null;
     }
 
     private JsonObject prepareContainer(ContainerType containerType, Container container) {
@@ -329,4 +331,9 @@ public class ContainerRestService implements RestReplyParser<Container> {
         return field;
     }
 
+    public void attachContainerToSample(Sample sample, String smapleId, Container container, ContainerType containerType) {
+        //toDo: implement Method
+        logger.info("METHOD IS IN DEVELOPMENT");
+        doCreateContainer(containerType, container);
+    }
 }

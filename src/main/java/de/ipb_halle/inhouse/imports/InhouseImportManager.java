@@ -67,8 +67,8 @@ public class InhouseImportManager {
     public InhouseImportManager(InhouseDB inhouseDB) {
         this.inhouseDB = inhouseDB;
         this.strategies = Map.of(
-               // InhouseImportType.STRUCTURE, new StructureImportStrategy(),
-                InhouseImportType.ORGANISM, new OrganismImportStrategy()
+                 InhouseImportType.STRUCTURE, new StructureImportStrategy()
+              //  InhouseImportType.ORGANISM, new OrganismImportStrategy()
         );
     }
 
@@ -92,23 +92,27 @@ public class InhouseImportManager {
      * @param chemDrawCache     Cache of ChemDraw data (used only for STRUCTURE imports)
      * @throws Exception If grouping or importing fails
      */
-    public void importAll(Map<InhouseImportType, List<InhouseExperiment>> experimentsByType,
-                          ChemDrawCacheService chemDrawCache) throws Exception {
+    public void importAll(Map<InhouseImportType, List<InhouseExperiment>> experimentsByType, ChemDrawCacheService chemDrawCache) throws Exception {
 
+        // extraction of List<InhouseExperinet> from Map according to InhouseImpotType (STRUCTURE, EXTRACT, UNKNOWN)
         for (InhouseImportType type : InhouseImportType.values()) {
             List<InhouseExperiment> list = experimentsByType.getOrDefault(type, List.of());
             if (list.isEmpty() || !strategies.containsKey(type)) continue;
 
 
+            // Grouping of  InhouseExperiments according to threeLc in to chunks with size of 10 experiments
             ExperimentGrouper grouper = new ExperimentGrouper();
             ErrorLogger logger = new ErrorLogger("grouping_" + type.name().toLowerCase() + ".log");
+            //   threeLc, grouped experiments toDO: weiter schreiben ab dieser Stelle
             Map<String, List<InhouseExperiment>> grouped = grouper.groupByThreeLC(list, ImportMode.TESTING, logger);
+
 
             for (Map.Entry<String, List<InhouseExperiment>> entry : grouped.entrySet()) {
 
-                Map<Integer, List<Optional<Experiments.ChemDrawData>>> cdxmlCache =
-                        (type == InhouseImportType.STRUCTURE) ? chemDrawCache.getCdxmlCache() : Map.of();
+                //getting ChemDrawData(molId, cdxml) from cache service chemDrawCache if type is Structure
+                Map<Integer, List<Optional<Experiments.ChemDrawData>>> cdxmlCache = (type == InhouseImportType.STRUCTURE) ? chemDrawCache.getCdxmlCache() : Map.of();
 
+                //starting of import strategy up to InhouseImportType
                 strategies.get(type).importGroup(
                         inhouseDB,
                         entry.getKey(),

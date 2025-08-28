@@ -19,6 +19,7 @@
 
 package de.ipb_halle.inhouse;
 
+import de.ipb_halle.signals.inventory.Location;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -48,6 +49,9 @@ public class InhouseLocation {
 
     @Column(name = "zero_based")
     private boolean zeroBased;
+
+    @Column(name="signals_location")
+    private Location signalsLocation;
 
     public Integer getId() {
         return id;
@@ -100,6 +104,15 @@ public class InhouseLocation {
 
     public InhouseLocation setZeroBased(boolean zeroBased) {
         this.zeroBased = zeroBased;
+        return this;
+    }
+
+    public Location getSignalsLocation() {
+        return signalsLocation;
+    }
+
+    public InhouseLocation setSignalsLocation(Location signalsLocation) {
+        this.signalsLocation = signalsLocation;
         return this;
     }
 }

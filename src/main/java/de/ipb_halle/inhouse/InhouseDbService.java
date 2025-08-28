@@ -35,6 +35,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Stateless
@@ -175,7 +176,7 @@ public class InhouseDbService {
             return em.createQuery(query).getResultList();
 
         } catch (NoResultException e) {
-            return null;
+            return Collections.emptyList();
         }
     }
 
@@ -234,7 +235,41 @@ public class InhouseDbService {
             return em.createQuery(cq).getResultList();
 
         } catch (NoResultException e) {
-            return null;
+            return Collections.emptyList();
         }
+    }
+
+    public List<InhouseContainer> loadInhouseContainerByMolProcId(Integer molProcId) {
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<InhouseContainer> query = builder.createQuery(InhouseContainer.class);
+        Root<InhouseContainer> root = query.from(InhouseContainer.class);
+        query.select(root);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(builder.equal(root.get("molProcId"), molProcId));
+        query.where(builder.and(predicates.toArray(new Predicate[0])));
+        try {
+            return em.createQuery(query).getResultList();
+        } catch (NoResultException e) {
+            logger.error("Loading of Inhouse Container is failed: {}\n", e);
+        }
+        return Collections.emptyList();
+    }
+
+    public InhouseLocation loadInhouseLocationById(Integer locationId) {
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<InhouseLocation> query = builder.createQuery(InhouseLocation.class);
+        Root<InhouseLocation> root = query.from(InhouseLocation.class);
+        query.select(root);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(builder.equal(root.get("id"), locationId));
+        query.where(builder.and(predicates.toArray(new Predicate[0])));
+        try {
+            return em.createQuery(query).getSingleResult();
+        } catch (NoResultException e) {
+            logger.error("Loading of Inhouse Location is failed: {}\n", e);
+        }
+        return null;
     }
 }

@@ -75,7 +75,7 @@ public class InhouseContainer {
     private String lastSolvent;
 
     @Column(name = "compound_correlation_id")
-    private Integer compoundCorrelationId;
+    private Integer molProcId;
 
     @Column(name = "organism_correlation_id")
     private Integer organismCorrelationId;
@@ -209,12 +209,12 @@ public class InhouseContainer {
         return this;
     }
 
-    public Integer getCompoundCorrelationId() {
-        return compoundCorrelationId;
+    public Integer getMolProcId() {
+        return molProcId;
     }
 
-    public InhouseContainer setCompoundCorrelationId(Integer compoundCorrelationId) {
-        this.compoundCorrelationId = compoundCorrelationId;
+    public InhouseContainer setMolProcId(Integer compoundCorrelationId) {
+        this.molProcId = compoundCorrelationId;
         return this;
     }
 

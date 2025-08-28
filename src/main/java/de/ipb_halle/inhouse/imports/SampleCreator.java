@@ -20,6 +20,8 @@
 
 package de.ipb_halle.inhouse.imports;
 
+import de.ipb_halle.inhouse.InhouseContainer;
+import de.ipb_halle.inhouse.InhouseCorrelation;
 import de.ipb_halle.inhouse.InhouseDB;
 import de.ipb_halle.signals.ado.Ado;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
@@ -30,11 +32,12 @@ import de.ipb_halle.signals.sample.StoicRef;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 public class SampleCreator {
-
 
 
     public static final String FIELD_DESCRIPTION = "samples.fields.description";
@@ -43,12 +46,14 @@ public class SampleCreator {
 
     private final InhouseDB inhouseDB;
     private final AdoCreator adoCreator;
+    private final SampleContainerAttacher attacher;
     private final static Logger logger = (Logger) LogManager.getLogger(SampleCreator.class);
     private final DynEnumManager dynEnumManager;
 
     public SampleCreator(InhouseDB inhouseDB, AdoCreator adoCreator) {
         this.inhouseDB = inhouseDB;
         this.adoCreator = adoCreator;
+        this.attacher = new SampleContainerAttacher(inhouseDB);
         this.dynEnumManager = inhouseDB.getDynEnumManager();
     }
 
@@ -57,7 +62,8 @@ public class SampleCreator {
                                      String rowId,
                                      String ancestorId,
                                      String description,
-                                     String ipbCode) {
+                                     String ipbCode,
+                                     Integer procId) throws Exception {
 
         // 1) Create a new Sample and assign the chemical sample template
         Sample sample = baseSample(sampleTemplateId, ancestorId);
@@ -69,20 +75,34 @@ public class SampleCreator {
         sample.setStoicRef(ref);
 
         // Create the sample via REST and store the returned Signals sample ID
-        String sampleId = inhouseDB.getSampleRestService().createNewSample(sample);
+        String eid = inhouseDB.getSampleRestService().createNewSample(sample);
 
         // Description property
-        SamplePropertyValue desc = attachDescription(sample, sampleId, description);
+        SamplePropertyValue desc = attachDescription(sample, eid, description);
 
         // === ADO link (optional) ===
         // Load or create ADO
-        attachIPB_CodeAdo( sample, sampleId, ipbCode);
+        attachIPB_CodeAdo(sample, eid, ipbCode);
 
+       // attachSampleContainer(sample, eid, procId);
+        attacher.attachSampleContainer(sample, eid, procId);
         // Prepare properties as key-value pairs for PATCH update
-        patch(sample, sampleId);
+        patch(sample, eid);
     }
 
-    public void createExtractSample(String templateId, String ancestorId, String description, String ipbCode){
+    private void attachSampleContainer(Sample sample, String eid, Integer procId) {
+        List<InhouseCorrelation> correlations = inhouseDB.getInhouseDbService().loadCorrelationByProcedureId(procId);
+        for (InhouseCorrelation correlation : correlations) {
+            if (correlation.getContext().equalsIgnoreCase("molproc")) {
+                Integer molProcId = correlation.getCorrId();
+                List<InhouseContainer> container = inhouseDB.getInhouseDbService().loadInhouseContainerByMolProcId(molProcId);
+                logger.info("Loaded Container: {}\n", Arrays.toString(container.toArray()));
+                //createSignalsContainerForChemicalSample(container);// toDo. hier weiter machen
+            }
+        }
+    }
+
+    public void createExtractSample(String templateId, String ancestorId, String description, String ipbCode) {
         Sample sample = baseSample(templateId, ancestorId);
 
         String sampleId = inhouseDB.getSampleRestService().createNewSample(sample);
@@ -115,7 +135,7 @@ public class SampleCreator {
         return desc;
     }
 
-    private void attachIPB_CodeAdo( Sample sample, String sampleId, String ipbCode) {
+    private void attachIPB_CodeAdo(Sample sample, String sampleId, String ipbCode) {
         if (ipbCode != null) {
             logger.info("SampleCreator:-> Starting create Ados");
             String adoTemplateId = inhouseDB.getConfigString(ADO_TEMPLATE_ID);
