@@ -23,6 +23,7 @@ package de.ipb_halle.inhouse.imports;
 import de.ipb_halle.inhouse.InhouseContainer;
 import de.ipb_halle.inhouse.InhouseCorrelation;
 import de.ipb_halle.inhouse.InhouseDB;
+import de.ipb_halle.signals.entity.Unit;
 import de.ipb_halle.signals.inventory.Container;
 import de.ipb_halle.signals.inventory.ContainerType;
 import de.ipb_halle.signals.inventory.Location;
@@ -68,7 +69,6 @@ public class SampleContainerAttacher {
 
     private static final Logger logger = LogManager.getLogger(SampleContainerAttacher.class);
 
-    private TraysCsvEntry entry;
 
     public SampleContainerAttacher(InhouseDB inhouseDb) {
         this.inhouseDb = inhouseDb;
@@ -135,7 +135,11 @@ public class SampleContainerAttacher {
                             container.setMaterial(new MaterialReference().setId(sample.getId()));
                             container.setLocation(new LocationReference().setId(location.getId()));
                             container.setContainerTypeId(CONTAINER_TYPE_ID_VIAL);
-                            container.se
+                            container.setCoordinateX(ic.getRow());
+                            container.setCoordinateY(ic.getColumn());
+                            container.setAmount(ic.getAmount());
+                            container.setUnit(Unit.getUnit("µl"));
+                            container.setDescription("this is a container for sample: " + sample.getName());
 
                             ContainerType containerType = container.getContainerType();
                             inhouseDb.getContainerRestService().doCreateContainer(containerType, container);
@@ -151,6 +155,7 @@ public class SampleContainerAttacher {
     private Map<String, List<TraysCsvEntry>> loadLocationsFromCSVForTray() {
         // setting path to csv file
         Map<String, List<TraysCsvEntry>> mapOfTrayEntries = new HashMap<>();
+
         for (TrayPrefix prefix : TrayPrefix.values()) {
 
             switch (prefix) {
@@ -182,6 +187,8 @@ public class SampleContainerAttacher {
     }
 
     private List<TraysCsvEntry> processLoading(String tPrefix) {
+        TraysCsvEntry entry;
+
         Path csvPath;
         csvPath = resolveCsvPath(tPrefix);
 
@@ -241,13 +248,13 @@ public class SampleContainerAttacher {
     }
 
     private static TraysCsvEntry toEntry(String[] parts, BufferedWriter reject, int lineNo, String raw, String trayPrefix) throws IOException {
-        String numberOfTray = parts[0].trim(); // "001" -> Nummer
-        String storageRoom = parts[1].trim(); // "R003.K.8"  -> Standort/Person
-        String giveAwayDate = parts[2].trim();
-        String giveBackDate = parts[3].trim();
-        String fillLevel = parts[4].trim(); // "Restpätze" | "Voll" | ""
-        String columnNumber = parts[5].trim(); // "3" | "2"
-        String rowNumber = parts[6].trim(); // "8 (A-H)" | "5 (A-E)" | "4 (A-D)"
+        String numberOfTray = parts[0].trim();      // "001" -> Nummer
+        String storageRoom = parts[1].trim();      // "R003.K.8"  -> Standort/Person
+        String giveAwayDate = parts[2].trim();      // never used
+        String giveBackDate = parts[3].trim();      // never used
+        String fillLevel = parts[4].trim();      // "Restpätze" | "Voll" | ""
+        String columnNumber = parts[5].trim();      // "3" | "2"
+        String rowNumber = parts[6].trim();      // "8 (A-H)" | "5 (A-E)" | "4 (A-D)"
 
 
         if (numberOfTray.isEmpty()) {
