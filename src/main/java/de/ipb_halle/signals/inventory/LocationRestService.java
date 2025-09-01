@@ -187,7 +187,7 @@ public class LocationRestService implements RestReplyParser<Location> {
 
     //toDo consider whether to return a new object or not
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void doCreateLocation(LocationType locationType, Location location) {
+    public String doCreateLocation(LocationType locationType, Location location) {
 
         JsonObject request = prepareLocation(locationType, location);
 
@@ -197,6 +197,14 @@ public class LocationRestService implements RestReplyParser<Location> {
                     .setEndpoint(LOCATION_CREATE_ENDPOINT)
                     .setRequestData(request.toString())
                     .execute(RestClient.HTTP_CREATED);
+
+            //Return String id of generated sample
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
+            return jsonResult.getAsJsonObject()
+                    .getAsJsonObject(RestHelper.ATTR_DATA)
+                    .get(RestHelper.ATTR_ID)
+                    .getAsJsonPrimitive().getAsString();
+
         } catch (Exception e) {
             throw new RuntimeException(e.getLocalizedMessage());
         }

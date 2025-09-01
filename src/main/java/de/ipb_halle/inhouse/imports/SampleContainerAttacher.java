@@ -24,12 +24,10 @@ import de.ipb_halle.inhouse.InhouseContainer;
 import de.ipb_halle.inhouse.InhouseCorrelation;
 import de.ipb_halle.inhouse.InhouseDB;
 import de.ipb_halle.signals.entity.Unit;
-import de.ipb_halle.signals.inventory.Container;
-import de.ipb_halle.signals.inventory.ContainerType;
-import de.ipb_halle.signals.inventory.Location;
-import de.ipb_halle.signals.inventory.LocationReference;
+import de.ipb_halle.signals.inventory.*;
 import de.ipb_halle.signals.materials.MaterialReference;
 import de.ipb_halle.signals.sample.Sample;
+import de.ipb_halle.signals.users.UserReference;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -53,6 +51,7 @@ public class SampleContainerAttacher {
     public static final String LOCATIONS_TH = "locations.th";
 
     public static final String CONTAINER_TYPE_ID_VIAL = "container:b9f1ac14-3a84-4812-98b3-6543abc68d62:ivt";
+    public static final String LOCATION_TYPE_ID_TRAY = "location:e4d8f923-d407-4bee-8121-857a86f9e59d:ivt";
 
     private final InhouseDB inhouseDb;
 
@@ -81,6 +80,8 @@ public class SampleContainerAttacher {
      * @param procId procedure_id from Inhouse
      */
     public void attachSampleContainer(Sample sample, String eid, Integer procId) throws Exception {
+        logger.info("SAMPLE CONTAINER ATTACHER:=> cheking sample eid = {} \n", eid);
+
         // 1) Load the correlation by procedure id for structure (aim context ="molproc")
         List<InhouseCorrelation> corr = inhouseDb.getInhouseDbService().loadCorrelationByProcedureId(procId);
         if (corr == null || corr.isEmpty()) {
@@ -106,6 +107,7 @@ public class SampleContainerAttacher {
                 Map<String, List<TraysCsvEntry>> mapOfStoragePlaceToStorageRoom = loadLocationsFromCSVForTray();
 
                 // if not
+                int counter = 1;
                 for (InhouseContainer ic : containers) {
                     // Location
                     Location location;
@@ -125,21 +127,33 @@ public class SampleContainerAttacher {
                             // e.g R003.K8 + TH001
                             //location = inhouseDb.getLocationDbService().loadLocationByName(entry.storageRoom + storagePlace);
 
-                            // this is a case for Test
+                            // toDo: this is a case for Test
+                            // =========== begin of the test code ==============
                             location = new Location();
-                            location.setLocationTypeId("location:4f175cfd-a596-47c6-ac0e-58aced1524c2:ivt");
-                            location.setName("TS001");
+                            location.setLocationTypeId(LOCATION_TYPE_ID_TRAY);
+                            location.setName(String.format("TS00%d", counter++));
+
+                            LocationType locationType = new LocationType();
+                            locationType.setId(LOCATION_TYPE_ID_TRAY);
+                            locationType.setId("Vial" + counter);
+
+                            // Rest call to create a location
+                            String locationEid = inhouseDb.getLocationRestService().doCreateLocation(locationType, location);
+                            // =========== end of the test code ==============
 
                             Container container = new Container();
                             container.setName(sample.getName());
-                            container.setMaterial(new MaterialReference().setId(sample.getId()));
-                            container.setLocation(new LocationReference().setId(location.getId()));
+                            // here the sample eid will be set
+                            container.setMaterial(new MaterialReference().setId(eid));
+                            // here location eid will be set
+                            container.setLocation(new LocationReference().setId(locationEid));
                             container.setContainerTypeId(CONTAINER_TYPE_ID_VIAL);
                             container.setCoordinateX(ic.getRow());
                             container.setCoordinateY(ic.getColumn());
                             container.setAmount(ic.getAmount());
                             container.setUnit(Unit.getUnit("µl"));
                             container.setDescription("this is a container for sample: " + sample.getName());
+                            container.setCreatedBy(new UserReference("147"));
 
                             ContainerType containerType = container.getContainerType();
                             inhouseDb.getContainerRestService().doCreateContainer(containerType, container);
