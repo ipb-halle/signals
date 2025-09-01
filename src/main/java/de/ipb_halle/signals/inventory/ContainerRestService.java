@@ -31,7 +31,6 @@ import de.ipb_halle.signals.field.FieldParser;
 import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.materials.MaterialReference;
 import de.ipb_halle.signals.rest.*;
-import de.ipb_halle.signals.sample.Sample;
 import de.ipb_halle.signals.sample.SampleProcessorBean;
 import de.ipb_halle.signals.users.UserReference;
 import jakarta.ejb.Local;
@@ -329,11 +328,5 @@ public class ContainerRestService implements RestReplyParser<Container> {
         content.addProperty(RestHelper.ATTR_VALUE, fieldValue.getValue());
         field.add(RestHelper.ATTR_CONTENT, content);
         return field;
-    }
-
-    public void attachContainerToSample(Sample sample, String smapleId, Container container, ContainerType containerType) {
-        //toDo: implement Method
-        logger.info("METHOD IS IN DEVELOPMENT");
-        doCreateContainer(containerType, container);
     }
 }

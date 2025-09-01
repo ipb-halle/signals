@@ -23,37 +23,52 @@ package de.ipb_halle.inhouse.imports;
 import de.ipb_halle.inhouse.InhouseContainer;
 import de.ipb_halle.inhouse.InhouseCorrelation;
 import de.ipb_halle.inhouse.InhouseDB;
-import de.ipb_halle.inhouse.InhouseLocation;
 import de.ipb_halle.signals.inventory.Container;
 import de.ipb_halle.signals.inventory.ContainerType;
 import de.ipb_halle.signals.inventory.Location;
 import de.ipb_halle.signals.inventory.LocationReference;
+import de.ipb_halle.signals.materials.MaterialReference;
 import de.ipb_halle.signals.sample.Sample;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SampleContainerAttacher {
-    public static final String LOCATIONS_CSV_FILENAME = "locations";
     public static final String LOCATIONS_CSV_REJECTFILE = "locations.reject";
     public static final String LOCATIONS_TS = "locations.ts";
     public static final String LOCATIONS_TM = "locations.tm";
     public static final String LOCATIONS_TL = "locations.tl";
     public static final String LOCATIONS_TH = "locations.th";
+
+    public static final String CONTAINER_TYPE_ID_VIAL = "container:b9f1ac14-3a84-4812-98b3-6543abc68d62:ivt";
+
     private final InhouseDB inhouseDb;
+
+    enum FillLevel {RESTPLAETZE, VOLL, EMPTY}
+
+    private record TraysCsvEntry(
+            String key,             // e.g. "TH001"
+            String storageRoom,     // e.g. "R003.K.8"
+            Integer columns,        // e.g. 3
+            Integer rows,           // e.g 8
+            FillLevel fillLevel
+    ) {
+    }
+
     private static final Logger logger = LogManager.getLogger(SampleContainerAttacher.class);
+
+    private TraysCsvEntry entry;
 
     public SampleContainerAttacher(InhouseDB inhouseDb) {
         this.inhouseDb = inhouseDb;
@@ -66,6 +81,7 @@ public class SampleContainerAttacher {
      * @param procId procedure_id from Inhouse
      */
     public void attachSampleContainer(Sample sample, String eid, Integer procId) throws Exception {
+        // 1) Load the correlation by procedure id for structure (aim context ="molproc")
         List<InhouseCorrelation> corr = inhouseDb.getInhouseDbService().loadCorrelationByProcedureId(procId);
         if (corr == null || corr.isEmpty()) {
             logger.error("The Inhouse Correlation is empty!");
@@ -73,153 +89,187 @@ public class SampleContainerAttacher {
         }
 
         for (InhouseCorrelation c : corr) {
+            // 2) filter for "molproc" correlation
             if (c.getContext().equalsIgnoreCase("molproc")) {
+                // get the "molproc" corr Id
                 Integer molProcId = c.getCorrId();
+
+                // 3) load with the help of "molproc" ID the InhouseContainers (Samples from InhouseDB)
                 List<InhouseContainer> containers = inhouseDb.getInhouseDbService().loadInhouseContainerByMolProcId(molProcId);
                 logger.info("Containers: {}\n", Arrays.toString(containers.toArray()));
+
+                // check if it is empty
                 if (containers == null || containers.isEmpty()) {
                     logger.info("Inhouse containers are empty for procId = {}\n", procId);
                 }
 
+                Map<String, List<TraysCsvEntry>> mapOfStoragePlaceToStorageRoom = loadLocationsFromCSVForTray();
+
+                // if not
                 for (InhouseContainer ic : containers) {
-                    Container container = createSignalsContainer(ic);
-                    ContainerType containerType = container.getContainerType();
-                    inhouseDb.getContainerRestService().attachContainerToSample(sample, eid, container, containerType);
+                    // Location
+                    Location location;
+
+                    // find the storage Place
+                    String storagePlace = ic.getLocation();
+
+                    // Extracting Tray Prefix TS, TM, TL, TH (small, middle, large, huge)
+                    String trayPrefix = extractTrayPrefix(storagePlace);
+
+                    List<TraysCsvEntry> traysCsvEntries = mapOfStoragePlaceToStorageRoom.get(trayPrefix);
+                    for (TraysCsvEntry entr : traysCsvEntries) {
+                        // e.g. key ="TH001"
+                        if (entr.key.equalsIgnoreCase(storagePlace)) {
+
+                            // todo: this is a case for production
+                            // e.g R003.K8 + TH001
+                            //location = inhouseDb.getLocationDbService().loadLocationByName(entry.storageRoom + storagePlace);
+
+                            // this is a case for Test
+                            location = new Location();
+                            location.setLocationTypeId("location:4f175cfd-a596-47c6-ac0e-58aced1524c2:ivt");
+                            location.setName("TS001");
+
+                            Container container = new Container();
+                            container.setName(sample.getName());
+                            container.setMaterial(new MaterialReference().setId(sample.getId()));
+                            container.setLocation(new LocationReference().setId(location.getId()));
+                            container.setContainerTypeId(CONTAINER_TYPE_ID_VIAL);
+                            container.se
+
+                            ContainerType containerType = container.getContainerType();
+                            inhouseDb.getContainerRestService().doCreateContainer(containerType, container);
+                        }
+                    }
                 }
             }
         }
     }
 
-    private Container createSignalsContainer(InhouseContainer ic) throws Exception {
-        Location location = findLocation(ic);
-        String locationId = location.getId();
-        String locationTypeId = location.getLocationTypeId();
-        Container container = new Container();
-        container.setLocation(new LocationReference().setId(locationId));
-        //toDo: setter and getter
+    enum TrayPrefix {TS, TM, TL, TH}
 
-        return container;
-    }
+    private Map<String, List<TraysCsvEntry>> loadLocationsFromCSVForTray() {
+        // setting path to csv file
+        Map<String, List<TraysCsvEntry>> mapOfTrayEntries = new HashMap<>();
+        for (TrayPrefix prefix : TrayPrefix.values()) {
 
-    private Location findLocation(InhouseContainer ic) throws Exception {
-        InhouseLocation il = inhouseDb.getInhouseDbService().loadInhouseLocationById(ic.getLocationId());
-        if (il.getSignalsLocation() == null) {
-            String iLocationName = il.getName();
-            Map<String, Location> locationMap = loadLocationsFromCSVForTray(iLocationName);
-            return locationMap.get(iLocationName);
+            switch (prefix) {
+                case TS -> {
+                    List<TraysCsvEntry> ts = processLoading("TS");
+                    mapOfTrayEntries.put("TS", ts);
+                    break;
+                }
+                case TM -> {
+                    List<TraysCsvEntry> tm = processLoading("TM");
+                    mapOfTrayEntries.put("TM", tm);
+                    break;
+                }
+                case TL -> {
+                    List<TraysCsvEntry> tl = processLoading("TL");
+                    mapOfTrayEntries.put("TL", tl);
+                    break;
+                }
+                case TH -> {
+                    List<TraysCsvEntry> th = processLoading("TH");
+                    mapOfTrayEntries.put("TH", th);
+                    break;
+
+                }
+                default -> processLoading("TH");
+            }
         }
-        return il.getSignalsLocation();
+        return mapOfTrayEntries;
     }
 
+    private List<TraysCsvEntry> processLoading(String tPrefix) {
+        Path csvPath;
+        csvPath = resolveCsvPath(tPrefix);
 
-    private Map<String, Location> loadLocationsFromCSVForTray(String trayPrefix) throws Exception {
-        Path csvPath = resolveCsvPath(trayPrefix);
+        // =========logging=============
         if (csvPath == null) {
             logger.error("csvPath not found, method loadLocationsFromCsv, class SampleContainerCreation");
-            throw new FileNotFoundException("Не настроен путь к CSV для префикса " + trayPrefix);
         }
+        logger.info("Starting import of CSV: {} (tray prefix {})\n", csvPath, tPrefix);
+        // =========logging=============
 
-        logger.info("Starting import of CSV: {} (tray prefix {})\n", csvPath, trayPrefix);
-
-        Map<String, Location> locationMap = new HashMap<>();
+        // set path for rejection
         Path rejectPath = resolveRejectPath();
 
-        try (BufferedReader reader = Files.newBufferedReader(csvPath, StandardCharsets.UTF_8);
-             BufferedWriter reject = Files.newBufferedWriter(rejectPath, StandardCharsets.UTF_8,
-                     StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
+        List<TraysCsvEntry> entries = new ArrayList<>();
 
+        // starting io stream for reading and writing
+        try (BufferedReader reader = Files.newBufferedReader(csvPath, StandardCharsets.UTF_8);
+             BufferedWriter reject = Files.newBufferedWriter(rejectPath, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
+
+            // skip header
             String header1 = reader.readLine(); // "Traygröße: TH;;;;;;;"
             String header2 = reader.readLine(); // "Nummer;Standort/Person;Datum Ausgabe;Datum Rückgabe;Füllstand;Spalten (Zahlen);Zeilen (Buchstaben);"
 
+            // starting line number
             int lineNo = 2;
             String line;
+
             while ((line = reader.readLine()) != null) {
                 lineNo++;
                 String raw = line.trim();
+
                 // skip empty lines and ";;;;;;;"
                 if (raw.isEmpty() || raw.replace(";", "").isEmpty()) continue;
 
+                //Split the values even the empty values will be considered (limit -1)
                 String[] parts = raw.split(";", -1);
-                if (parts.length < 7) {
+
+                // required number of columns
+                final int REQUIRED = 7;
+
+                // here it will be checked if it has 7 parts
+                if (parts.length < REQUIRED) {
                     writeReject(reject, lineNo, "Wrong column count (<7)", raw);
                     continue;
                 }
 
-                String nummer = parts[0].trim(); // "001" -> Nummer
-                String standortPerson = parts[1].trim(); // "R003.K.8"  -> Standort/Person
-                String datumAusgabe = parts[2].trim();
-                String datumRückgabe = parts[3].trim();
-                String feullstand = parts[4].trim(); // "Restpätze" | "Voll" | ""
-                String spaltenZahlStr = parts[5].trim(); // "3" | "2"
-                String zeilenBuchstStr = parts[6].trim(); // "8 (A-H)" | "5 (A-E)" | "4 (A-D)"
-
-                if (nummer.isEmpty()) {
-                    writeReject(reject, lineNo, "Empty Number", raw);
-                }
-
-                Integer columns = tryParseInt(spaltenZahlStr);
-                Integer rows = parseLeadingInt(zeilenBuchstStr);
-
-
+                // set reading results in record (int line number, key = tray_number, place or person/,rows, columns, fill level)
+                entry = toEntry(parts, reject, lineNo, raw, tPrefix);
+                entries.add(entry);
             }
+
+        } catch (IOException e) {
+            logger.error("SampleContainerAttacher:-> method loadLocationsFromCSVForTray() caught an exception");
+            throw new RuntimeException(e);
+        }
+        return entries;
+    }
+
+    private static TraysCsvEntry toEntry(String[] parts, BufferedWriter reject, int lineNo, String raw, String trayPrefix) throws IOException {
+        String numberOfTray = parts[0].trim(); // "001" -> Nummer
+        String storageRoom = parts[1].trim(); // "R003.K.8"  -> Standort/Person
+        String giveAwayDate = parts[2].trim();
+        String giveBackDate = parts[3].trim();
+        String fillLevel = parts[4].trim(); // "Restpätze" | "Voll" | ""
+        String columnNumber = parts[5].trim(); // "3" | "2"
+        String rowNumber = parts[6].trim(); // "8 (A-H)" | "5 (A-E)" | "4 (A-D)"
+
+
+        if (numberOfTray.isEmpty()) {
+            // number are continuously and are never empty
+            writeReject(reject, lineNo, "Empty Number", raw);
         }
 
+        Integer columns = tryParseInt(columnNumber);
+        Integer rows = parseLeadingInt(rowNumber);
 
-        /*
-        // pattern of Location
-        Pattern pattern = Pattern.compile(
-                "^'([A-Z]{2,3})';"                              // 'Nummer';
-                + "'([0-9]{3}[^']*)';"                          // 'Standort/Person';
-                + "'(.*)';"                                     // 'Datum Ausgabe';
-                + "([0-9]+);"                                   // Datum Rückgabe;
-                + "([0-9]*);"                                   // Füllstand;
-                + ";"                                           // Spalten (Zahlen);
-                + ";"                                           // Zeilen (Buchstaben);
-                + "(\\d+\\.\\d+\\.\\d+ 00:00:00)?;"             // Date;
-                + "('(.*)')?;"                                  // ProcedureRemarks;
-                + ";"                                           // TLC;
-                + "('(.*)')?$");                                // FileNamePublication
+        String key = trayPrefix + to3(numberOfTray); //"TH001"
 
-        // date column got disconnected in 2015 / 2015 upon refactoring of ChemFinder form
-        // for ChemFinder 2015ff
-        Pattern datePattern = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+) (\\d+):(\\d+):(\\d+)");
-*/
-        // LabJournal;RefProducerID;IndividualCode;FileNamePublication;ProcedureRemarks;ProcedureID
-        Pattern pattern = Pattern.compile("^(.*);"    // 1 LabJournal
-                + "(.*);"                                   // 2 RefProducerId (=ThreeLC)
-                + "(.*);"                                   // 3 IndividualCode (number)
-                + "(.*);"                                   // 4 FileNamePublication (never used)
-                + "(.*);"                                   // 5 ProcedureRemarks
-                + "(.*)$");                                 // 6 Procedure
-
-        Pattern quotePattern = Pattern.compile("\"(.*)\"");
-        Map<String, Location> locationMap = new HashMap<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(inhouseDb.getConfigString(LOCATIONS_CSV_FILENAME)));
-             BufferedWriter writer = new BufferedWriter(new FileWriter(inhouseDb.getConfigString(LOCATIONS_CSV_REJECTFILE)))) {
-            reader.readLine(); // discard header
-            int line = 1;
-            while (reader.ready()) {
-                String st = reader.readLine();
-                line++;
-                Matcher matcher = pattern.matcher(st);
-                if (matcher.matches()) {
-                    String containerName = matcher.group(1); // e.g. TM006
-
-                    Location location = new Location();
-                    //toDo:setter and getter
-                    locationMap.put(containerName, location);
-                } else {
-                    writer.append(st);
-                    writer.newLine();
-                }
-                if ((line % 1000) == 0) {
-                    System.out.printf("imported %d experiments\n", line);
-                }
+        FillLevel level = switch (fillLevel.toLowerCase(Locale.ROOT)) {
+            case "restplätze", "restplaetze" -> FillLevel.RESTPLAETZE;
+            case "voll" -> FillLevel.VOLL;
+            case "" -> FillLevel.EMPTY;
+            default -> {
+                writeReject(reject, lineNo, "Unknown fill level: " + fillLevel, raw);
+                yield FillLevel.EMPTY;
             }
-            writer.close();
-            reader.close();
-        }
-        return locationMap;
+        };
+        return new TraysCsvEntry(key, storageRoom, columns, rows, level);
     }
 
     /* ====================== helpers ====================== */
@@ -286,5 +336,16 @@ public class SampleContainerAttacher {
         }
     }
 
-
+    private static Integer parseLeadingInt(String s) {
+        if (s == null) return null;
+        Matcher m = Pattern.compile("^(\\d+)").matcher(s.trim());
+        if (m.find()) {
+            try {
+                return Integer.valueOf(m.group(1));
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
 }

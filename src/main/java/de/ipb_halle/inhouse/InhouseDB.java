@@ -28,6 +28,7 @@ import de.ipb_halle.signals.experiments.ExperimentDbService;
 import de.ipb_halle.signals.experiments.ExperimentRestService;
 import de.ipb_halle.signals.field.FieldDbService;
 import de.ipb_halle.signals.inventory.ContainerRestService;
+import de.ipb_halle.signals.inventory.LocationDbService;
 import de.ipb_halle.signals.materials.LibraryDbService;
 import de.ipb_halle.signals.materials.MaterialRestService;
 import de.ipb_halle.signals.rest.RestHelper;
@@ -112,6 +113,9 @@ public class InhouseDB {
     @Inject
     private ContainerRestService containerRestService;
 
+    @Inject
+    private LocationDbService locationDbService;
+
     @SuppressWarnings("static-access")
     private static final Option inhouseOpt = Option.builder("inhouse")
             .longOpt("importInhouse")
@@ -172,6 +176,10 @@ public class InhouseDB {
 
     public ContainerRestService getContainerRestService() {
         return containerRestService;
+    }
+
+    public LocationDbService getLocationDbService() {
+        return locationDbService;
     }
 
     private void importData(String configFile) throws Exception {

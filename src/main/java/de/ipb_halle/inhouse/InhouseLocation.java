@@ -41,6 +41,8 @@ public class InhouseLocation {
     @Column
     private String name;
 
+    private
+
     @Column(name = "location_columns")
     private int columns;
 

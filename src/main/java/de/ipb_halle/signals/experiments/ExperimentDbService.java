@@ -104,14 +104,12 @@ public class ExperimentDbService {
         criteriaQuery.select(root);
 
         List<Predicate> predicates = new ArrayList<>();
-        predicates.add(criteriaBuilder.equal(
-                root.get(ExperimentProperty.TEMPLATE_ID),
-                cmap.get(ExperimentProperty.TEMPLATE_ID)));
+        predicates.add(criteriaBuilder.equal(root.get(ExperimentProperty.TEMPLATE_ID), cmap.get(ExperimentProperty.TEMPLATE_ID)));
 
         criteriaQuery.where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
 
         List<ExperimentPropertyEntity> resultList = entityManager.createQuery(criteriaQuery).getResultList();
-       // logger.info("loadExperimentProperties= {}\n", Arrays.toString(resultList.toArray()));
+        // logger.info("loadExperimentProperties= {}\n", Arrays.toString(resultList.toArray()));
         return resultList;
     }
 }

@@ -26,6 +26,10 @@ import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -76,5 +80,17 @@ public class LocationDbService {
 
     }
 
+    public Location loadLocationByName(String storageRoom) {
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<Location> query = builder.createQuery(Location.class);
+        Root<Location> root = query.from(Location.class);
+        query.select(root);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(builder.equal(root.get("name"), storageRoom));
+        query.where((builder).and(predicates.toArray(new Predicate[0])));
+
+        return em.createQuery(query).getSingleResult();
+    }
 }
 
