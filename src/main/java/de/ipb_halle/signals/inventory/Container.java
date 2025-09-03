@@ -274,7 +274,7 @@ public class Container {
         digest = d;
     }
 
-    public void setFieldValues(List<Object> vs) {
+    public void setFieldValues(List<FieldValue> vs) {
         fieldValues = vs.stream()
                 .filter(FieldValue.class::isInstance)
                 .map(FieldValue.class::cast)

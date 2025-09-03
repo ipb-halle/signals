@@ -49,7 +49,19 @@ INSERT INTO dyn_enums (type, value) VALUES
     ('AttributeType', 'auto'),
     ('FieldDesignation','default'),
     ('FieldDesignation','asset'),
-    ('FieldDesignation','batch');
+    ('FieldDesignation','batch'),
+    ('FieldType','text'),
+    ('FieldType','number'),
+    ('FieldType','date'),
+    ('FieldType','choice'),
+    ('FieldType','multichoice'),
+    ('FieldType','boolean'),
+    ('FieldType','attachment'),
+    ('FieldType','user'),
+    ('FieldType','container'),
+    ('FieldType','location'),
+    ('FieldType','material'),
+    ('FieldType','link');
 
 CREATE TABLE local_config (
     id  SERIAL NOT NULL PRIMARY KEY,

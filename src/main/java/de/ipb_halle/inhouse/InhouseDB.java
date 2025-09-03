@@ -186,7 +186,7 @@ public class InhouseDB {
         return locationDbService;
     }
 
-    public LocationRestService getLocationRestService() {
+    public LocationRestService getLocationRestService(){
         return locationRestService;
     }
 

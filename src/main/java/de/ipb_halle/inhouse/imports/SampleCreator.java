@@ -67,6 +67,7 @@ public class SampleCreator {
 
         // 1) Create a new Sample and assign the chemical sample template
         Sample sample = baseSample(sampleTemplateId, ancestorId);
+        sample.setName(description);
 
         // Create the stoichiometry reference pointing to a row in the chemical drawing
         StoicRef ref = new StoicRef();
@@ -90,17 +91,7 @@ public class SampleCreator {
         patch(sample, eid);
     }
 
-    private void attachSampleContainer(Sample sample, String eid, Integer procId) {
-        List<InhouseCorrelation> correlations = inhouseDB.getInhouseDbService().loadCorrelationByProcedureId(procId);
-        for (InhouseCorrelation correlation : correlations) {
-            if (correlation.getContext().equalsIgnoreCase("molproc")) {
-                Integer molProcId = correlation.getCorrId();
-                List<InhouseContainer> container = inhouseDB.getInhouseDbService().loadInhouseContainerByMolProcId(molProcId);
-                logger.info("Loaded Container: {}\n", Arrays.toString(container.toArray()));
-                //createSignalsContainerForChemicalSample(container);// toDo. hier weiter machen
-            }
-        }
-    }
+
 
     public void createExtractSample(String templateId, String ancestorId, String description, String ipbCode) {
         Sample sample = baseSample(templateId, ancestorId);

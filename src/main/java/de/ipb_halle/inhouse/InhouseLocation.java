@@ -41,8 +41,6 @@ public class InhouseLocation {
     @Column
     private String name;
 
-    private
-
     @Column(name = "location_columns")
     private int columns;
 
@@ -52,8 +50,6 @@ public class InhouseLocation {
     @Column(name = "zero_based")
     private boolean zeroBased;
 
-    @Column(name="signals_location")
-    private Location signalsLocation;
 
     public Integer getId() {
         return id;
@@ -109,12 +105,5 @@ public class InhouseLocation {
         return this;
     }
 
-    public Location getSignalsLocation() {
-        return signalsLocation;
-    }
 
-    public InhouseLocation setSignalsLocation(Location signalsLocation) {
-        this.signalsLocation = signalsLocation;
-        return this;
-    }
 }

@@ -24,10 +24,12 @@ import de.ipb_halle.inhouse.InhouseContainer;
 import de.ipb_halle.inhouse.InhouseCorrelation;
 import de.ipb_halle.inhouse.InhouseDB;
 import de.ipb_halle.signals.entity.Unit;
+import de.ipb_halle.signals.field.Field;
+import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.inventory.*;
 import de.ipb_halle.signals.materials.MaterialReference;
 import de.ipb_halle.signals.sample.Sample;
-import de.ipb_halle.signals.users.UserReference;
+import de.ipb_halle.signals.users.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -50,8 +52,11 @@ public class SampleContainerAttacher {
     public static final String LOCATIONS_TL = "locations.tl";
     public static final String LOCATIONS_TH = "locations.th";
 
-    public static final String CONTAINER_TYPE_ID_VIAL = "container:b9f1ac14-3a84-4812-98b3-6543abc68d62:ivt";
-    public static final String LOCATION_TYPE_ID_TRAY = "location:e4d8f923-d407-4bee-8121-857a86f9e59d:ivt";
+    public static final String CONTAINER_TYPE_ID_VIAL = "b9f1ac14-3a84-4812-98b3-6543abc68d62";
+    public static final String CONTAINER_OBLIGATORY_FIELD_SECURITY ="b50d782a-8247-4adb-8dc9-9ea69aff987e";
+    public static final String CONTAINER_OBLIGATORY_FIELD_WEIGHT ="739151dc-bd74-407f-8d04-16d4b193a13d";
+    public static final String LOCATION_TYPE_ID_TRAY = "e4d8f923-d407-4bee-8121-857a86f9e59d"; //tray
+    public static final String LOCATION_ANCESTOR_ROOM_ID_TEST = "2af549e1-e596-44d9-b800-a63e258a58e0"; // room R301.S1
 
     private final InhouseDB inhouseDb;
 
@@ -80,7 +85,7 @@ public class SampleContainerAttacher {
      * @param procId procedure_id from Inhouse
      */
     public void attachSampleContainer(Sample sample, String eid, Integer procId) throws Exception {
-        logger.info("SAMPLE CONTAINER ATTACHER:=> cheking sample eid = {} \n", eid);
+        logger.info("SAMPLE CONTAINER ATTACHER:=> checking sample eid = {} \n", eid);
 
         // 1) Load the correlation by procedure id for structure (aim context ="molproc")
         List<InhouseCorrelation> corr = inhouseDb.getInhouseDbService().loadCorrelationByProcedureId(procId);
@@ -107,7 +112,8 @@ public class SampleContainerAttacher {
                 Map<String, List<TraysCsvEntry>> mapOfStoragePlaceToStorageRoom = loadLocationsFromCSVForTray();
 
                 // if not
-                int counter = 1;
+                int counter = 2;
+                int num = 1;
                 for (InhouseContainer ic : containers) {
                     // Location
                     Location location;
@@ -126,21 +132,39 @@ public class SampleContainerAttacher {
                             // todo: this is a case for production
                             // e.g R003.K8 + TH001
                             //location = inhouseDb.getLocationDbService().loadLocationByName(entry.storageRoom + storagePlace);
+                            //if(location == null){
 
                             // toDo: this is a case for Test
-                            // =========== begin of the test code ==============
+                            // =========== Create new Location begin of the test code ==============
                             location = new Location();
                             location.setLocationTypeId(LOCATION_TYPE_ID_TRAY);
-                            location.setName(String.format("TS00%d", counter++));
+                            location.setGrid(true);
+                            location.setName(String.format("TS00%d_%d", counter++, System.currentTimeMillis()));
+                            location.setDescription(String.format("This is a location : %s", location.getName()));
+                            location.setAncestorId(LOCATION_ANCESTOR_ROOM_ID_TEST);
+                            User user = new User();
+                            user.setId("140");
+                            location.setCreatedBy(user);
+                            location.setUpdatedBy(user);
+
+                            logger.info("Locations set ={}\n", location.toString());
 
                             LocationType locationType = new LocationType();
                             locationType.setId(LOCATION_TYPE_ID_TRAY);
-                            locationType.setId("Vial" + counter);
+                            locationType.setName("Tray " + counter + System.currentTimeMillis());
+                            locationType.setDescription("This is a tray");
 
                             // Rest call to create a location
                             String locationEid = inhouseDb.getLocationRestService().doCreateLocation(locationType, location);
-                            // =========== end of the test code ==============
+                            location.setId(locationEid);
+                            logger.info("Location created eid = {}\n ", locationEid);
+                            //WE NEED TO SAVE THE LOCATION TO OUR SIGNALS DATABASE
+                            logger.info("STARTING SAVING LOCATION");
+                            inhouseDb.getLocationDbService().saveLocation(location);
+                            logger.info("Created location saved = {}\n", location.toString());
 
+                            // =========== end of the test code ==============
+                            logger.info("STRATING CREATING CONTAINER");
                             Container container = new Container();
                             container.setName(sample.getName());
                             // here the sample eid will be set
@@ -148,15 +172,52 @@ public class SampleContainerAttacher {
                             // here location eid will be set
                             container.setLocation(new LocationReference().setId(locationEid));
                             container.setContainerTypeId(CONTAINER_TYPE_ID_VIAL);
-                            container.setCoordinateX(ic.getRow());
-                            container.setCoordinateY(ic.getColumn());
+                            container.setCoordinateX(entr.rows);
+                            container.setCoordinateY(entr.columns);
                             container.setAmount(ic.getAmount());
-                            container.setUnit(Unit.getUnit("µl"));
+                            container.setUnit(Unit.getUnit("mg"));
                             container.setDescription("this is a container for sample: " + sample.getName());
-                            container.setCreatedBy(new UserReference("147"));
+                            //container.setCreatedBy(new UserReference("140").setId("140"));
+                            container.setCreatedBy(user);
+                            container.setUpdatedBy(user);
 
-                            ContainerType containerType = container.getContainerType();
-                            inhouseDb.getContainerRestService().doCreateContainer(containerType, container);
+                            List<FieldValue> fieldValues = new ArrayList<>();
+
+                            // Field Security
+                            FieldValue fvConSecurity = new FieldValue();
+                            Field sec = new Field();
+                            sec.setId(CONTAINER_OBLIGATORY_FIELD_SECURITY);
+                            sec.setReadOnly(false);
+                            sec.setCalculated(false);
+                            sec.setRequired(true);
+                            fvConSecurity.setField(sec);
+                            fvConSecurity.setFieldId(sec.getId());
+                            fvConSecurity.setValue("Default");
+                            fieldValues.add(fvConSecurity);
+
+                            // Field tara weight
+                            FieldValue fvTaraWeight = new FieldValue();
+                            Field weight = new Field();
+                            weight.setId(CONTAINER_OBLIGATORY_FIELD_WEIGHT);
+                            weight.setReadOnly(false);
+                            weight.setCalculated(false);
+                            weight.setRequired(true);
+                            fvTaraWeight.setField(weight);
+                            fvTaraWeight.setFieldId(weight.getId());
+                            fvTaraWeight.setValue("2405"); // here is the weight of TARA = container meant
+                            fieldValues.add(fvTaraWeight);
+
+                            container.setFieldValues(fieldValues);
+
+                            ContainerType containerType = new ContainerType();
+                            containerType.setId(CONTAINER_TYPE_ID_VIAL);
+                            containerType.setName("Vial " + num++ + " " + System.currentTimeMillis());
+                            containerType.setDescription("This is a vial");
+
+                            String containerEid = inhouseDb.getContainerRestService().doCreateContainer(containerType, container);
+                            container.setId(containerEid);
+                            logger.info("Container created eid = {}\n ", containerEid);
+
                         }
                     }
                 }
@@ -322,17 +383,15 @@ public class SampleContainerAttacher {
     }
 
     private static String extractTrayPrefix(String name) {
-        // "TH006" -> "TH", "TM12" -> "TM"
-        Matcher m = Pattern.compile("(\\d+)").matcher(name);
+        // "TH006" -> "TH"
+        Matcher m = Pattern.compile("^([A-Z]{2})").matcher(name.trim());
         return m.find() ? m.group(1) : "";
     }
 
     private static String extractTrayNumber(String name) {
         // "TH006" -> "006", "TM12" -> "012"
-        Matcher m = Pattern.compile("^([A-Z]{2})").matcher(name);
-        if (!m.find()) return "000";
-        String num = m.group(1);
-        return to3(num);
+        Matcher m = Pattern.compile("(\\d+)$").matcher(name.trim());
+        return m.find() ? to3(m.group(1)) : "000";
     }
 
     private static String to3(String n) {

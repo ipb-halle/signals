@@ -33,8 +33,6 @@ import java.util.Set;
 @Entity
 @Table(name = "location_types")
 public class LocationTypeEntity {
-    private final static String LOCATION_TYPE_ENTITY_PREFIX = "location:";
-    private final static String LOCATION_TYPE_ENTITY_SUFFIX = ":ivt";
 
     @Id
     @Column

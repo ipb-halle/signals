@@ -53,6 +53,7 @@ import java.util.List;
 @Local
 public class ContainerRestService implements RestReplyParser<Container> {
 
+    private static final String TARA_WEIGHT_FIELD_ID = "739151dc-bd74-407f-8d04-16d4b193a13d"; // Tara weight (unit, base=g)
     public final String CONTAINER_ATTACHMENT_ENDPOINT = "/inventory/containers/%s/fields/%s/attachment";
     public final String CONTAINER_ENDPOINT = "/inventory/containers/%s";
     private static final String CONTAINER_CREATE_ENDPOINT = "/inventory/containers";
@@ -254,10 +255,16 @@ public class ContainerRestService implements RestReplyParser<Container> {
                     .setRequestData(request.toString())
                     .execute(RestClient.HTTP_CREATED);
 
+            //Return String id of generated container
+            JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
+            return jsonResult.getAsJsonObject()
+                    .getAsJsonObject(RestHelper.ATTR_DATA)
+                    .get(RestHelper.ATTR_ID)
+                    .getAsJsonPrimitive().getAsString();
+
         } catch (Exception e) {
             throw new RuntimeException("something went wrong", e);
         }
-        return null;
     }
 
     private JsonObject prepareContainer(ContainerType containerType, Container container) {
@@ -271,8 +278,10 @@ public class ContainerRestService implements RestReplyParser<Container> {
 
     private JsonObject prepareAttributes(ContainerType containerType, Container container) {
         JsonObject attributes = new JsonObject();
-
-        attributes.addProperty(RestHelper.ATTR_TYPE_ID, containerType.getId().split(":")[1]);
+        if (containerType.getId() == null) {
+            throw new RuntimeException("CONTAINER TYPE NOT SET");
+        }
+        attributes.addProperty(RestHelper.ATTR_TYPE_ID, containerType.getId());
         attributes.addProperty(RestHelper.ATTR_DESCRIPTION, container.getDescription());
         attributes.addProperty(ContainerEntity.ATTR_CONTAINER_TYPE_NAME, containerType.getName());
 
@@ -280,7 +289,7 @@ public class ContainerRestService implements RestReplyParser<Container> {
 
         attributes.add(ContainerEntity.ATTR_LOCATION, prepareLocation(container));
         attributes.add(ContainerEntity.ATTR_HOME_LOCATION, prepareLocation(container));
-        attributes.addProperty(ContainerEntity.ATTR_AMOUNT, 100);
+        attributes.addProperty(ContainerEntity.ATTR_AMOUNT, container.getAmount());
         attributes.addProperty(ContainerEntity.ATTR_UNIT, container.getUnit().toString());
 
         attributes.add(ContainerEntity.ATTR_CONTENTS, prepareContents(container));
@@ -295,8 +304,8 @@ public class ContainerRestService implements RestReplyParser<Container> {
     }
 
     private JsonElement prepareLocation(Container container) {
-        JsonObject location = new JsonObject();
-        location.addProperty(RestHelper.ATTR_ID, container.getLocation().getId().split(":")[1]);
+        JsonObject location = new JsonObject(); //toDO check it
+        location.addProperty(RestHelper.ATTR_ID, container.getLocation().getId());
         return location;
     }
 
@@ -323,9 +332,18 @@ public class ContainerRestService implements RestReplyParser<Container> {
 
     private JsonElement prepareFieldValue(FieldValue fieldValue) {
         JsonObject field = new JsonObject();
-        field.addProperty(RestHelper.ATTR_ID, fieldValue.getFieldId().split(":")[0]);
+        field.addProperty(RestHelper.ATTR_ID, fieldValue.getFieldId());
         JsonObject content = new JsonObject();
-        content.addProperty(RestHelper.ATTR_VALUE, fieldValue.getValue());
+
+
+        String fieldId = fieldValue.getFieldId();
+
+        if (TARA_WEIGHT_FIELD_ID.equalsIgnoreCase(fieldId)) {
+            content.addProperty(RestHelper.ATTR_VALUE, Double.parseDouble(fieldValue.getValue()) / 1000.0);
+            content.addProperty("user", fieldValue.getValue() + " mg");
+        } else {
+            content.addProperty(RestHelper.ATTR_VALUE, fieldValue.getValue());
+        }
         field.add(RestHelper.ATTR_CONTENT, content);
         return field;
     }
