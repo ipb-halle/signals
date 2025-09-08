@@ -29,6 +29,7 @@ import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.inventory.*;
 import de.ipb_halle.signals.materials.MaterialReference;
 import de.ipb_halle.signals.sample.Sample;
+import de.ipb_halle.signals.sample.SamplePropertyValue;
 import de.ipb_halle.signals.users.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -53,8 +54,8 @@ public class SampleContainerAttacher {
     public static final String LOCATIONS_TH = "locations.th";
 
     public static final String CONTAINER_TYPE_ID_VIAL = "b9f1ac14-3a84-4812-98b3-6543abc68d62";
-    public static final String CONTAINER_OBLIGATORY_FIELD_SECURITY ="b50d782a-8247-4adb-8dc9-9ea69aff987e";
-    public static final String CONTAINER_OBLIGATORY_FIELD_WEIGHT ="739151dc-bd74-407f-8d04-16d4b193a13d";
+    public static final String CONTAINER_OBLIGATORY_FIELD_SECURITY = "b50d782a-8247-4adb-8dc9-9ea69aff987e";
+    public static final String CONTAINER_OBLIGATORY_FIELD_WEIGHT = "739151dc-bd74-407f-8d04-16d4b193a13d";
     public static final String LOCATION_TYPE_ID_TRAY = "e4d8f923-d407-4bee-8121-857a86f9e59d"; //tray
     public static final String LOCATION_ANCESTOR_ROOM_ID_TEST = "2af549e1-e596-44d9-b800-a63e258a58e0"; // room R301.S1
 
@@ -117,6 +118,7 @@ public class SampleContainerAttacher {
                 for (InhouseContainer ic : containers) {
                     // Location
                     Location location;
+                    Location ancestorLocation;
 
                     // find the storage Place
                     String storagePlace = ic.getLocation();
@@ -128,11 +130,18 @@ public class SampleContainerAttacher {
                     for (TraysCsvEntry entr : traysCsvEntries) {
                         // e.g. key ="TH001"
                         if (entr.key.equalsIgnoreCase(storagePlace)) {
+                            //load ancestor Location e.g. R003.K8
+                            //ancestorLocation = inhouseDb.getLocationDbService().loadLocationByName(storagePlace);
+//                            if(ancestorLocation == null){
+//                                createAncestorLocation();
+//                            }
 
                             // todo: this is a case for production
-                            // e.g R003.K8 + TH001
-                            //location = inhouseDb.getLocationDbService().loadLocationByName(entry.storageRoom + storagePlace);
+                            //                                                              TH001
+                            //location = inhouseDb.getLocationDbService().loadLocationByName(storagePlace);
                             //if(location == null){
+                            logger.info("Location with name = {} is not found in the DB\n", storagePlace);
+                            logger.info("Creating new location\n");
 
                             // toDo: this is a case for Test
                             // =========== Create new Location begin of the test code ==============
@@ -162,6 +171,7 @@ public class SampleContainerAttacher {
                             logger.info("STARTING SAVING LOCATION");
                             inhouseDb.getLocationDbService().saveLocation(location);
                             logger.info("Created location saved = {}\n", location.toString());
+                            //}
 
                             // =========== end of the test code ==============
                             logger.info("STRATING CREATING CONTAINER");
@@ -172,12 +182,11 @@ public class SampleContainerAttacher {
                             // here location eid will be set
                             container.setLocation(new LocationReference().setId(locationEid));
                             container.setContainerTypeId(CONTAINER_TYPE_ID_VIAL);
-                            container.setCoordinateX(entr.rows);
-                            container.setCoordinateY(entr.columns);
+                            container.setCoordinateX(ic.getRow());
+                            container.setCoordinateY(ic.getColumn());
                             container.setAmount(ic.getAmount());
                             container.setUnit(Unit.getUnit("mg"));
                             container.setDescription("this is a container for sample: " + sample.getName());
-                            //container.setCreatedBy(new UserReference("140").setId("140"));
                             container.setCreatedBy(user);
                             container.setUpdatedBy(user);
 
@@ -204,7 +213,7 @@ public class SampleContainerAttacher {
                             weight.setRequired(true);
                             fvTaraWeight.setField(weight);
                             fvTaraWeight.setFieldId(weight.getId());
-                            fvTaraWeight.setValue("2405"); // here is the weight of TARA = container meant
+                            fvTaraWeight.setValue(String.valueOf(ic.getTara())); // here is the weight of TARA = container meant
                             fieldValues.add(fvTaraWeight);
 
                             container.setFieldValues(fieldValues);

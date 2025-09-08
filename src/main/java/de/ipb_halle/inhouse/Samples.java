@@ -110,7 +110,7 @@ public class Samples {
         // 15 ExtractBarcode                        ENTFÄLLT?
         // 16 IPBCode                               Sample
 
-        Pattern pattern = Pattern.compile("^(\\d+);"   //  1 extractId
+        Pattern pattern = Pattern.compile("^(\\d+);"    //  1 extractId
                 + "(\\d+);"                             //  2 correlationId
                 + "(.*);"                               //  3 last solvent
                 + "(.*);"                               //  4 storage place
@@ -223,8 +223,8 @@ public class Samples {
             location = lookupOrCreateLocation(matcher);
             container.setLocation(locationName)
                     .setLocationId(location.getId())
-                    .setRow(parseRow(matcher.group(4)))
-                    .setColumn(parseColumn(location, matcher.group(5)));
+                    .setRow(parseRow(location, matcher.group(3)))
+                    .setColumn(parseColumn(location, matcher.group(4)));
         } else {
             // could not parse location, setting default location
             logger.warn("Location '{}' does not match expected pattern. Assigning default location.", loc);
@@ -257,8 +257,13 @@ public class Samples {
         return location;
     }
 
-    private int parseRow(String row) {
-        return safeParseInt("" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ".indexOf(row), 0, "row letter: " + row);
+    private int parseRow(InhouseLocation location, String rowLetter) {
+        int idx = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".indexOf(rowLetter);
+        if (idx < 0) {
+            logger.warn("Unbekannter Row-Buchstabe: {}", rowLetter);
+            return 0;
+        }
+        return location.isZeroBased() ? idx : idx + 1;
     }
 
     private int parseColumn(InhouseLocation location, String col) {

@@ -257,10 +257,16 @@ public class ContainerRestService implements RestReplyParser<Container> {
 
             //Return String id of generated container
             JsonElement jsonResult = JsonParser.parseString(restClient.getResponse().getString());
-            return jsonResult.getAsJsonObject()
-                    .getAsJsonObject(RestHelper.ATTR_DATA)
-                    .get(RestHelper.ATTR_ID)
-                    .getAsJsonPrimitive().getAsString();
+            logger.info("JSON RESULT=================================================\n{}\n", jsonResult);
+            JsonElement dataElement = jsonResult.getAsJsonObject().get(RestHelper.ATTR_DATA);
+
+            if (dataElement.isJsonArray()) {
+                JsonObject firstObj = dataElement.getAsJsonArray().get(0).getAsJsonObject();
+                return firstObj.get(RestHelper.ATTR_ID).getAsString();
+            } else {
+                JsonObject obj = dataElement.getAsJsonObject();
+                return obj.get(RestHelper.ATTR_ID).getAsString();
+            }
 
         } catch (Exception e) {
             throw new RuntimeException("something went wrong", e);

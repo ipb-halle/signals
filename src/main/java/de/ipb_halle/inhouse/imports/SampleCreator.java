@@ -85,8 +85,13 @@ public class SampleCreator {
         // Load or create ADO
         attachIPB_CodeAdo(sample, eid, ipbCode);
 
+
+
        // attachSampleContainer(sample, eid, procId);
         attacher.attachSampleContainer(sample, eid, procId);
+
+
+
         // Prepare properties as key-value pairs for PATCH update
         patch(sample, eid);
     }

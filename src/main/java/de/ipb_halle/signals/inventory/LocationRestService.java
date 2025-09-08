@@ -228,8 +228,8 @@ public class LocationRestService implements RestReplyParser<Location> {
         attributes.addProperty(RestHelper.ATTR_NAME, location.getName());
 
         attributes.addProperty(LocationEntity.ATTR_GRID, true);
-        attributes.addProperty(LocationEntity.ATTR_ROWS, 20);
-        attributes.addProperty(LocationEntity.ATTR_COLUMNS, 20);
+        attributes.addProperty(LocationEntity.ATTR_ROWS, location.getRows());
+        attributes.addProperty(LocationEntity.ATTR_COLUMNS, location.getColumns());
         attributes.add(LocationEntity.ATTR_ANCESTORS, prepareAncestors(location));
         attributes.add(RestHelper.ATTR_FIELDS, prepareFields(location));
         return attributes;

@@ -120,7 +120,7 @@ public class RestClientImpl implements RestClient {
 
         if (requestData != null) {
             if ((method == Method.GET) || (method == Method.DELETE)) {
-                //logger.warn("Unexpected request for write operation in HttpRequest: {}", method.toString());
+                logger.warn("Unexpected request for write operation in HttpRequest: {}", method.toString());
 
                 throw new IllegalStateException("Cannot send requestData with HTTP method: " + method);
             }
