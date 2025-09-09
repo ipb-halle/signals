@@ -126,9 +126,9 @@ public class MaterialProcessorBean {
                 fieldLibrariesById.put(field.getId(), field);
             }
             fieldValue.setEntityId(material.getId());
-            if (field.getType().getValue().equals(FieldType.ATTACHED_FILE)
-                    || field.getType().getValue().equals(FieldType.CHEMICAL_DRAWING)
-                    || field.getType().getValue().equals(FieldType.SEQUENCE_FILE)) {
+            if (field.getFieldType().getValue().equals(FieldType.ATTACHED_FILE)
+                    || field.getFieldType().getValue().equals(FieldType.CHEMICAL_DRAWING)
+                    || field.getFieldType().getValue().equals(FieldType.SEQUENCE_FILE)) {
                 processAttachments(material, field, fieldValue);
             }
 
@@ -155,7 +155,7 @@ public class MaterialProcessorBean {
             logger.info("MaterialProcessorBean:-> processAttachments-> Found new attachment for material Id={}", material.getId());
             List<RestReply> replies = new ArrayList<>();
 
-            switch (field.getType().getValue()) {
+            switch (field.getFieldType().getValue()) {
                 case FieldType.ATTACHED_FILE:
                     replies = obtainAttachment(material, field, fieldValue);
                     break;

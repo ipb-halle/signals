@@ -72,7 +72,14 @@ public class SampleProcessorBean {
             Sample sample = sampleRestService.doGetSample(sampleId);
 
             // 2) set parent container id
-            sample.setParentContainerId(loadContainerIdForSample(sampleId));
+            String parentContainerId = loadContainerIdForSample(sampleId);
+            if (parentContainerId != null) {
+                sample.setParentContainerId(parentContainerId);
+            } else {
+                sample.setParentContainerId(null);
+            }
+
+            sample.setParentContainerId(parentContainerId);
 
             // 3) receive property keys for each sample
             sampleRestService.doGetSampleProperties(sample);
@@ -98,7 +105,7 @@ public class SampleProcessorBean {
             }
         }
         logger.warn("Warning! Where is no container for this sample = {}!!", sampleId);
-        return "null";
+        return null;
     }
 
 

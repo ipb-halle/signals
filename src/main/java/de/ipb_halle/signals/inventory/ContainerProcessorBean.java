@@ -106,7 +106,7 @@ public class ContainerProcessorBean {
 
     private void processContainerFields(Container container) throws IOException {
         for (Field field : container.getFields()) {
-            if (field.getType().getValue().equals(FieldType.ATTACHMENT_FILE)) {
+            if (field.getFieldType().getValue().equals(FieldType.ATTACHMENT_FILE)) {
                 for (FieldValue fieldValue : container.getFieldValues()) {
                     if (fieldValue.getFieldId().equals(field.getId())) {
                         obtainAttachment(container, field, fieldValue);

@@ -76,13 +76,27 @@ public class DynEnumManager {
 
     public DynEnum valueOf(DynEnum dynEnum) {
         String type = dynEnum.getShortType();
+        logger.debug("DynEnumManager.valueOf: requested type='{}', value='{}'", type, dynEnum.getValue());
         if (dynEnumsMapByType.containsKey(type)) {
             DynEnum e = dynEnumsMapByType.get(type).get(dynEnum.getValue());
             if (e != null) {
+                logger.debug("DynEnumManager.valueOf: hit id={} for type='{}', value='{}'",
+                        e.getId(), e.getShortType(), e.getValue());
                 return e;
             }
         }
+        logger.warn("DynEnumManager.valueOf: MISS for type='{}', value='{}'. discoverEnums={}",
+                type, dynEnum.getValue(), discoverEnums);
         return registerNewEnum(dynEnum);
+    }
+
+    private void putDynEnum(DynEnum de) {
+        String type = de.getShortType();
+        Map<String, DynEnum> typeMap = dynEnumsMapByType.getOrDefault(type, new HashMap<>());
+        typeMap.put(de.getValue(), de);
+        dynEnumsMapByType.put(type, typeMap);
+        dynEnumsById.put(de.getId(), de);
+        logger.debug("DynEnumManager.put: cached id={} type='{}' value='{}'", de.getId(), type, de.getValue());
     }
 
     public DynEnum valueOf(Integer id) {
@@ -100,14 +114,6 @@ public class DynEnumManager {
                 + " when auto-discovery was disabled.");
     }
 
-    private void putDynEnum(DynEnum de) {
-        String type = de.getShortType();
-        Map<String, DynEnum> typeMap = dynEnumsMapByType
-                .getOrDefault(type, new HashMap<String, DynEnum>());
-        typeMap.put(de.getValue(), de);
-        dynEnumsMapByType.put(type, typeMap);
-        dynEnumsById.put(de.getId(), de);
-    }
 
     public List<Integer> getDynEnumIds(DynEnum[] dynEnums) {
         Integer[] idList = new Integer[dynEnums.length];

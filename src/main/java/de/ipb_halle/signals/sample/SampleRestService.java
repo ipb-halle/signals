@@ -49,7 +49,7 @@ public class SampleRestService implements RestReplyParser<Sample> {
     //?force=true if we don't want to send a digest
     public static final String CREATE_NEW_SAMPLE_ENDPOINT = "/entities?force=true";
     //public static final String CREATE_NEW_SAMPLE_ENDPOINT = "/entities?digest=%s";
-    private  static final String PATCH_UPDATE_SAMPLE_PROPERTIES = "/samples/%s/properties?force=true";
+    private static final String PATCH_UPDATE_SAMPLE_PROPERTIES = "/samples/%s/properties?force=true";
     @Inject
     private RestClient restClient;
 
@@ -364,20 +364,26 @@ public class SampleRestService implements RestReplyParser<Sample> {
 
         //get propertyID
         if (definition.has(RestHelper.ATTR_KEY)) {
-            sampleProperty.setPropertyId(definition.get(RestHelper.ATTR_KEY).getAsString());
+            String propertyId = optStr(definition, RestHelper.ATTR_KEY);
+            sampleProperty.setPropertyId(propertyId);
             samplePropertyValue.setPropertyId(sampleProperty.getPropertyId());
         }
         //get property name
         if (definition.has(RestHelper.ATTR_TITLE)) {
-            sampleProperty.setPropertyName(definition.get(RestHelper.ATTR_TITLE).getAsString());
+            String propertyName = optStr(definition, RestHelper.ATTR_TITLE);
+            sampleProperty.setPropertyName(propertyName);
         }
         //get property type
-        sampleProperty.setPropertyType(definition.get(RestHelper.ATTR_TYPE).getAsString());
+        String propertyType = optStr(definition, RestHelper.ATTR_TYPE);
+        sampleProperty.setPropertyType(propertyType);
 
         //get property value
         if (attributes.has(RestHelper.ATTR_CONTENT)) {
-            samplePropertyValue.setPropertyValue(attributes.get(RestHelper.ATTR_CONTENT).getAsJsonObject().get(RestHelper.ATTR_VALUE).getAsString());
+            JsonObject content = attributes.get(RestHelper.ATTR_CONTENT).getAsJsonObject();
+            String value = extractContentString(content);
+            samplePropertyValue.setPropertyValue(value);
         }
+
         sample.addProperty(sampleProperty);
         sample.addPropertyValue(samplePropertyValue);
     }
@@ -485,5 +491,40 @@ public class SampleRestService implements RestReplyParser<Sample> {
 
         return propertyObj;
     }
+
+    private static JsonObject optObj(JsonObject src, String key) {
+        return (src != null && src.has(key) && src.get(key).isJsonObject())
+                ? src.getAsJsonObject(key) : null;
+    }
+
+    private static String optStr(JsonObject src, String key) {
+        if (src == null) return null;
+        JsonElement e = src.get(key);
+        return (e == null || e.isJsonNull()) ? null : e.getAsString();
+    }
+
+    private static String extractContentString(JsonObject content) {
+        if (content == null) return null;
+
+        // 1) regular value
+        if (content.has("value")) {
+            JsonElement v = content.get("value");
+            if (v == null || v.isJsonNull()) return null;
+            if (v.isJsonPrimitive()) {
+                var p = v.getAsJsonPrimitive();
+                if (p.isBoolean()) return Boolean.toString(p.getAsBoolean());
+                if (p.isNumber()) return p.getAsNumber().toString();
+                return p.getAsString();
+            }
+            // array / json — return as JSON
+            return v.toString();
+        }
+        // 2) Some fields received like "user", "rawValue"
+        if (content.has("user")) return optStr(content, "user");
+        if (content.has("rawValue")) return optStr(content, "rawValue");
+
+        return null;
+    }
+
 
 }

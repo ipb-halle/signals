@@ -53,8 +53,43 @@ public class FieldParser implements RestReplyParser<Field> {
      *                          auto discovery is not allowed (default).
      */
     private FieldType lookupFieldType(String typeString) {
-        return (FieldType) dynEnumMgr.valueOf(FieldType.valueOf(typeString));
+        String norm = (typeString == null) ? "" : typeString.trim().toLowerCase();
+
+        switch (norm) {
+            case "text":
+                return (FieldType) dynEnumMgr.valueOf(FieldType.text);
+            case "unit":
+                return (FieldType) dynEnumMgr.valueOf(FieldType.unit);
+            case "attributelist":
+                return (FieldType) dynEnumMgr.valueOf(FieldType.attributeList);
+            case "multiselect":
+                return (FieldType) dynEnumMgr.valueOf(FieldType.multiSelect);
+            case "datetime":
+                return (FieldType) dynEnumMgr.valueOf(FieldType.datetime);
+            case "user":
+                return (FieldType) dynEnumMgr.valueOf(FieldType.user);
+            case "integer":
+                // INTEGER (id=38)
+                return (FieldType) dynEnumMgr.valueOf(FieldType.valueOf("INTEGER"));
+            case "boolean":
+                // 'BOOLEAN' (id=37)
+                return (FieldType) dynEnumMgr.valueOf(FieldType.valueOf("BOOLEAN"));
+            case "link":
+                return (FieldType) dynEnumMgr.valueOf(FieldType.valueOf("LINK"));
+            case "list":
+                // 'list' (id=184)
+                return (FieldType) dynEnumMgr.valueOf(FieldType.list);
+            case "sequence_file":
+                return (FieldType) dynEnumMgr.valueOf(FieldType.valueOf("SEQUENCE_FILE"));
+            default:
+                try {
+                    return (FieldType) dynEnumMgr.valueOf(FieldType.valueOf(typeString));
+                } catch (RuntimeException ex) {
+                    throw new IllegalArgumentException("Unsupported FieldType: '" + typeString + "'", ex);
+                }
+        }
     }
+
 
     /**
      * ToDO: ATTR_COLLECTION currently not implemented!
@@ -81,6 +116,12 @@ public class FieldParser implements RestReplyParser<Field> {
             fd.setHidden(RestHelper.parseBool(j, Field.ATTR_HIDDEN, false));
             fd.setRequired(RestHelper.parseBool(j, Field.ATTR_MANDATORY, false));
             fd.setTitle(RestHelper.parseString(j, RestHelper.ATTR_NAME));
+
+            logger.info("FieldParser: resolved FieldType shortType='{}', value='{}', id={}",
+                    fd.getFieldType().getShortType(),
+                    fd.getFieldType().getValue(),
+                    fd.getFieldType().getId());
+
 
             if (j.has(Field.ATTR_MEASURE_OPTIONS)) {
                 parseMeasures(j.getAsJsonArray(Field.ATTR_MEASURE_OPTIONS), fd);

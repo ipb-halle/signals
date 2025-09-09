@@ -104,7 +104,7 @@ public class LocationProcessorBean {
 
     private void processLocationFields(Location location) throws IOException {
         for (Field field : location.getFields()) {
-            if (field.getType().getValue().equals(FieldType.ATTACHMENT_FILE)) {
+            if (field.getFieldType().getValue().equals(FieldType.ATTACHMENT_FILE)) {
                 for (FieldValue fieldValue : location.getFieldValues()) {
                     if (fieldValue.getFieldId().equals(field.getId())) {
                         obtainAttachment(location, field, fieldValue);

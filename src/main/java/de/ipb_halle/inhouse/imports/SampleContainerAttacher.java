@@ -29,7 +29,6 @@ import de.ipb_halle.signals.field.FieldValue;
 import de.ipb_halle.signals.inventory.*;
 import de.ipb_halle.signals.materials.MaterialReference;
 import de.ipb_halle.signals.sample.Sample;
-import de.ipb_halle.signals.sample.SamplePropertyValue;
 import de.ipb_halle.signals.users.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -65,7 +64,7 @@ public class SampleContainerAttacher {
 
     private record TraysCsvEntry(
             String key,             // e.g. "TH001"
-            String storageRoom,     // e.g. "R003.K.8"
+            String storageRoom,     // e.g. "R003.K8"
             Integer columns,        // e.g. 3
             Integer rows,           // e.g 8
             FillLevel fillLevel
@@ -117,10 +116,10 @@ public class SampleContainerAttacher {
                 int num = 1;
                 for (InhouseContainer ic : containers) {
                     // Location
-                    Location location;
+                    Location locationTray;
                     Location ancestorLocation;
 
-                    // find the storage Place
+                    // find the storage Place e. g TS005
                     String storagePlace = ic.getLocation();
 
                     // Extracting Tray Prefix TS, TM, TL, TH (small, middle, large, huge)
@@ -130,48 +129,21 @@ public class SampleContainerAttacher {
                     for (TraysCsvEntry entr : traysCsvEntries) {
                         // e.g. key ="TH001"
                         if (entr.key.equalsIgnoreCase(storagePlace)) {
-                            //load ancestor Location e.g. R003.K8
-                            //ancestorLocation = inhouseDb.getLocationDbService().loadLocationByName(storagePlace);
-//                            if(ancestorLocation == null){
-//                                createAncestorLocation();
-//                            }
 
-                            // todo: this is a case for production
-                            //                                                              TH001
-                            //location = inhouseDb.getLocationDbService().loadLocationByName(storagePlace);
-                            //if(location == null){
-                            logger.info("Location with name = {} is not found in the DB\n", storagePlace);
-                            logger.info("Creating new location\n");
+                            //load ancestor Location e.g. R003.K8                                   R003.K8
+                            ancestorLocation = inhouseDb.getLocationDbService().loadLocationByName(entr.storageRoom);
+                            if (ancestorLocation == null) {
+                                //ancestorLocation = createLocation(locationTypeID, name, description, ancestorLocationId);
+                            }
 
-                            // toDo: this is a case for Test
-                            // =========== Create new Location begin of the test code ==============
-                            location = new Location();
-                            location.setLocationTypeId(LOCATION_TYPE_ID_TRAY);
-                            location.setGrid(true);
-                            location.setName(String.format("TS00%d_%d", counter++, System.currentTimeMillis()));
-                            location.setDescription(String.format("This is a location : %s", location.getName()));
-                            location.setAncestorId(LOCATION_ANCESTOR_ROOM_ID_TEST);
-                            User user = new User();
-                            user.setId("140");
-                            location.setCreatedBy(user);
-                            location.setUpdatedBy(user);
-
-                            logger.info("Locations set ={}\n", location.toString());
-
-                            LocationType locationType = new LocationType();
-                            locationType.setId(LOCATION_TYPE_ID_TRAY);
-                            locationType.setName("Tray " + counter + System.currentTimeMillis());
-                            locationType.setDescription("This is a tray");
-
-                            // Rest call to create a location
-                            String locationEid = inhouseDb.getLocationRestService().doCreateLocation(locationType, location);
-                            location.setId(locationEid);
-                            logger.info("Location created eid = {}\n ", locationEid);
-                            //WE NEED TO SAVE THE LOCATION TO OUR SIGNALS DATABASE
-                            logger.info("STARTING SAVING LOCATION");
-                            inhouseDb.getLocationDbService().saveLocation(location);
-                            logger.info("Created location saved = {}\n", location.toString());
-                            //}
+                            //                                                                  e.g. TH001
+                            locationTray = inhouseDb.getLocationDbService().loadLocationByName(storagePlace);
+                            if (locationTray == null) {
+                                logger.info("Location with name = {} is not found in the DB\n", storagePlace);
+                                logger.info("Creating new location\n");
+                                                            // locationTypeID, name, description, ancestorLocationId
+                             //   locationTray = createLocation(LOCATION_TYPE_ID_TRAY, storagePlace, );
+                            }
 
                             // =========== end of the test code ==============
                             logger.info("STRATING CREATING CONTAINER");
@@ -180,15 +152,15 @@ public class SampleContainerAttacher {
                             // here the sample eid will be set
                             container.setMaterial(new MaterialReference().setId(eid));
                             // here location eid will be set
-                            container.setLocation(new LocationReference().setId(locationEid));
+                       //     container.setLocation(new LocationReference().setId(locationEid));
                             container.setContainerTypeId(CONTAINER_TYPE_ID_VIAL);
                             container.setCoordinateX(ic.getRow());
                             container.setCoordinateY(ic.getColumn());
                             container.setAmount(ic.getAmount());
                             container.setUnit(Unit.getUnit("mg"));
                             container.setDescription("this is a container for sample: " + sample.getName());
-                            container.setCreatedBy(user);
-                            container.setUpdatedBy(user);
+//                            container.setCreatedBy(user);
+//                            container.setUpdatedBy(user);
 
                             List<FieldValue> fieldValues = new ArrayList<>();
 
@@ -232,6 +204,39 @@ public class SampleContainerAttacher {
                 }
             }
         }
+    }
+
+    private Location createLocation(String locationTypeId, String name, String description, String ancestorLocationId) {
+        // toDo: this is a case for Test
+        // =========== Create new Location begin of the test code ==============
+        Location location = new Location();
+        location.setLocationTypeId(locationTypeId);
+        location.setGrid(true);
+        location.setName(String.format("%d_%d", name, System.currentTimeMillis()));
+        location.setDescription(description);
+        location.setAncestorId(ancestorLocationId);
+        User user = new User();
+        user.setId("140");
+        location.setCreatedBy(user);
+        location.setUpdatedBy(user);
+
+        logger.info("Locations set ={}\n", location.toString());
+
+        LocationType locationType = new LocationType();
+        locationType.setId(locationTypeId);
+        locationType.setName("Tray " + System.currentTimeMillis());
+        locationType.setDescription("This is a tray");
+
+        // Rest call to create a location
+        String locationEid = inhouseDb.getLocationRestService().doCreateLocation(locationType, location);
+        location.setId(locationEid);
+        logger.info("Location created eid = {}\n ", locationEid);
+        //WE NEED TO SAVE THE LOCATION TO OUR SIGNALS DATABASE
+        logger.info("STARTING SAVING LOCATION");
+        inhouseDb.getLocationDbService().saveLocation(location);
+        logger.info("Created location saved = {}\n", location.toString());
+
+        return location;
     }
 
     enum TrayPrefix {TS, TM, TL, TH}

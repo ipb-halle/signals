@@ -142,6 +142,9 @@ public class LocationRestService implements RestReplyParser<Location> {
     }
 
     private void parseFields(JsonArray fields, Location loc) {
+        logger.info("JSON ARRAY FIELDS \n");
+        logger.info("FIELDS = {}\n", fields);
+        logger.info("JSON ARRAY FIELDS \n");
         Iterator<JsonElement> iterator = fields.iterator();
         List<Field> fieldList = new ArrayList<>();
         while (iterator.hasNext()) {
@@ -149,6 +152,7 @@ public class LocationRestService implements RestReplyParser<Location> {
             // NOTE: field ids are NOT unique within Signals Inventory
             field.setId(field.getId());
             field.setDesignation((FieldDesignation) dynEnumManager.valueOf(FieldDesignation.valueOf(FieldDesignation.LOCATION)));
+            logger.info(String.valueOf(field.getDesignation()));
             field.setDefiningEntityId(loc.getId());
             fieldList.add(field);
         }
@@ -224,31 +228,47 @@ public class LocationRestService implements RestReplyParser<Location> {
         JsonObject attributes = new JsonObject();
 
         attributes.addProperty(RestHelper.ATTR_TYPE_ID, locationType.getId());
-        attributes.addProperty(RestHelper.ATTR_DESCRIPTION, location.getDescription());
+        attributes.addProperty(RestHelper.ATTR_DESCRIPTION,
+                (location.getDescription() == null) ? "" : location.getDescription());
         attributes.addProperty(RestHelper.ATTR_NAME, location.getName());
 
         attributes.addProperty(LocationEntity.ATTR_GRID, true);
-        attributes.addProperty(LocationEntity.ATTR_ROWS, location.getRows());
-        attributes.addProperty(LocationEntity.ATTR_COLUMNS, location.getColumns());
+        if (location.getRows() != null) attributes.addProperty(LocationEntity.ATTR_ROWS, location.getRows());
+        if (location.getColumns() != null) attributes.addProperty(LocationEntity.ATTR_COLUMNS, location.getColumns());
+
         attributes.add(LocationEntity.ATTR_ANCESTORS, prepareAncestors(location));
         attributes.add(RestHelper.ATTR_FIELDS, prepareFields(location));
         return attributes;
     }
-
     private JsonElement prepareAncestors(Location location) {
         JsonArray ancestors = new JsonArray();
-        ancestors.add(processAncestorsOfLocation(location));
-
+        String raw = location.getAncestorId();
+        if (raw != null && !raw.isBlank()) {
+            ancestors.add(processAncestorsOfLocation(location));
+        }
         return ancestors;
     }
 
     private JsonElement processAncestorsOfLocation(Location location) {
         JsonObject ancestor = new JsonObject();
-        ancestor.addProperty(LocationEntity.ATTR_ANCESTOR_ID, location.getAncestorId());
+        // id ДОЛЖЕН быть чистым UUID без префикса 'location:' и без ':ivt'
+        String rawAncestorId = location.getAncestorId();
+        if (rawAncestorId == null || rawAncestorId.isBlank()) {
+            // не отправляем пустой id → вообще не добавляем ancestor в массив
+            // но наш текущий prepareAncestors() всегда добавляет один элемент,
+            // поэтому защищаемся: вернём ПУСТОЙ массив вместо элемента
+            JsonObject fallback = new JsonObject();
+            // вообще можно вернуть null и не добавлять ancestor, но оставим пустой объект
+            return fallback;
+        }
+        String uuidOnly = rawAncestorId.replace("location:", "").replace(":ivt", "");
+        ancestor.addProperty(LocationEntity.ATTR_ANCESTOR_ID, uuidOnly);
         return ancestor;
     }
 
-     JsonElement prepareFields(Location location) {
+
+
+    JsonElement prepareFields(Location location) {
         JsonArray fields = new JsonArray();
         for (FieldValue fieldValue : location.getFieldValues()) {
             if (fieldValue.getField().getRequired()
@@ -260,7 +280,7 @@ public class LocationRestService implements RestReplyParser<Location> {
         return fields;
     }
 
-     JsonElement prepareFieldValue(FieldValue fieldValue) {
+    JsonElement prepareFieldValue(FieldValue fieldValue) {
         JsonObject field = new JsonObject();
         field.addProperty(RestHelper.ATTR_ID, fieldValue.getFieldId().split(":")[0]);
         JsonObject content = new JsonObject();

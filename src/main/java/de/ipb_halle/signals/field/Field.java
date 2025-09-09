@@ -252,7 +252,7 @@ public class Field {
         this.userDefined = userDefined;
     }
 
-    public FieldType getType() {
+    public FieldType getFieldType() {
         return fieldType;
     }
 

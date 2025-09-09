@@ -171,7 +171,7 @@ public class FieldDbService {
             FieldValue fv = new FieldValue(fve);
             Field field = loadById(fv.getFieldId());
             fv.setField(field);
-            switch (field.getType().getValue().toUpperCase()) {
+            switch (field.getFieldType().getValue().toUpperCase()) {
                 case FieldType.ATTACHED_FILE,
                      FieldType.CHEMICAL_DRAWING,
                      FieldType.SEQUENCE_FILE -> loadFieldAttachment(fv);

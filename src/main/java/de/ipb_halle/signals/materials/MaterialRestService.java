@@ -499,7 +499,7 @@ public class MaterialRestService implements RestReplyParser<Material> {
         }
 
         // Special file handling
-        switch (fieldValue.getField().getType().getValue().toUpperCase()) {
+        switch (fieldValue.getField().getFieldType().getValue().toUpperCase()) {
             case FieldType.ATTACHED_FILE:
             case FieldType.SEQUENCE_FILE:
                 obj.add(RestHelper.ATTR_VALUE, prepareAttachment(fieldValue));

@@ -28,7 +28,7 @@ import jakarta.persistence.Entity;
 
 @Entity
 @DiscriminatorValue("FieldType")
-public class FieldType extends DynEnum <FieldType> {
+public class FieldType extends DynEnum<FieldType> {
 
     public final static String ATTACHED_FILE = "ATTACHED_FILE";
     public final static String ATTACHMENT_FILE = "attachmentFile";      // used by Inventory
@@ -36,11 +36,19 @@ public class FieldType extends DynEnum <FieldType> {
     public final static String SEQUENCE = "SEQUENCE";
     public final static String SEQUENCE_FILE = "SEQUENCE_FILE";
     public final static String TEXT = "TEXT";
+    public final static FieldType text = valueOf("text");
+    public final static FieldType unit = valueOf("unit");
+    public final static FieldType attributeList = valueOf("attributeList");
+    public final static FieldType multiSelect = valueOf("multiSelect");
+    public final static FieldType datetime = valueOf("datetime");
+    public final static FieldType user = valueOf("user");
+    public final static FieldType list = valueOf("list");
 
     /**
      * private no-argument constructor
      */
-    private FieldType() { }
+    private FieldType() {
+    }
 
     private FieldType(String v) {
         super(v);

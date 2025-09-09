@@ -129,7 +129,11 @@ public class FieldValue {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
         FieldValue that = (FieldValue) object;
-        return Objects.equals(entityId, that.entityId) && Objects.equals(fieldId, that.fieldId) && Objects.equals(fieldTitle, that.fieldTitle) && Objects.equals(value, that.value) && linkType == that.linkType;
+        return Objects.equals(entityId, that.entityId) &&
+                Objects.equals(fieldId, that.fieldId) &&
+                Objects.equals(fieldTitle, that.fieldTitle) &&
+                Objects.equals(value, that.value) &&
+                linkType == that.linkType;
     }
 
     @Override
