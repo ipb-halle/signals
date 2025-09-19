@@ -21,8 +21,6 @@ import de.ipb_halle.inhouse.imports.ChemDrawCacheService;
 import de.ipb_halle.inhouse.imports.InhouseExperimentFilter;
 import de.ipb_halle.inhouse.imports.InhouseExperimentLoader;
 import de.ipb_halle.inhouse.imports.InhouseImportManager;
-import de.ipb_halle.inhouse.OrganismImportStrategy;
-import de.ipb_halle.inhouse.StructureImportStrategy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -102,7 +100,7 @@ public class Experiments {
     public record ChemDrawData(Integer molId, String fieldValueCdxml) {
     }
 
-    private final Map<InhouseImportType, InhouseImportStrategy> strategyMap = Map.of(InhouseImportType.STRUCTURE, new StructureImportStrategy(), InhouseImportType.ORGANISM, new OrganismImportStrategy()
+    private final Map<InhouseImportType, InhouseImportStrategy> strategyMap = Map.of(InhouseImportType.STRUCTURE, new StructureImportStrategy(), InhouseImportType.ORGANISM, new ExtractImportStrategy()
             //   InhouseImportType.EXTRACT, new ExtractImportStrategy()
     );
 

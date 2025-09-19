@@ -31,10 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class OrganismImportStrategy extends AbstractBatchImportStrategy {
+public class ExtractImportStrategy extends AbstractBatchImportStrategy {
 
     public static final String TEMPLATE_ID_EXTRACT_SAMPLE = "samples.templateIdExtractSample";
-    private final Logger logger = LogManager.getLogger(OrganismImportStrategy.class);
+    private final Logger logger = LogManager.getLogger(ExtractImportStrategy.class);
 
     @Override
     protected String experimentNamePrefix() {
@@ -88,7 +88,7 @@ public class OrganismImportStrategy extends AbstractBatchImportStrategy {
                 String desc = String.format("OrgId: %s, Experiment: %s%s, Journal: %s",
                         orgId, exp.getThreelc(), procId, exp.getJournal());
 
-                sampleCreator.createExtractSample(TEMPLATE_ID_EXTRACT_SAMPLE, eid, desc, ipbCodeNorm);
+                sampleCreator.createExtractSample(TEMPLATE_ID_EXTRACT_SAMPLE, eid, desc, ipbCodeNorm, procId);
             }
         }
     }

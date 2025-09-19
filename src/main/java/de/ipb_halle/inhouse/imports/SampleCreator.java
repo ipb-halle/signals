@@ -88,7 +88,7 @@ public class SampleCreator {
 
 
        // attachSampleContainer(sample, eid, procId);
-        attacher.attachSampleContainer(sample, eid, procId);
+        attacher.attachSampleContainer(sample, eid, procId,"molproc");
 
 
 
@@ -98,7 +98,7 @@ public class SampleCreator {
 
 
 
-    public void createExtractSample(String templateId, String ancestorId, String description, String ipbCode) {
+    public void createExtractSample(String templateId, String ancestorId, String description, String ipbCode, Integer procId) throws Exception {
         Sample sample = baseSample(templateId, ancestorId);
 
         String sampleId = inhouseDB.getSampleRestService().createNewSample(sample);
@@ -106,6 +106,9 @@ public class SampleCreator {
         attachIPB_CodeAdo(sample, sampleId, ipbCode);
         //attachOrganism()
         //attachChemDraw()
+
+        // attachSampleContainer(sample, eid, procId);
+        attacher.attachSampleContainer(sample, sampleId, procId, "orgproc");
         patch(sample, sampleId);
     }
 

@@ -23,6 +23,7 @@ package de.ipb_halle.inhouse.imports;
 import de.ipb_halle.inhouse.InhouseContainer;
 import de.ipb_halle.inhouse.InhouseCorrelation;
 import de.ipb_halle.inhouse.InhouseDB;
+import de.ipb_halle.inhouse.InhouseExtract;
 import de.ipb_halle.signals.entity.Unit;
 import de.ipb_halle.signals.field.Field;
 import de.ipb_halle.signals.field.FieldValue;
@@ -74,11 +75,18 @@ public class SampleContainerAttacher {
     enum FillLevel {RESTPLAETZE, VOLL, EMPTY}
 
     private record TraysCsvEntry(
-            String key,             // e.g. "TH001"
+            String key,             // e.g. "TH067"
             String storageRoom,     // e.g. "R003.K8"
             Integer columns,        // e.g. 3
             Integer rows,           // e.g 8
             FillLevel fillLevel
+    ) {
+    }
+
+    record GridForContainerAndAmount(
+            Integer containerCoordinateX,
+            Integer containerCoordinateY,
+            Double amount
     ) {
     }
 
@@ -94,11 +102,11 @@ public class SampleContainerAttacher {
      *
      * @param sample Signals Sample ()
      * @param procId procedure_id from Inhouse
-     */
-    public void attachSampleContainer(Sample sample, String eid, Integer procId) throws Exception {
+     */                                                                                 //molproc or orgproc
+    public void attachSampleContainer(Sample sample, String eid, Integer procId, String correlationContext) throws Exception {
         logger.info("SAMPLE CONTAINER ATTACHER:=> checking sample eid = {} \n", eid);
 
-        // 1) Load the correlation by procedure id for structure (aim context ="molproc")
+        // 1) Load the correlation by procedure id for structure (aim context ="molproc" or "orgproc")
         List<InhouseCorrelation> corr = inhouseDb.getInhouseDbService().loadCorrelationByProcedureId(procId);
         if (corr == null || corr.isEmpty()) {
             logger.error("The Inhouse Correlation is empty!");
@@ -106,149 +114,200 @@ public class SampleContainerAttacher {
         }
 
         for (InhouseCorrelation c : corr) {
-            // 2) filter for "molproc" correlation
-            if (c.getContext().equalsIgnoreCase("molproc")) {
-                // get the "molproc" corr Id
-                Integer molProcId = c.getCorrId();
+            // Load containers location of inhouseDB from csv
+            Map<String, List<TraysCsvEntry>> mapOfStoragePlaceToStorageRoom = loadLocationsFromCSVForTray();
 
-                // 3) load with the help of "molproc" ID the InhouseContainers (Samples from InhouseDB)
-                List<InhouseContainer> containers = inhouseDb.getInhouseDbService().loadInhouseContainerByMolProcId(molProcId);
+            // get the "molproc" corr Id
+            Integer corrId = c.getCorrId();
+
+            // filter for "molproc" correlation or "orgproc"
+            if (c.getContext().equalsIgnoreCase("molproc")) {
+
+                //  load with the help of "molproc"  ID the InhouseContainers (Samples from InhouseDB)
+                List<InhouseContainer> containers = inhouseDb.getInhouseDbService().loadInhouseContainerByMolProcId(corrId);
                 logger.info("Containers: {}\n", Arrays.toString(containers.toArray()));
 
                 // check if it is empty
                 if (containers == null || containers.isEmpty()) {
                     logger.info("Inhouse containers are empty for procId = {}\n", procId);
+                    continue;
                 }
-
-                Map<String, List<TraysCsvEntry>> mapOfStoragePlaceToStorageRoom = loadLocationsFromCSVForTray();
 
                 // if not
-                int counter = 2;
-                int num = 1;
                 for (InhouseContainer ic : containers) {
-                    // Location
-                    Location rootAncestor;
-                    Location ancestorLocation;
-                    Location locationTray;
-
                     // find the storage Place e. g TS005
                     String storagePlace = ic.getLocation();
+                    Integer containerCoordinateX = ic.getRow();
+                    Integer containerCoordinateY = ic.getColumn();
+                    Double amount = ic.getAmount();
 
-                    // Extracting Tray Prefix TS, TM, TL, TH (small, middle, large, huge)
-                    String trayPrefix = extractTrayPrefix(storagePlace);
+                    GridForContainerAndAmount gcm = new GridForContainerAndAmount(containerCoordinateX, containerCoordinateY, amount);
 
-                    List<TraysCsvEntry> traysCsvEntries = mapOfStoragePlaceToStorageRoom.get(trayPrefix);
-                    if (traysCsvEntries == null || traysCsvEntries.isEmpty()) {
-                        logger.warn("No CSV entries for tray prefix '{}'", trayPrefix);
+                    createContainer(sample, eid, storagePlace, mapOfStoragePlaceToStorageRoom, gcm);
+                }
+            } else if (c.getContext().equalsIgnoreCase("orgproc")) {
+                logger.info("SAMPLE_CONTAINER_ATTACHER:=> inhouse container c get correlation context = {}\n", c.getContext());
+
+                // Here we create Signals containers in case of InhouseExtracts
+                List<InhouseExtract> extracts = inhouseDb.getInhouseDbService().loadExtractByCorrOrgProcId(corrId);
+
+                // check if it is empty
+                if (extracts == null || extracts.isEmpty()) {
+                    logger.info("Inhouse extracts are empty for procId = {}\n", procId);
+                    continue;
+                }
+                for (InhouseExtract ix : extracts) {
+                    String storagePlaceArray[] = ix.getStoragePlace().trim().split("\\.");
+                    String storagePlace = storagePlaceArray[0];// TM018
+                    String coordinates = storagePlaceArray[1];
+                    Integer coordinatesXY[] = parseCoordinate(coordinates);
+                    Integer containerCoordinateX = coordinatesXY[0];
+                    Integer containerCoordinateY = coordinatesXY[1];
+                    Double amount = ix.getAmount();
+
+                    GridForContainerAndAmount gcm = new GridForContainerAndAmount(containerCoordinateX, containerCoordinateY, amount);
+
+                    createContainer(sample, eid, storagePlace, mapOfStoragePlaceToStorageRoom, gcm);
+                }
+
+            } else {
+                logger.error("SAMPLE_CONTAINER_ATTACHER:=>UNKNOWN CONTEXT!!!\n inhouse container c get correlation context = {}\n", c.getContext());
+                continue;
+            }
+        }
+    }
+
+    private Integer[] parseCoordinate(String input) {
+        input = input.toUpperCase();
+        String letters = input.replaceAll("[0-9]", "");
+        String numbers = input.replaceAll("[^0-9]", "");
+
+        int col = letters.charAt(0) - 'A';
+        int row = Integer.parseInt(numbers) - 1;
+
+        return new Integer[]{col, row};
+    }
+
+    private void createContainer(Sample sample, String eid, String storagePlace, Map<String, List<TraysCsvEntry>> mapOfStoragePlaceToStorageRoom, GridForContainerAndAmount gcm) {
+        // Location
+        Location rootAncestor;
+        Location ancestorLocation;
+        Location locationTray;
+
+
+        // Extracting Tray Prefix TS, TM, TL, TH (small, middle, large, huge)
+        String trayPrefix = extractTrayPrefix(storagePlace);
+
+        List<TraysCsvEntry> traysCsvEntries = mapOfStoragePlaceToStorageRoom.get(trayPrefix);
+        if (traysCsvEntries == null || traysCsvEntries.isEmpty()) {
+            logger.warn("No CSV entries for tray prefix '{}'", trayPrefix);
+            return;
+        }
+        for (TraysCsvEntry entr : traysCsvEntries) {
+            // e.g. key ="TH001"
+            if (entr.key.equalsIgnoreCase(storagePlace)) {
+                User user = new User();
+                user.setId("140");
+
+                //====================== Handling ROOT location ===============================
+                //load root ancestor location e.g. R003
+                String roomNumber = entr.storageRoom.trim().split("\\.")[0];
+                //                                                                  R003
+                rootAncestor = inhouseDb.getLocationDbService().loadLocationByName(roomNumber);
+                if (rootAncestor == null) {
+                    String locationTypeId = LOCATION_ID_ROOM;
+                    String name = roomNumber;
+                    String description = String.format("This is a room Nr. %s", roomNumber);
+                    rootAncestor = createLocation(user, locationTypeId, name, description, null, entr);
+                }
+
+                //====================== Handling ANCESTOR location ===============================
+                //load ancestor Location e.g. R003.K8 or R002.G1 or R2-109.P1                   R003.K8
+                ancestorLocation = inhouseDb.getLocationDbService().loadLocationByName(entr.storageRoom);
+                if (ancestorLocation == null) {
+                    String storageDevice = entr.storageRoom.trim().split("\\.")[1];
+                    Matcher m = Pattern.compile("^([A-Za-z]+)(\\d+)$").matcher(storageDevice);
+                    if (!m.find()) {
+                        logger.error("Cannot parse device type from '{}'", storageDevice);
                         continue;
                     }
-                    for (TraysCsvEntry entr : traysCsvEntries) {
-                        // e.g. key ="TH001"
-                        if (entr.key.equalsIgnoreCase(storagePlace)) {
-                            User user = new User();
-                            user.setId("140");
+                    String deviceType = m.group(1); // "K", "P", "S", "G", ...
 
-                            //====================== Handling ROOT location ===============================
-                            //load root ancestor location e.g. R003
-                            String roomNumber = entr.storageRoom.trim().split("\\.")[0];
-                            //                                                                  R003
-                            rootAncestor = inhouseDb.getLocationDbService().loadLocationByName(roomNumber);
-                            if (rootAncestor == null) {
-                                String locationTypeId = LOCATION_ID_ROOM;
-                                String name = roomNumber;
-                                String description = String.format("This is a room Nr. %s", roomNumber);
-                                rootAncestor = createLocation(user, locationTypeId, name, description, null, entr);
-                            }
+                    String locationTypeID = mapDeviceTypeToLocationTypeId(deviceType);
+                    if (locationTypeID == null) continue;
+                    String name = entr.storageRoom;
+                    String description = String.format("This is a location %s", name);
 
-                            //====================== Handling ANCESTOR location ===============================
-                            //load ancestor Location e.g. R003.K8 or R002.G1 or R2-109.P1                   R003.K8
-                            ancestorLocation = inhouseDb.getLocationDbService().loadLocationByName(entr.storageRoom);
-                            if (ancestorLocation == null) {
-                                String storageDevice = entr.storageRoom.trim().split("\\.")[1];
-                                Matcher m = Pattern.compile("^([A-Za-z]+)(\\d+)$").matcher(storageDevice);
-                                if (!m.find()) {
-                                    logger.error("Cannot parse device type from '{}'", storageDevice);
-                                    continue;
-                                }
-                                String deviceType = m.group(1); // "K", "P", "S", "G", ...
-
-                                String locationTypeID = mapDeviceTypeToLocationTypeId(deviceType);
-                                if (locationTypeID == null) continue;
-                                String name = entr.storageRoom;
-                                String description = String.format("This is a location %s", name);
-
-                                ancestorLocation = createLocation(user, locationTypeID, name, description, rootAncestor.getId(),entr);
-                            }
-
-                            //====================== Handling TRAY location ===============================
-                            // load storage place                                               e.g. TH001
-                            locationTray = inhouseDb.getLocationDbService().loadLocationByName(storagePlace);
-                            if (locationTray == null) {
-                                logger.info("Location with name = {} is not found in the DB\n", storagePlace);
-                                logger.info("Creating new location\n");
-                                String name = storagePlace;
-                                String description = String.format("This is a Tray %s", name);
-                                // locationTypeID, name, description, ancestorLocationId
-                                locationTray = createLocation(user, LOCATION_TYPE_ID_TRAY, name, description, ancestorLocation.getId(), entr);
-                            }
-
-                            // =========== end of the test code ==============
-                            logger.info("STRATING CREATING CONTAINER");
-                            Container container = new Container();
-                            container.setName(sample.getName());
-                            // here the sample eid will be set
-                            container.setMaterial(new MaterialReference().setId(eid));
-                            // here location eid will be set
-                            container.setLocation(new LocationReference().setId(locationTray.getId()));
-                            container.setContainerTypeId(CONTAINER_TYPE_ID_VIAL);
-                            container.setCoordinateX(ic.getRow());
-                            container.setCoordinateY(ic.getColumn());
-                            container.setAmount(ic.getAmount());
-                            container.setUnit(Unit.getUnit("mg"));
-                            container.setDescription("This is a container for sample: " + sample.getId());
-                            container.setCreatedBy(user);
-                            container.setUpdatedBy(user);
-
-                            List<FieldValue> fieldValues = new ArrayList<>();
-
-                            // Field Security
-                            FieldValue fvConSecurity = new FieldValue();
-                            Field sec = new Field();
-                            sec.setId(CONTAINER_OBLIGATORY_FIELD_SECURITY);
-                            sec.setReadOnly(false);
-                            sec.setCalculated(false);
-                            sec.setRequired(true);
-                            fvConSecurity.setField(sec);
-                            fvConSecurity.setFieldId(sec.getId());
-                            fvConSecurity.setValue("Default");
-                            fieldValues.add(fvConSecurity);
-
-                            // Field tara weight
-                            FieldValue fvTaraWeight = new FieldValue();
-                            Field weight = new Field();
-                            weight.setId(CONTAINER_OBLIGATORY_FIELD_WEIGHT);
-                            weight.setReadOnly(false);
-                            weight.setCalculated(false);
-                            weight.setRequired(true);
-                            fvTaraWeight.setField(weight);
-                            fvTaraWeight.setFieldId(weight.getId());
-                            fvTaraWeight.setValue(String.valueOf(ic.getTara())); // here is the weight of TARA = container meant
-                            fieldValues.add(fvTaraWeight);
-
-                            container.setFieldValues(fieldValues);
-
-                            ContainerType containerType = new ContainerType();
-                            containerType.setId(CONTAINER_TYPE_ID_VIAL);
-                            containerType.setName("Vial");
-                            containerType.setDescription("Standard vial");
-
-                            String containerEid = inhouseDb.getContainerRestService().doCreateContainer(containerType, container);
-                            container.setId(containerEid);
-                            logger.info("Container created eid = {}\n ", containerEid);
-
-                        }
-                    }
+                    ancestorLocation = createLocation(user, locationTypeID, name, description, rootAncestor.getId(), entr);
                 }
+
+                //====================== Handling TRAY location ===============================
+                // load storage place                                               e.g. TH001
+                locationTray = inhouseDb.getLocationDbService().loadLocationByName(storagePlace);
+                if (locationTray == null) {
+                    logger.info("Location with name = {} is not found in the DB\n", storagePlace);
+                    logger.info("Creating new location\n");
+                    String name = storagePlace;
+                    String description = String.format("This is a Tray %s", name);
+                    // locationTypeID, name, description, ancestorLocationId
+                    locationTray = createLocation(user, LOCATION_TYPE_ID_TRAY, name, description, ancestorLocation.getId(), entr);
+                }
+
+                // =========== end of the test code ==============
+                logger.info("STRATING CREATING CONTAINER");
+                Container container = new Container();
+                container.setName(sample.getName());
+                // here the sample eid will be set
+                container.setMaterial(new MaterialReference().setId(eid));
+                // here location eid will be set
+                container.setLocation(new LocationReference().setId(locationTray.getId()));
+                container.setContainerTypeId(CONTAINER_TYPE_ID_VIAL);
+                container.setCoordinateX(gcm.containerCoordinateX);
+                container.setCoordinateY(gcm.containerCoordinateY);
+                container.setAmount(gcm.amount);
+                container.setUnit(Unit.getUnit("mg"));
+                container.setDescription("This is a container for sample: " + sample.getId());
+                container.setCreatedBy(user);
+                container.setUpdatedBy(user);
+
+                List<FieldValue> fieldValues = new ArrayList<>();
+
+                // Field Security
+                FieldValue fvConSecurity = new FieldValue();
+                Field sec = new Field();
+                sec.setId(CONTAINER_OBLIGATORY_FIELD_SECURITY);
+                sec.setReadOnly(false);
+                sec.setCalculated(false);
+                sec.setRequired(true);
+                fvConSecurity.setField(sec);
+                fvConSecurity.setFieldId(sec.getId());
+                fvConSecurity.setValue("Default");
+                fieldValues.add(fvConSecurity);
+
+                // Field tara weight
+                FieldValue fvTaraWeight = new FieldValue();
+                Field weight = new Field();
+                weight.setId(CONTAINER_OBLIGATORY_FIELD_WEIGHT);
+                weight.setReadOnly(false);
+                weight.setCalculated(false);
+                weight.setRequired(true);
+                fvTaraWeight.setField(weight);
+                fvTaraWeight.setFieldId(weight.getId());
+                //fvTaraWeight.setValue(String.valueOf("ic.getTara()")); // here is the weight of TARA = container meant
+                fvTaraWeight.setValue(String.valueOf("2046")); // here is the weight of TARA = container meant
+                fieldValues.add(fvTaraWeight);
+
+                container.setFieldValues(fieldValues);
+
+                ContainerType containerType = new ContainerType();
+                containerType.setId(CONTAINER_TYPE_ID_VIAL);
+                containerType.setName("Vial");
+                containerType.setDescription("Standard vial");
+
+                String containerEid = inhouseDb.getContainerRestService().doCreateContainer(containerType, container);
+                container.setId(containerEid);
+                logger.info("Container created eid = {}\n ", containerEid);
+
             }
         }
     }

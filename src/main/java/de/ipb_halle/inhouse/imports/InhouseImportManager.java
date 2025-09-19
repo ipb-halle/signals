@@ -59,7 +59,7 @@ public class InhouseImportManager {
      * <p>Initializes the strategy map with:
      * <ul>
      *   <li>{@link InhouseImportType#STRUCTURE} → {@link StructureImportStrategy}</li>
-     *   <li>{@link InhouseImportType#ORGANISM} → {@link OrganismImportStrategy}</li>
+     *   <li>{@link InhouseImportType#ORGANISM} → {@link ExtractImportStrategy}</li>
      * </ul>
      *
      * @param inhouseDB The Inhouse database service used during import
@@ -68,7 +68,7 @@ public class InhouseImportManager {
         this.inhouseDB = inhouseDB;
         this.strategies = Map.of(
                  InhouseImportType.STRUCTURE, new StructureImportStrategy()
-              //  InhouseImportType.ORGANISM, new OrganismImportStrategy()
+              //  InhouseImportType.ORGANISM, new ExtractImportStrategy()
         );
     }
 
