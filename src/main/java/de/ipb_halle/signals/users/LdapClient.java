@@ -251,16 +251,22 @@ public class LdapClient {
         }
 
         User user = new User();
-        user.setAlias(getAttribute(attrs, signalsConfig.getLdapAttrAlias()).toUpperCase());
-        user.setCountry(signalsConfig.getUserAttrCountry());
-        user.setCreatedAt(getCreatedAt(attrs));
-        user.setEmail(getAttribute(attrs, signalsConfig.getLdapAttrEmail()).toLowerCase());
-        user.setEnabled(getUserExpiration(attrs));
-        user.setFirstName(getAttribute(attrs, signalsConfig.getLdapAttrFirstName()));
-        user.setMutable(true);
-        user.setLastName(getAttribute(attrs, signalsConfig.getLdapAttrLastName()));
-        user.setOrganization(signalsConfig.getUserAttrOrganization());
-        user.setUserName(getAttribute(attrs, signalsConfig.getLdapAttrUserName()).toLowerCase());
+        try {
+            user.setAlias(getAttribute(attrs, signalsConfig.getLdapAttrAlias()).toUpperCase());
+            user.setCountry(signalsConfig.getUserAttrCountry());
+            user.setCreatedAt(getCreatedAt(attrs));
+            user.setEmail(getAttribute(attrs, signalsConfig.getLdapAttrEmail()).toLowerCase());
+            user.setEnabled(getUserExpiration(attrs));
+            user.setFirstName(getAttribute(attrs, signalsConfig.getLdapAttrFirstName()));
+            user.setMutable(true);
+            user.setLastName(getAttribute(attrs, signalsConfig.getLdapAttrLastName()));
+            user.setOrganization(signalsConfig.getUserAttrOrganization());
+            user.setUserName(getAttribute(attrs, signalsConfig.getLdapAttrUserName()).toLowerCase());
+        } catch(MissingAttributeException mae) {
+            String message = String.format("%s for user %s", mae.getMessage(), userDN);
+            logger.warn(message);
+            throw new MissingAttributeException(message);
+        }
 
         return user;
     }
@@ -273,7 +279,7 @@ public class LdapClient {
             return attribute.get().toString();
         }
         logger.warn("Missing mandatory attribute {}", attrName);
-        throw new MissingAttributeException("Missing mandatory attribute");
+        throw new MissingAttributeException(String.format("Missing mandatory attribute %s", attrName));
     }
 
     /**
