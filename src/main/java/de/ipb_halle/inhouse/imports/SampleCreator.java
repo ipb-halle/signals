@@ -20,8 +20,6 @@
 
 package de.ipb_halle.inhouse.imports;
 
-import de.ipb_halle.inhouse.InhouseContainer;
-import de.ipb_halle.inhouse.InhouseCorrelation;
 import de.ipb_halle.inhouse.InhouseDB;
 import de.ipb_halle.signals.ado.Ado;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
@@ -32,9 +30,7 @@ import de.ipb_halle.signals.sample.StoicRef;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 
 public class SampleCreator {
@@ -138,6 +134,8 @@ public class SampleCreator {
         if (ipbCode != null) {
             logger.info("SampleCreator:-> Starting create Ados");
             String adoTemplateId = inhouseDB.getConfigString(ADO_TEMPLATE_ID);
+            // IPBCodeCacheService
+            // findIpbCodeFromCache(cacheService, IPBCode) --> SignalsEID
             Optional<Ado> maybeAdo = adoCreator.findOrCreateAdoByIpbCode(ipbCode, adoTemplateId);
             if (maybeAdo.isPresent()) {
                 Ado ado = maybeAdo.get();

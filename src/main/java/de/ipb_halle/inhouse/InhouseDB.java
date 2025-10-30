@@ -214,7 +214,7 @@ public class InhouseDB {
 //        Taxonomy taxonomy = new Taxonomy(this);
 
         //  compounds.importData();
-     //   experiments.importData();
+        experiments.importData();
         // correlation.importData();
 
 //        taxonomy.importData();

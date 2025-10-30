@@ -56,7 +56,7 @@ public class StructureImportStrategy extends AbstractBatchImportStrategy {
 
         List<Optional<Experiments.ChemDrawData>> structures = cdxmlCahce.get(procId);
         if (structures == null || structures.isEmpty()) {
-            errorLogger.log("No ChenDraw for procId=" + procId);
+            errorLogger.log("No ChemDraw for procId=" + procId);
             return;
         }
 

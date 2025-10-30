@@ -242,6 +242,7 @@ public class  Compounds {
         Material batch = compoundDTO.createBatch();
 
         // Create material in Signals platform
+        //toDo: -> implementieren die unique Regeln für Import der identischen Compounds
         Material mat = inhouseDB.getMaterialRestService().doCreateMaterial(library, asset, batch);
         compound.setEid(mat.getId());
 

@@ -107,6 +107,7 @@ public class SampleContainerAttacher {
         logger.info("SAMPLE CONTAINER ATTACHER:=> checking sample eid = {} \n", eid);
 
         // 1) Load the correlation by procedure id for structure (aim context ="molproc" or "orgproc")
+        //toDo cache benutzen
         List<InhouseCorrelation> corr = inhouseDb.getInhouseDbService().loadCorrelationByProcedureId(procId);
         if (corr == null || corr.isEmpty()) {
             logger.error("The Inhouse Correlation is empty!");

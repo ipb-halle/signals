@@ -67,8 +67,10 @@ import java.util.List;
 public class AdoDbService {
 
     private static final Logger logger = (Logger) LogManager.getLogger(AdoDbService.class);
+
     @PersistenceContext(unitName = "signalsDB")
     private EntityManager em;
+
     @Inject
     private DynEnumManager dynEnumManager;
 
@@ -98,7 +100,7 @@ public class AdoDbService {
             em.merge(adoPropertyEntity);
         }
 
-        //this part of code should be disabled by first synchronization or by generating new ado types like ado-3 where new id of field can appear
+        //todo-> this part of code should be disabled by first synchronization or by generating new ado types like ado-3 where new id of field can appear
         for (AdoPropertyValue adoPropertyValue : ado.getPropertyValues()) {
             if (adoPropertyValue.getPropertyId() == null) {
                 logger.warn("Skipping AdoPropertyValue with null propertyId: adoId = {} \n", ado.getId());

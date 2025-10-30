@@ -33,10 +33,7 @@ import java.util.Optional;
 public abstract class AbstractBatchImportStrategy implements InhouseImportStrategy {
 
     private final Logger logger = LogManager.getLogger(getClass());
-
-    protected int chunkSize(int size) {
-        return size;
-    }
+    private final int CHUNK_SIZE = 10;
 
     protected abstract String experimentNamePrefix();
 
@@ -68,12 +65,12 @@ public abstract class AbstractBatchImportStrategy implements InhouseImportStrate
         ErrorLogger errorLogger = new ErrorLogger("errorLog_" + experimentNamePrefix().toLowerCase() + "_import.txt");
 
         int experimentCounter = 1;
-        for (int i = 0; i < group.size(); i += chunkSize(10)) {
-            int toIndex = Math.min(i + chunkSize(10), group.size());
+        for (int i = 0; i < group.size(); i += CHUNK_SIZE) {
+            int toIndex = Math.min(i + CHUNK_SIZE, group.size());
             List<InhouseExperiment> chunk = group.subList(i, toIndex);
 
             InhouseExperiment main = chunk.get(0);
-            String expName = threeLc + "-" + experimentNamePrefix() + "-" + experimentCounter++;
+            String expName = experimentNamePrefix() + "-" + threeLc + "-" + experimentCounter++;
             //Postrequest for creation of experiment
             String eid = experimentCreator.createExperiment(expName, main);
             logger.info("Created experiment {} (eid={})", expName, eid);

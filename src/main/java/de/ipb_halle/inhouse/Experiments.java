@@ -222,6 +222,7 @@ public class Experiments {
 
         ChemDrawCacheService chemDrawCache = new ChemDrawCacheService(inhouseDB);
         InhouseExperimentFilter filter = new InhouseExperimentFilter(inhouseDB);
+
         ErrorLogger errorLogger = new ErrorLogger("error_log_filter_experiments.txt");
 
         Map<InhouseImportType, List<InhouseExperiment>> filtered = filter.filter(experiments, chemDrawCache, errorLogger);

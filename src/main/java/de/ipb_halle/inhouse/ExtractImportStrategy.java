@@ -56,6 +56,7 @@ public class ExtractImportStrategy extends AbstractBatchImportStrategy {
             return;
         }
 
+        // toDo correlation-cache benutzen
         List<InhouseCorrelation> correlations =
                 inhouseDB.getInhouseDbService().loadCorrelationByProcedureId(procId);
 
@@ -82,6 +83,7 @@ public class ExtractImportStrategy extends AbstractBatchImportStrategy {
             if (extractList.isEmpty()) {
                 logger.info("No Extracts for this organism ={}\n ", orgId);
             } else {
+                //toDO für alle in der liste
                 extract = extractList.get(0);
                 String ipbCodeRaw = extract.getIpbCode();
                 String ipbCodeNorm = IpbCodeNormalizer.normalize(ipbCodeRaw).orElse(null);

@@ -123,7 +123,7 @@ public class InhouseExperimentFilter {
         );
     }
 
-    // toDo: test schreiben!!!!
+    // toDo: test schreiben!!!! eintrag zu extractvorhandensein in physischen verkörperung und eintrag in labor journal trennen! (nicht jeder orgproc hat einen extrakt)
     private boolean hasExtract(int procId) {
         List<InhouseCorrelation> correlations = inhouseDB.getInhouseDbService().loadCorrelationByProcedureId(procId);
         for (InhouseCorrelation ic : correlations) {
