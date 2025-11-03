@@ -36,7 +36,7 @@ public class IpbCodeCacheServiceTest {
             .withUsername("signals")
             .withPassword("signals");
 
-    // -------------------- 2) DataSource для TomEE/OpenEJB -----------------------
+    // -------------------- 2) DataSource for TomEE/OpenEJB -----------------------
     @Configuration
     public Properties config() {
         Properties p = new Properties();
@@ -50,13 +50,13 @@ public class IpbCodeCacheServiceTest {
         return p;
     }
 
-    // -------------------- 3) Какие классы грузить контейнеру -------------------
+    // -------------------- 3) Which classes to be loaded by container -------------------
     @Module
     @Classes(cdi = true, value = {
-            // EJB/сервисы
+            // EJB/services
             IpbCodeCacheService.class,
             AdoDbService.class,
-            // Entities/модели
+            // Entities/models
             Ado.class,
             AdoEntity.class,
             TestCdiProducers.class
@@ -68,17 +68,17 @@ public class IpbCodeCacheServiceTest {
         return ejb;
     }
 
-    // -------------------- 4) Программный PersistenceUnit -----------------------
+    // -------------------- 4) Programmed PersistenceUnit -----------------------
     @Module
     public Persistence persistenceModule() {
         PersistenceUnit pu = new PersistenceUnit("signalsDB");
         pu.setJtaDataSource("jdbc/signalsDS");
         pu.setProvider("org.hibernate.jpa.HibernatePersistenceProvider");
 
-        // Регистрируем entity-класс(ы)
+        // registration of persistence classes entity-класс(ы)
         pu.getClazz().add(AdoEntity.class.getName());
 
-        // JPA/Hibernate свойства для автогенерации схемы в тесте
+        // JPA/Hibernate properties for autogeneration of schema
         pu.getProperties().put("jakarta.persistence.schema-generation.database.action", "drop-and-create");
         pu.getProperties().put("hibernate.hbm2ddl.auto", "create-drop");
         pu.getProperties().put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
@@ -88,7 +88,7 @@ public class IpbCodeCacheServiceTest {
         return new Persistence(pu);
     }
 
-    // -------------------- 5) JPA и ресурсы -------------------------------------
+    // -------------------- 5) JPA and resources -------------------------------------
     @PersistenceContext(unitName = "signalsDB")
     private EntityManager em;
 
@@ -102,7 +102,7 @@ public class IpbCodeCacheServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        // cхему создаёт Hibernate; просто наполняем таблицу данными
+        // schema is made by hibernate , we fill the table with values
         utx.begin();
         em.joinTransaction();
         for (int i = 0; i <= 10; i++) {
@@ -119,7 +119,7 @@ public class IpbCodeCacheServiceTest {
         }
         utx.commit();
 
-        // Инициализируем кэш 10-ю элементами
+        // Initialization cache with 10 elements
         cacheService.initialize(TEMPLATE_ID, 10, null, null, false);
     }
 
@@ -132,7 +132,7 @@ public class IpbCodeCacheServiceTest {
         cacheService.clear();
     }
 
-    // -------------------- 6) Сам тест ------------------------------------------
+    // -------------------- 6) Test ------------------------------------------
     @Test
     public void pickAdoForIpb_returnsExpectedBucket_byModulo10() {
         String raw = "IPB_002433"; // 2433 % 10 = 3
