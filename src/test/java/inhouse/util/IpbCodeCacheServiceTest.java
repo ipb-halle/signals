@@ -5,7 +5,6 @@ import de.ipb_halle.inhouse.util.IpbCodeNormalizer;
 import de.ipb_halle.signals.ado.Ado;
 import de.ipb_halle.signals.ado.AdoDbService;
 import de.ipb_halle.signals.ado.AdoEntity;
-import de.ipb_halle.signals.ado.AdoRestService;
 import jakarta.annotation.Resource;
 import jakarta.ejb.EJB;
 import jakarta.persistence.EntityManager;

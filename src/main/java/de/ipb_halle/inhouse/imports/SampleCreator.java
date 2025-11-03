@@ -21,6 +21,7 @@
 package de.ipb_halle.inhouse.imports;
 
 import de.ipb_halle.inhouse.InhouseDB;
+import de.ipb_halle.inhouse.util.IpbCodeCacheService;
 import de.ipb_halle.signals.ado.Ado;
 import de.ipb_halle.signals.dynEnum.DynEnumManager;
 import de.ipb_halle.signals.entity.SignalsEntity;
@@ -82,16 +83,13 @@ public class SampleCreator {
         attachIPB_CodeAdo(sample, eid, ipbCode);
 
 
-
-       // attachSampleContainer(sample, eid, procId);
-        attacher.attachSampleContainer(sample, eid, procId,"molproc");
-
+        // attachSampleContainer(sample, eid, procId);
+        attacher.attachSampleContainer(sample, eid, procId, "molproc");
 
 
         // Prepare properties as key-value pairs for PATCH update
         patch(sample, eid);
     }
-
 
 
     public void createExtractSample(String templateId, String ancestorId, String description, String ipbCode, Integer procId) throws Exception {
@@ -134,22 +132,33 @@ public class SampleCreator {
         if (ipbCode != null) {
             logger.info("SampleCreator:-> Starting create Ados");
             String adoTemplateId = inhouseDB.getConfigString(ADO_TEMPLATE_ID);
-            // IPBCodeCacheService
-            // findIpbCodeFromCache(cacheService, IPBCode) --> SignalsEID
-            Optional<Ado> maybeAdo = adoCreator.findOrCreateAdoByIpbCode(ipbCode, adoTemplateId);
-            if (maybeAdo.isPresent()) {
-                Ado ado = maybeAdo.get();
-                SamplePropertyValue adoRef = new SamplePropertyValue();
-                adoRef.setPropertyId(inhouseDB.getConfigString(FIELD_IPB_CODE));
-                adoRef.setPropertyValue(ado.getType() + ";" + ado.getName() + ";" + ado.getEid());
-                sample.addPropertyValue(adoRef);
-                adoRef.setSampleId(sampleId);
-            } else {
-                logger.info("Skipping ADO link: not found/created for ipbCode={}", ipbCode);
-            }
+
+            // ==For Testing is modular method should be used==
+            IpbCodeCacheService cacheService = new IpbCodeCacheService();
+            Ado ipbCodeAdoObject = cacheService.pickAdoForIpb(ipbCode);
+
+            // this is production where all adp objects will be generated in one shot
+
+//            Optional<Ado> maybeAdo = adoCreator.findOrCreateAdoByIpbCode(ipbCode, adoTemplateId);
+//            if (maybeAdo.isPresent()) {
+//                Ado ado = maybeAdo.get();
+//                createSamplePropertyValueAdoReference(sample, sampleId, ado);
+//            } else {
+//                logger.info("Skipping ADO link: not found/created for ipbCode={}", ipbCode);
+//            }
+
+            createSamplePropertyValueAdoReference(sample, sampleId, ipbCodeAdoObject);
         } else {
             logger.info("Skipping ADO link: missing IPB code");
         }
+    }
+
+    private void createSamplePropertyValueAdoReference(Sample sample, String sampleId, Ado ado) {
+        SamplePropertyValue adoRef = new SamplePropertyValue();
+        adoRef.setPropertyId(inhouseDB.getConfigString(FIELD_IPB_CODE));
+        adoRef.setPropertyValue(ado.getType() + ";" + ado.getName() + ";" + ado.getEid());
+        sample.addPropertyValue(adoRef);
+        adoRef.setSampleId(sampleId);
     }
 
     private void patch(Sample sample, String sampleId) {
