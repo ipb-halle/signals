@@ -19,26 +19,18 @@ package de.ipb_halle.signals.users;
 
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.SignalsConfig;
-
 import jakarta.annotation.Resource;
 import jakarta.inject.Inject;
-
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.junit.ApplicationComposer;
-import org.apache.openejb.testing.Classes;
-import org.apache.openejb.testing.Configuration;
-import org.apache.openejb.testing.Module;
-import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
-
+import org.apache.deltaspike.testcontrol.api.junit.CdiTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -46,7 +38,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
 
-@RunWith(ApplicationComposer.class)
+@RunWith(CdiTestRunner.class)
 public class LdapClientTest {
 
     public final static String TEST_ALL_USERS_DN = "CN=All Users, OU=groups, DC=somewhere, DC=invalid";
@@ -58,26 +50,6 @@ public class LdapClientTest {
 
     @Inject
     LdapClient ldapClient;
-
-    @Module
-    @Classes(cdi = true, value = { MockLdapAdapterFactory.class, SignalsConfig.class,
-        LdapClient.class, Role.class, RoleEntity.class, RolePriv.class, 
-        Group.class, User.class })
-    public EjbJar app() {
-        return new EjbJar();
-    }
-
-/*
-    @Module
-    public PersistenceUnit persistence() {
-        return TestBase.persistence(new String[]{ UserEntity.class.getName() });
-    }
-*/
-
-    @Configuration
-    public Properties configuration() {
-        return TestBase.configuration();
-    }
 
 
     @Test
