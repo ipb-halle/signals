@@ -20,25 +20,20 @@ package de.ipb_halle.signals.inventory;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.rest.MockRestClient;
+import de.ipb_halle.signals.rest.RestClient;
 import java.util.List;
 import java.util.Properties;
 import jakarta.inject.Inject;
+import org.apache.deltaspike.testcontrol.api.junit.CdiTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.junit.ApplicationComposer;
-import org.apache.openejb.testing.Classes;
-import org.apache.openejb.testing.Configuration;
-import org.apache.openejb.testing.Module;
-import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 
-@RunWith(ApplicationComposer.class)
+@RunWith(CdiTestRunner.class)
 public class LocationTypeManagerTest {
 
     private final String TEST_RESOURCE_1 = "LocationTypeManagerTest001.json";
@@ -48,31 +43,15 @@ public class LocationTypeManagerTest {
     private final String TEST_LOCATION_TYPE_NAME = "Cabinet";
 
     @Inject
-    private MockRestClient mockRestClient;
+    private RestClient mockRestClient;
 
     @Inject
     private LocationTypeManager manager;
 
-    @Module
-    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class, // RestResultIterator.class, RestService.class,
-        LocationType.class, LocationTypeDbService.class, LocationTypeManager.class, LocationTypeRestService.class })
-    public EjbJar app() {
-        return new EjbJar();
-    }
-
-    @Module
-    public PersistenceUnit persistence() {
-        return TestBase.persistence(new String[]{ LocationType.class.getName()});
-    }
-
-    @Configuration
-    public Properties configuration() {
-        return TestBase.configuration();
-    }
 
     @Before
     public void testSetup() {
-        TestBase.prepareRestClients(mockRestClient,
+        TestBase.prepareRestClients((MockRestClient) mockRestClient,
             TEST_KEY_1,
             getClass().getResourceAsStream(TEST_RESOURCE_1));
     }

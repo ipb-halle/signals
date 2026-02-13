@@ -20,46 +20,25 @@ package de.ipb_halle.signals.inventory;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.UpdateConfig;
-import de.ipb_halle.signals.inventory.LocationDbService;
 import de.ipb_halle.signals.inventory.LocationEntity;
 import de.ipb_halle.signals.inventory.LocationManager;
-import de.ipb_halle.signals.inventory.LocationRestService;
 import de.ipb_halle.signals.rest.MockRestClient;
-import de.ipb_halle.signals.users.LdapClient;
-import de.ipb_halle.signals.users.MockLdapAdapter;
-import de.ipb_halle.signals.users.MockLdapAdapterFactory;
+import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.users.User;
-import de.ipb_halle.signals.users.GroupDbService;
-import de.ipb_halle.signals.users.GroupManager;
-import de.ipb_halle.signals.users.GroupRestService;
-import de.ipb_halle.signals.users.RoleDbService;
-import de.ipb_halle.signals.users.RoleManager;
-import de.ipb_halle.signals.users.RoleRestService;
-import de.ipb_halle.signals.users.UserDbService;
-import de.ipb_halle.signals.users.UserRestService;
-import de.ipb_halle.signals.users.UserEntity;
 import de.ipb_halle.signals.users.UserManager;
 import java.util.Date;
 import java.util.Properties;
 import jakarta.inject.Inject;
+import org.apache.deltaspike.testcontrol.api.junit.CdiTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.junit.ApplicationComposer;
-import org.apache.openejb.testing.Classes;
-import org.apache.openejb.testing.Configuration;
-import org.apache.openejb.testing.Descriptor;
-import org.apache.openejb.testing.Descriptors;
-import org.apache.openejb.testing.Module;
-import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 
-@RunWith(ApplicationComposer.class)
+@RunWith(CdiTestRunner.class)
 public class ContainerManagerTest {
 
     private final String TEST_RESOURCE_1 = "ContainerManagerTest001.json";
@@ -76,7 +55,7 @@ public class ContainerManagerTest {
     private final String TEST_LOCATION_NAME = "Grid96Well_Test";
 
     @Inject
-    private MockRestClient mockRestClient;
+    private RestClient mockRestClient;
 
     @Inject
     private UserManager userManager;
@@ -87,31 +66,9 @@ public class ContainerManagerTest {
     @Inject
     private ContainerManager manager;
 
-    @Module
-    @Classes(cdi = true, value = { LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class,
-        MockRestClient.class, SignalsConfig.class,
-        LocationDbService.class, LocationManager.class, LocationRestService.class,
-        GroupDbService.class, GroupManager.class, GroupRestService.class,
-        RoleDbService.class, RoleManager.class, RoleRestService.class,
-        UserDbService.class, UserManager.class, UserRestService.class,
-        ContainerDbService.class, ContainerManager.class, ContainerRestService.class })
-    public EjbJar app() {
-        return new EjbJar();
-    }
-
-    @Module
-    public PersistenceUnit persistence() {
-        return TestBase.persistence(new String[]{ ContainerType.class.getName()});
-    }
-
-    @Configuration
-    public Properties configuration() {
-        return TestBase.configuration();
-    }
-
     @Before
     public void testSetup() {
-        TestBase.prepareRestClients(mockRestClient,
+        TestBase.prepareRestClients((MockRestClient) mockRestClient,
             TEST_KEY_1,
             getClass().getResourceAsStream(TEST_RESOURCE_1));
 
