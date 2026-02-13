@@ -35,6 +35,7 @@
 
     <!-- check Maven Central for latest versions! -->
     <cxf.version>4.0.0</cxf.version>
+    <deltaspike.version>2.0.1</deltaspike.version>
   </properties>
 
   <!-- define (additional) repositories -->
@@ -290,7 +291,27 @@
       <version>2.17.2</version>
   </dependency>
 
+  <!-- Deltaspike testing -->
+  <dependency>
+      <groupId>org.apache.deltaspike.modules</groupId>
+      <artifactId>deltaspike-test-control-module-api</artifactId>
+      <version>${deltaspike.version}</version>
+      <scope>test</scope>
+  </dependency>
 
+  <dependency>
+      <groupId>org.apache.deltaspike.modules</groupId>
+      <artifactId>deltaspike-test-control-module-impl</artifactId>
+      <version>${deltaspike.version}</version>
+      <scope>test</scope>
+  </dependency>
+
+  <dependency>
+      <groupId>org.apache.deltaspike.cdictrl</groupId>
+      <artifactId>deltaspike-cdictrl-openejb</artifactId>
+      <version>${deltaspike.version}</version>
+      <scope>test</scope>
+  </dependency>
 
   <!-- TomEE / openEJB  -->
   <dependency>

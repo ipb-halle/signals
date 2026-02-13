@@ -28,12 +28,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URI;
-import jakarta.ejb.Local;
 
 /**
  * Http client reader for Signals tool
  */
-@Local
 public interface RestClient {
 
     public final int HTTP_OK = 200;

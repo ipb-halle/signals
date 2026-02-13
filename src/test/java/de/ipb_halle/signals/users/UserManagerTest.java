@@ -21,6 +21,7 @@ import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.UpdateConfig;
 import de.ipb_halle.signals.reporting.HtmlReport;
+import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.signals.rest.MockRestClient;
 import java.util.Iterator;
 import java.util.HashMap;
@@ -35,12 +36,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.junit.ApplicationComposer;
-import org.apache.openejb.testing.Classes;
-import org.apache.openejb.testing.Configuration;
-import org.apache.openejb.testing.Module;
-import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
+import org.apache.deltaspike.testcontrol.api.junit.CdiTestRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -48,7 +44,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
 
-@RunWith(ApplicationComposer.class)
+@RunWith(CdiTestRunner.class)
 public class UserManagerTest {
 
     private final String TEST_RESOURCE_1 = "UserManagerTest001.json";
@@ -87,7 +83,7 @@ public class UserManagerTest {
     private final String TEST_ROLE4_NAME = "Inventory Admin";
 
     @Inject
-    private MockRestClient mockRestClient;
+    private RestClient mockRestClient;
 
     @Inject
     private UserManager manager;
@@ -98,44 +94,24 @@ public class UserManagerTest {
     @Inject
     private UserDbService userDbService;
 
-    @Module
-    @Classes(cdi = true, value = { LdapClient.class, MockLdapAdapter.class, MockLdapAdapterFactory.class,
-        MockRestClient.class, SignalsConfig.class,
-        GroupDbService.class, GroupManager.class, GroupRestService.class,
-        RoleDbService.class, RoleManager.class, RoleRestService.class,
-        UserDbService.class, UserManager.class, UserRestService.class })
-    public EjbJar app() {
-        return new EjbJar();
-    }
-
-    @Module
-    public PersistenceUnit persistence() {
-        return TestBase.persistence(new String[]{ UserEntity.class.getName() });
-    }
-
-    @Configuration
-    public Properties configuration() {
-        return TestBase.configuration();
-    }
-
     @Before
     public void testSetup() {
-        TestBase.prepareRestClients(mockRestClient,
+        TestBase.prepareRestClients((MockRestClient) mockRestClient,
             TEST_KEY_1,
             getClass().getResourceAsStream(TEST_RESOURCE_1));
-        TestBase.prepareRestClients(mockRestClient,
+        TestBase.prepareRestClients((MockRestClient) mockRestClient,
             TEST_KEY_2,
             getClass().getResourceAsStream(TEST_RESOURCE_2));
-        TestBase.prepareRestClients(mockRestClient,
+        TestBase.prepareRestClients((MockRestClient) mockRestClient,
             TEST_KEY_3a,
             getClass().getResourceAsStream(TEST_RESOURCE_3));
-        TestBase.prepareRestClients(mockRestClient,
+        TestBase.prepareRestClients((MockRestClient) mockRestClient,
             TEST_KEY_3b,
             getClass().getResourceAsStream(TEST_RESOURCE_3));
-        TestBase.prepareRestClients(mockRestClient,
+        TestBase.prepareRestClients((MockRestClient) mockRestClient,
             TEST_KEY_3c,
             getClass().getResourceAsStream(TEST_RESOURCE_3));
-        TestBase.prepareRestClients(mockRestClient,
+        TestBase.prepareRestClients((MockRestClient) mockRestClient,
             TEST_KEY_4,
             getClass().getResourceAsStream(TEST_RESOURCE_4));
 

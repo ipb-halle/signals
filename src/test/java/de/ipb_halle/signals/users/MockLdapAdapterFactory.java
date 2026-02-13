@@ -18,9 +18,10 @@
 package de.ipb_halle.signals.users;
 
 import de.ipb_halle.signals.SignalsConfig;
-import jakarta.ejb.LocalBean;
+import jakarta.enterprise.inject.Alternative;
 
-@LocalBean
+
+@Alternative
 public class MockLdapAdapterFactory implements LdapAdapterFactory {
 
     @Override

@@ -1,0 +1,6 @@
+<beans>
+  <alternatives>
+    <class>de.ipb_halle.signals.rest.MockRestClient</class>
+    <class>de.ipb_halle.signals.users.MockLdapAdapterFactory</class>
+  </alternatives>
+</beans>

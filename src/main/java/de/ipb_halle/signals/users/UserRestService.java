@@ -113,7 +113,7 @@ public class UserRestService implements RestService<User> {
 
 
     @Inject
-    private RestClientImpl restClient;
+    private RestClient restClient;
 
     /**
      * deserialize user

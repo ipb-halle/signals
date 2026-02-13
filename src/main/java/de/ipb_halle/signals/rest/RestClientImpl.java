@@ -57,7 +57,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import jakarta.annotation.Resource;
-import jakarta.ejb.Local;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 
@@ -67,7 +66,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Http client reader for Signals tool
  */
-@Local
 public class RestClientImpl implements RestClient {
 
     private final static String UTF8 = "UTF-8";
