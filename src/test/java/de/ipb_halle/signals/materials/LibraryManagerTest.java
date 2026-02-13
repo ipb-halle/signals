@@ -23,26 +23,21 @@ import de.ipb_halle.signals.TestBase;
 import de.ipb_halle.signals.entity.FieldDefinition;
 import de.ipb_halle.signals.entity.FieldDefinitionDbService;
 import de.ipb_halle.signals.rest.MockRestClient;
+import de.ipb_halle.signals.rest.RestClient;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import jakarta.inject.Inject;
+import org.apache.deltaspike.testcontrol.api.junit.CdiTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.junit.ApplicationComposer;
-import org.apache.openejb.testing.Classes;
-import org.apache.openejb.testing.Configuration;
-import org.apache.openejb.testing.Module;
-import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 
-@RunWith(ApplicationComposer.class)
+@RunWith(CdiTestRunner.class)
 public class LibraryManagerTest {
 
     private final String TEST_RESOURCE_1 = "LibraryManagerTest001.json";
@@ -55,34 +50,14 @@ public class LibraryManagerTest {
     private final String TEST_LIBRARY_ASSET_FIELD_TITLE = "Chemical Name";
 
     @Inject
-    private MockRestClient mockRestClient;
+    private RestClient mockRestClient;
 
     @Inject
     private LibraryManager manager;
 
-    @Module
-    @Classes(cdi = true, value = { MockRestClient.class, SignalsConfig.class, 
-        FieldDefinition.class, FieldDefinitionDbService.class, 
-        Library.class, LibraryEntity.class, 
-        LibraryFieldDefinition.class, LibraryFieldDefinitionId.class,
-        LibraryDbService.class, LibraryManager.class, LibraryRestService.class })
-    public EjbJar app() {
-        return new EjbJar();
-    }
-
-    @Module
-    public PersistenceUnit persistence() {
-        return TestBase.persistence(new String[]{ Library.class.getName(), LibraryFieldDefinition.class.getName(), FieldDefinition.class.getName() });
-    }
-
-    @Configuration
-    public Properties configuration() {
-        return TestBase.configuration();
-    }
-
     @Before
     public void testSetup() {
-        TestBase.prepareRestClients(mockRestClient,
+        TestBase.prepareRestClients((MockRestClient) mockRestClient,
             TEST_KEY_1,
             getClass().getResourceAsStream(TEST_RESOURCE_1));
     }
