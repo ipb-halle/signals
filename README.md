@@ -1,6 +1,6 @@
 # Helper Tool for Signals Notebook
 
-This project bundles code for migration of IPB data sources, for backup, maintenance and external services for the Perkin Elmer Signals Notebook. The command line tool relies on a single configuration file <code>openejb.xml</code>, which is passed via command line. The configuration file contains the <code>DataSource</code> definition(s), the base url of the Signals Notebook instance and the API key. Example content is as follows (please adjust for your instance):
+This project bundles code for migration of IPB data sources, for backup, maintenance and external services for the electronic lab notebook "Signals Notebook". The command line tool relies on a single configuration file <code>openejb.xml</code>, which is passed via command line. The configuration file contains the <code>DataSource</code> definition(s), the base url of the Signals Notebook instance and the API key. Example content is as follows (please adjust for your instance):
 
     <?xml version="1.0"?>
     <openejb>
@@ -86,4 +86,7 @@ or e.g.
 
 
 ## Trademark Notice
-PerkinElmer is a registered trademark of PerkinElmer Inc. Signals is a trade mark of PerkinElmer Inc. 
+Signals Notebook is a product of Revvity Inc. 
+
+## Branch Info
+This branch introduces Apache DeltaSpike for simplified management of test dependencies. As of Feb. 2026, DeltaSpike is more or less tied to JUnit4, which precludes the migration to JUnit5.
