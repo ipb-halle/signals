@@ -35,7 +35,7 @@ public class TestBase {
      */
     public static Properties configuration() {
         Properties properties = new Properties();
-        properties.put("openejb.configuration", TestBase.class.getResource("/test-openejb.xml").getFile());
+        properties.put("openejb.configuration", TestBase.class.getResource("/META-INF/test-openejb.xml").getFile());
         return properties;
     }
 

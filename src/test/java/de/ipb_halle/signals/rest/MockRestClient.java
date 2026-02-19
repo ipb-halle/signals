@@ -26,13 +26,14 @@ import java.util.StringJoiner;
 
 import jakarta.ejb.LocalBean;
 import jakarta.ejb.Stateful;
+import jakarta.enterprise.inject.Alternative;
 import jakarta.inject.Inject;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import org.apache.openejb.OpenEjbContainer;
 import org.apache.openejb.api.LocalClient;
 
-@LocalBean
+@Alternative
 public class MockRestClient extends RestClientImpl {
 
     private static Map<String, String> responseMap = new HashMap<> ();

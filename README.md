@@ -1,6 +1,6 @@
 # Helper Tool for Signals Notebook
 
-This project bundles code for migration of IPB data sources, for backup, maintenance and external services for the Perkin Elmer Signals Notebook. The command line tool relies on a single configuration file <code>openejb.xml</code>, which is passed via command line. The configuration file contains the <code>DataSource</code> definition(s), the base url of the Signals Notebook instance and the API key. Example content is as follows (please adjust for your instance):
+This project bundles code for migration of IPB data sources, for backup, maintenance and external services for the Revvity Signals Notebook. The command line tool relies on a single configuration file <code>openejb.xml</code>, which is passed via command line. The configuration file contains the <code>DataSource</code> definition(s), the base url of the Signals Notebook instance and the API key. Example content is as follows (please adjust for your instance):
 
     <?xml version="1.0"?>
     <openejb>
@@ -86,4 +86,7 @@ or e.g.
 
 
 ## Trademark Notice
-PerkinElmer is a registered trademark of PerkinElmer Inc. Signals is a trade mark of PerkinElmer Inc. 
+Signals Notebook is a product of Revvity Inc.
+
+## Branch Info
+This branch tries to dispense with the @Classes annotation in the unit tests. These annotations need to list all classes, which are directly or indirectly involved in the test. Creation and maintenance of thes annotations is tedious and error prone. Apache DeltaSpike provides a solution for JUnit4 tests (see DeltaSpike branch). For JUnit5, we did not succeed so far.
