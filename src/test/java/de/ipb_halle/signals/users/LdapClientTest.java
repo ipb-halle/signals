@@ -67,12 +67,21 @@ public class LdapClientTest {
 
     @Test
     public void getGroupTest() {
-        Assertions.assertEquals(TEST_ALL_USERS_NAME, ldapClient.getGroup(TEST_ALL_USERS_DN).getName(), "Name of Group matches");
+        try {
+            Assertions.assertEquals(TEST_ALL_USERS_NAME, ldapClient.getGroup(TEST_ALL_USERS_DN).getName(), "Name of Group matches");
+        } catch(LdapConnectionErrorException ex) {
+            Assertions.fail("LdapConnectionErrorException");
+        }
     }
 
     @Test
     public void getMembersTest() {
-        Assertions.assertTrue(ldapClient.getMembers(TEST_ALL_USERS_DN, true).contains(TEST_GOETHE_DN), "'All Users' has member 'Goethe'");
+        try {
+            Assertions.assertTrue(ldapClient.getMembers(TEST_ALL_USERS_DN, true).contains(TEST_GOETHE_DN), "'All Users' has member 'Goethe'");
+        } catch(LdapConnectionErrorException ex) {
+            Assertions.fail("LdapConnectionErrorException");
+        }
+
     }
 
     @Test

@@ -1,6 +1,6 @@
 /*
  * IPB Signals client
- * Copyright 2022 Leibniz-Institut f. Pflanzenbiochemie
+ * Copyright 2025 Leibniz-Institut f. Pflanzenbiochemie
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,13 @@
  */
 package de.ipb_halle.signals.users;
 
-import de.ipb_halle.signals.SignalsConfig;
-import jakarta.ejb.LocalBean;
-
-@LocalBean
-public class MockLdapAdapterFactory implements LdapAdapterFactory {
-
-    @Override
-    public LdapAdapter getAdapter(SignalsConfig cfg) {
-        return new MockLdapAdapter();
+/**
+ * Exception condition if account is missing mandatory attributes
+ * Most commonly, Alias is missing.
+ * @author fblocal
+ */
+public class MissingAttributeException extends Exception {
+    public MissingAttributeException(String msg) {
+        super(msg);
     }
 }

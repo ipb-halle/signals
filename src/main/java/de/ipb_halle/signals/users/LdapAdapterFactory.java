@@ -28,6 +28,6 @@ import jakarta.ejb.Local;
 @Local
 public interface LdapAdapterFactory {
 
-    public LdapAdapter getAdapter(SignalsConfig cfg) throws Exception;
+    public LdapAdapter getAdapter(SignalsConfig cfg) throws LdapConnectionErrorException;
 
 }

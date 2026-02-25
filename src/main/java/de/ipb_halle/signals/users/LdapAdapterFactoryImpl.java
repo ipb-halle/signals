@@ -38,15 +38,18 @@ public class LdapAdapterFactoryImpl implements LdapAdapterFactory {
 
     private Logger logger = LoggerFactory.getLogger(LdapAdapterFactoryImpl.class);
 
-    public LdapAdapter getAdapter(SignalsConfig cfg) throws Exception {
+    public LdapAdapter getAdapter(SignalsConfig cfg) throws LdapConnectionErrorException {
         LdapAdapterImpl adapter = new LdapAdapterImpl(cfg);
         adapter.initEnv();
         for (int maxRepeat = 2; maxRepeat > 0; maxRepeat--) {
             try {
                 adapter.initContext();
                 return adapter;
-            } catch (NamingException ex) {
-                logger.warn("initContext() caught an exception: {}", ex.getMessage());
+            } catch (IOException ioe) {
+                logger.warn("initContext() caught an exception: {}", ioe.getMessage());
+                logger.warn("initContext(): new attempt will be made in 200 ms");
+            } catch (NamingException ne) {
+                logger.warn("initContext() caught an exception: {}", ne.getMessage());
                 logger.warn("initContext(): new attempt will be made in 200 ms");
             }
             /*
@@ -55,8 +58,12 @@ public class LdapAdapterFactoryImpl implements LdapAdapterFactory {
              * We do it in rare error cases only until we better understand
              * what causes this condition and how to avoid it.
              */
-            Thread.sleep(200);
+            try {
+                Thread.sleep(200);
+            } catch(InterruptedException ie) {
+                // ignore
+            }
         }
-        throw new Exception("getAdapter() repeatedly failed to initialize context");
+        throw new LdapConnectionErrorException("getAdapter() repeatedly failed to initialize context");
     }
 }

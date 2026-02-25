@@ -25,29 +25,16 @@ import de.ipb_halle.signals.rest.MockRestClient;
 import de.ipb_halle.signals.rest.RestClient;
 import de.ipb_halle.tda.DeploymentElement;
 import jakarta.inject.Inject;
+import java.io.IOException;
 import java.util.HashMap;
+import javax.naming.NamingException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/*
- * no longer needed
- *
-import java.util.Properties;
-import org.apache.openejb.jee.EjbJar;
-import org.apache.openejb.junit5.RunWithApplicationComposer;
-import org.apache.openejb.testing.Classes;
-import org.apache.openejb.testing.Configuration;
-import org.apache.openejb.testing.Module;
-import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
-import org.junit.jupiter.api.TestInstance;
-*/
 
-
-//@RunWithApplicationComposer
-//@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class UserManagerTest {
 
     private final String TEST_RESOURCE_1 = "UserManagerTest001.json";
@@ -185,7 +172,17 @@ public abstract class UserManagerTest {
         context.groupsByDN = new HashMap<> ();
         context.rolesByDN = new HashMap<> ();
         AccessManager.prepareReport(context,  new HtmlReport());
-        manager.syncUsersFromLdap(context);
+        try {
+            manager.syncUsersFromLdap(context);
+        } catch (LdapConnectionErrorException ex) {
+            Assertions.fail("LdapConnectionErrorException");
+        } catch (NamingException ex) {
+            Assertions.fail("NamingException");
+        } catch (MissingAttributeException ex) {
+            Assertions.fail("MissingAttributeException");
+        } catch (IOException ex) {
+            Assertions.fail("IOException");
+        }
         String html = context.report.render();
         Assertions.assertTrue(context.report.render().contains("ae@somewhere.invalid"), "report contains 'ae@somewhere.invalid'");
     }

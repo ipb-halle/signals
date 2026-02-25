@@ -1,7 +1,7 @@
 <!--
 
-  CRIMSy Agency
-  Copyright 2020 Leibniz-Institut f. Pflanzenbiochemie
+  Signals Tool
+  Copyright 2026 Leibniz-Institut f. Pflanzenbiochemie
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -20,17 +20,18 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
  http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.ipb-halle</groupId>
-    <artifactId>signals</artifactId>
-    <version>1.0</version>
-    <packaging>jar</packaging>
-
-    <name>IPB signals client</name>
-    <url>http://www.ipb-halle.de</url>
-
-    <properties>
+      <modelVersion>4.0.0</modelVersion>
+ 
+      <groupId>de.ipb-halle</groupId>
+      <artifactId>signals</artifactId>
+      <version>1.0.4</version>
+      <packaging>jar</packaging>
+ 
+      <name>IPB signals client</name>
+      <url>http://www.ipb-halle.de</url>
+ 
+      <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- check Maven Central for latest versions! -->

@@ -46,16 +46,16 @@ import javax.naming.ldap.StartTlsResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** 
+/**
  * Ldap client reader for Signals tool.
- * The current implementation was created to fit IPB needs. It therefore 
- * depends on AD peculiarities and is not platform neutral.  It should be 
- * straightforward however, to adjust it to other flavours of LDAP. 
- * As IPB does not possess other LDAP instances for testing and has 
+ * The current implementation was created to fit IPB needs. It therefore
+ * depends on AD peculiarities and is not platform neutral.  It should be
+ * straightforward however, to adjust it to other flavours of LDAP.
+ * As IPB does not possess other LDAP instances for testing and has
  * no use case, the introduction of an abstraction layer (LdapClientImplAD, etc.)
  * is deemed unnecessary.
- * This implementation supports (and currently requires) STARTTLS. It might be 
- * necessary to provide a custom truststore, in case the LDAP server does not 
+ * This implementation supports (and currently requires) STARTTLS. It might be
+ * necessary to provide a custom truststore, in case the LDAP server does not
  * use a certificate from an officially recognized CA.
  */
 @Local
@@ -79,7 +79,7 @@ public class LdapClient {
      * @param attrs the attribute set
      * @return the account creation date
      */
-    private Date getCreatedAt(Attributes attrs) throws Exception {
+    private Date getCreatedAt(Attributes attrs) throws MissingAttributeException, NamingException {
         DateFormat dateFormat = new SimpleDateFormat(signalsConfig.getLdapDateFormatString());
         try {
             return dateFormat.parse(
@@ -93,8 +93,9 @@ public class LdapClient {
     /**
      * @param groupDN a distinguished group name
      * @return a corresponding Group object
+     * @throws de.ipb_halle.signals.users.LdapConnectionErrorException
      */
-    public Group getGroup(String groupDN) {
+    public Group getGroup(String groupDN) throws LdapConnectionErrorException {
         try (LdapAdapter adapter = ldapAdapterFactory.getAdapter(signalsConfig)) {
             Attributes attrs = adapter.getAttributes(groupDN);
 
@@ -105,9 +106,13 @@ public class LdapClient {
             group.setSystem(true);
 
             return group;
-        } catch(Exception e) {
-            logger.warn("getGroup() caught an Exception: ", (Throwable) e);
-        }                                                
+        } catch(NamingException ne) {
+            logger.warn("getGroup() caught a NamingException: ", (Throwable) ne);
+        } catch(IOException ioe) {
+            logger.warn("getGroup() caught an IOException upon close()", (Throwable) ioe);
+        } catch(MissingAttributeException mae) {
+            logger.warn("getGroup() caught a MissingAttributeException: ", (Throwable) mae);
+        }
         return null;
     }
 
@@ -116,7 +121,7 @@ public class LdapClient {
      * @param nesting true if nested memberships should be resolved
      * @return the list of users, who are members of that group, including nested memberships
      */
-    public Set<String> getMembers(String groupDN, boolean nesting) {
+    public Set<String> getMembers(String groupDN, boolean nesting) throws LdapConnectionErrorException {
         Set<String> groupCache = new HashSet<> ();
         Set<String> users = new HashSet<> ();
         getMembers(users, groupCache, groupDN, nesting);
@@ -132,12 +137,14 @@ public class LdapClient {
     public void getMembers(Set<String> users,
                 Set<String> groups,
                 String groupDN,
-                boolean nesting) {
+                boolean nesting) throws LdapConnectionErrorException {
 
         try (LdapAdapter adapter = ldapAdapterFactory.getAdapter(signalsConfig)) {
             getMembers(adapter, users, groups, groupDN, nesting);
-        } catch(Exception e) {
-            logger.warn("getMembers() caught an Exception for DN {}: ", groupDN, e);
+        } catch(IOException ioe) {
+            logger.warn("getMembers() caught an IOException for DN {}: ", groupDN, ioe);
+        } catch(NamingException ne) {
+            logger.warn("getMembers() caught a NamingException for DN {}: ", groupDN, ne);
         }
     }
 
@@ -146,7 +153,7 @@ public class LdapClient {
                     Set<String> users,
                     Set<String> groups,
                     String groupDN,
-                    boolean nesting) throws Exception {
+                    boolean nesting) throws NamingException {
 
         BasicAttribute membersAttr = (BasicAttribute) adapter
                 .getAttributes(groupDN)
@@ -232,17 +239,19 @@ public class LdapClient {
     /**
      * @param userDN a distinguished user name
      * @return a corresponding User object
+     * @throws de.ipb_halle.signals.users.LdapConnectionErrorException
      */
-    public User getUser(String userDN) throws Exception {
-        try (LdapAdapter adapter = ldapAdapterFactory.getAdapter(signalsConfig)) {
-            Attributes attrs = adapter.getAttributes(userDN);
+    public User getUser(String userDN) throws LdapConnectionErrorException, MissingAttributeException, NamingException, IOException {
+        LdapAdapter adapter = ldapAdapterFactory.getAdapter(signalsConfig);
+        Attributes attrs = adapter.getAttributes(userDN);
 
-            if (! attrs.get(signalsConfig.getLdapAttrObjectClass())
-                        .contains(signalsConfig.getLdapAttrObjectClassUser())) {
-                throw new Exception("DN " + userDN +  " is not a person");
-            }
+        if (! attrs.get(signalsConfig.getLdapAttrObjectClass())
+                    .contains(signalsConfig.getLdapAttrObjectClassUser())) {
+            throw new NamingException("DN " + userDN +  " is not a person");
+        }
 
-            User user = new User();
+        User user = new User();
+        try {
             user.setAlias(getAttribute(attrs, signalsConfig.getLdapAttrAlias()).toUpperCase());
             user.setCountry(signalsConfig.getUserAttrCountry());
             user.setCreatedAt(getCreatedAt(attrs));
@@ -253,34 +262,37 @@ public class LdapClient {
             user.setLastName(getAttribute(attrs, signalsConfig.getLdapAttrLastName()));
             user.setOrganization(signalsConfig.getUserAttrOrganization());
             user.setUserName(getAttribute(attrs, signalsConfig.getLdapAttrUserName()).toLowerCase());
-
-            return user;
-        } catch(Exception e) {
-            logger.warn("getUser({}) caught an exception", userDN);
-            throw new Exception(e.getMessage() + " for user " + userDN);
+        } catch(MissingAttributeException mae) {
+            String message = String.format("%s for user %s", mae.getMessage(), userDN);
+            logger.warn(message);
+            throw new MissingAttributeException(message);
         }
+
+        return user;
     }
 
-    private String getAttribute(Attributes attrs, String attrName) throws Exception {
+    private String getAttribute(Attributes attrs, String attrName) throws
+            MissingAttributeException,
+            NamingException {
         BasicAttribute attribute = (BasicAttribute) attrs.get(attrName);
         if (attribute != null) {
             return attribute.get().toString();
         }
         logger.warn("Missing mandatory attribute {}", attrName);
-        throw new Exception("Missing mandatory attribute");
+        throw new MissingAttributeException(String.format("Missing mandatory attribute %s", attrName));
     }
 
     /**
      * Determine expiration status of account according to account expiration date.
      *
-     * NOTE: This is an AD specific implementation, "expires never" can obviously 
+     * NOTE: This is an AD specific implementation, "expires never" can obviously
      * be represented by two values: either 2^63-1 or 0.
      *
      * @param attr LDAP attribute set
-     * @return enabled state 
+     * @return enabled state
      */
-    private boolean getUserExpiration(Attributes attrs) throws Exception {
-        String value = getAttribute(attrs, 
+    private boolean getUserExpiration(Attributes attrs) throws MissingAttributeException, NamingException {
+        String value = getAttribute(attrs,
                 signalsConfig.getLdapAttrAccountExpirationDate());
         try {
             long nanos = Long.parseLong(value);
@@ -300,7 +312,7 @@ public class LdapClient {
 
     private boolean isGroup(LdapAdapter adapter, String dn) {
         try {
-            BasicAttribute objectClassAttr = (BasicAttribute) adapter 
+            BasicAttribute objectClassAttr = (BasicAttribute) adapter
                     .getAttributes(dn)
                     .get(signalsConfig.getLdapAttrObjectClass());
 
