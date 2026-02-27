@@ -17,7 +17,9 @@
  */
 package de.ipb_halle.signals;
 
-
+import java.io.IOException;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 import org.apache.commons.cli.*;
 
 public class RuntimeConfig {
@@ -74,6 +76,7 @@ public class RuntimeConfig {
             .desc("\nSet the truststore for startSSL. The trustStore should contain certificates for both: LDAP and SNB API.")
             .build();
 
+    private final static String PROJECT_VERSION = "projectVersion";
 
     public boolean updateDb;
 
@@ -85,6 +88,8 @@ public class RuntimeConfig {
 
     public boolean noMail;
 
+    public String projectVersion;
+
     public RuntimeConfig() {
         this(true, true, true,false, true);
     }
@@ -95,6 +100,18 @@ public class RuntimeConfig {
         this.updateFromLdap = ldap;
         this.syncDbFromSNB = syncSNB;
         this.noMail = noMail;
+        this.projectVersion = getProjectVersion();
+    }
+
+    public String getProjectVersion() {
+        try {
+            Manifest mf = new Manifest();
+            mf.read(this.getClass().getResourceAsStream("/META-INF/MANIFEST.MF"));
+            Attributes attributes = mf.getMainAttributes();
+            return attributes.getValue(PROJECT_VERSION);
+        } catch (Exception e) {
+            return "unavail";
+        }
     }
 
     public static void registerOptions(Options options) {

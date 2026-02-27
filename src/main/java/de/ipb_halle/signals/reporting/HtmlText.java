@@ -17,6 +17,8 @@
  */
 package de.ipb_halle.signals.reporting;
 
+import java.util.ArrayList;
+import java.util.List;
 import j2html.tags.Tag;
 import static j2html.TagCreator.*;
 
@@ -24,17 +26,19 @@ import static j2html.TagCreator.*;
 public class HtmlText implements HtmlSection {
 
     private String title;
-    private String text;
+    private List<String> text;
 
     public HtmlText(String title, String text) {
         this.title = title;
-        this.text = text;
+        this.text = new ArrayList<> ();
+        this.text.add(text);
     }
 
     public void addContent(String content) {
+        text.add(content);
     }
 
     public Tag getContent() {
-        return div(h1(title), p(text));
+        return div(h1(title), each(text, textItem -> p(textItem)));
     }
 }

@@ -98,15 +98,18 @@ public class AccessManager {
     }
 
     private static HtmlText getReportHeader(UserSynchronizationContext context) {
+        HtmlText header;
         if (context.runtimeConfig.updateSNB) {
-            return new HtmlText(
+            header = new HtmlText(
                 "Access Management",
                 "This mail informs about changes to user accounts in Signals Notebook.");
         } else {
-            return new HtmlText(
+            header = new HtmlText(
                 "Access Management Dry Run!",
                 "Signals Tool has not been allowed to make any changes. This mail informs about changes that will be made once the tool is allowed to make changes.");
         }
+        header.addContent(String.format("Toolkit version: %s", context.runtimeConfig.projectVersion));
+        return header;
     }
 
     private void sendReport(UserSynchronizationContext context, MailReport report) {

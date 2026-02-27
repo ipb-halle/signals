@@ -151,6 +151,9 @@
                         <manifest>
                             <mainClass>de.ipb_halle.signals.Signals</mainClass>
                         </manifest>
+                        <manifestEntries>
+                            <projectVersion>${project.version}</projectVersion>
+                        </manifestEntries>
                     </archive>
                 </configuration>
                 <executions>
