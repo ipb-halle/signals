@@ -25,15 +25,21 @@ import org.apache.commons.cli.*;
 public class RuntimeConfig {
 
     @SuppressWarnings("static-access")
+    private static final Option noMailOpt = Option.builder("m")
+            .longOpt("noMail")
+            .desc("\nDo not send any reports by email")
+            .build();
+
+    @SuppressWarnings("static-access")
     private static final Option dryRunOpt = Option.builder("n")
             .longOpt("dry-run")
             .desc("\nDry run - don't modify anything (includes --noUpdateSNB and --noUpdateFromLDAP).")
             .build();
 
     @SuppressWarnings("static-access")
-    private static final Option noMailOpt = Option.builder("m")
-            .longOpt("noMail")
-            .desc("\nDo not send any reports by email")
+    private static final Option followChildrenOpt = Option.builder("fc")
+            .longOpt("followChildren")
+            .desc("\nAlso obtain child objects during synchronization.")
             .build();
 
     @SuppressWarnings("static-access")
@@ -86,20 +92,30 @@ public class RuntimeConfig {
 
     public boolean syncDbFromSNB;
 
+    public boolean followChildren;
+
     public boolean noMail;
 
     public String projectVersion;
 
     public RuntimeConfig() {
-        this(true, true, true,false, true);
+        this(   true,   // updateDb
+                true,   // snb
+                true,   // ldap
+                false,  // noMail
+                true,   // syncSNB
+                false   // followChildren
+        );
     }
 
-    public RuntimeConfig(boolean db, boolean snb, boolean ldap, boolean noMail, boolean syncSNB) {
+    public RuntimeConfig(boolean db, boolean snb, boolean ldap, boolean noMail,
+                    boolean syncSNB, boolean followChildren) {
         this.updateDb = db;
         this.updateSNB = snb;
         this.updateFromLdap = ldap;
         this.syncDbFromSNB = syncSNB;
         this.noMail = noMail;
+        this.followChildren = followChildren;
         this.projectVersion = getProjectVersion();
     }
 
@@ -118,6 +134,7 @@ public class RuntimeConfig {
         options.addOption(debugOpt);
         options.addOption(discoverOpt);
         options.addOption(dryRunOpt);
+        options.addOption(followChildrenOpt);
         options.addOption(noMailOpt);
         options.addOption(noSyncDbFromSNBOpt);
         options.addOption(noUpdateSnbOpt);
@@ -141,6 +158,10 @@ public class RuntimeConfig {
             config.updateDb = false;
             config.updateSNB = false;
             config.updateFromLdap = false;
+        }
+
+        if (cmdline.hasOption(followChildrenOpt.getOpt())) {
+            config.followChildren = true;
         }
 
         if (cmdline.hasOption(noMailOpt.getOpt())) {

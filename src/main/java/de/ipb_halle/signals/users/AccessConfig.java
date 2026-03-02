@@ -53,10 +53,13 @@ public class AccessConfig {
                 ******************************************************
                 *
                 * Manage Users
-                * {} / {}
+                * {} / v{} / {}
                 *
                 ******************************************************
-                """, signalsConfig.getSnbInstanceName(), new Date().toString());
+                """,
+                signalsConfig.getSnbInstanceName(),
+                runtimeConfig.projectVersion,
+                new Date().toString());
         accessManager.manageAccess(runtimeConfig);
     }
 

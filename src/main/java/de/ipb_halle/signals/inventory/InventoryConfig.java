@@ -40,7 +40,7 @@ public class InventoryConfig {
             .valueSeparator(':')
             .optionalArg(true)
             .desc("""
-                    \nSynchronize location types, container types, locations and containers 
+                    \nSynchronize location types, container types, locations and containers
                     from SNB to DB. Date interval can be specified optionally, see --entitiesSync for details.""")
             .build();
 
@@ -66,10 +66,13 @@ public class InventoryConfig {
                 ******************************************************
                 *
                 * Manage Inventory
-                * {} / {}
+                * {} / v{} / {}
                 *
                 ******************************************************
-                """, signalsConfig.getSnbInstanceName(), new Date().toString());
+                """,
+                signalsConfig.getSnbInstanceName(),
+                runtimeConfig.projectVersion,
+                new Date().toString());
         inventoryManager.manageInventory(dateRange);
     }
 

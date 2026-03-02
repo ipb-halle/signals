@@ -132,12 +132,16 @@ public class SignalsEntityConfig {
                         ******************************************************
                         *
                         * Manage Signals Attributes and Entities
-                        * {} / {}
+                        * {} / v{} / {}
                         * From: {}   to: {}
                         *
                         ******************************************************
-                        """, signalsConfig.getSnbInstanceName(), new Date().toString(),
-                dateRange[0], dateRange[1]);
+                        """,
+                        signalsConfig.getSnbInstanceName(),
+                        runtimeConfig.projectVersion,
+                        new Date().toString(),
+                        dateRange[0],
+                        dateRange[1]);
 
         attributeManager.manageAttributes();
 

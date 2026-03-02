@@ -45,9 +45,11 @@ public class SEProcessorBean {
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void processEntity(RuntimeConfig config, SignalsEntityDTO parentEntity) {
         try {
-            RestResultIterator<SignalsEntityDTO> iterator = restService.doGetChildren(parentEntity);
-            while (iterator.hasNext()) {
-                parentEntity.addChild(iterator.next());
+            if (config.followChildren) {
+                RestResultIterator<SignalsEntityDTO> iterator = restService.doGetChildren(parentEntity);
+                while (iterator.hasNext()) {
+                    parentEntity.addChild(iterator.next());
+                }
             }
             if (config.updateDb) {
                 dbService.save(parentEntity);

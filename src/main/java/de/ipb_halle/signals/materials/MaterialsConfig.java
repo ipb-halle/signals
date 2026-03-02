@@ -59,10 +59,13 @@ public class MaterialsConfig {
                 ******************************************************
                 *
                 * Manage Materials
-                * {} / {}
+                * {} / v{} / {}
                 *
                 ******************************************************
-                """, signalsConfig.getSnbInstanceName(), new Date().toString());
+                """,
+                signalsConfig.getSnbInstanceName(),
+                runtimeConfig.projectVersion,
+                new Date().toString());
 
         materialsManager.manageLibraries(runtimeConfig);
         materialsManager.manageMaterials(runtimeConfig, dateRange);

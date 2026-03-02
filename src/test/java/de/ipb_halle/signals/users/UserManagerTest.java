@@ -167,7 +167,7 @@ public abstract class UserManagerTest {
 
     @Test
     public void syncUsersFromLdapTest() {
-        RuntimeConfig config = new RuntimeConfig(true, false, true, true, true);
+        RuntimeConfig config = new RuntimeConfig(true, false, true, true, true, false);
         UserSynchronizationContext context = new UserSynchronizationContext(config);
         context.groupsByDN = new HashMap<> ();
         context.rolesByDN = new HashMap<> ();

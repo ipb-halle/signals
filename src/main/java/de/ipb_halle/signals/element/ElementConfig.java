@@ -33,6 +33,10 @@ import java.util.Date;
 
 public class ElementConfig {
 
+/*
+ * NOTE: this option masks the --entitiesSync option in file
+ *       ../entity/SignalsEntityConfig.java
+ *
     @SuppressWarnings("static-access")
     private static final Option elementsSyncOpt = Option.builder("eS")
             .longOpt("elementsSync")
@@ -42,7 +46,7 @@ public class ElementConfig {
             .optionalArg(true)
             .desc("\nSynchronize the constituting elements of experiments, samples, etc. from SNB to DB.")
             .build();
-
+*/
     private ElementManager elementManager;
     private RuntimeConfig runtimeConfig;
     private SignalsConfig signalsConfig;
@@ -61,17 +65,20 @@ public class ElementConfig {
                 ******************************************************
                 *
                 * Manage Elements
-                * {} / {}
+                * {} / v{} / {}
                 *
                 ******************************************************
-                """, signalsConfig.getSnbInstanceName(), new Date().toString());
+                """,
+                signalsConfig.getSnbInstanceName(),
+                runtimeConfig.projectVersion,
+                new Date().toString());
 
         elementManager.manageElements(runtimeConfig, dateRange);
     }
 
 
     public static void registerOptions(Options options) {
-        options.addOption(elementsSyncOpt);
+//      options.addOption(elementsSyncOpt);
     }
 
     /**
@@ -84,9 +91,11 @@ public class ElementConfig {
     public static void processCommandLine(CommandLine cmdline, Options options, Signals signals)
             throws MissingArgumentException, MissingOptionException, UnrecognizedOptionException, ParseException {
 
+/*
         if (cmdline.hasOption(elementsSyncOpt.getOpt())) {
             String[] dateRangeArgs = cmdline.getOptionValues(elementsSyncOpt.getOpt());
             signals.manageElements(DateRangeParser.parseDateRange(dateRangeArgs));
         }
+*/
     }
 }
