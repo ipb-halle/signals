@@ -1,0 +1,24 @@
+#
+# Containerized database server
+#
+networks:
+  db_net:
+    driver: bridge
+
+services:
+  db:
+    env_file:
+      - path: example_conf/db_env
+        required: true
+    image: postgres:16
+    networks:
+      - db_net
+    ports:
+      - 5432:5432
+    restart: unless-stopped
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
+    external: false

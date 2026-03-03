@@ -71,7 +71,7 @@ public class AccessManager {
         } else {
             logger.debug("DRY RUN: skipping updates from LDAP");
         }
-        if (runtimeConfig.noMail) {
+        if (! runtimeConfig.noMail) {
             sendReport(context, report);
         }
     }

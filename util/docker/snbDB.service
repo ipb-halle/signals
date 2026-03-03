@@ -1,0 +1,17 @@
+[Unit]
+Description=Toolkit DB Server
+After=docker.service
+Before=
+
+[Service]
+User=root
+Group=root
+Type=oneshot
+RemainAfterExit=yes
+TimeoutStartSec=600s
+ExecStart=/opt/signals/bin/db.sh start
+ExecStop=/opt/signals/bin/db.sh stop
+
+[Install]
+WantedBy=multi-user.target
+

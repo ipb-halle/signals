@@ -1,0 +1,8 @@
+#
+# Compose Override File
+# You should adapt this file and add, e.g.
+#  - environment settings
+#  - volumes
+#
+version: '2.0'
+
