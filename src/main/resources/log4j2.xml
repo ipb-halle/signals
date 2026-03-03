@@ -21,7 +21,7 @@
         </Logger>
 
         <!-- Hibernate Logging -->
-        <Logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
+        <Logger name="org.hibernate.SQL" level="INFO" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
         <Logger name="org.hibernate" level="warn" additivity="true">
