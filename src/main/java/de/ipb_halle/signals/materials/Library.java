@@ -51,7 +51,7 @@ public class Library {
     public final static String ATTR_DISPLAY_TABLE = "displayTable";
     public final static String ATTR_MATERIALS_SAMPLE_MAPPING = "materialsSampleMapping";
 
-    public final static String LIBRARY_TYPE = "assetType";
+    public final static String ENTITY_TYPE_LIBRARY = "assetType";
 
     private String assetDisplayName;
     private Set<Field> assetFields;
@@ -221,7 +221,7 @@ public class Library {
         return entityFlags;
     }
 
-    public String getEId() { return LIBRARY_TYPE + ":" + id; }
+    public String getEId() { return ENTITY_TYPE_LIBRARY + ":" + id; }
 
     public String getId() {
         return id;

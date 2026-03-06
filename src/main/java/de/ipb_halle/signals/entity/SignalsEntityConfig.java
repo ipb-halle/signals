@@ -23,7 +23,10 @@ import de.ipb_halle.signals.Signals;
 import de.ipb_halle.signals.SignalsConfig;
 import de.ipb_halle.signals.element.ElementManager;
 import de.ipb_halle.signals.attribute.AttributeManager;
+import de.ipb_halle.signals.inventory.ContainerEntity;
 import de.ipb_halle.signals.inventory.LocationEntity;
+import de.ipb_halle.signals.materials.Library;
+import de.ipb_halle.signals.materials.Material;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +83,7 @@ public class SignalsEntityConfig {
             .optionalArg(false)
             .desc("\nSpecify the entity types to be processed by options --syncEntities " +
                     "or --dumpEntities. The default is to include experiment, journal, asset, " +
-                    "assetType, location, batch, container, sample, text.")
+                    "assetType, location, batch, container, sample.")
             .build();
 
     /**
@@ -108,10 +111,10 @@ public class SignalsEntityConfig {
          * because attributes cannot be fetched together with other entities
          */
         includedTypes = new EntityType[]{
-                EntityType.valueOf("asset"),
-                EntityType.valueOf("assetType"),
-                EntityType.valueOf("batch"),
-                EntityType.valueOf("container"),
+                EntityType.valueOf(Material.ENTITY_TYPE_ASSET),
+                EntityType.valueOf(Library.ENTITY_TYPE_LIBRARY),
+                EntityType.valueOf(Material.ENTITY_TYPE_BATCH),
+                EntityType.valueOf(ContainerEntity.ENTITY_TYPE_CONTAINER),
                 EntityType.valueOf("experiment"),
                 EntityType.valueOf("journal"),
                 EntityType.valueOf(LocationEntity.ENTITY_TYPE_LOCATION),

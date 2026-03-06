@@ -150,7 +150,7 @@ public class MaterialsManager {
     private List<Field> receiveAllFieldsOfAllLibraries(Collection<String> libraryIds) {
         Map<String, Object> cmap = new HashMap<>();
         cmap.put(Field.DEFINING_ENTITY_ID, libraryIds.stream()
-                .map(id -> Library.LIBRARY_TYPE + ":" + id)
+                .map(id -> Library.ENTITY_TYPE_LIBRARY + ":" + id)
                 .collect(Collectors.toList()));
         return fieldDbService.load(cmap);
     }
