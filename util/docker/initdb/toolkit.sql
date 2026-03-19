@@ -2,11 +2,47 @@
  * Toolkit database
  *
  * If you maintain more than a single instance (e.g. production and trial), 
- * you need to set up a database for each of these instances
+ * you need to set up a database for each of these instances separately
  */
 CREATE USER toolkit PASSWORD 'toolkit';
 CREATE DATABASE toolkit WITH ENCODING 'UTF8' OWNER toolkit;
 
+\set SNB_SCHEMA snb
+\set SNB_DATABASE toolkit
+\set SNB_WRITE_USER snbWriter
+\set SNB_READ_USER snbReader
+\set SNB_WRITE_PW superSecret
+\set SNB_READ_PW secret
+
+-- quoted variables --
+\set SNB_WRITE_PW_QUOTED '\'' :SNB_WRITE_PW '\''
+\set SNB_READ_PW_QUOTED '\'' :SNB_READ_PW '\''
+
+-- start initialization
+CREATE USER :SNB_WRITE_USER PASSWORD :SNB_WRITE_PW_QUOTED
+        NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT;
+CREATE USER :SNB_READ_USER PASSWORD :SNB_READ_PW_QUOTED
+        NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT;
+
+CREATE DATABASE :SNB_DATABASE WITH ENCODING 'UTF8' OWNER :SNB_WRITE_USER;
+
+
+\connect :SNB_DATABASE
+
+-- schema --
+CREATE SCHEMA :SNB_SCHEMA AUTHORIZATION :SNB_WRITE_USER;
+ALTER USER :SNB_WRITE_USER SET search_path to :SNB_SCHEMA,public;
+ALTER USER :SNB_READ_USER SET search_path to :SNB_SCHEMA,public;
+
+-- privileges: write user --
+GRANT USAGE ON SCHEMA :SNB_SCHEMA, public TO :SNB_WRITE_USER;
+GRANT CONNECT, TEMPORARY, TEMP  ON  DATABASE :SNB_DATABASE to :SNB_WRITE_USER;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA :SNB_SCHEMA to :SNB_WRITE_USER;
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public to :SNB_WRITE_USER;
+
+REVOKE ALL ON ALL TABLES IN SCHEMA :SNB_SCHEMA FROM public;
+
 /*
- * \connect toolkit
+ * \connect - :SNB_WRITE_USER
  */
+
