@@ -1,6 +1,6 @@
 # Helper Tool for Signals Notebook
 
-This project bundles code for migration of IPB data sources, for backup, maintenance and external services for the Perkin Elmer Signals Notebook. The command line tool relies on a single configuration file <code>openejb.xml</code>, which is passed via command line. The configuration file contains the <code>DataSource</code> definition(s), the base url of the Signals Notebook instance and the API key. Example content is as follows (please adjust for your instance):
+This project bundles code for migration of IPB data sources, for backup, maintenance and external services for the Revvity Signals Notebook. The command line tool relies on a single configuration file <code>openejb.xml</code>, which is passed via command line. The configuration file contains the <code>DataSource</code> definition(s), the base url of the Signals Notebook instance and the API key. Example content is as follows (please adjust for your instance):
 
     <?xml version="1.0"?>
     <openejb>
@@ -72,7 +72,7 @@ This project bundles code for migration of IPB data sources, for backup, mainten
     </openejb>
 
 
-To run the code, build the project 
+To run the code, build the project
 
     mvn package
 
@@ -87,4 +87,6 @@ or e.g.
 
 
 ## Trademark Notice
-PerkinElmer is a registered trademark of PerkinElmer Inc. Signals is a trade mark of PerkinElmer Inc. 
+Signals Notebook is a product of Revvity Signals Software Inc., Waltham, MA, USA.
+The mention or use of brand names does not imply that IPB has any rights to these
+products or names.

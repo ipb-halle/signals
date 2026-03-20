@@ -1,0 +1,26 @@
+Branch overview
+---------------
+
+main
+    Production version. Modify with care!
+
+DeltaSpike
+    Branch exemplifying better management of deployment
+    and injection during unit tests. Removes the need for
+    extensive annotation of required classes (@Classes
+    annotation) and persistence entities.
+    Requires JUnit4 / does not work for JUnit5.
+
+autoScan
+    Unsuccessful attempts to replace the extensive test
+    annotations (@Classes, ...) with auto discovery.
+
+openAPI
+    Unsuccessful attempt to auto-generate the necessary
+    classes to operate the Signals OpenAPI REST interface.
+    The API is rather complex and has conflicting definitions
+    for inner classes of response objects.
+
+entities, import-single-experiment, last_version
+    Branches for the import of the ChemFinder InhouseDB. Can
+    be discarded once the import has been accomplished.
