@@ -35,7 +35,7 @@ function error {
 #==========================================================
 #
 
-GETOPT=$(getopt -o 'hc:t:' --longoptions 'help,config:,help2,toolkit' -n 'toolkit.sh' -- "$@")
+GETOPT=$(getopt -o 'hc:t:' --longoptions 'help,config:,help2,toolkit:' -n 'toolkit.sh' -- "$@")
 if [ $? -ne 0 ]; then
         echo 'Error in commandline evaluation. Terminating...' >&2
         exit 1
