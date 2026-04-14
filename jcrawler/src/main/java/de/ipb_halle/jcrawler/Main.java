@@ -17,6 +17,7 @@ import org.apache.commons.cli.MissingArgumentException;
 import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 
 import org.slf4j.Logger;
@@ -55,25 +56,23 @@ are skipped during the scan. This flag triggers a full scan.
 
 
     private Logger logger;
-    private String configFile;
-    private boolean fullScan = false;
+    private Config config;
 
     public Main() {
         logger = LoggerFactory.getLogger(Main.class);
+        config = new Config();
     }
 
     public static void main(String[] argv) {
-
         Main main = new Main();
         if (processCommandLine(main, argv)) {
-            main.run();
+            return;
         }
+        main.run();
     }
 
     private void run() {
-        System.out.printf("Run parameters\nfull scan: %s\nconfigFile: %s\n",
-                fullScan,
-                configFile);
+        System.out.printf("Hallo Welt\n");
     }
 
     public static boolean processCommandLine(Main main, String[] argv) {
@@ -84,28 +83,32 @@ are skipped during the scan. This flag triggers a full scan.
 
             if (!cmdline.hasOption(configOpt.getOpt())) {
                 printHelp("ERROR: missing configuration file", options);
-                return false;
+                return true;
             }
 
             if (cmdline.hasOption(fullScanOpt.getOpt())) {
-                main.fullScan = true;
+                main.config.setFullScan(true);
             }
 
             if (cmdline.hasOption(helpOpt.getOpt())) {
                 printHelp(null, options);
-                return false;
+                return true;
             }
 
-            main.configFile = cmdline.getOptionValue(configOpt.getOpt());
+            if (! main.config.setConfigFile(
+                    cmdline.getOptionValue(configOpt.getOpt()))) {
+                System.out.println("Could not parse config file");
+                return true;
+            }
 
         } catch (MissingArgumentException | MissingOptionException | UnrecognizedOptionException e) {
             printHelp("ERROR: " + e.getMessage(), options);
-            return false;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            return true;
+        } catch (ParseException e) {
+            printHelp("ERROR: " + e.getMessage(), options);
+            return true;
         }
-        return true;
+        return false;
     }
 
     private static Options registerOptions() {

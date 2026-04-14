@@ -1,0 +1,7 @@
+{
+  "fields" : {
+    "boolean" : true,
+    "long" : 1234567890,
+    "string" : "Hello World!"
+  }
+}

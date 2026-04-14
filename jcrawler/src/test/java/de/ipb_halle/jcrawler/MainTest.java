@@ -19,7 +19,7 @@ public class MainTest {
     @Test
     public void testOptions() {
         Main main = new Main();
-        Assertions.assertFalse(Main.processCommandLine(main,
+        Assertions.assertTrue(Main.processCommandLine(main,
                 new String[] {"-h", "-f"}));
     }
 }
