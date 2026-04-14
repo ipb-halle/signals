@@ -7,10 +7,7 @@
  */
 package de.ipb_halle.jcrawler;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.LinkedList;
 
 /**
  *
@@ -19,14 +16,14 @@ import java.util.logging.Logger;
 public class CrawlerExecutor {
 
     private final Config config;
-    private List<Thread> threads;
+    private LinkedList<Thread> threads;
 
     public CrawlerExecutor(Config config) {
         this.config = config;
     }
 
     public void start() {
-        threads = new ArrayList<> ();
+        threads = new LinkedList<> ();
         for(Crawler c : new CrawlerFactory(config).buildCrawlers()) {
             Thread t = new Thread(c);
             threads.add(t);
@@ -35,5 +32,14 @@ public class CrawlerExecutor {
     }
 
     public void joinAll() {
+        while(! threads.isEmpty()) {
+            Thread t = threads.getFirst();
+            try {
+                t.join();
+                threads.removeFirst();
+            } catch (InterruptedException ex) {
+                System.getLogger(CrawlerExecutor.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+            }
+        }
     }
 }
