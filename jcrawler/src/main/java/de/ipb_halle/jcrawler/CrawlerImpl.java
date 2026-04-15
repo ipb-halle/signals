@@ -11,6 +11,10 @@ package de.ipb_halle.jcrawler;
  *
  * @author fblocal
  */
-public interface Crawler extends Runnable {
+public class CrawlerImpl implements Crawler {
 
+    @Override
+    public void run() {
+
+    }
 }
