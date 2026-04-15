@@ -8,6 +8,7 @@
 package de.ipb_halle.jcrawler;
 
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  *
@@ -16,15 +17,23 @@ import java.util.LinkedList;
 public class CrawlerExecutor {
 
     private final Config config;
+    private final CrawlerFactory factory;
     private LinkedList<Thread> threads;
+    private ConcurrentLinkedQueue<CrawlPath> paths;
 
-    public CrawlerExecutor(Config config) {
+    public CrawlerExecutor(Config config, CrawlerFactory factory) {
         this.config = config;
+        this.factory = factory;
+    }
+
+    public void setup() {
+        paths = new ConcurrentLinkedQueue<> ();
     }
 
     public void start() {
         threads = new LinkedList<> ();
-        for(Crawler c : new CrawlerFactory(config).buildCrawlers()) {
+        for(Crawler c : factory.buildCrawlers()) {
+            c.setPathQueue(paths);
             Thread t = new Thread(c);
             threads.add(t);
             t.start();

@@ -7,14 +7,10 @@
  */
 package de.ipb_halle.jcrawler;
 
-import java.util.AbstractQueue;
-
 /**
  *
- * @author fblocal
+ * @author fbroda
  */
-public interface Crawler extends Runnable {
+public interface CrawlPath {
 
-    public Statistics getStatistics();
-    public void setPathQueue(AbstractQueue<CrawlPath> queue);
 }

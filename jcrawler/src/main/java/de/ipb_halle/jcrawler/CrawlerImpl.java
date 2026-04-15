@@ -7,14 +7,28 @@
  */
 package de.ipb_halle.jcrawler;
 
+import java.util.AbstractQueue;
+
 /**
  *
  * @author fblocal
  */
 public class CrawlerImpl implements Crawler {
 
+    private final Statistics statistics = new Statistics();
+
+    @Override
+    public Statistics getStatistics() {
+        return statistics;
+    }
+
     @Override
     public void run() {
+
+    }
+
+    @Override
+    public void setPathQueue(AbstractQueue<CrawlPath> q) {
 
     }
 }
