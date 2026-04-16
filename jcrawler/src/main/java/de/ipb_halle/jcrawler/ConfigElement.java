@@ -22,6 +22,10 @@ public class ConfigElement {
     protected ConfigElement() {
     }
 
+    private ConfigElement(JsonElement json) {
+        this.json = json;
+    }
+
     public Boolean getConfigBoolean(String path, Boolean dflt) {
         JsonPrimitive p = getConfigPrimitive(path);
         if ((p != null) && p.isBoolean()) {
@@ -44,6 +48,31 @@ public class ConfigElement {
             return p.getAsString();
         }
         return dflt;
+    }
+
+    public boolean isArray(String path) {
+        JsonElement element = getFromPath(json, path);
+        if ((element != null)) {
+            return element.isJsonArray();
+        }
+        return false;
+    }
+
+    public int getArraySize(String path) {
+        JsonElement element = getFromPath(json, path);
+        if ((element != null) && element.isJsonArray()) {
+            return element.getAsJsonArray().size();
+        }
+        return 0;
+    }
+
+    public ConfigElement getArrayElement(String path, int index) {
+        JsonElement element = getFromPath(json, path);
+        if ((element != null) && element.isJsonArray()) {
+            JsonElement arrayElement = element.getAsJsonArray().get(index);
+            return new ConfigElement(arrayElement);
+        }
+        return null;
     }
 
     private JsonPrimitive getConfigPrimitive(String path) {

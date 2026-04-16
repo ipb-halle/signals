@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 public class CrawlerFactoryImpl implements CrawlerFactory {
 
     private final Config config;
+    private final static String CRAWLER_CONFIG = "crawlers";
 
     public CrawlerFactoryImpl(Config config) {
         this.config = config;
@@ -26,6 +27,18 @@ public class CrawlerFactoryImpl implements CrawlerFactory {
 
     @Override
     public List<Crawler> buildCrawlers() {
-        return new ArrayList<> ();
+        ArrayList<Crawler> crawlers = new ArrayList<> ();
+        if (config.isArray(CRAWLER_CONFIG)) {
+            int size = config.getArraySize(CRAWLER_CONFIG);
+            for (int i = 0; i < size; i++) {
+                ConfigElement crawlerConfig = config.getArrayElement(CRAWLER_CONFIG, i);
+                crawlers.add(setupCrawler(crawlerConfig));
+            }
+        }
+        return crawlers;
+    }
+
+    private Crawler setupCrawler(ConfigElement cfg) {
+        return null;
     }
 }

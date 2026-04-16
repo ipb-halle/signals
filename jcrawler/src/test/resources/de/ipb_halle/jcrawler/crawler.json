@@ -1,0 +1,16 @@
+{
+  "threads" : 1,
+  "dbConnectionInfo" : "postgresql://spider:spider@localhost:5432/spider",
+  "crawlers" : [ {
+      "directory" : "/src/main",
+      "namespace" : "localhost",
+      "stripPrefix" : "/src",
+      "subtreeScanThreshold" : 3600
+    },{
+      "directory" : "/src/test",
+      "namespace" : "localhost",
+      "stripPrefix" : "/src",
+      "subtreeScanThreshold" : 3600
+    }
+  ]
+}
