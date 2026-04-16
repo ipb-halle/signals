@@ -30,12 +30,23 @@ public class Config extends ConfigElement {
 
     private boolean fullScan = false;
 
+    // for testing purposes
+    private String globalPrefix;
+
     public boolean isFullScan() {
         return fullScan;
     }
 
     void setFullScan(boolean f) {
         fullScan = f;
+    }
+
+    public String getGlobalPrefix() {
+        return globalPrefix;
+    }
+
+    public void setGlobalPrefix(String globalPrefix) {
+        this.globalPrefix = globalPrefix;
     }
 
     private boolean parseConfig(Reader reader) {

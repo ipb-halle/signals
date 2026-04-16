@@ -13,8 +13,30 @@ import java.util.AbstractQueue;
  *
  * @author fblocal
  */
-public interface Crawler extends Runnable {
+public class Crawler implements Runnable {
 
-    public Statistics getStatistics();
-    public void setPathQueue(AbstractQueue<CrawlPath> queue);
+    private final Statistics statistics = new Statistics();
+    private Thread thread;
+
+    public Statistics getStatistics() {
+        return statistics;
+    }
+
+    public void run() {
+
+    }
+
+    public void setJobQueue(AbstractQueue<CrawlPath> q) {
+
+    }
+
+    public Thread getThread() {
+        return thread;
+    }
+
+    public void setThread(Thread thread) {
+        this.thread = thread;
+    }
+
+
 }

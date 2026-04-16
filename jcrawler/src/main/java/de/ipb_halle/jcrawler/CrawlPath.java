@@ -7,10 +7,14 @@
  */
 package de.ipb_halle.jcrawler;
 
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 /**
  *
  * @author fbroda
  */
 public interface CrawlPath {
-
+    public Statistics getStatistics();
+    public void setJobQueue(ConcurrentLinkedQueue queue);
+    public void walkDirectory();
 }

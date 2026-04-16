@@ -7,14 +7,17 @@
  */
 package de.ipb_halle.jcrawler;
 
-import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  *
  * @author fblocal
  */
-public interface CrawlerFactory {
+public class MockJobFactory implements CrawlJobFactory {
 
-    List<Crawler> buildCrawlers();
+    @Override
+    public ConcurrentLinkedQueue<CrawlPath> buildJobs() {
+        return new ConcurrentLinkedQueue<> ();
+    }
 
 }

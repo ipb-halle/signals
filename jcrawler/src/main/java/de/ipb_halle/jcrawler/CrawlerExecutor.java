@@ -16,39 +16,45 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class CrawlerExecutor {
 
-    private final Config config;
-    private final CrawlerFactory factory;
-    private LinkedList<Thread> threads;
-    private ConcurrentLinkedQueue<CrawlPath> paths;
+    private final CrawlerFactory crawlerFactory;
+    private final CrawlJobFactory jobFactory;
+    private final LinkedList<Crawler> crawlers;
 
-    public CrawlerExecutor(Config config, CrawlerFactory factory) {
-        this.config = config;
-        this.factory = factory;
-    }
+    // crawlJobs will see concurrent access!
+    private final ConcurrentLinkedQueue<CrawlPath> crawlJobs;
 
-    public void setup() {
-        paths = new ConcurrentLinkedQueue<> ();
+
+    public CrawlerExecutor(CrawlJobFactory jobFactory,
+            CrawlerFactory crawlerFactory) {
+        this.jobFactory = jobFactory;
+        this.crawlerFactory = crawlerFactory;
+        this.crawlJobs = new ConcurrentLinkedQueue<> ();
+        this.crawlers = new LinkedList<> ();
     }
 
     public void start() {
-        threads = new LinkedList<> ();
-        for(Crawler c : factory.buildCrawlers()) {
-            c.setPathQueue(paths);
+        crawlers.addAll(crawlerFactory.buildCrawlers());
+        crawlJobs.addAll(jobFactory.buildJobs());
+        for(Crawler c : crawlers) {
+            c.setJobQueue(crawlJobs);
             Thread t = new Thread(c);
-            threads.add(t);
+            c.setThread(t);
             t.start();
         }
     }
 
-    public void joinAll() {
-        while(! threads.isEmpty()) {
-            Thread t = threads.getFirst();
+    public Statistics joinAll() {
+        Statistics statistics = new Statistics();
+        while(! crawlers.isEmpty()) {
+            Crawler c = crawlers.getFirst();
             try {
-                t.join();
-                threads.removeFirst();
+                c.getThread().join();
+                statistics.accumulateStatistics(c.getStatistics());
+                crawlers.removeFirst();
             } catch (InterruptedException ex) {
                 System.getLogger(CrawlerExecutor.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
             }
         }
+        return statistics;
     }
 }
