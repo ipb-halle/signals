@@ -1,6 +1,8 @@
 {
   "threads" : 1,
-  "dbConnectionInfo" : "postgresql://spider:spider@localhost:5432/spider",
+  "dbConnectionInfo" : "jdbc:postgresql://localhost:5432/spider",
+  "dbPassword" : "spider",
+  "dbUser" : "spider",
   "paths" : [ {
       "directory" : "/src/main",
       "namespace" : "localhost",

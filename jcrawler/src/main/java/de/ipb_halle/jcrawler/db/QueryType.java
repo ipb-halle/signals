@@ -5,15 +5,13 @@
  * JCrawler
  * JCrawler is a project to efficiently crawl large file systems.
  */
-package de.ipb_halle.jcrawler;
-
+package de.ipb_halle.jcrawler.db;
 
 /**
  *
- * @author fbroda
+ * @author fblocal
  */
-public interface CrawlPath {
-    public Statistics getStatistics();
-    public void setCrawler(Crawler crawler);
-    public void walkDirectory();
+public enum QueryType {
+    NamespaceCreate,
+    NamespaceByName
 }
