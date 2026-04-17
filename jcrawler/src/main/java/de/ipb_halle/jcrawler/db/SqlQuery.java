@@ -39,6 +39,10 @@ public abstract class SqlQuery<T> implements Iterator<T> {
 
     public abstract QueryType getType();
 
+    public void execute(T obj) throws SQLException {
+        throw new UnsupportedOperationException("execute(T) not implemented for this query");
+    }
+
     public void execute(List<Object> parameters) throws SQLException {
         if (state != ResultState.PREPARED_CLOSED) {
             throw new IllegalStateException("SqlQuery is not in PREPARED_CLOSED state");

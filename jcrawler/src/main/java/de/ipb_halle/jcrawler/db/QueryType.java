@@ -12,6 +12,9 @@ package de.ipb_halle.jcrawler.db;
  * @author fblocal
  */
 public enum QueryType {
-    NamespaceCreate,
-    NamespaceByName
+    DirectoryByName,
+    DirectoryCreate,
+    DirectoryUpdate,
+    NamespaceByName,
+    NamespaceCreate
 }
