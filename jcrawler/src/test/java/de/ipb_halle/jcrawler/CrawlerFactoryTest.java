@@ -48,7 +48,7 @@ public class CrawlerFactoryTest {
         assertFalse(Files.exists(fail, LinkOption.NOFOLLOW_LINKS));
 
         List<Crawler> crawlers = factory.buildCrawlers();
-        assertEquals(2,
+        assertEquals(1,
                 crawlers.size());
     }
 }

@@ -9,8 +9,6 @@ package de.ipb_halle.jcrawler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -18,8 +16,10 @@ import java.util.logging.Logger;
  */
 public class CrawlerFactoryImpl implements CrawlerFactory {
 
+    private final static String CONFIG_NTHREADS = "threads";
+    private final static long MAX_THREADS = 10L;     // requires 3*MAX_THREADS JDBC connections
+
     private final Config config;
-    private final static String CRAWLER_CONFIG = "crawlers";
 
     public CrawlerFactoryImpl(Config config) {
         this.config = config;
@@ -28,17 +28,16 @@ public class CrawlerFactoryImpl implements CrawlerFactory {
     @Override
     public List<Crawler> buildCrawlers() {
         ArrayList<Crawler> crawlers = new ArrayList<> ();
-        if (config.isArray(CRAWLER_CONFIG)) {
-            int size = config.getArraySize(CRAWLER_CONFIG);
-            for (int i = 0; i < size; i++) {
-                ConfigElement crawlerConfig = config.getArrayElement(CRAWLER_CONFIG, i);
-                crawlers.add(setupCrawler(crawlerConfig));
+        Long nThreads = config.getConfigLong(CONFIG_NTHREADS, null);
+        if ((nThreads != null) && (nThreads > 0) && (nThreads < MAX_THREADS)) {
+            for (long i = 0; i < nThreads; i++) {
+                crawlers.add(setupCrawler());
             }
         }
         return crawlers;
     }
 
-    private Crawler setupCrawler(ConfigElement cfg) {
+    private Crawler setupCrawler() {
         return null;
     }
 }
