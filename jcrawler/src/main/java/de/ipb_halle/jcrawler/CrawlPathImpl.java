@@ -13,13 +13,13 @@ import de.ipb_halle.jcrawler.db.DirectoryByName;
 import de.ipb_halle.jcrawler.db.DirectoryCreate;
 import de.ipb_halle.jcrawler.db.Namespace;
 import de.ipb_halle.jcrawler.db.QueryType;
-import de.ipb_halle.jcrawler.db.SqlQuery;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.PosixFileAttributes;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -91,13 +91,13 @@ public class CrawlPathImpl implements CrawlPath {
     }
 
     private void lookupPath() throws SQLException {
-        SqlQuery<?> byName = crawler.getQuery(QueryType.DirectoryByName);
+        DirectoryByName byName = (DirectoryByName) crawler.getQuery(QueryType.DirectoryByName);
         List<Object> arguments = new ArrayList<> ();
         arguments.add(namespace.getId());
         arguments.add(logicalPath);
         byName.execute(arguments);
         if (byName.hasNext()) {
-            directory = (Directory) byName.next();
+            directory = byName.next();
             byName.close();
         } else {
             createPath();
@@ -123,7 +123,8 @@ public class CrawlPathImpl implements CrawlPath {
         try {
             c.setName(p.getFileName().toString());
             c.setPathId(directory.getId());
-            BasicFileAttributes attrs = Files.readAttributes(p, BasicFileAttributes.class);
+            PosixFileAttributes attrs = Files.readAttributes(p,
+                    PosixFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
             c.setSize(attrs.size());
             c.setType(getFileType(attrs));
             c.setAtime(new Timestamp(attrs.lastAccessTime().toMillis()));
@@ -143,7 +144,7 @@ public class CrawlPathImpl implements CrawlPath {
         return c;
     }
 
-    private CrawlFile.FileType getFileType(BasicFileAttributes attrs) {
+    private CrawlFile.FileType getFileType(PosixFileAttributes attrs) {
         if (attrs.isRegularFile()) {
             return CrawlFile.FileType.REGULAR_FILE;
         }
