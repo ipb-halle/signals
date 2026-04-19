@@ -8,6 +8,7 @@
 package de.ipb_halle.jcrawler;
 
 import de.ipb_halle.jcrawler.db.CrawlFile;
+import de.ipb_halle.jcrawler.db.CrawlFileByDir;
 import de.ipb_halle.jcrawler.db.Directory;
 import de.ipb_halle.jcrawler.db.DirectoryByName;
 import de.ipb_halle.jcrawler.db.DirectoryCreate;
@@ -24,7 +25,8 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -39,7 +41,7 @@ public class CrawlPathImpl implements CrawlPath {
     private String logicalPath;
     private final String path;
     private final String prefix;
-    private Set<CrawlFile> files;
+    private Map<String, CrawlFile> files;
     private Directory directory;
     private Namespace namespace;
 
@@ -55,6 +57,10 @@ public class CrawlPathImpl implements CrawlPath {
         try {
             lookupPath();
             readDirectory();
+            CrawlFileByDir byDir = (CrawlFileByDir) crawler.getQuery(QueryType.CrawlFileByDir);
+            databaseFetch(byDir);
+            matchFiles(byDir);
+            handleNewFiles();
         } catch (IOException | SQLException e) {
             // ignore
         }
@@ -115,7 +121,9 @@ public class CrawlPathImpl implements CrawlPath {
     private void readDirectory() throws IOException {
         Stream<Path> pathStream = Files.walk(Paths.get(path), 0);
         files = pathStream.map(p -> getCrawlFile(p))
-                .collect(Collectors.toSet());
+                .filter(f -> !(".".equals(f.getName()) || "..".equals(f.getName())))
+                .collect(Collectors.toMap(f -> f.getName(),
+                        Function.identity()));
     }
 
     private CrawlFile getCrawlFile(Path p) {
@@ -155,5 +163,32 @@ public class CrawlPathImpl implements CrawlPath {
             return CrawlFile.FileType.SYMBOLIC_LINK;
         }
         return CrawlFile.FileType.OTHER;
+    }
+
+    private void databaseFetch(CrawlFileByDir byDir) throws SQLException {
+        List<Object> arguments = new ArrayList<> ();
+        arguments.add(directory.getId());
+        byDir.execute(arguments);
+    }
+
+    private void matchFiles(CrawlFileByDir byDir) throws SQLException {
+        while (byDir.hasNext()) {
+            CrawlFile fromDb = byDir.next();
+            CrawlFile fromDir = files.remove(fromDb.getName());
+            if (fromDir == null) {
+                statistics.incrementVanished();
+                // update DB ...
+            } else {
+                if (! fromDb.deepEquals(fromDir)) {
+                    statistics.incrementChanged();
+                    // update DB ...
+                }
+            }
+        }
+        byDir.close();
+    }
+
+    private void handleNewFiles() throws SQLException {
+
     }
 }

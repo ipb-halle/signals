@@ -33,7 +33,7 @@ public class CrawlFile {
         public int getTypeId() {
             return typeId;
         }
-        public FileType getById(int id) {
+        public static FileType getById(int id) {
             for (FileType t : FileType.values()) {
                 if (t.typeId == id) {
                     return t;
@@ -83,6 +83,19 @@ public class CrawlFile {
         return Objects.equals(this.pathId, other.pathId);
     }
 
+    public boolean deepEquals(CrawlFile other) {
+        return (missing == other.missing)
+                && Objects.equals(size, other.size)
+                && Objects.equals(type, other.type)
+                && Objects.equals(mode, other.mode)
+                && Objects.equals(uid, other.uid)
+                && Objects.equals(gid, other.gid)
+                && Objects.equals(ctime, other.ctime)
+                && Objects.equals(mtime, other.mtime)
+                && Objects.equals(name, other.name)
+                && Objects.equals(digest, other.digest)
+                && Objects.equals(linkTarget, other.linkTarget);
+    }
     public Long getId() {
         return id;
     }

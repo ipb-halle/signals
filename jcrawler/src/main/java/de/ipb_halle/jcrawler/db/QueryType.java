@@ -12,6 +12,7 @@ package de.ipb_halle.jcrawler.db;
  * @author fblocal
  */
 public enum QueryType {
+    CrawlFileByDir,
     DirectoryByName,
     DirectoryCreate,
     DirectoryUpdate,
