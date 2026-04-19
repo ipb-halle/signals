@@ -59,6 +59,8 @@ public abstract class SqlQuery<T> implements Iterator<T> {
         }
         state = ResultState.PREPARED_CLOSED;
         result.close();
+        statement.clearParameters();
+        statement.clearWarnings();
     }
 
     @Override

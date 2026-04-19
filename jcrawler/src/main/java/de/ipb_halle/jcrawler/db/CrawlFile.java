@@ -8,18 +8,47 @@
 package de.ipb_halle.jcrawler.db;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  *
  * @author frank
  */
 public class CrawlFile {
+
+    public enum FileType {
+        REGULAR_FILE(0),
+        DIRECTORY(1),
+        SYMBOLIC_LINK(2),
+        OTHER(3);
+
+        private final int typeId;
+
+        private FileType(int id) {
+            typeId = id;
+        }
+
+        public int getTypeId() {
+            return typeId;
+        }
+        public FileType getById(int id) {
+            for (FileType t : FileType.values()) {
+                if (t.typeId == id) {
+                    return t;
+                }
+            }
+            throw new IllegalArgumentException("Invalid FileType-Id");
+        }
+    }
+
     private Long id;
-    private Long path_id;
+    private Long pathId;
     private Long size;
     private Long uid;
-    private Long git;
-    private Integer type;
+    private Long gid;
+    private FileType type;
     private Integer mode;
     private String name;
     private String digest;
@@ -29,6 +58,31 @@ public class CrawlFile {
     private Timestamp mtime;
     private boolean missing;
 
+    @Override
+    public int hashCode() {
+        int hash = (name != null) ? name.hashCode() : 0;
+        hash += (pathId != null) ? pathId.hashCode() : 0;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CrawlFile other = (CrawlFile) obj;
+        if (!Objects.equals(this.name, other.name)) {
+            return false;
+        }
+        return Objects.equals(this.pathId, other.pathId);
+    }
+
     public Long getId() {
         return id;
     }
@@ -37,12 +91,12 @@ public class CrawlFile {
         this.id = id;
     }
 
-    public Long getPath_id() {
-        return path_id;
+    public Long getPathId() {
+        return pathId;
     }
 
-    public void setPath_id(Long path_id) {
-        this.path_id = path_id;
+    public void setPathId(Long path_id) {
+        this.pathId = path_id;
     }
 
     public Long getSize() {
@@ -61,19 +115,19 @@ public class CrawlFile {
         this.uid = uid;
     }
 
-    public Long getGit() {
-        return git;
+    public Long getGid() {
+        return gid;
     }
 
-    public void setGit(Long git) {
-        this.git = git;
+    public void setGid(Long gid) {
+        this.gid = gid;
     }
 
-    public Integer getType() {
+    public FileType getType() {
         return type;
     }
 
-    public void setType(Integer type) {
+    public void setType(FileType type) {
         this.type = type;
     }
 

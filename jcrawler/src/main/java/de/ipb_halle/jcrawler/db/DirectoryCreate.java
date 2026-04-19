@@ -29,6 +29,7 @@ public class DirectoryCreate extends SqlQuery<Directory> {
         execute(param);
         Directory dbDir = next();
         dir.setId(dbDir.getId());
+        close();
     }
 
     @Override
