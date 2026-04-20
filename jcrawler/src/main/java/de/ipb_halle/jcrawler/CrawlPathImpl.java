@@ -9,6 +9,9 @@ package de.ipb_halle.jcrawler;
 
 import de.ipb_halle.jcrawler.db.CrawlFile;
 import de.ipb_halle.jcrawler.db.CrawlFileByDir;
+import de.ipb_halle.jcrawler.db.CrawlFileCreate;
+import de.ipb_halle.jcrawler.db.DbPrincipal;
+import de.ipb_halle.jcrawler.db.DbPrincipalCache;
 import de.ipb_halle.jcrawler.db.Directory;
 import de.ipb_halle.jcrawler.db.DirectoryByName;
 import de.ipb_halle.jcrawler.db.DirectoryCreate;
@@ -43,6 +46,7 @@ public class CrawlPathImpl implements CrawlPath {
     private final String prefix;
     private Map<String, CrawlFile> files;
     private Directory directory;
+    private List<CrawlFile> directories;
     private Namespace namespace;
 
     public CrawlPathImpl(String path, String prefix) {
@@ -50,6 +54,7 @@ public class CrawlPathImpl implements CrawlPath {
         this.prefix = prefix;
         initPaths();
         statistics = new Statistics();
+        directories = new ArrayList<> ();
     }
 
     @Override
@@ -134,13 +139,13 @@ public class CrawlPathImpl implements CrawlPath {
             PosixFileAttributes attrs = Files.readAttributes(p,
                     PosixFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
             c.setSize(attrs.size());
-            c.setType(getFileType(attrs));
+            c.setType(getFileType(c, attrs));
             c.setAtime(new Timestamp(attrs.lastAccessTime().toMillis()));
             c.setCtime(new Timestamp(attrs.creationTime().toMillis()));
             c.setMtime(new Timestamp(attrs.lastModifiedTime().toMillis()));
-//            c.setMode(0);
-//            c.setUID(0);
-//            c.setGID(0);
+            c.setMode(getMode(attrs));
+            c.setUid(getOwner(attrs));
+            c.setGid(getGroup(attrs));
 //            c.setDigest();
             if (c.getType() == CrawlFile.FileType.SYMBOLIC_LINK) {
                 c.setLinkTarget(Files.readSymbolicLink(p).toString());
@@ -152,17 +157,37 @@ public class CrawlPathImpl implements CrawlPath {
         return c;
     }
 
-    private CrawlFile.FileType getFileType(PosixFileAttributes attrs) {
+    private CrawlFile.FileType getFileType(CrawlFile file, PosixFileAttributes attrs) {
         if (attrs.isRegularFile()) {
             return CrawlFile.FileType.REGULAR_FILE;
         }
         if (attrs.isDirectory()) {
+            directories.add(file);
             return CrawlFile.FileType.DIRECTORY;
         }
         if (attrs.isSymbolicLink()) {
             return CrawlFile.FileType.SYMBOLIC_LINK;
         }
         return CrawlFile.FileType.OTHER;
+    }
+
+    private Long getOwner(PosixFileAttributes attrs) {
+        DbPrincipalCache cache = DbPrincipalCache.getInstance();
+        DbPrincipal p = new DbPrincipal(attrs.owner());
+        p = cache.lookup(p);
+        return p.getId();
+    }
+
+    private Long getGroup(PosixFileAttributes attrs) {
+        DbPrincipalCache cache = DbPrincipalCache.getInstance();
+        DbPrincipal p = new DbPrincipal(attrs.group());
+        p.setGroup(true);
+        p = cache.lookup(p);
+        return p.getId();
+    }
+
+    private Integer getMode(PosixFileAttributes attrs) {
+        return 0;
     }
 
     private void databaseFetch(CrawlFileByDir byDir) throws SQLException {
@@ -189,6 +214,12 @@ public class CrawlPathImpl implements CrawlPath {
     }
 
     private void handleNewFiles() throws SQLException {
-
+        CrawlFileCreate create = (CrawlFileCreate) crawler.getQuery(QueryType.CrawlFileCreate);
+        create.setup();
+        for (CrawlFile f : files.values()) {
+            create.execute(f);
+            statistics.incrementNew();
+        }
+        create.close();
     }
 }

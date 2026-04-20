@@ -13,9 +13,12 @@ package de.ipb_halle.jcrawler.db;
  */
 public enum QueryType {
     CrawlFileByDir,
+    CrawlFileCreate,
     DirectoryByName,
     DirectoryCreate,
     DirectoryUpdate,
     NamespaceByName,
-    NamespaceCreate
+    NamespaceCreate,
+    DbPrincipalsQuery,
+    DbPrincipalCreate;
 }

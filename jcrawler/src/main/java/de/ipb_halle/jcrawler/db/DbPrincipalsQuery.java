@@ -1,0 +1,48 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: 2026 Leibniz-Institut f. Pflanzenbiochemie
+ *
+ * JCrawler
+ * JCrawler is a project to efficiently crawl large file systems.
+ */
+package de.ipb_halle.jcrawler.db;
+
+import java.security.Principal;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ *
+ * @author fblocal
+ */
+public class DbPrincipalsQuery extends SqlQuery<DbPrincipal> {
+
+    private final String QUERY = "SELECT id, principal, is_group, is_everyone, guid FROM principals";
+
+
+    @Override
+    protected DbPrincipal getRecord() throws SQLException {
+        ResultSet result = getResultSet();
+        String name = result.getString(2);
+        DbPrincipal p = new DbPrincipal(name);
+        p.setId(result.getLong(1));
+        p.setGroup(result.getBoolean(3));
+        p.setEveryone(result.getBoolean(4));
+        p.setGuid(result.getLong(5));
+        return p;
+    }
+
+    @Override
+    public void prepare(Connection conn) throws SQLException {
+        setStatement(conn.prepareStatement(QUERY));
+    }
+
+    @Override
+    public QueryType getType() {
+        return QueryType.DbPrincipalsQuery;
+    }
+
+}
