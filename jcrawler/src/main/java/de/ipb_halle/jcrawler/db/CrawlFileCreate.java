@@ -14,6 +14,8 @@ import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.postgresql.PGConnection;
 
 import org.postgresql.copy.CopyManager;
@@ -45,22 +47,21 @@ COPY files (path_id, size, type, mode, uid,
 
     @Override
     public void execute(CrawlFile file) throws SQLException {
-        PGConnection pgConn = connection.unwrap(PGConnection.class);
         if (busy) {
             printStream.append(COPY_TEMPLATE.formatted(
-                    file.getPathId().toString(),
-                    file.getSize().toString(),
-                    file.getType().getTypeId(),
-                    file.getMode().toString(),
-                    file.getUid().toString(),
-                    file.getGid().toString(),
+                    SqlConnection.copyEscape(file.getPathId()),
+                    SqlConnection.copyEscape(file.getSize()),
+                    SqlConnection.copyEscape(file.getType().getTypeId()),
+                    SqlConnection.copyEscape(file.getMode()),
+                    SqlConnection.copyEscape(file.getUid()),
+                    SqlConnection.copyEscape(file.getGid()),
                     file.getAtime().toString(),
                     file.getCtime().toString(),
                     file.getMtime().toString(),
-                    "\\N",
-                    pgConn.escapeLiteral(file.getName()),
-                    "\\N"));
-                    } else {
+                    SqlConnection.copyEscape(file.getDigest()),
+                    SqlConnection.copyEscape(file.getName()),
+                    SqlConnection.copyEscape(file.getLinkTarget())));
+        } else {
             throw new IllegalStateException("Not initialized.");
         }
     }

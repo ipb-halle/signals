@@ -22,9 +22,6 @@ import java.util.Properties;
 public class CrawlerFactoryImpl implements CrawlerFactory {
 
     private final static String CONFIG_NTHREADS = "threads";
-    private final static String DB_CONNECTION_INFO = "dbConnectionInfo";
-    private final static String DB_PASSWORD = "dbPassword";
-    private final static String DB_USER = "dbUser";
     private final static long MAX_THREADS = 10L;     // requires 3*MAX_THREADS JDBC connections
 
     private final Config config;
@@ -58,14 +55,13 @@ public class CrawlerFactoryImpl implements CrawlerFactory {
     }
 
     private void addQueryConnections(Crawler crawler) throws SQLException {
-        Connection conn = getConnection();
+        Connection conn = SqlConnection.getConnection(config);
         addNamespaceByName(crawler, conn);
         addNamespaceCreate(crawler, conn);
-
     }
 
     private void addUpdateConnections(Crawler crawler) throws SQLException {
-        Connection conn = getConnection();
+        Connection conn = SqlConnection.getConnection(config);
     }
 
     private void addNamespaceByName(Crawler crawler, Connection conn) throws SQLException {
@@ -78,18 +74,5 @@ public class CrawlerFactoryImpl implements CrawlerFactory {
         NamespaceCreate n = new NamespaceCreate();
         n.prepare(conn);
         crawler.addQuery(n.getType(), n);
-    }
-
-    private Connection getConnection() throws SQLException {
-        String user = config.getConfigString(DB_USER, null);
-        String password = config.getConfigString(DB_PASSWORD, null);
-        String connInfo = config.getConfigString(DB_CONNECTION_INFO, null);
-        if ((connInfo == null) || (user == null) || (password == null)) {
-            throw new IllegalStateException("ConnectionInfo, user or password missing");
-        }
-        Properties props = new Properties();
-        props.put("user", user);
-        props.put("password", password);
-        return DriverManager.getConnection(connInfo, props);
     }
 }
