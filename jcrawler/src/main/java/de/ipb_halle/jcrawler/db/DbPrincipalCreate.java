@@ -33,6 +33,7 @@ public class DbPrincipalCreate extends SqlQuery<DbPrincipal> {
         if (hasNext()) {
             principal.setId(getResultSet().getLong(1));
         }
+        close();
     }
 
     @Override

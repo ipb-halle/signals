@@ -9,11 +9,9 @@ package de.ipb_halle.jcrawler;
 
 import de.ipb_halle.jcrawler.db.*;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 /**
  *
@@ -25,9 +23,11 @@ public class CrawlerFactoryImpl implements CrawlerFactory {
     private final static long MAX_THREADS = 10L;     // requires 3*MAX_THREADS JDBC connections
 
     private final Config config;
+    private DbPrincipalCache principalCache;
 
     public CrawlerFactoryImpl(Config config) {
         this.config = config;
+        setupPrincipalCache();
     }
 
     @Override
@@ -49,30 +49,44 @@ public class CrawlerFactoryImpl implements CrawlerFactory {
 
     private Crawler setupCrawler() throws SQLException {
         Crawler crawler = new Crawler();
+        crawler.setPrincipalCache(principalCache);
+        addCopyConnections(crawler);
         addQueryConnections(crawler);
         addUpdateConnections(crawler);
-        return null;
+        return crawler;
+    }
+
+    private void setupPrincipalCache() {
+        try {
+            Connection conn = SqlConnection.getConnection(config);
+            principalCache = DbPrincipalCache.getInstance();
+            principalCache.setup(conn);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void addCopyConnections(Crawler crawler) throws SQLException {
+        Connection conn = SqlConnection.getConnection(config);
+        addSqlQuery(crawler, conn, new CrawlFileCreate());
     }
 
     private void addQueryConnections(Crawler crawler) throws SQLException {
         Connection conn = SqlConnection.getConnection(config);
-        addNamespaceByName(crawler, conn);
-        addNamespaceCreate(crawler, conn);
+        addSqlQuery(crawler, conn, new CrawlFileByDir());
+        addSqlQuery(crawler, conn, new DirectoryByName());
+        addSqlQuery(crawler, conn, new NamespaceByName());
     }
 
     private void addUpdateConnections(Crawler crawler) throws SQLException {
         Connection conn = SqlConnection.getConnection(config);
+        addSqlQuery(crawler, conn, new CrawlFileUpdate());
+        addSqlQuery(crawler, conn, new DirectoryUpdate());
+        addSqlQuery(crawler, conn, new NamespaceCreate());
     }
 
-    private void addNamespaceByName(Crawler crawler, Connection conn) throws SQLException {
-        NamespaceByName n = new NamespaceByName();
-        n.prepare(conn);
-        crawler.addQuery(n.getType(), n);
-    }
-
-    private void addNamespaceCreate(Crawler crawler, Connection conn) throws SQLException {
-        NamespaceCreate n = new NamespaceCreate();
-        n.prepare(conn);
-        crawler.addQuery(n.getType(), n);
+    private void addSqlQuery(Crawler crawler, Connection conn, SqlQuery query) throws SQLException {
+        query.prepare(conn);
+        crawler.addQuery(query.getType(), query);
     }
 }

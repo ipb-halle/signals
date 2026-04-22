@@ -19,7 +19,7 @@ public class CrawlFileByDir extends SqlQuery<CrawlFile> {
 
     private final static String QUERY = """
 SELECT id, path_id, size, uid, gid, type, mode, missing,
-  atime, ctimer, mtime, name, digest, link_target
+  atime, ctime, mtime, name, digest, link_target
   FROM files
   WHERE path_id=?
   ORDER BY name

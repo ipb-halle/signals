@@ -49,7 +49,7 @@ public abstract class SqlQuery<T> implements Iterator<T> {
         }
         setParameters(parameters);
         result = statement.executeQuery();
-        validRecord = result.first();
+        validRecord = result.next();
         state = ResultState.EXECUTED;
     }
 

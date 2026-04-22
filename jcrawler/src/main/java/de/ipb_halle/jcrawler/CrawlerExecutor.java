@@ -19,6 +19,7 @@ public class CrawlerExecutor {
     private final CrawlerFactory crawlerFactory;
     private final CrawlJobFactory jobFactory;
     private final LinkedList<Crawler> crawlers;
+    private final Statistics statistics;
 
     // crawlJobs will see concurrent access!
     private final ConcurrentLinkedQueue<CrawlPath> crawlJobs;
@@ -30,6 +31,8 @@ public class CrawlerExecutor {
         this.crawlerFactory = crawlerFactory;
         this.crawlJobs = new ConcurrentLinkedQueue<> ();
         this.crawlers = new LinkedList<> ();
+        this.statistics = new Statistics();
+
     }
 
     public void start() {
@@ -44,7 +47,6 @@ public class CrawlerExecutor {
     }
 
     public Statistics joinAll() {
-        Statistics statistics = new Statistics();
         while(! crawlers.isEmpty()) {
             Crawler c = crawlers.getFirst();
             try {
@@ -55,6 +57,10 @@ public class CrawlerExecutor {
                 System.getLogger(CrawlerExecutor.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
             }
         }
+        return statistics;
+    }
+
+    public Statistics getStatistics() {
         return statistics;
     }
 }

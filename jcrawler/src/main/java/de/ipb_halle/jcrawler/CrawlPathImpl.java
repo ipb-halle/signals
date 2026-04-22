@@ -10,6 +10,7 @@ package de.ipb_halle.jcrawler;
 import de.ipb_halle.jcrawler.db.CrawlFile;
 import de.ipb_halle.jcrawler.db.CrawlFileByDir;
 import de.ipb_halle.jcrawler.db.CrawlFileCreate;
+import de.ipb_halle.jcrawler.db.CrawlFileUpdate;
 import de.ipb_halle.jcrawler.db.DbPrincipal;
 import de.ipb_halle.jcrawler.db.DbPrincipalCache;
 import de.ipb_halle.jcrawler.db.Directory;
@@ -66,8 +67,9 @@ public class CrawlPathImpl implements CrawlPath {
             databaseFetch(byDir);
             matchFiles(byDir);
             handleNewFiles();
+            processSubdirs();
         } catch (IOException | SQLException e) {
-            // ignore
+            throw new RuntimeException(e);
         }
     }
 
@@ -197,16 +199,19 @@ public class CrawlPathImpl implements CrawlPath {
     }
 
     private void matchFiles(CrawlFileByDir byDir) throws SQLException {
+        CrawlFileUpdate fileUpdate = (CrawlFileUpdate) crawler.getQuery(QueryType.CrawlFileUpdate);
         while (byDir.hasNext()) {
             CrawlFile fromDb = byDir.next();
             CrawlFile fromDir = files.remove(fromDb.getName());
             if (fromDir == null) {
                 statistics.incrementVanished();
-                // update DB ...
+                fromDb.setMissing(true);
+                fileUpdate.execute(fromDb);
             } else {
                 if (! fromDb.deepEquals(fromDir)) {
                     statistics.incrementChanged();
-                    // update DB ...
+                    fromDir.setId(fromDb.getId());
+                    fileUpdate.execute(fromDir);
                 }
             }
         }
@@ -215,11 +220,21 @@ public class CrawlPathImpl implements CrawlPath {
 
     private void handleNewFiles() throws SQLException {
         CrawlFileCreate create = (CrawlFileCreate) crawler.getQuery(QueryType.CrawlFileCreate);
-        create.setup();
+        create.begin();
         for (CrawlFile f : files.values()) {
             create.execute(f);
             statistics.incrementNew();
         }
         create.close();
+    }
+
+    private void processSubdirs() throws SQLException {
+        for (CrawlFile f : directories) {
+            Path p = Paths.get(path, f.getName());
+            CrawlPathImpl subdir = new CrawlPathImpl(p.toString(), prefix);
+            subdir.setNamespace(namespace);
+            subdir.setCrawler(crawler);
+            subdir.walkDirectory();
+        }
     }
 }

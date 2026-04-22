@@ -47,4 +47,13 @@ public class Statistics {
         changedEntities += s.getChangedEntities();
         vanishedEntities += s.getVanishedEntities();
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("New entities:      % 8l\n".formatted(newEntities));
+        sb.append("Changed entities:  % 8l\n".formatted(changedEntities));
+        sb.append("Vanished entities: % 8l\n".formatted(vanishedEntities));
+        return sb.toString();
+    }
 }

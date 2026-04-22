@@ -8,7 +8,6 @@
  */
 package de.ipb_halle.jcrawler;
 
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -20,10 +19,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class Main {
+
     @SuppressWarnings("static-access")
     private static final Option configOpt = Option.builder("c")
             .longOpt("config")
@@ -53,13 +50,9 @@ are skipped during the scan. This flag triggers a full scan.
             .desc("\nDisplay this help")
             .build();
 
-
-
-    private Logger logger;
     private Config config;
 
     public Main() {
-        logger = LoggerFactory.getLogger(Main.class);
         config = new Config();
     }
 
@@ -72,7 +65,19 @@ are skipped during the scan. This flag triggers a full scan.
     }
 
     private void run() {
-        System.out.printf("Hallo Welt\n");
+        CrawlerFactoryImpl crawlerFactory = new CrawlerFactoryImpl(config);
+        CrawlJobFactoryImpl jobFactory = new CrawlJobFactoryImpl(config);
+        CrawlerExecutor executor = new CrawlerExecutor(jobFactory, crawlerFactory);
+        executor.start();
+        executor.joinAll();
+        System.out.printf("""
+                          *****************************************************
+                          *                                                   *
+                          * JCrawler Statistics                               *
+                          *                                                   *
+                          *****************************************************
+
+               %s""", executor.getStatistics().toString());
     }
 
     public static boolean processCommandLine(Main main, String[] argv) {

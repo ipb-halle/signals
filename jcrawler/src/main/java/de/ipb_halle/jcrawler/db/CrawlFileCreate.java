@@ -74,7 +74,7 @@ COPY files (path_id, size, type, mode, uid,
         busy = false;
     }
 
-    public synchronized void setup() {
+    public synchronized void begin() {
         if (! busy) {
             outputStream = new PipedOutputStream();
             printStream = new PrintStream(outputStream);

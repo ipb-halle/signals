@@ -7,6 +7,7 @@
  */
 package de.ipb_halle.jcrawler;
 
+import de.ipb_halle.jcrawler.db.DbPrincipalCache;
 import de.ipb_halle.jcrawler.db.QueryType;
 import de.ipb_halle.jcrawler.db.SqlQuery;
 import java.util.AbstractQueue;
@@ -21,6 +22,7 @@ public class Crawler implements Runnable {
 
     private final Statistics statistics;
     private Thread thread;
+    private DbPrincipalCache principalCache;
     private final Map<QueryType, SqlQuery<?>> queries;
     private AbstractQueue<CrawlPath> queue;
 
@@ -56,6 +58,14 @@ public class Crawler implements Runnable {
 
     public void setJobQueue(AbstractQueue<CrawlPath> q) {
         queue = q;
+    }
+
+    public DbPrincipalCache getPrincipalCache() {
+        return principalCache;
+    }
+
+    public void setPrincipalCache(DbPrincipalCache principalCache) {
+        this.principalCache = principalCache;
     }
 
     public Thread getThread() {

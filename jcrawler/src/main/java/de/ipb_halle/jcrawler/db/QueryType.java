@@ -14,11 +14,14 @@ package de.ipb_halle.jcrawler.db;
 public enum QueryType {
     CrawlFileByDir,
     CrawlFileCreate,
+    CrawlFileUpdate,
     DirectoryByName,
     DirectoryCreate,
     DirectoryUpdate,
     NamespaceByName,
     NamespaceCreate,
+
+    // used by DbPrincipalCache only!
     DbPrincipalsQuery,
     DbPrincipalCreate;
 }
