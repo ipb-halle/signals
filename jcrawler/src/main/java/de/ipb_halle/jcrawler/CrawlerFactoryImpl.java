@@ -10,8 +10,7 @@ package de.ipb_halle.jcrawler;
 import de.ipb_halle.jcrawler.db.*;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 
 /**
  *
@@ -31,8 +30,8 @@ public class CrawlerFactoryImpl implements CrawlerFactory {
     }
 
     @Override
-    public List<Crawler> buildCrawlers() {
-        ArrayList<Crawler> crawlers = new ArrayList<> ();
+    public LinkedList<Crawler> buildCrawlers() {
+        LinkedList<Crawler> crawlers = new LinkedList<> ();
         try {
             Long nThreads = config.getConfigLong(CONFIG_NTHREADS, null);
             if ((nThreads != null) && (nThreads > 0) && (nThreads < MAX_THREADS)) {
@@ -81,11 +80,12 @@ public class CrawlerFactoryImpl implements CrawlerFactory {
     private void addUpdateConnections(Crawler crawler) throws SQLException {
         Connection conn = SqlConnection.getConnection(config);
         addSqlQuery(crawler, conn, new CrawlFileUpdate());
+        addSqlQuery(crawler, conn, new DirectoryCreate());
         addSqlQuery(crawler, conn, new DirectoryUpdate());
         addSqlQuery(crawler, conn, new NamespaceCreate());
     }
 
-    private void addSqlQuery(Crawler crawler, Connection conn, SqlQuery query) throws SQLException {
+    private void addSqlQuery(Crawler crawler, Connection conn, SqlQuery<?> query) throws SQLException {
         query.prepare(conn);
         crawler.addQuery(query.getType(), query);
     }

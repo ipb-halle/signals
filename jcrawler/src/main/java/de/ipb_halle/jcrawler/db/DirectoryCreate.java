@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class DirectoryCreate extends SqlQuery<Directory> {
 
-    private final static String QUERY = "INSERT INTO directories (namespace_id, path) VALUES (?, ?) RETURNING id";
+    private final static String QUERY = "INSERT INTO directories (namespace_id, path) VALUES (?, ?) RETURNING id, namespace_id, path";
 
     @Override
     public void execute(Directory dir) throws SQLException {

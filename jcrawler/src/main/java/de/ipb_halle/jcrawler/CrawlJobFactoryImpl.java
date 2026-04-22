@@ -17,6 +17,10 @@ public class CrawlJobFactoryImpl implements CrawlJobFactory {
 
     private final Config config;
     private final static String PATHS_CONFIG = "paths";
+    private final static String DIRECTORY = "directory";
+    private final static String STRIP_PREFIX = "stripPrefix";
+    private final static String NAMESPACE = "namespace";
+    private final static String THRESHOLD = "subtreeScanThreshold";
 
     public CrawlJobFactoryImpl(Config config) {
         this.config = config;
@@ -36,6 +40,12 @@ public class CrawlJobFactoryImpl implements CrawlJobFactory {
     }
 
     private CrawlPath setupPath(ConfigElement element) {
-        return null;
+        String dir = element.getConfigString(DIRECTORY, null);
+        String prefix = element.getConfigString(STRIP_PREFIX, null);
+        String namespace = element.getConfigString(NAMESPACE, null);
+        if ((dir == null) || (prefix == null) || (namespace == null)) {
+            throw new RuntimeException("invalid configuration: directory or prefix missing");
+        }
+        return new CrawlPathImpl(dir, prefix, namespace);
     }
 }

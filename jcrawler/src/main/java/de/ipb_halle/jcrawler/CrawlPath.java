@@ -7,6 +7,8 @@
  */
 package de.ipb_halle.jcrawler;
 
+import de.ipb_halle.jcrawler.db.Namespace;
+
 
 /**
  *

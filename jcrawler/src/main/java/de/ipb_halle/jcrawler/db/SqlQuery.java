@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.JDBCType;
 import java.sql.Timestamp;
 import java.util.Iterator;
 import java.util.List;
@@ -82,6 +83,7 @@ public abstract class SqlQuery<T> implements Iterator<T> {
                 nextRecord();
                 return t;
             } catch(SQLException e) {
+                e.printStackTrace();
                 // fall through
             }
         }
@@ -98,7 +100,11 @@ public abstract class SqlQuery<T> implements Iterator<T> {
     }
 
     private void nextRecord() throws SQLException {
-        validRecord = result.next();
+        try {
+            validRecord = result.next();
+        } catch( SQLException e) {
+            validRecord = false;
+        }
     }
 
     private void setParameters(List<Object> parameters) throws SQLException {
@@ -109,13 +115,35 @@ public abstract class SqlQuery<T> implements Iterator<T> {
                 throw new SQLException("parameter is null");
             }
             switch (obj.getClass().getName()) {
-                case "java.lang.String" -> statement.setString(i, (String) obj);
+                case "java.lang.Boolean" -> statement.setBoolean(i, (Boolean) obj);
                 case "java.lang.Integer" -> statement.setInt(i, (Integer) obj);
                 case "java.lang.Long" -> statement.setLong(i, (Long) obj);
+                case "java.lang.String" -> statement.setString(i, (String) obj);
                 case "java.sql.Timestamp" -> statement.setTimestamp(i, (Timestamp) obj);
-                case "de.ipb_halle.crawler.db.NullObj" -> statement.setNull(i,
+                case "de.ipb_halle.jcrawler.db.NullObj" -> statement.setNull(i,
                         ((NullObj) obj).getType().getVendorTypeNumber());
+                default -> throw new RuntimeException("Unknown type: %s".formatted(obj.getClass().getName()));
             }
         }
+    }
+
+    public Object paramBoolean(Boolean param) {
+        return (param == null) ? new NullObj(JDBCType.BOOLEAN) : param;
+    }
+
+    public Object paramInteger(Integer param) {
+        return (param == null) ? new NullObj(JDBCType.INTEGER) : param;
+    }
+
+    public Object paramLong(Long param) {
+        return (param == null) ? new NullObj(JDBCType.BIGINT) : param;
+    }
+
+    public Object paramString(String param) {
+        return (param == null) ? new NullObj(JDBCType.VARCHAR) : param;
+    }
+
+    public Object paramTimestamp(Timestamp param) {
+        return (param == null) ? new NullObj(JDBCType.TIMESTAMP) : param;
     }
 }

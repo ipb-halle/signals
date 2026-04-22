@@ -18,26 +18,24 @@ public class CrawlerExecutor {
 
     private final CrawlerFactory crawlerFactory;
     private final CrawlJobFactory jobFactory;
-    private final LinkedList<Crawler> crawlers;
+    private LinkedList<Crawler> crawlers;
     private final Statistics statistics;
 
     // crawlJobs will see concurrent access!
-    private final ConcurrentLinkedQueue<CrawlPath> crawlJobs;
+    private ConcurrentLinkedQueue<CrawlPath> crawlJobs;
 
 
     public CrawlerExecutor(CrawlJobFactory jobFactory,
             CrawlerFactory crawlerFactory) {
         this.jobFactory = jobFactory;
         this.crawlerFactory = crawlerFactory;
-        this.crawlJobs = new ConcurrentLinkedQueue<> ();
-        this.crawlers = new LinkedList<> ();
         this.statistics = new Statistics();
 
     }
 
     public void start() {
-        crawlers.addAll(crawlerFactory.buildCrawlers());
-        crawlJobs.addAll(jobFactory.buildJobs());
+        crawlers = crawlerFactory.buildCrawlers();
+        crawlJobs = jobFactory.buildJobs();
         for(Crawler c : crawlers) {
             c.setJobQueue(crawlJobs);
             Thread t = new Thread(c);

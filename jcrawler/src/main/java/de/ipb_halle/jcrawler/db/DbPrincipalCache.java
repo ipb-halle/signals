@@ -48,6 +48,7 @@ public class DbPrincipalCache {
 
     public DbPrincipal lookup(DbPrincipal principal) {
         DbPrincipal p = principals.get(principal.getName());
+        System.out.printf("Looking up principal %s\n", principal.getName());
         if (p == null) {
             createPrincipal(principal);
             p = principals.get(principal.getName());
@@ -57,11 +58,16 @@ public class DbPrincipalCache {
 
     private synchronized void createPrincipal(DbPrincipal principal) {
         try {
+            System.out.printf("Creating new principal: %s\n", principal.getName());
             create.execute(principal);
             if (principal.getId() != null) {
                 principals.put(principal.getName(), principal);
+                System.out.printf("Created Principal(%s) --> %d\n", principal.getName(), principal.getId());
+            } else {
+                System.out.println("execute did not create a principal");
             }
         } catch (SQLException ex) {
+            ex.printStackTrace();
             // possible duplicate key exception ignored
         }
     }

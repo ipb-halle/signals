@@ -71,13 +71,12 @@ are skipped during the scan. This flag triggers a full scan.
         executor.start();
         executor.joinAll();
         System.out.printf("""
-                          *****************************************************
-                          *                                                   *
-                          * JCrawler Statistics                               *
-                          *                                                   *
-                          *****************************************************
-
-               %s""", executor.getStatistics().toString());
+*****************************************************
+*                                                   *
+* JCrawler Statistics                               *
+*                                                   *
+*****************************************************
+\n%s""", executor.getStatistics().toString());
     }
 
     public static boolean processCommandLine(Main main, String[] argv) {
@@ -100,10 +99,12 @@ are skipped during the scan. This flag triggers a full scan.
                 return true;
             }
 
-            if (! main.config.setConfigFile(
-                    cmdline.getOptionValue(configOpt.getOpt()))) {
-                System.out.println("Could not parse config file");
-                return true;
+            if (cmdline.hasOption(configOpt.getOpt())) {
+                String cfgFile = cmdline.getOptionValue(configOpt.getOpt());
+                if (main.config.setConfigFile(cfgFile)) {
+                    System.out.println("Could not parse config file");
+                    return true;
+                }
             }
 
         } catch (MissingArgumentException | MissingOptionException | UnrecognizedOptionException e) {

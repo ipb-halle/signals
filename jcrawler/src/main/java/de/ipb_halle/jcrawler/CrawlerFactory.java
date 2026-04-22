@@ -7,7 +7,7 @@
  */
 package de.ipb_halle.jcrawler;
 
-import java.util.List;
+import java.util.LinkedList;
 
 /**
  *
@@ -15,6 +15,6 @@ import java.util.List;
  */
 public interface CrawlerFactory {
 
-    List<Crawler> buildCrawlers();
+    LinkedList<Crawler> buildCrawlers();
 
 }

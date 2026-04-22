@@ -24,6 +24,20 @@ CREATE TABLE directories (
     UNIQUE (namespace_id, path)
 );
 
+CREATE TABLE principals (
+    id                  SERIAL NOT NULL PRIMARY KEY,
+    principal           VARCHAR NOT NULL,
+    is_group            BOOLEAN,
+    is_everyone         BOOLEAN,
+    guid                INTEGER
+);
+
+INSERT INTO principals (principal, is_group, is_everyone, guid) VALUES
+    ('OWNER@',    false, false, NULL),
+    ('GROUP@',    true,  false, NULL),
+    ('EVERYONE@', false, true,  NULL);
+
+
 CREATE TABLE files (
     id          BIGSERIAL NOT NULL PRIMARY KEY,
     name        VARCHAR NOT NULL COLLATE "C",
@@ -31,8 +45,8 @@ CREATE TABLE files (
     size        BIGINT,
     type        INTEGER,
     mode        INTEGER,
-    uid         INTEGER,
-    gid         INTEGER,
+    uid         INTEGER REFERENCES principals(id),
+    gid         INTEGER REFERENCES principals(id),
     atime       TIMESTAMP,
     mtime       TIMESTAMP,
     ctime       TIMESTAMP,
@@ -42,19 +56,6 @@ CREATE TABLE files (
     UNIQUE (path_id, name)
 );
 
-CREATE TABLE principals (
-    id                  SERIAL NOT NULL PRIMARY KEY,
-    principal           VARCHAR NOT NULL,
-    is_group            BOOLEAN,
-    is_everyone         BOOLEAN,
-    guid                INTEGER
-);
-
-INSERT INTO principals (principal, is_group, is_everyone, guid) VALUES 
-    ('OWNER@',    false, false, NULL),
-    ('GROUP@',    true,  false, NULL),
-    ('EVERYONE@', false, true,  NULL);
-    
 
 CREATE TABLE aces (
     id                      BIGSERIAL NOT NULL PRIMARY KEY,

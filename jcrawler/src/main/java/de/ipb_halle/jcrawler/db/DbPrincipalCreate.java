@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -25,13 +26,14 @@ public class DbPrincipalCreate extends SqlQuery<DbPrincipal> {
     @Override
     public void execute(DbPrincipal principal) throws SQLException {
         List<Object> arguments = new ArrayList<> ();
-        arguments.add(principal.getPrincipal().getName());
-        arguments.add(principal.isGroup());
-        arguments.add(principal.isEveryone());
-        arguments.add(principal.getGuid());
+        arguments.add(paramString(principal.getName()));
+        arguments.add(paramBoolean(principal.isGroup()));
+        arguments.add(paramBoolean(principal.isEveryone()));
+        arguments.add(paramLong(principal.getGuid()));
         execute(arguments);
         if (hasNext()) {
             principal.setId(getResultSet().getLong(1));
+            System.out.printf("PrincipalId(%s) = %d\n", principal.getName(), principal.getId());
         }
         close();
     }

@@ -51,9 +51,9 @@ public class Statistics {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("New entities:      % 8l\n".formatted(newEntities));
-        sb.append("Changed entities:  % 8l\n".formatted(changedEntities));
-        sb.append("Vanished entities: % 8l\n".formatted(vanishedEntities));
+        sb.append("New entities:      % 8d\n".formatted(newEntities));
+        sb.append("Changed entities:  % 8d\n".formatted(changedEntities));
+        sb.append("Vanished entities: % 8d\n".formatted(vanishedEntities));
         return sb.toString();
     }
 }

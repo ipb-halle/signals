@@ -14,9 +14,6 @@ import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.postgresql.PGConnection;
 
 import org.postgresql.copy.CopyManager;
 import org.postgresql.core.BaseConnection;
@@ -31,7 +28,9 @@ public class CrawlFileCreate extends SqlQuery<CrawlFile> implements Runnable {
 COPY files (path_id, size, type, mode, uid,
   gid, atime, ctime, mtime, digest, name,
   link_target) FROM STDIN""";
-    private final static String COPY_TEMPLATE = "%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t";
+
+    //                                           p   s   t   m   u   g   a   c   m   d   n   l
+    private final static String COPY_TEMPLATE = "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n";
 
     private Connection connection;
     private PipedOutputStream outputStream;
@@ -55,9 +54,9 @@ COPY files (path_id, size, type, mode, uid,
                     SqlConnection.copyEscape(file.getMode()),
                     SqlConnection.copyEscape(file.getUid()),
                     SqlConnection.copyEscape(file.getGid()),
-                    file.getAtime().toString(),
-                    file.getCtime().toString(),
-                    file.getMtime().toString(),
+                    SqlConnection.copyEscape(file.getAtime()),
+                    SqlConnection.copyEscape(file.getCtime()),
+                    SqlConnection.copyEscape(file.getMtime()),
                     SqlConnection.copyEscape(file.getDigest()),
                     SqlConnection.copyEscape(file.getName()),
                     SqlConnection.copyEscape(file.getLinkTarget())));
@@ -80,6 +79,7 @@ COPY files (path_id, size, type, mode, uid,
             printStream = new PrintStream(outputStream);
             copyThread = new Thread(this);
             copyThread.start();
+            busy = true;
         } else {
             throw new IllegalStateException("Instance is busy");
         }

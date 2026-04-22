@@ -11,6 +11,7 @@ import de.ipb_halle.jcrawler.Config;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Properties;
 
 /**
@@ -70,5 +71,12 @@ public class SqlConnection {
                 .replace("\r", "\\r")
                 .replace("\t", "\\t")
                 .replace("\0", "\\0");
+    }
+
+    public static String copyEscape(Timestamp t) {
+        if (t == null) {
+            return NULL;
+        }
+        return t.toString();
     }
 }

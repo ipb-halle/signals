@@ -8,8 +8,7 @@
 package de.ipb_halle.jcrawler;
 
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 
 /**
  *
@@ -18,8 +17,8 @@ import java.util.List;
 public class MockCrawlerFactory implements CrawlerFactory {
 
     @Override
-    public List<Crawler> buildCrawlers() {
-        List<Crawler> crawlers = new ArrayList<> ();
+    public LinkedList<Crawler> buildCrawlers() {
+        LinkedList<Crawler> crawlers = new LinkedList<> ();
         crawlers.add(new MockCrawler(3));
         crawlers.add(new MockCrawler(5));
         return crawlers;

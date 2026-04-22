@@ -17,6 +17,8 @@ import de.ipb_halle.jcrawler.db.Directory;
 import de.ipb_halle.jcrawler.db.DirectoryByName;
 import de.ipb_halle.jcrawler.db.DirectoryCreate;
 import de.ipb_halle.jcrawler.db.Namespace;
+import de.ipb_halle.jcrawler.db.NamespaceByName;
+import de.ipb_halle.jcrawler.db.NamespaceCreate;
 import de.ipb_halle.jcrawler.db.QueryType;
 import java.io.File;
 import java.io.IOException;
@@ -43,16 +45,18 @@ public class CrawlPathImpl implements CrawlPath {
     private final Statistics statistics;
     private Crawler crawler;
     private String logicalPath;
+    private final String namespaceName;
     private final String path;
     private final String prefix;
     private Map<String, CrawlFile> files;
     private Directory directory;
-    private List<CrawlFile> directories;
+    private final List<CrawlFile> directories;
     private Namespace namespace;
 
-    public CrawlPathImpl(String path, String prefix) {
+    public CrawlPathImpl(String path, String prefix, String namespace) {
         this.path = path;
         this.prefix = prefix;
+        this.namespaceName = namespace;
         initPaths();
         statistics = new Statistics();
         directories = new ArrayList<> ();
@@ -61,6 +65,7 @@ public class CrawlPathImpl implements CrawlPath {
     @Override
     public void walkDirectory() {
         try {
+            lookupNamespace();
             lookupPath();
             readDirectory();
             CrawlFileByDir byDir = (CrawlFileByDir) crawler.getQuery(QueryType.CrawlFileByDir);
@@ -96,11 +101,36 @@ public class CrawlPathImpl implements CrawlPath {
         if ((path.length() >= len)
                 && (path.startsWith(prefix))) {
             this.logicalPath = path.substring(len);
-            if (this.logicalPath.charAt(0) == File.pathSeparatorChar) {
+            if (this.logicalPath.charAt(0) == File.separatorChar) {
                 return;
             }
         }
+        System.out.printf("path     >>>%s<<<\nprefix   >>>%s<<<\n", path, prefix);
+        System.out.printf("logic    >>>%s<<<\n", logicalPath);
+        System.out.printf("combined >>>%s%s<<<\n", prefix, logicalPath);
         throw new IllegalArgumentException("Invalid path/prefix combination");
+    }
+
+    private void lookupNamespace() throws SQLException {
+        if ((namespace == null) || (namespace.getId() == null)) {
+            NamespaceByName byName = (NamespaceByName) crawler.getQuery(QueryType.NamespaceByName);
+            List<Object> arguments = new ArrayList<> ();
+            arguments.add(namespaceName);
+            byName.execute(arguments);
+            if (byName.hasNext()) {
+                namespace = byName.next();
+                byName.close();
+            } else {
+                createNamespace();
+            }
+        }
+    }
+
+    private void createNamespace() throws SQLException {
+        NamespaceCreate create = (NamespaceCreate) crawler.getQuery(QueryType.NamespaceCreate);
+        namespace = new Namespace();
+        namespace.setName(namespaceName);
+        create.execute(namespace);
     }
 
     private void lookupPath() throws SQLException {
@@ -126,14 +156,17 @@ public class CrawlPathImpl implements CrawlPath {
     }
 
     private void readDirectory() throws IOException {
-        Stream<Path> pathStream = Files.walk(Paths.get(path), 0);
-        files = pathStream.map(p -> getCrawlFile(p))
-                .filter(f -> !(".".equals(f.getName()) || "..".equals(f.getName())))
+        System.out.printf("readDirectory(%s)\n", path);
+        Path currentPath = Paths.get(path);
+        Stream<Path> pathStream = Files.walk(currentPath, 1);
+        files = pathStream.filter(p -> !currentPath.equals(p))
+                .map(p -> getCrawlFile(p))
                 .collect(Collectors.toMap(f -> f.getName(),
                         Function.identity()));
     }
 
     private CrawlFile getCrawlFile(Path p) {
+        System.out.printf("getCrawlFile(%s)\n", p.toString());
         CrawlFile c = new CrawlFile();
         try {
             c.setName(p.getFileName().toString());
@@ -231,7 +264,7 @@ public class CrawlPathImpl implements CrawlPath {
     private void processSubdirs() throws SQLException {
         for (CrawlFile f : directories) {
             Path p = Paths.get(path, f.getName());
-            CrawlPathImpl subdir = new CrawlPathImpl(p.toString(), prefix);
+            CrawlPathImpl subdir = new CrawlPathImpl(p.toString(), prefix, namespaceName);
             subdir.setNamespace(namespace);
             subdir.setCrawler(crawler);
             subdir.walkDirectory();
