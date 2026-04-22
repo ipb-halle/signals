@@ -48,7 +48,7 @@ public class DbPrincipalCache {
 
     public DbPrincipal lookup(DbPrincipal principal) {
         DbPrincipal p = principals.get(principal.getName());
-        System.out.printf("Looking up principal %s\n", principal.getName());
+//        System.out.printf("Looking up principal %s\n", principal.getName());
         if (p == null) {
             createPrincipal(principal);
             p = principals.get(principal.getName());

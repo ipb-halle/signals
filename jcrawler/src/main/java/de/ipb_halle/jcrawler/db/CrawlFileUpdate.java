@@ -8,7 +8,6 @@
 package de.ipb_halle.jcrawler.db;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,27 +19,26 @@ import java.util.List;
 public class CrawlFileUpdate extends SqlQuery<CrawlFile> {
 
     private final static String QUERY = """
-UPDATE files SET path_id=?, size=?, uid=?, git=?, type=?, mode=?,
-  missing=?, atime=?, ctime=? mtime=?, digest=?, link_target=?
-  WHERE id=?
-""";
+UPDATE files SET path_id=?, size=?, uid=?, gid=?, type=?, mode=?,
+  missing=?, atime=?, ctime=?, mtime=?, digest=?, link_target=?
+  WHERE id=? RETURNING id""";
 
     @Override
     public void execute(CrawlFile file) throws SQLException {
         List<Object> arguments = new ArrayList<> ();
-        arguments.add(file.getPathId());
-        arguments.add(file.getSize());
-        arguments.add(file.getUid());
-        arguments.add(file.getGid());
-        arguments.add(file.getType().getTypeId());
-        arguments.add(file.getMode());
-        arguments.add(file.isMissing());
-        arguments.add(file.getAtime());
-        arguments.add(file.getCtime());
-        arguments.add(file.getMtime());
-        arguments.add(file.getDigest());
-        arguments.add(file.getLinkTarget());
-        arguments.add(file.getId());
+        arguments.add(paramLong(file.getPathId()));
+        arguments.add(paramLong(file.getSize()));
+        arguments.add(paramLong(file.getUid()));
+        arguments.add(paramLong(file.getGid()));
+        arguments.add(paramInteger(file.getType().getTypeId()));
+        arguments.add(paramInteger(file.getMode()));
+        arguments.add(paramBoolean(file.isMissing()));
+        arguments.add(paramTimestamp(file.getAtime()));
+        arguments.add(paramTimestamp(file.getCtime()));
+        arguments.add(paramTimestamp(file.getMtime()));
+        arguments.add(paramString(file.getDigest()));
+        arguments.add(paramString(file.getLinkTarget()));
+        arguments.add(paramLong(file.getId()));
         execute(arguments);
         close();
     }

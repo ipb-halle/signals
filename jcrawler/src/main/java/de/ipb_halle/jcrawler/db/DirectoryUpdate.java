@@ -35,6 +35,7 @@ accumulated_size=?, change_time=now() WHERE id=?
         // change time provided by the database
         param.add(dir.getId());
         execute(param);
+        close();
     }
 
     @Override

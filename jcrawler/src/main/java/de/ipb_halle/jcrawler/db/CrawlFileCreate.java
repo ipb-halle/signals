@@ -14,6 +14,8 @@ import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.postgresql.copy.CopyManager;
 import org.postgresql.core.BaseConnection;
@@ -34,6 +36,7 @@ COPY files (path_id, size, type, mode, uid,
 
     private Connection connection;
     private PipedOutputStream outputStream;
+    private PipedInputStream copyStream;
     private PrintStream printStream;
     private Thread copyThread;
     private boolean busy = true;
@@ -60,6 +63,7 @@ COPY files (path_id, size, type, mode, uid,
                     SqlConnection.copyEscape(file.getDigest()),
                     SqlConnection.copyEscape(file.getName()),
                     SqlConnection.copyEscape(file.getLinkTarget())));
+//            System.out.printf("copied %s\n", file.getName());
         } else {
             throw new IllegalStateException("Not initialized.");
         }
@@ -67,18 +71,36 @@ COPY files (path_id, size, type, mode, uid,
 
     @Override
     public void close() {
-        printStream.append("\\.\n");
-        printStream.flush();
-        printStream.close();
-        busy = false;
+        if (busy) {
+            try {
+//                System.out.println("closing transaction");
+                printStream.append("\\.\n");
+                printStream.flush();
+                printStream.close();
+                copyThread.join();
+//                System.out.println("copy thread joined");
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+            busy = false;
+        } else {
+            throw new IllegalStateException("Instance is not busy");
+        }
     }
 
     public synchronized void begin() {
         if (! busy) {
-            outputStream = new PipedOutputStream();
-            printStream = new PrintStream(outputStream);
-            copyThread = new Thread(this);
-            copyThread.start();
+            try {
+//                System.out.println("starting transaction");
+                outputStream = new PipedOutputStream();
+                printStream = new PrintStream(outputStream);
+                copyStream = new PipedInputStream(outputStream);
+                copyThread = new Thread(this);
+                copyThread.start();
+                Thread.yield();
+            } catch(IOException e) {
+                throw new RuntimeException(e);
+            }
             busy = true;
         } else {
             throw new IllegalStateException("Instance is busy");
@@ -88,8 +110,10 @@ COPY files (path_id, size, type, mode, uid,
     @Override
     public void run() {
         try {
+//            System.out.println("copy-thread running");
             CopyManager cp = new CopyManager((BaseConnection) connection);
-            cp.copyIn(QUERY, new PipedInputStream(outputStream));
+            cp.copyIn(QUERY, copyStream);
+//            System.out.println("copy-thread complete");
         } catch (IOException | SQLException e) {
             throw new RuntimeException("SQL error: " + e.getMessage());
         }

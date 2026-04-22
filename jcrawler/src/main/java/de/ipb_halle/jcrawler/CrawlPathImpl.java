@@ -105,9 +105,6 @@ public class CrawlPathImpl implements CrawlPath {
                 return;
             }
         }
-        System.out.printf("path     >>>%s<<<\nprefix   >>>%s<<<\n", path, prefix);
-        System.out.printf("logic    >>>%s<<<\n", logicalPath);
-        System.out.printf("combined >>>%s%s<<<\n", prefix, logicalPath);
         throw new IllegalArgumentException("Invalid path/prefix combination");
     }
 
@@ -143,6 +140,7 @@ public class CrawlPathImpl implements CrawlPath {
             directory = byName.next();
             byName.close();
         } else {
+            byName.close();
             createPath();
         }
     }
@@ -156,7 +154,6 @@ public class CrawlPathImpl implements CrawlPath {
     }
 
     private void readDirectory() throws IOException {
-        System.out.printf("readDirectory(%s)\n", path);
         Path currentPath = Paths.get(path);
         Stream<Path> pathStream = Files.walk(currentPath, 1);
         files = pathStream.filter(p -> !currentPath.equals(p))
@@ -166,7 +163,6 @@ public class CrawlPathImpl implements CrawlPath {
     }
 
     private CrawlFile getCrawlFile(Path p) {
-        System.out.printf("getCrawlFile(%s)\n", p.toString());
         CrawlFile c = new CrawlFile();
         try {
             c.setName(p.getFileName().toString());
@@ -252,6 +248,10 @@ public class CrawlPathImpl implements CrawlPath {
     }
 
     private void handleNewFiles() throws SQLException {
+        if (files.isEmpty()) {
+            // must not start copy process with empty map!
+            return;
+        }
         CrawlFileCreate create = (CrawlFileCreate) crawler.getQuery(QueryType.CrawlFileCreate);
         create.begin();
         for (CrawlFile f : files.values()) {
@@ -268,6 +268,7 @@ public class CrawlPathImpl implements CrawlPath {
             subdir.setNamespace(namespace);
             subdir.setCrawler(crawler);
             subdir.walkDirectory();
+            statistics.accumulateStatistics(subdir.getStatistics());
         }
     }
 }
