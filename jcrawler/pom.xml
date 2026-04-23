@@ -32,6 +32,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jni.header.dir>${project.build.directory}/generated-sources/jni</jni.header.dir>
+        <jni.build.dir>${project.build.directory}/C</jni.build.dir>
         <log4j.version>2.25.4</log4j.version>
     </properties>
 
@@ -70,9 +72,59 @@
                     <compilerArgs>
                         <arg>-Xlint:all</arg>
                         <arg>-Aclasspath=${maven.compile.classpath}</arg>
+                        <arg>-h</arg>
+                        <arg>${jni.header.dir}</arg>
                     </compilerArgs>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
+            </plugin>
+
+            <!-- add generated C‑Sources -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>add-native-src</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.basedir}/src/main/C</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Make -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>make-native</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>make</executable>
+                            <workingDirectory>${project.basedir}/src/main/C</workingDirectory>
+                            <arguments>
+                                <argument>-e</argument>
+                                <argument> JNI_INCLUDE=${jni.header.dir}</argument>
+                                <argument>-e</argument>
+                                <argument>BUILD_DIR=${jni.build.dir}</argument>
+                                <!-- <argument>libLinuxNFS4Acl.so</argument> -->
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- dependency plugin -->
