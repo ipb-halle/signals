@@ -43,7 +43,7 @@ static void releaseBuffer(JNIEnv *env, jbyteArray jbytes, char* buffer) {
 }
 
 jint JNICALL Java_de_ipb_1halle_jcrawler_acl_LinuxNFS4AclView_readAttribute
-  (JNIEnv *env, jobject obj, jstring jstr, jbyteArray jbytes) {
+  (JNIEnv *env, jclass callingClass, jstring jstr, jbyteArray jbytes) {
 
     const char *path;
     char *buffer;

@@ -59,5 +59,5 @@ public class LinuxNFS4AclView implements AclFileAttributeView {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    private native int readAttribute(String filename, byte[] buffer);
+    public static native int readAttribute(String filename, byte[] buffer);
 }
