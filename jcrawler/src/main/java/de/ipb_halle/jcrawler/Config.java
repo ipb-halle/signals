@@ -26,7 +26,7 @@ public class Config extends ConfigElement {
     private boolean fullScan = false;
 
     // for testing purposes
-    private String globalPrefix;
+    private String globalPrefix = "";
 
     public boolean isFullScan() {
         return fullScan;

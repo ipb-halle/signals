@@ -18,7 +18,7 @@ import java.time.Instant;
  */
 public class PathParameters {
 
-    private boolean forceScan;
+    private boolean fullScan;
     private String logicalPath;
     private Namespace namespace;
     private final String namespaceName;
@@ -27,7 +27,7 @@ public class PathParameters {
     private Timestamp scanCutOff;
 
     public PathParameters(String path, String prefix, String namespaceName) {
-        this.forceScan = true;
+        this.fullScan = false;  // same as Config default
         this.path = path;
         this.prefix = prefix;
         this.namespaceName = namespaceName;
@@ -39,7 +39,7 @@ public class PathParameters {
         PathParameters params = new PathParameters(p, prefix, namespaceName);
         params.setNamespace(namespace);
         params.setScanCutOff(scanCutOff);
-        params.setForceScan(forceScan);
+        params.setFullScan(fullScan);
         return params;
     }
 
@@ -55,8 +55,8 @@ public class PathParameters {
         throw new IllegalArgumentException("Invalid path/prefix combination");
     }
 
-    public boolean isForceScan() {
-        return forceScan;
+    public boolean isFullScan() {
+        return fullScan;
     }
 
     public Timestamp getScanCutOff() {
@@ -79,8 +79,8 @@ public class PathParameters {
         return path;
     }
 
-    public void setForceScan(boolean forceScan) {
-        this.forceScan = forceScan;
+    public void setFullScan(boolean fullScan) {
+        this.fullScan = fullScan;
     }
 
     public void setNamespace(Namespace namespace) {

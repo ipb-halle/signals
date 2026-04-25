@@ -135,7 +135,7 @@ public class CrawlPathImpl implements CrawlPath {
     }
 
     private boolean checkCanSkip() {
-        if (parameters.isForceScan()) {
+        if (parameters.isFullScan()) {
             return false;
         }
         return directory.getChangeTime()
