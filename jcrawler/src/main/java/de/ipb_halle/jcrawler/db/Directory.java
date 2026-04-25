@@ -7,6 +7,7 @@
  */
 package de.ipb_halle.jcrawler.db;
 
+import de.ipb_halle.jcrawler.Statistics;
 import java.sql.Timestamp;
 
 /**
@@ -85,5 +86,11 @@ public class Directory {
 
     public void setChangeTime(Timestamp changeTime) {
         this.changeTime = changeTime;
+    }
+
+    public void setStatistics(Statistics statistics) {
+        newEntries = statistics.getNewEntities();
+        changedEntries = statistics.getChangedEntities();
+        vanishedEntries = statistics.getVanishedEntities();
     }
 }

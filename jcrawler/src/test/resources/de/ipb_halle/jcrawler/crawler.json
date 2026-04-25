@@ -5,11 +5,13 @@
   "dbUser" : "spider",
   "paths" : [ {
       "directory" : "/src/main",
+      "forceScan" : true,
       "namespace" : "localhost",
       "stripPrefix" : "/src",
       "subtreeScanThreshold" : 3600
     },{
       "directory" : "/src/test",
+      "forceScan" : true,
       "namespace" : "localhost",
       "stripPrefix" : "/src",
       "subtreeScanThreshold" : 3600

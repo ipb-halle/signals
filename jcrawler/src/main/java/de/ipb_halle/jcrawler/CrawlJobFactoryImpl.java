@@ -20,6 +20,7 @@ public class CrawlJobFactoryImpl implements CrawlJobFactory {
     private final static String DIRECTORY = "directory";
     private final static String STRIP_PREFIX = "stripPrefix";
     private final static String NAMESPACE = "namespace";
+    private final static String FORCE_SCAN = "forceScan";
     private final static String THRESHOLD = "subtreeScanThreshold";
 
     public CrawlJobFactoryImpl(Config config) {
@@ -46,6 +47,9 @@ public class CrawlJobFactoryImpl implements CrawlJobFactory {
         if ((dir == null) || (prefix == null) || (namespace == null)) {
             throw new RuntimeException("invalid configuration: directory or prefix missing");
         }
-        return new CrawlPathImpl(dir, prefix, namespace);
+        PathParameters parameters = new PathParameters(dir, prefix, namespace);
+        parameters.setForceScan(element.getConfigBoolean(FORCE_SCAN,true));
+        parameters.setScanThreshold(element.getConfigLong(THRESHOLD, 0L));
+        return new CrawlPathImpl(parameters);
     }
 }

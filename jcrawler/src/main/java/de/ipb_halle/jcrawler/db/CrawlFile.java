@@ -96,6 +96,11 @@ public class CrawlFile {
                 && Objects.equals(digest, other.digest)
                 && Objects.equals(linkTarget, other.linkTarget);
     }
+
+    public boolean isDirectory() {
+        return type == CrawlFile.FileType.DIRECTORY;
+    }
+
     public Long getId() {
         return id;
     }
