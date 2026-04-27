@@ -7,6 +7,7 @@
  */
 package de.ipb_halle.jcrawler.db;
 
+import java.nio.file.attribute.UserPrincipal;
 import java.security.Principal;
 import java.util.Objects;
 
@@ -15,9 +16,9 @@ import java.util.Objects;
  *
  * @author fblocal
  */
-public class DbPrincipal  {
+public class DbPrincipal implements UserPrincipal  {
 
-    public class SimplePrincipal implements Principal {
+    public class SimplePrincipal implements UserPrincipal {
         private final String name;
 
         public SimplePrincipal(String name) {
@@ -88,6 +89,7 @@ public class DbPrincipal  {
         this.id = id;
     }
 
+    @Override
     public String getName() {
         return principal.getName();
     }

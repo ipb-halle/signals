@@ -63,6 +63,7 @@ public class CrawlPathImpl implements CrawlPath {
             lookupNamespace();
             lookupPath();
             if (checkCanSkip()) {
+                System.out.printf("Skipping directory: %s\n", parameters.getPath());
                 return;
             }
             readDirectory();

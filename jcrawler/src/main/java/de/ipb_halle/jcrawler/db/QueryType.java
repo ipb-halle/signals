@@ -21,7 +21,10 @@ public enum QueryType {
     NamespaceByName,
     NamespaceCreate,
 
-    // used by DbPrincipalCache only!
+    // used by Caches only!
+    AclQuery,
+    AclCreate,
+    AclDetail,
     DbPrincipalsQuery,
     DbPrincipalCreate;
 }

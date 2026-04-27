@@ -29,10 +29,10 @@ public class CrawlFileCreate extends SqlQuery<CrawlFile> implements Runnable {
     private final static String QUERY = """
 COPY files (path_id, size, type, mode, uid,
   gid, atime, ctime, mtime, digest, name,
-  link_target) FROM STDIN""";
+  link_target, acl_id) FROM STDIN""";
 
-    //                                           p   s   t   m   u   g   a   c   m   d   n   l
-    private final static String COPY_TEMPLATE = "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n";
+    //                                           p   s   t   m   u   g   a   c   m   d   n   l   a
+    private final static String COPY_TEMPLATE = "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n";
 
     private Connection connection;
     private PipedOutputStream outputStream;
@@ -62,7 +62,8 @@ COPY files (path_id, size, type, mode, uid,
                     SqlConnection.copyEscape(file.getMtime()),
                     SqlConnection.copyEscape(file.getDigest()),
                     SqlConnection.copyEscape(file.getName()),
-                    SqlConnection.copyEscape(file.getLinkTarget())));
+                    SqlConnection.copyEscape(file.getLinkTarget()),
+                    SqlConnection.copyEscape(file.getAclId())));
 //            System.out.printf("copied %s\n", file.getName());
         } else {
             throw new IllegalStateException("Not initialized.");

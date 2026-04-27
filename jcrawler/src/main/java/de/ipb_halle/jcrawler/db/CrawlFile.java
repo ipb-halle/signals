@@ -7,7 +7,9 @@
  */
 package de.ipb_halle.jcrawler.db;
 
+import java.nio.file.attribute.AclFileAttributeView;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -55,6 +57,7 @@ public class CrawlFile {
     private Timestamp ctime;
     private Timestamp mtime;
     private boolean missing;
+    private Long aclId;
 
     @Override
     public int hashCode() {
@@ -91,7 +94,7 @@ public class CrawlFile {
                 && Objects.equals(ctime, other.ctime)
                 && Objects.equals(mtime, other.mtime)
                 && Objects.equals(name, other.name)
-                && Objects.equals(digest, other.digest)
+                && Arrays.equals(digest, other.digest)
                 && Objects.equals(linkTarget, other.linkTarget);
     }
 
@@ -105,6 +108,14 @@ public class CrawlFile {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getAclId() {
+        return aclId;
+    }
+
+    public void setAclId(Long aclId) {
+        this.aclId = aclId;
     }
 
     public Long getPathId() {

@@ -43,10 +43,11 @@ public class CrawlJobFactoryImpl implements CrawlJobFactory {
 
     private CrawlPath setupPath(ConfigElement element) {
         String globalPrefix = config.getGlobalPrefix();
-        String algorithm = config.getConfigString(ALGORITHM, null);
+
+        String algorithm = element.getConfigString(ALGORITHM, null);
         String dir = element.getConfigString(DIRECTORY, null);
-        String prefix = element.getConfigString(STRIP_PREFIX, null);
         String namespace = element.getConfigString(NAMESPACE, null);
+        String prefix = element.getConfigString(STRIP_PREFIX, null);
         if ((dir == null) || (prefix == null) || (namespace == null)) {
             throw new RuntimeException("invalid configuration: directory or prefix missing");
         }

@@ -7,6 +7,9 @@
  */
 package de.ipb_halle.jcrawler;
 
+import de.ipb_halle.jcrawler.acl.LinuxNFS4AclView;
+import de.ipb_halle.jcrawler.db.Acl;
+import de.ipb_halle.jcrawler.db.AclCache;
 import de.ipb_halle.jcrawler.db.CrawlFile;
 import de.ipb_halle.jcrawler.db.DbPrincipal;
 import de.ipb_halle.jcrawler.db.DbPrincipalCache;
@@ -18,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.AclFileAttributeView;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import static java.nio.file.attribute.PosixFilePermission.GROUP_EXECUTE;
@@ -73,8 +77,12 @@ public class FileInspector {
                     && (c.getType() == CrawlFile.FileType.REGULAR_FILE)) {
                 c.setDigest(digest(p, algorithm));
             }
+            c.setAclId(getAclId(p));
+//            System.out.printf("%s\n%s\n\n", p.toString(), c.getAcl().toString());
         } catch (NoSuchAlgorithmException | IOException e) {
             //
+            e.printStackTrace();
+            throw new RuntimeException("error in inspector");
         }
         return c;
     }
@@ -90,6 +98,20 @@ public class FileInspector {
             return CrawlFile.FileType.SYMBOLIC_LINK;
         }
         return CrawlFile.FileType.OTHER;
+    }
+
+    private Long getAclId(Path path) throws IOException {
+        byte[] rawAcl = new LinuxNFS4AclView(path).getRawAttribute();
+        Acl acl = new Acl();
+        if (rawAcl == null) {
+            throw new NullPointerException("Was erlaube FileInspector!");
+        }
+        acl.setRawAttribute(rawAcl);
+        acl = AclCache.getInstance().lookup(acl);
+        if (acl == null) {
+            return null;
+        }
+        return acl.getId();
     }
 
     private Long getOwner(PosixFileAttributes attrs) {

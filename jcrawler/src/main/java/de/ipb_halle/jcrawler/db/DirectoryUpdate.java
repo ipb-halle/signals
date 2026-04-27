@@ -20,20 +20,18 @@ public class DirectoryUpdate extends SqlQuery<Directory> {
 
     private final static String QUERY = """
 UPDATE directories SET new_entries=?, changed_entries=?, vanished_entries=?,
-accumulated_size=?, change_time=now() WHERE id=?
+accumulated_sizes=?, change_time=now() WHERE id=? RETURNING id
 """;
 
     @Override
     public void execute(Directory dir) throws SQLException {
         List<Object> param = new ArrayList<> ();
-        param.add(dir.getNamespaceId());
-        param.add(dir.getPath());
-        param.add(dir.getNewEntries());
-        param.add(dir.getChangedEntries());
-        param.add(dir.getVanishedEntries());
-        param.add(dir.getAccumlatedSizes());
+        param.add(paramLong(dir.getNewEntries()));
+        param.add(paramLong(dir.getChangedEntries()));
+        param.add(paramLong(dir.getVanishedEntries()));
+        param.add(paramLong(dir.getAccumulatedSizes()));
         // change time provided by the database
-        param.add(dir.getId());
+        param.add(paramLong(dir.getId()));
         execute(param);
         close();
     }

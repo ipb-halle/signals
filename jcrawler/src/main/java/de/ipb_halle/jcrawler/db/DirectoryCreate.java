@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class DirectoryCreate extends SqlQuery<Directory> {
 
-    private final static String QUERY = "INSERT INTO directories (namespace_id, path) VALUES (?, ?) RETURNING id, namespace_id, path";
+    private final static String QUERY = "INSERT INTO directories (namespace_id, path) VALUES (?, ?) RETURNING id, namespace_id, path, change_time";
 
     @Override
     public void execute(Directory dir) throws SQLException {
@@ -29,6 +29,7 @@ public class DirectoryCreate extends SqlQuery<Directory> {
         execute(param);
         Directory dbDir = next();
         dir.setId(dbDir.getId());
+        dir.setChangeTime(dbDir.getChangeTime());
         close();
     }
 
@@ -39,6 +40,7 @@ public class DirectoryCreate extends SqlQuery<Directory> {
         dir.setId(result.getLong(1));
         dir.setNamespaceId(result.getInt(2));
         dir.setPath(result.getString(3));
+        dir.setChangeTime(result.getTimestamp(4));
         return dir;
     }
 

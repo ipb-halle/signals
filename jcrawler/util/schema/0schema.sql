@@ -37,6 +37,38 @@ INSERT INTO principals (principal, is_group, is_everyone, guid) VALUES
     ('GROUP@',    true,  false, NULL),
     ('EVERYONE@', false, true,  NULL);
 
+CREATE TABLE acls (
+    id                  BIGSERIAL NOT NULL PRIMARY KEY,
+    raw_attribute       BYTEA NOT NULL,
+    UNIQUE (raw_attribute)
+);
+
+CREATE TABLE acl_details (
+    id                  BIGSERIAL NOT NULL PRIMARY KEY,
+    acl_id              BIGINT REFERENCES acls(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    seq                 INTEGER,
+    principal_id        INTEGER NOT NULL REFERENCES principals(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    type                INTEGER,
+    file_inherit        BOOLEAN NOT NULL DEFAULT FALSE,
+    dir_inherit         BOOLEAN NOT NULL DEFAULT FALSE,
+    no_propagate        BOOLEAN NOT NULL DEFAULT FALSE,
+    inherit_only        BOOLEAN NOT NULL DEFAULT FALSE,
+    read_data           BOOLEAN NOT NULL DEFAULT FALSE,
+    write_data          BOOLEAN NOT NULL DEFAULT FALSE,
+    append_data         BOOLEAN NOT NULL DEFAULT FALSE,
+    execute             BOOLEAN NOT NULL DEFAULT FALSE,
+    delete              BOOLEAN NOT NULL DEFAULT FALSE,
+    delete_child        BOOLEAN NOT NULL DEFAULT FALSE,
+    read_attr           BOOLEAN NOT NULL DEFAULT FALSE,
+    write_attr          BOOLEAN NOT NULL DEFAULT FALSE,
+    read_named_attr     BOOLEAN NOT NULL DEFAULT FALSE,
+    write_named_attr    BOOLEAN NOT NULL DEFAULT FALSE,
+    read_acl            BOOLEAN NOT NULL DEFAULT FALSE,
+    write_acl           BOOLEAN NOT NULL DEFAULT FALSE,
+    write_owner         BOOLEAN NOT NULL DEFAULT FALSE,
+    synchronize         BOOLEAN NOT NULL DEFAULT FALSE,
+    UNIQUE (acl_id, seq)
+);
 
 CREATE TABLE files (
     id          BIGSERIAL NOT NULL PRIMARY KEY,
@@ -53,39 +85,7 @@ CREATE TABLE files (
     digest      BYTEA,
     link_target VARCHAR,
     missing     BOOLEAN NOT NULL DEFAULT false,
+    acl_id      BIGINT REFERENCES acls(id),
     UNIQUE (path_id, name)
 );
 
-
-CREATE TABLE aces (
-    id                      BIGSERIAL NOT NULL PRIMARY KEY,
-    file_id                 BIGINT NOT NULL REFERENCES files(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    ace_index               INTEGER,
-/* ACE TYPE */
-    type                    INTEGER,
-/* ACE FLAGS */
-    f_group                 BOOLEAN NOT NULL DEFAULT FALSE,
-    f_directory_inherit     BOOLEAN NOT NULL DEFAULT FALSE,
-    f_nopropagate_inherit   BOOLEAN NOT NULL DEFAULT FALSE,
-    f_inherit_only          BOOLEAN NOT NULL DEFAULT FALSE,
-    f_success_access        BOOLEAN NOT NULL DEFAULT FALSE,
-    f_fail_access           BOOLEAN NOT NULL DEFAULT FALSE,
-/* ACE PERMISSIONS */
-    p_read_data             BOOLEAN NOT NULL DEFAULT FALSE,
-    p_write_data            BOOLEAN NOT NULL DEFAULT FALSE,
-    p_append_data           BOOLEAN NOT NULL DEFAULT FALSE,
-    p_execute               BOOLEAN NOT NULL DEFAULT FALSE,
-    p_delete                BOOLEAN NOT NULL DEFAULT FALSE,
-    p_delete_child          BOOLEAN NOT NULL DEFAULT FALSE,
-    p_read_attr             BOOLEAN NOT NULL DEFAULT FALSE,
-    p_write_attr            BOOLEAN NOT NULL DEFAULT FALSE,
-    p_read_named_attr       BOOLEAN NOT NULL DEFAULT FALSE,
-    p_write_named_attr      BOOLEAN NOT NULL DEFAULT FALSE,
-    p_read_acl              BOOLEAN NOT NULL DEFAULT FALSE,
-    p_write_acl             BOOLEAN NOT NULL DEFAULT FALSE,
-    p_write_owner           BOOLEAN NOT NULL DEFAULT FALSE,
-    p_synchronize           BOOLEAN NOT NULL DEFAULT FALSE,
-/* ACE PRINCIPAL */
-    principal               INTEGER NOT NULL REFERENCES principals(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    UNIQUE(file_id, ace_index)
-);

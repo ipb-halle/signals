@@ -21,8 +21,15 @@ public class Directory {
     private Long newEntries;
     private Long changedEntries;
     private Long vanishedEntries;
-    private Long accumlatedSizes;
+    private Long accumulatedSizes;
     private Timestamp changeTime;
+
+    public Directory() {
+        newEntries = 0L;
+        changedEntries = 0L;
+        vanishedEntries = 0L;
+        accumulatedSizes = 0L;
+    }
 
     public Long getId() {
         return id;
@@ -72,12 +79,12 @@ public class Directory {
         this.vanishedEntries = vanishedEntries;
     }
 
-    public Long getAccumlatedSizes() {
-        return accumlatedSizes;
+    public Long getAccumulatedSizes() {
+        return accumulatedSizes;
     }
 
-    public void setAccumlatedSizes(Long accumlatedSizes) {
-        this.accumlatedSizes = accumlatedSizes;
+    public void setAccumulatedSizes(Long accumlatedSizes) {
+        this.accumulatedSizes = accumlatedSizes;
     }
 
     public Timestamp getChangeTime() {

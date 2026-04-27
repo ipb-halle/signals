@@ -20,6 +20,7 @@ static int getPath(JNIEnv *env, jstring jstr, const char** path) {
     if (path == NULL) {
         return -1;
     }
+    return 0;
 }
 
 static void releasePath(JNIEnv *env, jstring jstr, const char* path) {

@@ -23,9 +23,11 @@ public class CrawlerFactoryImpl implements CrawlerFactory {
 
     private final Config config;
     private DbPrincipalCache principalCache;
+    private AclCache aclCache;
 
     public CrawlerFactoryImpl(Config config) {
         this.config = config;
+        setupAclCache();
         setupPrincipalCache();
     }
 
@@ -48,13 +50,21 @@ public class CrawlerFactoryImpl implements CrawlerFactory {
 
     private Crawler setupCrawler() throws SQLException {
         Crawler crawler = new Crawler();
-        crawler.setPrincipalCache(principalCache);
         addCopyConnections(crawler);
         addQueryConnections(crawler);
         addUpdateConnections(crawler);
         return crawler;
     }
 
+    private void setupAclCache() {
+        try {
+            Connection conn = SqlConnection.getConnection(config);
+            aclCache = AclCache.getInstance();
+            aclCache.setup(conn);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
     private void setupPrincipalCache() {
         try {
             Connection conn = SqlConnection.getConnection(config);
