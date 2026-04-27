@@ -25,6 +25,7 @@ public class PathParameters {
     private final String path;
     private final String prefix;
     private Timestamp scanCutOff;
+    private DigestAlgorithm algorithm;
 
     public PathParameters(String path, String prefix, String namespaceName) {
         this.fullScan = false;  // same as Config default
@@ -37,6 +38,7 @@ public class PathParameters {
 
     public PathParameters createPathParameters(String p) {
         PathParameters params = new PathParameters(p, prefix, namespaceName);
+        params.setAlgorithm(algorithm);
         params.setNamespace(namespace);
         params.setScanCutOff(scanCutOff);
         params.setFullScan(fullScan);
@@ -63,6 +65,10 @@ public class PathParameters {
         return scanCutOff;
     }
 
+    public DigestAlgorithm getAlgorithm() {
+        return algorithm;
+    }
+
     public String getLogicalPath() {
         return logicalPath;
     }
@@ -77,6 +83,10 @@ public class PathParameters {
 
     public String getPath() {
         return path;
+    }
+
+    public void setAlgorithm(DigestAlgorithm algorithm) {
+        this.algorithm = algorithm;
     }
 
     public void setFullScan(boolean fullScan) {

@@ -7,6 +7,7 @@
  */
 package de.ipb_halle.jcrawler;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -16,6 +17,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class CrawlJobFactoryImpl implements CrawlJobFactory {
 
     private final Config config;
+    private final static String ALGORITHM = "digestAlgorithm";
     private final static String PATHS_CONFIG = "paths";
     private final static String DIRECTORY = "directory";
     private final static String STRIP_PREFIX = "stripPrefix";
@@ -41,6 +43,7 @@ public class CrawlJobFactoryImpl implements CrawlJobFactory {
 
     private CrawlPath setupPath(ConfigElement element) {
         String globalPrefix = config.getGlobalPrefix();
+        String algorithm = config.getConfigString(ALGORITHM, null);
         String dir = element.getConfigString(DIRECTORY, null);
         String prefix = element.getConfigString(STRIP_PREFIX, null);
         String namespace = element.getConfigString(NAMESPACE, null);
@@ -51,6 +54,7 @@ public class CrawlJobFactoryImpl implements CrawlJobFactory {
                 globalPrefix + dir,
                 globalPrefix + prefix,
                 namespace);
+        parameters.setAlgorithm(DigestAlgorithm.byName(algorithm));
         parameters.setFullScan(config.isFullScan());
         parameters.setScanThreshold(element.getConfigLong(THRESHOLD, 0L));
         return new CrawlPathImpl(parameters);

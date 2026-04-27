@@ -115,6 +115,7 @@ public abstract class SqlQuery<T> implements Iterator<T> {
                 throw new SQLException("parameter is null");
             }
             switch (obj.getClass().getName()) {
+                case "[B" -> statement.setBytes(i, (byte[]) obj);
                 case "java.lang.Boolean" -> statement.setBoolean(i, (Boolean) obj);
                 case "java.lang.Integer" -> statement.setInt(i, (Integer) obj);
                 case "java.lang.Long" -> statement.setLong(i, (Long) obj);
@@ -129,6 +130,10 @@ public abstract class SqlQuery<T> implements Iterator<T> {
 
     public Object paramBoolean(Boolean param) {
         return (param == null) ? new NullObj(JDBCType.BOOLEAN) : param;
+    }
+
+    public Object paramBytes(byte[] param) {
+        return (param == null) ? new NullObj(JDBCType.BINARY) : param;
     }
 
     public Object paramInteger(Integer param) {

@@ -41,7 +41,7 @@ SELECT id, path_id, size, uid, gid, type, mode, missing,
         c.setCtime(result.getTimestamp(10));
         c.setMtime(result.getTimestamp(11));
         c.setName(result.getString(12));
-        c.setDigest(result.getString(13));
+        c.setDigest(result.getBytes(13));
         c.setLinkTarget(result.getString(14));
         return c;
     }

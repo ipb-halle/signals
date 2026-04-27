@@ -36,7 +36,7 @@ UPDATE files SET path_id=?, size=?, uid=?, gid=?, type=?, mode=?,
         arguments.add(paramTimestamp(file.getAtime()));
         arguments.add(paramTimestamp(file.getCtime()));
         arguments.add(paramTimestamp(file.getMtime()));
-        arguments.add(paramString(file.getDigest()));
+        arguments.add(paramBytes(file.getDigest()));
         arguments.add(paramString(file.getLinkTarget()));
         arguments.add(paramLong(file.getId()));
         execute(arguments);

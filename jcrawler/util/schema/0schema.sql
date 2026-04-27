@@ -50,7 +50,7 @@ CREATE TABLE files (
     atime       TIMESTAMP,
     mtime       TIMESTAMP,
     ctime       TIMESTAMP,
-    digest      VARCHAR,
+    digest      BYTEA,
     link_target VARCHAR,
     missing     BOOLEAN NOT NULL DEFAULT false,
     UNIQUE (path_id, name)

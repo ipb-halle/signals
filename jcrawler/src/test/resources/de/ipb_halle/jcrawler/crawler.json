@@ -4,11 +4,13 @@
   "dbPassword" : "spider",
   "dbUser" : "spider",
   "paths" : [ {
+      "digestAlgorithm" : "SHA1",
       "directory" : "/src/main",
       "namespace" : "localhost",
       "stripPrefix" : "/src",
       "subtreeScanThreshold" : 3600
     },{
+      "digestAlgorithm" : "SHA1",
       "directory" : "/src/test",
       "namespace" : "localhost",
       "stripPrefix" : "/src",

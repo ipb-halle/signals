@@ -12,9 +12,12 @@ import de.ipb_halle.jcrawler.db.DbPrincipal;
 import de.ipb_halle.jcrawler.db.DbPrincipalCache;
 import de.ipb_halle.jcrawler.db.Directory;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import static java.nio.file.attribute.PosixFilePermission.GROUP_EXECUTE;
@@ -26,7 +29,10 @@ import static java.nio.file.attribute.PosixFilePermission.OTHERS_WRITE;
 import static java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE;
 import static java.nio.file.attribute.PosixFilePermission.OWNER_READ;
 import static java.nio.file.attribute.PosixFilePermission.OWNER_WRITE;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
+import java.util.Objects;
 
 /**
  *
@@ -35,41 +41,45 @@ import java.sql.Timestamp;
 public class FileInspector {
 
     private final static FileInspector instance = new FileInspector();
+    private final static int BUFFER_SIZE = 65536;
 
     private static FileInspector getInstance() {
         return instance;
     }
 
-    public static CrawlFile inspect(Path p) {
-        return getInstance().getCrawlFile(p);
+    public static CrawlFile inspect(Path p, DigestAlgorithm algorithm) {
+        return getInstance().getCrawlFile(p, algorithm);
     }
 
-    private CrawlFile getCrawlFile(Path p) {
+    private CrawlFile getCrawlFile(Path p, DigestAlgorithm algorithm) {
         CrawlFile c = new CrawlFile();
         try {
             c.setName(p.getFileName().toString());
             PosixFileAttributes attrs = Files.readAttributes(p,
                     PosixFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
             c.setSize(attrs.size());
-            c.setType(getFileType(c, attrs));
+            c.setType(getFileType(attrs));
             c.setAtime(new Timestamp(attrs.lastAccessTime().toMillis()));
             c.setCtime(new Timestamp(attrs.creationTime().toMillis()));
             c.setMtime(new Timestamp(attrs.lastModifiedTime().toMillis()));
             c.setMode(getMode(attrs));
             c.setUid(getOwner(attrs));
             c.setGid(getGroup(attrs));
-//            c.setDigest();
+            c.setMissing(false);
             if (c.getType() == CrawlFile.FileType.SYMBOLIC_LINK) {
                 c.setLinkTarget(Files.readSymbolicLink(p).toString());
             }
-            c.setMissing(false);
-        } catch (IOException e) {
+            if ((algorithm != null)
+                    && (c.getType() == CrawlFile.FileType.REGULAR_FILE)) {
+                c.setDigest(digest(p, algorithm));
+            }
+        } catch (NoSuchAlgorithmException | IOException e) {
             //
         }
         return c;
     }
 
-    private CrawlFile.FileType getFileType(CrawlFile file, PosixFileAttributes attrs) {
+    private CrawlFile.FileType getFileType(PosixFileAttributes attrs) {
         if (attrs.isRegularFile()) {
             return CrawlFile.FileType.REGULAR_FILE;
         }
@@ -118,5 +128,24 @@ public class FileInspector {
     public static CrawlFile applyDirectory(CrawlFile file, Directory dir) {
         file.setPathId(dir.getId());
         return file;
+    }
+
+    public byte[] digest(Path path, DigestAlgorithm algorithm)
+            throws IOException, NoSuchAlgorithmException {
+
+        Objects.requireNonNull(path, "path must not be null");
+        Objects.requireNonNull(algorithm, "algorithm must not be null");
+
+        try (FileChannel fc = FileChannel.open(path, StandardOpenOption.READ)) {
+            MessageDigest md = algorithm.newDigest();
+            ByteBuffer buffer = ByteBuffer.allocateDirect(BUFFER_SIZE); // Direct für native IO
+
+            while (fc.read(buffer) != -1) {        // read -> pos = 0, limit = bytesRead
+                buffer.flip();                     // prepare to read
+                md.update(buffer);                  // ByteBuffer‑Übergabe ist optimiert
+                buffer.clear();                     // ready for next read
+            }
+            return md.digest();
+        }
     }
 }

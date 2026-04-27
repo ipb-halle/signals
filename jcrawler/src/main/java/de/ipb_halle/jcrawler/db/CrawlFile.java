@@ -8,8 +8,6 @@
 package de.ipb_halle.jcrawler.db;
 
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -51,7 +49,7 @@ public class CrawlFile {
     private FileType type;
     private Integer mode;
     private String name;
-    private String digest;
+    private byte[] digest;
     private String linkTarget;
     private Timestamp atime;
     private Timestamp ctime;
@@ -165,11 +163,11 @@ public class CrawlFile {
         this.name = name;
     }
 
-    public String getDigest() {
+    public byte[] getDigest() {
         return digest;
     }
 
-    public void setDigest(String digest) {
+    public void setDigest(byte[] digest) {
         this.digest = digest;
     }
 

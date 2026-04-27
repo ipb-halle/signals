@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.HexFormat;
 import java.util.Properties;
 
 /**
@@ -45,6 +46,12 @@ public class SqlConnection {
         return b ? "true" : "false";
     }
 
+    public static String copyEscape(byte[] b) {
+        if (b == null) {
+        return NULL;
+        }
+        return "\\\\x%s".formatted(HexFormat.of().formatHex(b));
+    }
 
     public static String copyEscape(Integer i) {
         if (i == null) {
