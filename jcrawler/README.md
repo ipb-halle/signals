@@ -12,4 +12,7 @@ Configurable multithreaded File system crawler written in Java SE.
 * store  NFS4  ACLs where available (currently, this is little brittle)
 
 ## Planned features / ToDo
+* propagation of missing property to files in missing directories
+* test coverage
+* real implementation for Windows ACLs (possibly Posix ACLs too?)
 * explanation of functionality and design assumptions and decisions
