@@ -91,7 +91,7 @@ public class NFS4AclParser {
                 int wholen = buf.getInt(ptr + 12);
                 ptr += 16;
                 parseAcePrincipal(builder, new String(rawBuffer, ptr, wholen), isGroup);
-                // ptr += 4 * ((wholen / 4) + (((wholen % 4) > 0) ? 1 : 0));
+                // align ptr to 32 bit word address
                 ptr += (wholen & ~3) + (((wholen & 3) > 0) ? 4 : 0);
                 acl.add(builder.build());
             }
@@ -105,7 +105,7 @@ public class NFS4AclParser {
             case NFS4_ACE_ACCESS_DENIED_ACE_TYPE -> builder.setType(AclEntryType.DENY);
             case NFS4_ACE_SYSTEM_AUDIT_ACE_TYPE -> builder.setType(AclEntryType.AUDIT);
             case NFS4_ACE_SYSTEM_ALARM_ACE_TYPE -> builder.setType(AclEntryType.ALARM);
-//            default -> throw new IllegalArgumentException("Unknown ACE type: %d".formatted(type));
+            default -> throw new IllegalArgumentException("Parse error: unknown ACE type %d".formatted(type));
         }
     }
 
@@ -124,9 +124,12 @@ public class NFS4AclParser {
         if((flags & NFS4_ACE_INHERIT_ONLY_ACE) > 0) {
             aceFlags.add(AclEntryFlag.INHERIT_ONLY);
         }
+        // flags for AUDIT & ALARM are ignored
+
         if(! aceFlags.isEmpty()) {
             builder.setFlags(aceFlags);
         }
+
         // isGroup?
         return ((flags & NFS4_ACE_GROUP) > 0);
     }

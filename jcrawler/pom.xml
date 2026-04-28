@@ -33,7 +33,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jni.header.dir>${project.build.directory}/generated-sources/jni</jni.header.dir>
-        <jni.build.dir>${project.build.directory}/C</jni.build.dir>
+        <jni.build.dir>${project.build.directory}/native</jni.build.dir>
         <log4j.version>2.25.4</log4j.version>
     </properties>
 
@@ -117,10 +117,11 @@
                             <workingDirectory>${project.basedir}/src/main/C</workingDirectory>
                             <arguments>
                                 <argument>-e</argument>
-                                <argument> JNI_INCLUDE=${jni.header.dir}</argument>
+                                <argument>JNI_INCLUDE=${jni.header.dir}</argument>
                                 <argument>-e</argument>
                                 <argument>BUILD_DIR=${jni.build.dir}</argument>
-                                <!-- <argument>libLinuxNFS4Acl.so</argument> -->
+                                <argument>-e</argument>
+                                <argument>VERSION=${project.version}</argument>
                             </arguments>
                         </configuration>
                     </execution>

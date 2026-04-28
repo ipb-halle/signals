@@ -86,7 +86,6 @@ public class PathParameters {
     }
 
     public void setAlgorithm(DigestAlgorithm algorithm) {
-        System.out.printf("Setting Algorithm to: %s\n", algorithm.toString());
         this.algorithm = algorithm;
     }
 

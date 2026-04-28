@@ -14,11 +14,13 @@ import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.postgresql.copy.CopyManager;
 import org.postgresql.core.BaseConnection;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  *
@@ -34,6 +36,7 @@ COPY files (path_id, size, type, mode, uid,
     //                                           p   s   t   m   u   g   a   c   m   d   n   l   a
     private final static String COPY_TEMPLATE = "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n";
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private Connection connection;
     private PipedOutputStream outputStream;
     private PipedInputStream copyStream;
@@ -64,7 +67,7 @@ COPY files (path_id, size, type, mode, uid,
                     SqlConnection.copyEscape(file.getName()),
                     SqlConnection.copyEscape(file.getLinkTarget()),
                     SqlConnection.copyEscape(file.getAclId())));
-//            System.out.printf("copied %s\n", file.getName());
+            logger.trace("copied {}", file.getName());
         } else {
             throw new IllegalStateException("Not initialized.");
         }
@@ -74,12 +77,12 @@ COPY files (path_id, size, type, mode, uid,
     public void close() {
         if (busy) {
             try {
-//                System.out.println("closing transaction");
+                logger.trace("closing COPY transaction");
                 printStream.append("\\.\n");
                 printStream.flush();
                 printStream.close();
                 copyThread.join();
-//                System.out.println("copy thread joined");
+                logger.trace("copy-thread joined");
             } catch (InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
@@ -92,7 +95,7 @@ COPY files (path_id, size, type, mode, uid,
     public synchronized void begin() {
         if (! busy) {
             try {
-//                System.out.println("starting transaction");
+                logger.trace("starting COPY transaction");
                 outputStream = new PipedOutputStream();
                 printStream = new PrintStream(outputStream);
                 copyStream = new PipedInputStream(outputStream);
@@ -111,10 +114,10 @@ COPY files (path_id, size, type, mode, uid,
     @Override
     public void run() {
         try {
-//            System.out.println("copy-thread running");
+            logger.trace("copy-thread started");
             CopyManager cp = new CopyManager((BaseConnection) connection);
             cp.copyIn(QUERY, copyStream);
-//            System.out.println("copy-thread complete");
+            logger.trace("copy-thread completed");
         } catch (IOException | SQLException e) {
             throw new RuntimeException("SQL error: " + e.getMessage());
         }

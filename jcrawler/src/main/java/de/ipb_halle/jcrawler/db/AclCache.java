@@ -12,6 +12,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -20,11 +22,13 @@ import java.util.Map;
 public class AclCache {
     private final Map<Acl, Acl> acls;
     private static final AclCache instance = new AclCache();
+    private final Logger logger;
     private AclCreate create;
     private AclDetail detail;
 
     private AclCache() {
         acls = new HashMap<> ();
+        logger = LoggerFactory.getLogger(this.getClass());
     }
 
     public static AclCache getInstance() {
@@ -48,40 +52,35 @@ public class AclCache {
 
     public Acl lookup(Acl acl) {
         if (acl.getRawAttribute() == null) {
-            throw new NullPointerException("Was erlaube AclCache.lookup()!");
-            // return null;
+            throw new NullPointerException("lookup() called with empty attribute!");
         }
         Acl cachedAcl = acls.get(acl);
         if (cachedAcl == null) {
             createAcl(acl);
             cachedAcl = acls.get(acl);
+            if ((cachedAcl == null) || (cachedAcl.getId() == null)) {
+                throw new NullPointerException("caching mechanism failure");
+            }
         }
         return cachedAcl;
     }
 
     private synchronized void createAcl(Acl acl) {
         try {
-            System.out.printf("Creating new ACL\n");
             create.execute(acl);
-            if (acl.getRawAttribute() == null) {
-                throw new NullPointerException("Was erlaube AclCache.createAcl()!");
-            }
             if (acl.getId() != null) {
                 acls.put(acl, acl);
-                System.out.printf("Created Acl: id = %d\n", acl.getId());
                 createDetails(acl);
             } else {
-                System.out.println("execute did not create an acl");
+                logger.debug("createAcl did not create an acl");
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
             // possible duplicate key exception ignored
         }
     }
 
     private void createDetails(Acl acl) throws SQLException {
         detail.begin();
-        System.out.printf("createDetails: %s\n", acl.getRawAttribute().toString());
         detail.execute(acl);
         detail.close();
     }

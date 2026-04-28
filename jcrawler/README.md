@@ -8,9 +8,8 @@ Configurable multithreaded File system crawler written in Java SE.
 * recording of relevant file meta data (size, uid, gid, mtime, ctime)
 * configurable scan threshold to skip scanning inactive directories
 * optional computation of file digests (MD5, SHA-1, SHA-256)
+* logging; log level configurable at runtime
 * store  NFS4  ACLs where available (currently, this is little brittle)
 
 ## Planned features / ToDo
-* logging (currently configurable at compile time)
-* make log level and log file configurable
 * explanation of functionality and design assumptions and decisions

@@ -8,6 +8,9 @@
  */
 package de.ipb_halle.jcrawler;
 
+import java.util.Date;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -19,7 +22,17 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 
+// import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 public class Main {
+
+    private final static String PROJECT_VERSION = "projectVersion";
 
     @SuppressWarnings("static-access")
     private static final Option configOpt = Option.builder("c")
@@ -50,9 +63,22 @@ are skipped during the scan. This flag triggers a full scan.
             .desc("\nDisplay this help")
             .build();
 
-    private Config config;
+    @SuppressWarnings("static-access")
+    private static final Option levelOpt = Option.builder("l")
+            .longOpt("level")
+            .desc("""
+Log level. Default level is set to INFO. Valid options
+include ERROR, WARN, INFO, DEBUG and TRACE.""")
+            .hasArg()
+            .argName("LEVEL")
+            .build();
+
+
+    private final Config config;
+    private final Logger logger;
 
     public Main() {
+        logger = LoggerFactory.getLogger(this.getClass());
         config = new Config();
     }
 
@@ -65,6 +91,7 @@ are skipped during the scan. This flag triggers a full scan.
     }
 
     private void run() {
+        logger.info("Started JCrawler {}", getProjectVersion());
         CrawlerFactoryImpl crawlerFactory = new CrawlerFactoryImpl(config);
         CrawlJobFactoryImpl jobFactory = new CrawlJobFactoryImpl(config);
         CrawlerExecutor executor = new CrawlerExecutor(jobFactory, crawlerFactory);
@@ -73,10 +100,29 @@ are skipped during the scan. This flag triggers a full scan.
         System.out.printf("""
 *****************************************************
 *                                                   *
-* JCrawler Statistics                               *
+* JCrawler %-8s                                 *
+* %-32s                  *
 *                                                   *
 *****************************************************
-\n%s""", executor.getStatistics().toString());
+
+Statistics
+==========
+%s""",
+                getProjectVersion(),
+                new Date().toString(),
+                executor.getStatistics().toString());
+    }
+
+
+    private String getProjectVersion() {
+        try {
+            Manifest mf = new Manifest();
+            mf.read(this.getClass().getResourceAsStream("/META-INF/MANIFEST.MF"));
+            Attributes attributes = mf.getMainAttributes();
+            return attributes.getValue(PROJECT_VERSION);
+        } catch (Exception e) {
+            return "unavail";
+        }
     }
 
     public static boolean processCommandLine(Main main, String[] argv) {
@@ -107,6 +153,17 @@ are skipped during the scan. This flag triggers a full scan.
                 }
             }
 
+            if (cmdline.hasOption(levelOpt.getOpt())) {
+                String userInput = cmdline.getOptionValue(levelOpt.getOpt());
+                Level newLevel = Level.valueOf(userInput);
+                if (newLevel != null) {
+                    Configurator.setLevel("de.ipb_halle", newLevel);
+                } else {
+                    printHelp("ERROR: unrecognized log level", options);
+                    return true;
+                }
+            }
+
         } catch (MissingArgumentException | MissingOptionException | UnrecognizedOptionException e) {
             printHelp("ERROR: " + e.getMessage(), options);
             return true;
@@ -122,6 +179,7 @@ are skipped during the scan. This flag triggers a full scan.
         options.addOption(configOpt);
         options.addOption(fullScanOpt);
         options.addOption(helpOpt);
+        options.addOption(levelOpt);
         return options;
     }
 

@@ -10,6 +10,9 @@ package de.ipb_halle.jcrawler;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 /**
  *
  * @author fblocal
@@ -20,6 +23,7 @@ public class CrawlerExecutor {
     private final CrawlJobFactory jobFactory;
     private LinkedList<Crawler> crawlers;
     private final Statistics statistics;
+    private final Logger logger;
 
     // crawlJobs will see concurrent access!
     private ConcurrentLinkedQueue<CrawlPath> crawlJobs;
@@ -30,7 +34,7 @@ public class CrawlerExecutor {
         this.jobFactory = jobFactory;
         this.crawlerFactory = crawlerFactory;
         this.statistics = new Statistics();
-
+        this.logger = LoggerFactory.getLogger(this.getClass());
     }
 
     public void start() {
@@ -52,7 +56,7 @@ public class CrawlerExecutor {
                 statistics.accumulateStatistics(c.getStatistics());
                 crawlers.removeFirst();
             } catch (InterruptedException ex) {
-                System.getLogger(CrawlerExecutor.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+                logger.debug("joinAll() was interrupted.");
             }
         }
         return statistics;

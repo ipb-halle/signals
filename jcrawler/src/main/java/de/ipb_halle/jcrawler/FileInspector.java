@@ -21,7 +21,6 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.AclFileAttributeView;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import static java.nio.file.attribute.PosixFilePermission.GROUP_EXECUTE;
@@ -37,7 +36,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.Objects;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  *
  * @author fbroda
@@ -46,6 +46,7 @@ public class FileInspector {
 
     private final static FileInspector instance = new FileInspector();
     private final static int BUFFER_SIZE = 65536;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private static FileInspector getInstance() {
         return instance;
@@ -78,10 +79,9 @@ public class FileInspector {
                 c.setDigest(digest(p, algorithm));
             }
             c.setAclId(getAclId(p));
-//            System.out.printf("%s\n%s\n\n", p.toString(), c.getAcl().toString());
         } catch (NoSuchAlgorithmException | IOException e) {
             //
-            e.printStackTrace();
+            logger.warn(e.getMessage());
             throw new RuntimeException("error in inspector");
         }
         return c;
@@ -162,10 +162,10 @@ public class FileInspector {
             MessageDigest md = algorithm.newDigest();
             ByteBuffer buffer = ByteBuffer.allocateDirect(BUFFER_SIZE); // Direct für native IO
 
-            while (fc.read(buffer) != -1) {        // read -> pos = 0, limit = bytesRead
-                buffer.flip();                     // prepare to read
-                md.update(buffer);                  // ByteBuffer‑Übergabe ist optimiert
-                buffer.clear();                     // ready for next read
+            while (fc.read(buffer) != -1) {
+                buffer.flip();
+                md.update(buffer);
+                buffer.clear();
             }
             return md.digest();
         }

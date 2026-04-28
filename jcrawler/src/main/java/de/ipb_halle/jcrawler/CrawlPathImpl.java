@@ -11,8 +11,6 @@ import de.ipb_halle.jcrawler.db.CrawlFile;
 import de.ipb_halle.jcrawler.db.CrawlFileByDir;
 import de.ipb_halle.jcrawler.db.CrawlFileCreate;
 import de.ipb_halle.jcrawler.db.CrawlFileUpdate;
-import de.ipb_halle.jcrawler.db.DbPrincipal;
-import de.ipb_halle.jcrawler.db.DbPrincipalCache;
 import de.ipb_halle.jcrawler.db.Directory;
 import de.ipb_halle.jcrawler.db.DirectoryByName;
 import de.ipb_halle.jcrawler.db.DirectoryCreate;
@@ -23,22 +21,17 @@ import de.ipb_halle.jcrawler.db.NamespaceCreate;
 import de.ipb_halle.jcrawler.db.QueryType;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.PosixFileAttributes;
-import java.nio.file.attribute.PosixFilePermission;
-import static java.nio.file.attribute.PosixFilePermission.GROUP_EXECUTE;
-import static java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  *
  * @author frank
@@ -51,10 +44,12 @@ public class CrawlPathImpl implements CrawlPath {
     private Map<String, CrawlFile> files;
     private List<CrawlFile> directories;
     private Directory directory;
+    private final Logger logger;
 
     public CrawlPathImpl(PathParameters parameters) {
         this.parameters = parameters;
         statistics = new Statistics();
+        logger = LoggerFactory.getLogger(this.getClass());
     }
 
     @Override
@@ -63,7 +58,7 @@ public class CrawlPathImpl implements CrawlPath {
             lookupNamespace();
             lookupPath();
             if (checkCanSkip()) {
-                System.out.printf("Skipping directory: %s\n", parameters.getPath());
+                logger.info("Skipping directory: {}", parameters.getPath());
                 return;
             }
             readDirectory();
@@ -96,7 +91,9 @@ public class CrawlPathImpl implements CrawlPath {
             arguments.add(parameters.getNamespaceName());
             byName.execute(arguments);
             if (byName.hasNext()) {
-                parameters.setNamespace(byName.next());
+                Namespace nspc = byName.next();
+                logger.debug("found namespace: {} --> {}", nspc.getName(), nspc.getId());
+                parameters.setNamespace(nspc);
                 byName.close();
             } else {
                 createNamespace();
@@ -109,6 +106,7 @@ public class CrawlPathImpl implements CrawlPath {
         Namespace namespace = new Namespace();
         namespace.setName(parameters.getNamespaceName());
         create.execute(namespace);
+        logger.info("created namespace: {} --> {}", namespace.getName(), namespace.getId());
         parameters.setNamespace(namespace);
     }
 
@@ -120,6 +118,7 @@ public class CrawlPathImpl implements CrawlPath {
         byName.execute(arguments);
         if (byName.hasNext()) {
             directory = byName.next();
+            logger.trace("found directory: {} --> {}", directory.getPath(), directory.getId());
             byName.close();
         } else {
             byName.close();
@@ -133,6 +132,7 @@ public class CrawlPathImpl implements CrawlPath {
         directory.setPath(parameters.getLogicalPath());
         directory.setNamespaceId(parameters.getNamespace().getId());
         create.execute(directory);
+        logger.debug("created directory {} --> {}", directory.getPath(), directory.getId());
     }
 
     private boolean checkCanSkip() {

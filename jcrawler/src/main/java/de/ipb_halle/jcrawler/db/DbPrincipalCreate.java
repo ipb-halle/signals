@@ -11,7 +11,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -23,6 +24,9 @@ public class DbPrincipalCreate extends SqlQuery<DbPrincipal> {
                                         INSERT INTO principals (principal, is_group, is_everyone, guid)
                                         VALUES (?, ?, ?, ?) RETURNING id
                                         """;
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Override
     public void execute(DbPrincipal principal) throws SQLException {
         List<Object> arguments = new ArrayList<> ();
@@ -33,7 +37,9 @@ public class DbPrincipalCreate extends SqlQuery<DbPrincipal> {
         execute(arguments);
         if (hasNext()) {
             principal.setId(getResultSet().getLong(1));
-            System.out.printf("PrincipalId(%s) = %d\n", principal.getName(), principal.getId());
+            logger.debug("created principal {} -->{}",
+                    principal.getName(),
+                    principal.getId());
         }
         close();
     }

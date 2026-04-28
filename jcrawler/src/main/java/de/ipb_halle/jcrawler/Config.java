@@ -16,7 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  *
  * @author fblocal
@@ -24,6 +25,7 @@ import java.io.Reader;
 public class Config extends ConfigElement {
 
     private boolean fullScan = false;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     // for testing purposes
     private String globalPrefix = "";
@@ -48,7 +50,7 @@ public class Config extends ConfigElement {
         try {
              setJson(JsonParser.parseReader(reader));
         } catch(JsonIOException | JsonSyntaxException e) {
-            e.printStackTrace();
+            logger.error("Parsing error: {}", e.getMessage());
             return true;
         }
         return false;
@@ -58,9 +60,9 @@ public class Config extends ConfigElement {
         try (Reader reader = new FileReader(name)) {
             return parseConfig(reader);
         } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
+            logger.error("Config file not found: {}", name);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            logger.error("IO exception: {}", ex.getMessage());
         }
         return true;
     }
@@ -70,7 +72,7 @@ public class Config extends ConfigElement {
         try (Reader reader = new InputStreamReader(is)) {
             return parseConfig(reader);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            logger.error("IO exception: {}", ex.getMessage());
         }
         return true;
     }

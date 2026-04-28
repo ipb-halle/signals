@@ -11,6 +11,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -22,6 +24,8 @@ public class AclCreate extends SqlQuery<Acl> {
                                         INSERT INTO acls (raw_attribute)
                                         VALUES (?) RETURNING id
                                         """;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Override
     public void execute(Acl acl) throws SQLException {
         List<Object> arguments = new ArrayList<> ();
@@ -29,7 +33,7 @@ public class AclCreate extends SqlQuery<Acl> {
         execute(arguments);
         if (hasNext()) {
             acl.setId(getResultSet().getLong(1));
-            System.out.printf("AclId() = %d\n",  acl.getId());
+            logger.trace("created new aclId: {}", acl.getId());
         }
         close();
     }

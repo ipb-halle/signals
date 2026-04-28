@@ -16,6 +16,8 @@ import java.sql.Timestamp;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -33,6 +35,7 @@ public abstract class SqlQuery<T> implements Iterator<T> {
     private ResultSet result;
     private ResultState state = ResultState.UNPREPARED;
     private boolean validRecord = false;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     protected abstract T getRecord() throws SQLException;
 
@@ -83,7 +86,7 @@ public abstract class SqlQuery<T> implements Iterator<T> {
                 nextRecord();
                 return t;
             } catch(SQLException e) {
-                e.printStackTrace();
+                logger.warn(e.getMessage());
                 // fall through
             }
         }
