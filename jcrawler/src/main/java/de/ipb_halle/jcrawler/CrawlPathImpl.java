@@ -164,23 +164,37 @@ public class CrawlPathImpl implements CrawlPath {
     }
 
     private void matchFiles(CrawlFileByDir byDir) throws SQLException {
-        CrawlFileUpdate fileUpdate = (CrawlFileUpdate) crawler.getQuery(QueryType.CrawlFileUpdate);
         while (byDir.hasNext()) {
             CrawlFile fromDb = byDir.next();
             CrawlFile fromDir = files.remove(fromDb.getName());
             if (fromDir == null) {
-                statistics.incrementVanished();
-                fromDb.setMissing(true);
-                fileUpdate.execute(fromDb);
+                handleMissingFile(fromDb);
             } else {
                 if (! fromDb.deepEquals(fromDir)) {
-                    statistics.incrementChanged();
-                    fromDir.setId(fromDb.getId());
-                    fileUpdate.execute(fromDir);
+                    handleChangedFile(fromDb, fromDir);
                 }
             }
         }
         byDir.close();
+    }
+
+    private void handleChangedFile(CrawlFile fromDb, CrawlFile fromDir) throws SQLException {
+        CrawlFileUpdate fileUpdate = (CrawlFileUpdate) crawler.getQuery(QueryType.CrawlFileUpdate);
+        statistics.incrementChanged();
+        statistics.addChangedBytes(
+                fromDir.getSize() - fromDb.getSize());
+        fromDir.setId(fromDb.getId());
+        fileUpdate.execute(fromDir);
+    }
+
+    private void handleMissingFile(CrawlFile fromDb) throws SQLException {
+        CrawlFileUpdate fileUpdate = (CrawlFileUpdate) crawler.getQuery(QueryType.CrawlFileUpdate);
+        statistics.incrementVanished();
+        if (fromDb.isRegularFile()) {
+            statistics.addVanishedBytes(fromDb.getSize());
+        }
+        fromDb.setMissing(true);
+        fileUpdate.execute(fromDb);
     }
 
     private void handleNewFiles() throws SQLException {
@@ -193,6 +207,7 @@ public class CrawlPathImpl implements CrawlPath {
         for (CrawlFile f : files.values()) {
             create.execute(f);
             statistics.incrementNew();
+            statistics.addNewBytes(f.getSize());
         }
         create.close();
     }

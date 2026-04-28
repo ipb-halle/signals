@@ -7,6 +7,7 @@
  */
 package de.ipb_halle.jcrawler.acl;
 
+import de.ipb_halle.jcrawler.Main;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.attribute.AclEntry;
@@ -63,7 +64,7 @@ public class LinuxNFS4AclView implements AclFileAttributeView {
     private final static int ACL_BUFFER_SIZE = 4196;
 
     static {
-        System.loadLibrary("LinuxNFS4Acl");
+        System.loadLibrary("LinuxNFS4Acl.%s".formatted(Main.getProjectVersion()));
     }
 
     private final byte[] rawAttributeBuffer;

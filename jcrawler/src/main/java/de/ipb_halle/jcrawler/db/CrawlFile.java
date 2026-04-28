@@ -102,6 +102,10 @@ public class CrawlFile {
         return type == CrawlFile.FileType.DIRECTORY;
     }
 
+    public boolean isRegularFile() {
+        return type == CrawlFile.FileType.REGULAR_FILE;
+    }
+
     public Long getId() {
         return id;
     }

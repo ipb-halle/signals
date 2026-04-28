@@ -8,6 +8,7 @@
  */
 package de.ipb_halle.jcrawler;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -114,13 +115,13 @@ Statistics
     }
 
 
-    private String getProjectVersion() {
+    public static String getProjectVersion() {
         try {
             Manifest mf = new Manifest();
-            mf.read(this.getClass().getResourceAsStream("/META-INF/MANIFEST.MF"));
+            mf.read(Main.class.getResourceAsStream("/META-INF/MANIFEST.MF"));
             Attributes attributes = mf.getMainAttributes();
             return attributes.getValue(PROJECT_VERSION);
-        } catch (Exception e) {
+        } catch (IOException e) {
             return "unavail";
         }
     }

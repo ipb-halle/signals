@@ -62,7 +62,6 @@ public class FileInspector {
             c.setName(p.getFileName().toString());
             PosixFileAttributes attrs = Files.readAttributes(p,
                     PosixFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
-            c.setSize(attrs.size());
             c.setType(getFileType(attrs));
             c.setAtime(new Timestamp(attrs.lastAccessTime().toMillis()));
             c.setCtime(new Timestamp(attrs.creationTime().toMillis()));
@@ -74,9 +73,14 @@ public class FileInspector {
             if (c.getType() == CrawlFile.FileType.SYMBOLIC_LINK) {
                 c.setLinkTarget(Files.readSymbolicLink(p).toString());
             }
-            if ((algorithm != null)
-                    && (c.getType() == CrawlFile.FileType.REGULAR_FILE)) {
-                c.setDigest(digest(p, algorithm));
+            if (c.getType() == CrawlFile.FileType.REGULAR_FILE) {
+                c.setSize(attrs.size());
+                if (algorithm != null) {
+                    c.setDigest(digest(p, algorithm));
+                }
+            } else {
+                c.setSize(0L);
+                c.setDigest(null);
             }
             c.setAclId(getAclId(p));
         } catch (NoSuchAlgorithmException | IOException e) {
