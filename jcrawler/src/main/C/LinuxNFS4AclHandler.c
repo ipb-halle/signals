@@ -8,7 +8,7 @@
 #include <errno.h>
 #include <sys/xattr.h>
 #include <jni.h>
-#include "de_ipb_halle_jcrawler_acl_LinuxNFS4AclView.h"
+#include "de_ipb_halle_jcrawler_acl_LinuxNFS4AclHandler.h"
 
 
 #define NFS4_ACL_ATTR "system.nfs4_acl"
@@ -43,7 +43,7 @@ static void releaseBuffer(JNIEnv *env, jbyteArray jbytes, char* buffer) {
     (*env)->ReleaseByteArrayElements(env, jbytes, buffer, 0);
 }
 
-jint JNICALL Java_de_ipb_1halle_jcrawler_acl_LinuxNFS4AclView_readAttribute
+jint JNICALL Java_de_ipb_1halle_jcrawler_acl_LinuxNFS4AclHandler_readAttribute
   (JNIEnv *env, jclass callingClass, jstring jstr, jbyteArray jbytes) {
 
     const char *path;
