@@ -7,7 +7,7 @@
  */
 package de.ipb_halle.jcrawler;
 
-import de.ipb_halle.jcrawler.acl.LinuxNFS4AclView;
+import de.ipb_halle.jcrawler.acl.GenericAclHandler;
 import de.ipb_halle.jcrawler.db.Acl;
 import de.ipb_halle.jcrawler.db.AclCache;
 import de.ipb_halle.jcrawler.db.CrawlFile;
@@ -105,7 +105,7 @@ public class FileInspector {
     }
 
     private Long getAclId(Path path) throws IOException {
-        byte[] rawAcl = new LinuxNFS4AclView(path).getRawAttribute();
+        byte[] rawAcl = GenericAclHandler.getInstance().getRawAttribute(path);
         Acl acl = new Acl();
         if (rawAcl == null) {
             throw new NullPointerException("Was erlaube FileInspector!");

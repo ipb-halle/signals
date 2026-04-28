@@ -10,18 +10,14 @@ package de.ipb_halle.jcrawler.acl;
 import de.ipb_halle.jcrawler.Main;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.attribute.AclEntry;
-import java.nio.file.attribute.AclFileAttributeView;
-import java.nio.file.attribute.UserPrincipal;
 import java.util.Arrays;
 import java.util.HexFormat;
-import java.util.List;
 
 /**
  *
  * @author fblocal
  */
-public class LinuxNFS4AclView implements AclFileAttributeView {
+public class LinuxNFS4AclHandler implements AclHandler {
 
     public enum UnixError {
         ENOENT(2, "No such file or directory"),
@@ -60,50 +56,27 @@ public class LinuxNFS4AclView implements AclFileAttributeView {
         }
     }
 
-    private final static String NFS4_ACL = "system.nfs4_acl";
     private final static int ACL_BUFFER_SIZE = 4196;
+    private final static LinuxNFS4AclHandler instance;
 
     static {
         System.loadLibrary("LinuxNFS4Acl.%s".formatted(Main.getProjectVersion()));
+        instance = new LinuxNFS4AclHandler();
     }
 
-    private final byte[] rawAttributeBuffer;
-
-    public LinuxNFS4AclView(Path path) throws IOException {
-        this.rawAttributeBuffer = readRawAttribute(path.toString());
+    private LinuxNFS4AclHandler() {
     }
 
-    @Override
-    public String name() {
-        return NFS4_ACL;
+    public AclHandler getInstance() {
+        return instance;
     }
 
     @Override
-    public List<AclEntry> getAcl() throws IOException {
-        return NFS4AclParser.getInstance().parseAcl(rawAttributeBuffer);
+    public byte[] getRawAttribute(Path path) throws IOException {
+        return readRawAttribute(path.toString());
     }
 
-    @Override
-    public void setAcl(List<AclEntry> list) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public UserPrincipal getOwner() throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void setOwner(UserPrincipal up) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public byte[] getRawAttribute() {
-        return rawAttributeBuffer;
-    }
-
-
-    public static byte[] readRawAttribute(String filename) throws IOException {
+    private byte[] readRawAttribute(String filename) throws IOException {
         byte[] buffer = new byte[ACL_BUFFER_SIZE];
         int size = readAttribute(filename, buffer);
         if (size > 0) {
@@ -115,8 +88,7 @@ public class LinuxNFS4AclView implements AclFileAttributeView {
         throw new IOException (UnixError.byErrNo(size).getDescription());
     }
 
-    @Override
-    public String toString() {
+    public String toString(byte[] rawAttributeBuffer) {
         StringBuilder sb = new StringBuilder();
         HexFormat format = HexFormat.ofDelimiter(" ");
         if (rawAttributeBuffer != null) {
