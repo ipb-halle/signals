@@ -21,6 +21,7 @@ CREATE TABLE directories (
     vanished_entries        BIGINT NOT NULL DEFAULT 0,
     accumulated_sizes       BIGINT NOT NULL DEFAULT 0,
     change_time             TIMESTAMP NOT NULL DEFAULT now(),
+    missing                 BOOLEAN NOT NULL DEFAULT false,
     UNIQUE (namespace_id, path)
 );
 
