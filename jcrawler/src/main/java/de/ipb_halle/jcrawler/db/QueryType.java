@@ -18,6 +18,7 @@ public enum QueryType {
     DirectoryByName,
     DirectoryCreate,
     DirectoryUpdate,
+    MissingSubdirUpdate,
     NamespaceByName,
     NamespaceCreate,
 

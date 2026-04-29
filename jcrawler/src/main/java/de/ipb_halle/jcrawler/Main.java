@@ -23,7 +23,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 
-// import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
 
@@ -65,6 +64,16 @@ are skipped during the scan. This flag triggers a full scan.
             .build();
 
     @SuppressWarnings("static-access")
+    private static final Option jobOpt = Option.builder("j")
+            .longOpt("jobType")
+            .desc("""
+Type of job to perform. Default job is set to crawl. Currently
+the only alternative job type is clean.""")
+            .hasArg()
+            .argName("JOB_TYPE")
+            .build();
+
+    @SuppressWarnings("static-access")
     private static final Option levelOpt = Option.builder("l")
             .longOpt("level")
             .desc("""
@@ -74,13 +83,19 @@ include ERROR, WARN, INFO, DEBUG and TRACE.""")
             .argName("LEVEL")
             .build();
 
+    private enum JobType {
+        clean,
+        crawl
+    };
 
     private final Config config;
     private final Logger logger;
+    private JobType jobType;
 
     public Main() {
         logger = LoggerFactory.getLogger(this.getClass());
         config = new Config();
+        jobType = JobType.crawl;
     }
 
     public static void main(String[] argv) {
@@ -93,25 +108,52 @@ include ERROR, WARN, INFO, DEBUG and TRACE.""")
 
     private void run() {
         logger.info("Started JCrawler {}", getProjectVersion());
+        System.out.printf("""
+*****************************************************
+*                                                   *
+* JCrawler %-8s                                 *
+* Job start: %-32s       *
+* Job type:  %-8s                               *
+*                                                   *
+*****************************************************
+""",
+                getProjectVersion(),
+                new Date().toString(),
+                jobType.toString());
+
+        switch(jobType) {
+            case clean -> runClean();
+            case crawl -> runCrawl();
+        }
+
+    }
+
+    private void runClean() {
+        // this method will clean all files and directories
+        // which have their missing flag set.
+        System.out.println("Currently not supported.");
+    }
+
+    private void runCrawl() {
         CrawlerFactoryImpl crawlerFactory = new CrawlerFactoryImpl(config);
         CrawlJobFactoryImpl jobFactory = new CrawlJobFactoryImpl(config);
         CrawlerExecutor executor = new CrawlerExecutor(jobFactory, crawlerFactory);
         executor.start();
         executor.joinAll();
         System.out.printf("""
-*****************************************************
-*                                                   *
-* JCrawler %-8s                                 *
-* %-32s                  *
-*                                                   *
-*****************************************************
 
 Statistics
 ==========
-%s""",
-                getProjectVersion(),
-                new Date().toString(),
-                executor.getStatistics().toString());
+%s
+
+*****************************************************
+*                                                   *
+* Job finished: %-32s    *
+*                                                   *
+*****************************************************
+""",
+                executor.getStatistics().toString(),
+                new Date().toString());
     }
 
 
@@ -154,6 +196,16 @@ Statistics
                 }
             }
 
+            if (cmdline.hasOption(jobOpt.getOpt())) {
+                try {
+                    main.jobType = JobType.valueOf(
+                            cmdline.getOptionValue(jobOpt.getOpt()));
+                } catch(IllegalArgumentException e) {
+                    System.out.println("Unknown job type.");
+                    return true;
+                }
+            }
+
             if (cmdline.hasOption(levelOpt.getOpt())) {
                 String userInput = cmdline.getOptionValue(levelOpt.getOpt());
                 Level newLevel = Level.valueOf(userInput);
@@ -180,6 +232,7 @@ Statistics
         options.addOption(configOpt);
         options.addOption(fullScanOpt);
         options.addOption(helpOpt);
+        options.addOption(jobOpt);
         options.addOption(levelOpt);
         return options;
     }

@@ -35,6 +35,10 @@ public class Statistics {
         vanishedBytes += b;
     }
 
+    public void addVanishedEntities(long e) {
+        vanishedEntities += e;
+    }
+
     public long getNewBytes() {
         return newBytes;
     }

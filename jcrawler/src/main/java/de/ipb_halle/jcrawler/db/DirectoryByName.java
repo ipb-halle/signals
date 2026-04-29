@@ -19,7 +19,7 @@ public class DirectoryByName extends SqlQuery<Directory> {
 
     private final static String QUERY = """
 SELECT id, namespace_id, path, new_entries, changed_entries, vanished_entries,
-  accumulated_sizes, change_time
+  accumulated_sizes, change_time, missing
   FROM directories
   WHERE namespace_id=? AND path=?""";
 
@@ -37,7 +37,7 @@ SELECT id, namespace_id, path, new_entries, changed_entries, vanished_entries,
         dir.setAccumlatedSizes(result.getLong(7));
 */
         dir.setChangeTime(result.getTimestamp(8));
-
+        dir.setMissing(result.getBoolean(9));
         return dir;
     }
 

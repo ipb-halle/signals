@@ -92,6 +92,7 @@ public class CrawlerFactoryImpl implements CrawlerFactory {
         addSqlQuery(crawler, conn, new CrawlFileUpdate());
         addSqlQuery(crawler, conn, new DirectoryCreate());
         addSqlQuery(crawler, conn, new DirectoryUpdate());
+        addSqlQuery(crawler, conn, new MissingSubdirUpdate());
         addSqlQuery(crawler, conn, new NamespaceCreate());
     }
 

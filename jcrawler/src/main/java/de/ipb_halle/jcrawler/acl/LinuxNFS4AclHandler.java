@@ -67,7 +67,7 @@ public class LinuxNFS4AclHandler implements AclHandler {
     private LinuxNFS4AclHandler() {
     }
 
-    public AclHandler getInstance() {
+    public static AclHandler getInstance() {
         return instance;
     }
 

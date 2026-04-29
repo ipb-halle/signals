@@ -20,7 +20,7 @@ public class DirectoryUpdate extends SqlQuery<Directory> {
 
     private final static String QUERY = """
 UPDATE directories SET new_entries=?, changed_entries=?, vanished_entries=?,
-accumulated_sizes=?, change_time=now() WHERE id=? RETURNING id
+accumulated_sizes=?, change_time=now(), missing=? WHERE id=? RETURNING id
 """;
 
     @Override
@@ -31,6 +31,7 @@ accumulated_sizes=?, change_time=now() WHERE id=? RETURNING id
         param.add(paramLong(dir.getVanishedEntries()));
         param.add(paramLong(dir.getAccumulatedSizes()));
         // change time provided by the database
+        param.add(paramBoolean(dir.isMissing()));
         param.add(paramLong(dir.getId()));
         execute(param);
         close();

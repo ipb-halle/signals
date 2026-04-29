@@ -15,6 +15,8 @@ import de.ipb_halle.jcrawler.db.Directory;
 import de.ipb_halle.jcrawler.db.DirectoryByName;
 import de.ipb_halle.jcrawler.db.DirectoryCreate;
 import de.ipb_halle.jcrawler.db.DirectoryUpdate;
+import de.ipb_halle.jcrawler.db.MissingSubdir;
+import de.ipb_halle.jcrawler.db.MissingSubdirUpdate;
 import de.ipb_halle.jcrawler.db.Namespace;
 import de.ipb_halle.jcrawler.db.NamespaceByName;
 import de.ipb_halle.jcrawler.db.NamespaceCreate;
@@ -201,32 +203,13 @@ public class CrawlPathImpl implements CrawlPath {
     }
 
     private void handleMissingDirectory(CrawlFile fromDb) throws SQLException {
-        /*
-            -- 8 parameters:
-            --   namespaceId, path, path, path separator character,
-            --   namespaceId, path, path, path separator character
-            -- returns total: entity count and bytes missing
-
-             WITH upd_files AS (
-                WITH filepath (id, path, namespace_id) AS
-                (SELECT f.id, d.path, d.namespace_id
-                  FROM files AS f JOIN directories AS d ON f.path_id=d.id)
-              UPDATE files AS fu SET missing=true FROM filepath AS fp
-                WHERE fu.id=fp.id
-                    AND fp.namespace_id=?
-                    AND (fp.path = ?
-                        OR starts_with(fp.path, ? || ?))
-                RETURNING fu.size),
-            upd_directories AS (
-              UPDATE directories SET missing=true WHERE namespace_id=?
-                    AND (path = ?
-                        OR starts_with(path, ? || ?))
-                RETURNING 0 AS size)
-            SELECT sum(size), sum(count) FROM (
-                SELECT sum(size), count(*) FROM upd_files
-              UNION
-                SELECT sum(size), 0 FROM upd_directories) AS summary;
-         */
+        MissingSubdir subdir = new MissingSubdir();
+        subdir.setNamespaceId(directory.getNamespaceId());
+        subdir.setPath(Paths.get(directory.getPath(), fromDb.getName()).toString());
+        MissingSubdirUpdate update = (MissingSubdirUpdate) crawler.getQuery(QueryType.MissingSubdirUpdate);
+        update.execute(subdir);
+        statistics.addVanishedBytes(subdir.getBytes());
+        statistics.addVanishedEntities(subdir.getEntities());
     }
 
     private void handleNewFiles() throws SQLException {

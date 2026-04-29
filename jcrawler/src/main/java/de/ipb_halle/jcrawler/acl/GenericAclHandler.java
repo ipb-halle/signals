@@ -49,7 +49,7 @@ public class GenericAclHandler implements AclHandler {
         try {
             Class<?> handlerClass = Class.forName(platform.getHandlerClassName());
             Method method = handlerClass.getDeclaredMethod("getInstance");
-            AclHandler instance = (AclHandler) method.invoke(null, (Object[]) null);
+            AclHandler instance = (AclHandler) method.invoke(null, new Object[0]);
             return instance;
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
             throw new RuntimeException(ex.getMessage());

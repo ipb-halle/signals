@@ -23,12 +23,14 @@ public class Directory {
     private Long vanishedEntries;
     private Long accumulatedSizes;
     private Timestamp changeTime;
+    private boolean missing;
 
     public Directory() {
         newEntries = 0L;
         changedEntries = 0L;
         vanishedEntries = 0L;
         accumulatedSizes = 0L;
+        missing = false;
     }
 
     public Long getId() {
@@ -37,6 +39,14 @@ public class Directory {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public boolean isMissing() {
+        return missing;
+    }
+
+    public void setMissing(boolean missing) {
+        this.missing = missing;
     }
 
     public Integer getNamespaceId() {
