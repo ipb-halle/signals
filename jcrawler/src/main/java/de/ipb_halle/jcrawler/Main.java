@@ -36,25 +36,12 @@ public class Main {
     }
 
     private void run() {
-        logger.info("Started JCrawler {}", Config.getProjectVersion());
-        System.out.printf("""
-*****************************************************
-*                                                   *
-* JCrawler %-8s                                 *
-* Job start: %-32s       *
-* Job type:  %-8s                               *
-*                                                   *
-*****************************************************
-""",
-                Config.getProjectVersion(),
-                new Date().toString(),
-                Config.getInstance().getJobType().toString());
-
+        start();
         switch(Config.getInstance().getJobType()) {
             case crawl -> runCrawl();
             case purge -> runPurge();
         }
-
+        finish();
     }
 
     private void runCrawl() {
@@ -63,14 +50,8 @@ public class Main {
         CrawlerExecutor executor = new CrawlerExecutor(jobFactory, crawlerFactory);
         executor.start();
         executor.joinAll();
-        System.out.printf("""
-
-Statistics
-==========
-%s
-""",
+        System.out.printf("\n\nStatistics\n==========\n%s\n",
                 executor.getStatistics().toString());
-        finish();
     }
 
     private void runPurge() {
@@ -87,7 +68,22 @@ Statistics
         } catch(SQLException e) {
             logger.warn("runPurge failed: {}", e.getMessage());
         }
-        finish();
+    }
+
+    private void start() {
+        logger.info("Started JCrawler {}", Config.getProjectVersion());
+        System.out.printf("""
+*****************************************************
+*                                                   *
+* JCrawler %-8s                                 *
+* Job start: %-32s       *
+* Job type:  %-8s                               *
+*                                                   *
+*****************************************************
+""",
+                Config.getProjectVersion(),
+                new Date().toString(),
+                Config.getInstance().getJobType().toString());
     }
 
     private void finish() {

@@ -27,7 +27,7 @@ public class CrawlFileCreateTest {
     }
 
     private void setup() {
-        Config config = Config.getInstance();
+        Config config = Config.getInstance().reset();
         InputStream is = this.getClass().getResourceAsStream("../crawler.json");
         config.setConfigStream(is);
         Properties props = System.getProperties();

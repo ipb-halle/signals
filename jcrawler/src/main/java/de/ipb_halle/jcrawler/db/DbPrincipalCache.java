@@ -23,8 +23,10 @@ public class DbPrincipalCache {
     private static final DbPrincipalCache instance = new DbPrincipalCache();
     private final Logger logger;
     private DbPrincipalCreate create;
+    private boolean ready;
 
     private DbPrincipalCache() {
+        ready = false;
         principals = new HashMap<> ();
         logger = LoggerFactory.getLogger(this.getClass());
     }
@@ -44,6 +46,11 @@ public class DbPrincipalCache {
         query.close();
         create = new DbPrincipalCreate();
         create.prepare(conn);
+        ready = true;
+    }
+
+    public boolean isReady() {
+        return ready;
     }
 
     public DbPrincipal lookup(DbPrincipal principal) {

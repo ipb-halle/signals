@@ -15,7 +15,9 @@ import java.nio.file.attribute.AclEntryFlag;
 import java.nio.file.attribute.AclEntryPermission;
 import java.nio.file.attribute.AclEntryType;
 import java.nio.file.attribute.UserPrincipal;
+import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,7 +26,7 @@ import java.util.Set;
  *
  * @author fblocal
  */
-public class NFS4AclParser {
+public class AclConverter {
 
     public final static int NFS4_ACE_ACCESS_ALLOWED_ACE_TYPE = 0;
     public final static int NFS4_ACE_ACCESS_DENIED_ACE_TYPE  = 1;
@@ -64,16 +66,94 @@ public class NFS4AclParser {
     public final static String NFS4_GROUP = "GROUP@";
     public final static String NFS4_EVERYONE = "EVERYONE@";
 
+    public final static int RAW_BUFFER_SIZE = 4096;
 
     private final DbPrincipalCache principalCache;
-    private final static NFS4AclParser parser = new NFS4AclParser();
+    private final static AclConverter parser = new AclConverter();
 
-    private NFS4AclParser() {
+    private AclConverter() {
         principalCache = DbPrincipalCache.getInstance();
     }
 
-    public static NFS4AclParser getInstance() {
+    public static AclConverter getInstance() {
         return parser;
+    }
+
+    public byte[] buildRawAttribute(List<AclEntry> acl) {
+        byte[] rawBuffer = new byte[RAW_BUFFER_SIZE];
+        ByteBuffer buf = ByteBuffer.wrap(rawBuffer);
+        buf.putInt(acl.size());
+        for (AclEntry ace : acl) {
+            addAce(buf, ace);
+        }
+        return Arrays.copyOf(buf.array(), buf.position());
+    }
+
+    private void addAce(ByteBuffer buf, AclEntry ace) {
+        DbPrincipal principal = new DbPrincipal(ace.principal());
+        principal = principalCache.lookup(principal);
+        addAceType(buf, ace);
+        addAceFlags(buf, ace, principal.isGroup());
+        addAcePermissions(buf, ace);
+        addPrincipal(buf, principal);
+    }
+
+    private void addAceType(ByteBuffer buf, AclEntry ace) {
+        switch(ace.type()) {
+            case ALLOW -> buf.putInt(NFS4_ACE_ACCESS_ALLOWED_ACE_TYPE);
+            case DENY -> buf.putInt(NFS4_ACE_ACCESS_DENIED_ACE_TYPE);
+            case AUDIT -> buf.putInt(NFS4_ACE_SYSTEM_AUDIT_ACE_TYPE);
+            case ALARM -> buf.putInt(NFS4_ACE_SYSTEM_ALARM_ACE_TYPE);
+            default -> throw new IllegalArgumentException("Unknown ACE type %s".formatted(ace.type().toString()));
+        }
+    }
+
+    private void addAceFlags(ByteBuffer buf, AclEntry ace, boolean isGroup) {
+        int flags = 0;
+        for (AclEntryFlag f: ace.flags()) {
+            switch (f) {
+                case FILE_INHERIT -> flags |= NFS4_ACE_FILE_INHERIT_ACE;
+                case DIRECTORY_INHERIT -> flags |= NFS4_ACE_DIRECTORY_INHERIT_ACE;
+                case NO_PROPAGATE_INHERIT -> flags |= NFS4_ACE_NO_PROPAGATE_INHERIT_ACE;
+                case INHERIT_ONLY -> flags |= NFS4_ACE_INHERIT_ONLY_ACE;
+            }
+        }
+        if (isGroup) {
+            flags |= NFS4_ACE_GROUP;
+        }
+        buf.putInt(flags);
+    }
+
+    private void addAcePermissions(ByteBuffer buf, AclEntry ace) {
+        int permissions = 0;
+        for (AclEntryPermission p : ace.permissions()) {
+            switch (p) {
+                case READ_DATA -> permissions |= NFS4_ACE_READ_DATA;
+                case WRITE_DATA -> permissions |= NFS4_ACE_WRITE_DATA;
+                case APPEND_DATA -> permissions |= NFS4_ACE_APPEND_DATA;
+                case READ_NAMED_ATTRS -> permissions |= NFS4_ACE_READ_NAMED_ATTRS;
+                case WRITE_NAMED_ATTRS -> permissions |= NFS4_ACE_WRITE_NAMED_ATTRS;
+                case EXECUTE -> permissions |= NFS4_ACE_EXECUTE;
+                case DELETE_CHILD -> permissions |= NFS4_ACE_DELETE_CHILD;
+                case READ_ATTRIBUTES -> permissions |= NFS4_ACE_READ_ATTRIBUTES;
+                case WRITE_ATTRIBUTES -> permissions |= NFS4_ACE_WRITE_ATTRIBUTES;
+                case DELETE ->  permissions |= NFS4_ACE_DELETE;
+                case READ_ACL -> permissions |= NFS4_ACE_READ_ACL;
+                case WRITE_ACL -> permissions |= NFS4_ACE_WRITE_ACL;
+                case WRITE_OWNER -> permissions |= NFS4_ACE_WRITE_OWNER;
+                case SYNCHRONIZE -> permissions |= NFS4_ACE_SYNCHRONIZE;
+            }
+        }
+        buf.putInt(permissions);
+    }
+
+    public void addPrincipal(ByteBuffer buf, Principal principal) {
+        byte[] principalBytes = principal.getName().getBytes();
+        int whoLength = principalBytes.length;
+        int padLength = ((whoLength & 3) == 0) ? 0 : (4 - (whoLength & 3));
+        buf.putInt(whoLength);
+        buf.put(principalBytes);
+        buf.put(new byte[padLength]);
     }
 
     public List<AclEntry> parseAcl(byte[] rawBuffer) {

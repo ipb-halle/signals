@@ -7,7 +7,7 @@
  */
 package de.ipb_halle.jcrawler.db;
 
-import de.ipb_halle.jcrawler.acl.NFS4AclParser;
+import de.ipb_halle.jcrawler.acl.AclConverter;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
@@ -62,7 +62,7 @@ COPY acl_details (acl_id, seq, principal_id, type,
         if (busy) {
             DbPrincipalCache cache = DbPrincipalCache.getInstance();
             int i = 0;
-            for (AclEntry ace : NFS4AclParser.getInstance()
+            for (AclEntry ace : AclConverter.getInstance()
                     .parseAcl(acl.getRawAttribute())) {
                 DbPrincipal principal = new DbPrincipal(ace.principal().getName());
                 principal = cache.lookup(principal);

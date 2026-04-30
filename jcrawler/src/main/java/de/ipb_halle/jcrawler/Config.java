@@ -46,7 +46,7 @@ public final class Config extends ConfigElement {
     }
 
     // for testing purposes
-    protected final Config reset() {
+    public final Config reset() {
         fullScan = false;
         globalPrefix = "";
         jobType = JobType.crawl;
