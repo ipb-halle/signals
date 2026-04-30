@@ -25,14 +25,20 @@ public class AclCache {
     private final Logger logger;
     private AclCreate create;
     private AclDetail detail;
+    private boolean ready;
 
     private AclCache() {
         acls = new HashMap<> ();
         logger = LoggerFactory.getLogger(this.getClass());
+        ready = false;
     }
 
     public static AclCache getInstance() {
         return instance;
+    }
+
+    public boolean isReady() {
+        return ready;
     }
 
     public void setup(Connection conn) throws SQLException {
@@ -48,6 +54,7 @@ public class AclCache {
         create.prepare(conn);
         detail = new AclDetail();
         detail.prepare(conn);
+        ready = true;
     }
 
     public Acl lookup(Acl acl) {
