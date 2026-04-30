@@ -14,4 +14,5 @@ Configurable multithreaded File system crawler written in Java SE.
 ## Planned features / ToDo
 * test coverage
 * real implementation for Windows ACLs (possibly Posix ACLs too?)
-* explanation of functionality and design assumptions and decisions
+* Support for posix ACLs (attributes 'system.posix_acl_default' and 'system.posix_acl_access')
+* explanation of functionality and of design assumptions and decisions

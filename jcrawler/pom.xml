@@ -24,7 +24,7 @@
 
     <groupId>de.ipb-halle</groupId>
     <artifactId>jcrawler</artifactId>
-    <version>0.2.1</version>
+    <version>0.2.2</version>
     <packaging>jar</packaging>
 
     <name>JCrawler</name>
