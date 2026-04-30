@@ -8,7 +8,10 @@
 package de.ipb_halle.jcrawler.acl;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.nio.file.attribute.AclFileAttributeView;
 
 /**
  *
@@ -28,7 +31,8 @@ public class WindowsAclHandler implements AclHandler {
 
     @Override
     public byte[] getRawAttribute(Path path) throws IOException {
-        byte[] fake = new byte[] { 0, 0, 0, 0 }; // empty ACL
-        return fake;
+        AclFileAttributeView aclView = Files.getFileAttributeView(
+                path, AclFileAttributeView.class, LinkOption.NOFOLLOW_LINKS);
+        return AclConverter.getInstance().buildRawAttribute(aclView.getAcl());
     }
 }

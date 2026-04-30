@@ -18,9 +18,9 @@ import java.nio.file.Path;
  */
 public class GenericAclHandler implements AclHandler {
 
-    private enum Platform {
+    protected enum Platform {
         Linux("de.ipb_halle.jcrawler.acl.LinuxNFS4AclHandler"),
-        Windows("java.nio.file.attribute.WindowsAclHandler");
+        Windows("de.ipb_halle.jcrawler.acl.WindowsAclHandler");
 
         String handlerClassName;
 
@@ -56,9 +56,10 @@ public class GenericAclHandler implements AclHandler {
         }
     }
 
-    private Platform getPlatform() {
+    protected Platform getPlatform() {
         switch (System.getProperty(OS_NAME_PROPERTY).toLowerCase()) {
             case "windows" -> { return Platform.Windows; }
+            case "windows 11" -> { return Platform.Windows; }
             case "linux" -> { return Platform.Linux; }
             default -> throw new RuntimeException("Unknown platform %s"
                 .formatted(System.getProperty(OS_NAME_PROPERTY)));
