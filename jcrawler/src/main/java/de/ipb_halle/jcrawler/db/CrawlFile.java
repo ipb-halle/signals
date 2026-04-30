@@ -89,6 +89,7 @@ public class CrawlFile {
                 && Objects.equals(size, other.size)
                 && Objects.equals(type, other.type)
                 && Objects.equals(mode, other.mode)
+                && Objects.equals(aclId, other.aclId)
                 && Objects.equals(uid, other.uid)
                 && Objects.equals(gid, other.gid)
                 && Objects.equals(ctime, other.ctime)

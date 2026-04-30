@@ -21,7 +21,7 @@ public enum DigestAlgorithm {
 
     private final String jdkName;
 
-    DigestAlgorithm(String name) {
+    private DigestAlgorithm(String name) {
         jdkName = name;
     }
 
@@ -40,6 +40,6 @@ public enum DigestAlgorithm {
                 || name.toLowerCase().equals("null")) {
             return null;
         }
-        throw new RuntimeException("Unknown algorithm in configuration");
+        throw new RuntimeException("Unknown algorithm specified");
     }
 }
