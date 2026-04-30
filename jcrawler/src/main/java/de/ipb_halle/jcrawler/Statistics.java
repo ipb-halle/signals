@@ -7,6 +7,8 @@
  */
 package de.ipb_halle.jcrawler;
 
+import java.util.Locale;
+
 
 /**
  *
@@ -119,13 +121,15 @@ public class Statistics {
             suffixIndex++;
         }
         if (suffixIndex > 0) {
-            return "%s%.2f %s%s".formatted(
+            return String.format(Locale.ENGLISH,
+                    "%s%.2f %s%s",
                     negative ? "-" : "",
                     d,
                     suffixes[suffixIndex],
                     unit == null ? "" : unit);
         }
-        return "%d%s%s".formatted(
+        return String.format(Locale.ENGLISH,
+                "%d%s%s",
                 number,
                 unit == null ? "" : " ",
                 unit == null ? "" : unit);
