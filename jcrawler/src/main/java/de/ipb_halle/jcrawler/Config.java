@@ -31,6 +31,7 @@ public class Config extends ConfigElement {
     private final Logger logger;
     private JobType jobType;
     private boolean fullScan;
+    private String namespace;
 
     // for testing purposes
     private String globalPrefix = "";
@@ -78,6 +79,14 @@ public class Config extends ConfigElement {
 
     public void setJobType(JobType jobType) {
         this.jobType = jobType;
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
     }
 
     private boolean parseConfig(Reader reader) {

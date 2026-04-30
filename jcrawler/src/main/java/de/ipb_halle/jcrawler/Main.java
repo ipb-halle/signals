@@ -8,7 +8,12 @@
  */
 package de.ipb_halle.jcrawler;
 
+import de.ipb_halle.jcrawler.db.MissingFilePurge;
+import de.ipb_halle.jcrawler.db.MissingSubdirPurge;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,20 +68,36 @@ public class Main {
 Statistics
 ==========
 %s
-
-*****************************************************
-*                                                   *
-* Job finished: %-32s    *
-*                                                   *
-*****************************************************
 """,
-                executor.getStatistics().toString(),
-                new Date().toString());
+                executor.getStatistics().toString());
+        finish();
     }
 
     private void runPurge() {
-        // this method will clean all files and directories
-        // which have their missing flag set.
-        System.out.println("Currently not supported.");
+        // this method shall clean all subdir trees and
+        // individual files of a given namespace, which
+        // have their missing flag set.
+        try {
+            List<Object> arguments = new ArrayList<> ();
+            arguments.add(Config.getInstance().getNamespace());
+            MissingSubdirPurge subdirPurge = new MissingSubdirPurge();
+            MissingFilePurge filePurge = new MissingFilePurge();
+            subdirPurge.execute(arguments);
+            filePurge.execute(arguments);
+        } catch(SQLException e) {
+            logger.warn("runPurge failed: {}", e.getMessage());
+        }
+        finish();
+    }
+
+    private void finish() {
+System.out.printf("""
+*****************************************************
+*                                                   *
+* Finished: %-32s        *
+*                                                   *
+*****************************************************
+""",
+                new Date().toString());
     }
 }

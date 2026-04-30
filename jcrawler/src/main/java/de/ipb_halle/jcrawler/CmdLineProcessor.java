@@ -77,6 +77,15 @@ include ERROR, WARN, INFO, DEBUG and TRACE.""")
             .argName("LEVEL")
             .build();
 
+    @SuppressWarnings("static-access")
+    private static final Option namespaceOpt = Option.builder("n")
+            .longOpt("namespace")
+            .desc("""
+Namespace for jobtype 'purge'.""")
+            .hasArg()
+            .argName("NAMESPACE")
+            .build();
+
    /*
     * Help Texts
     */
@@ -85,6 +94,7 @@ java -jar <JAR_WITH_DEPENDENCIES>
      [-Djava.library.path=LIBRARY_PATH --enable-native-access=ALL-UNNAMED]""";
 
     private final static String HELP_HEADER = """
+
 JCrawler %s
 (c) 2026 Leibniz Institute of Plant Biochemistry
 
@@ -111,6 +121,11 @@ OPTIONS:
                 return true;
             }
 
+            if (cmdline.hasOption(namespaceOpt.getOpt())) {
+                String userInput = cmdline.getOptionValue(namespaceOpt.getOpt());
+                Config.getInstance().setNamespace(userInput);
+            }
+
             if (cmdline.hasOption(fullScanOpt.getOpt())) {
                 Config.getInstance().setFullScan(true);
             }
@@ -122,16 +137,23 @@ OPTIONS:
                     return true;
                 }
             } else {
-                printHelp("ERROR: missing configuration file", options);
+                printHelp("Missing configuration file", options);
                 return true;
             }
 
             if (cmdline.hasOption(jobOpt.getOpt())) {
                 try {
-                    Config.getInstance().setJobType(JobType.valueOf(
-                            cmdline.getOptionValue(jobOpt.getOpt())));
+                    JobType type = JobType.valueOf(
+                            cmdline.getOptionValue(jobOpt.getOpt()));
+                    if ((type == JobType.purge)
+                            && (Config.getInstance().getNamespace() == null)) {
+                        printHelp("Job type 'purge' requires namespace setting.", options);
+                        return true;
+                    }
+                    Config.getInstance().setJobType(type);
+
                 } catch(IllegalArgumentException e) {
-                    System.out.println("Unknown job type.");
+                    printHelp("Unknown job type.", options);
                     return true;
                 }
             }
@@ -142,16 +164,15 @@ OPTIONS:
                 if (newLevel != null) {
                     Configurator.setLevel("de.ipb_halle", newLevel);
                 } else {
-                    printHelp("ERROR: unrecognized log level", options);
+                    printHelp("Unrecognized log level", options);
                     return true;
                 }
             }
-
         } catch (MissingArgumentException | MissingOptionException | UnrecognizedOptionException e) {
-            printHelp("ERROR: " + e.getMessage(), options);
+            printHelp(e.getMessage(), options);
             return true;
         } catch (ParseException e) {
-            printHelp("ERROR: " + e.getMessage(), options);
+            printHelp(e.getMessage(), options);
             return true;
         }
         return false;
@@ -164,6 +185,7 @@ OPTIONS:
         options.addOption(helpOpt);
         options.addOption(jobOpt);
         options.addOption(levelOpt);
+        options.addOption(namespaceOpt);
         return options;
     }
 
@@ -171,7 +193,7 @@ OPTIONS:
         HelpFormatter writer = new HelpFormatter();
         StringBuilder sb = new StringBuilder();
         if (errorMessage != null) {
-            sb.append("\n");
+            sb.append("\nERROR: ");
             sb.append(errorMessage);
             sb.append("\n");
         }
