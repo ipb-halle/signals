@@ -40,9 +40,6 @@ public class AclConverter {
     public final static int NFS4_ACE_SUCCESSFUL_ACCESS_ACE_FLAG = 0x00000010;
     public final static int NFS4_ACE_FAILED_ACCESS_ACE_FLAG     = 0x00000020;
     public final static int NFS4_ACE_IDENTIFIER_GROUP           = 0x00000040;
-    public final static int NFS4_ACE_OWNER                      = 0x00000080;
-    public final static int NFS4_ACE_GROUP                      = 0x00000100;
-    public final static int NFS4_ACE_EVERYONE                   = 0x00000200;
 
     public final static int NFS4_ACE_READ_DATA                  = 0x00000001;
     public final static int NFS4_ACE_LIST_DIRECTORY             = 0x00000001;
@@ -65,6 +62,11 @@ public class AclConverter {
     public final static String NFS4_OWNER = "OWNER@";
     public final static String NFS4_GROUP = "GROUP@";
     public final static String NFS4_EVERYONE = "EVERYONE@";
+
+    // maybe these flags are our own invention?
+    public final static int NFS4_ACE_OWNER                      = 0x00000080;
+    public final static int NFS4_ACE_GROUP                      = 0x00000100;
+    public final static int NFS4_ACE_EVERYONE                   = 0x00000200;
 
     public final static int RAW_BUFFER_SIZE = 4096;
 
@@ -119,7 +121,7 @@ public class AclConverter {
             }
         }
         if (isGroup) {
-            flags |= NFS4_ACE_GROUP;
+            flags |= NFS4_ACE_IDENTIFIER_GROUP;
         }
         buf.putInt(flags);
     }
@@ -211,7 +213,7 @@ public class AclConverter {
         }
 
         // isGroup?
-        return ((flags & NFS4_ACE_GROUP) > 0);
+        return ((flags & NFS4_ACE_IDENTIFIER_GROUP) > 0);
     }
 
     private void parseAcePermissions(AclEntry.Builder builder, int perm) {

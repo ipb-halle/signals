@@ -52,6 +52,8 @@ public class AclConverterTest {
             rawBuffer = st.readAllBytes();
             List<AclEntry> acl = converter.parseAcl(rawBuffer);
             Assertions.assertEquals(4, acl.size());
+            byte[] reverseBuffer = converter.buildRawAttribute(acl);
+            Assertions.assertArrayEquals(rawBuffer, reverseBuffer);
         } catch (IOException e) {
             Assertions.fail(e);
         }
