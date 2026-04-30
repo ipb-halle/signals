@@ -35,5 +35,21 @@ public class StatisticsTest {
                 s1.getChangedEntities());
         Assertions.assertEquals(2,
                 s1.getVanishedEntities());
+
+        Assertions.assertTrue(s1.toString().contains("New"));
+        Assertions.assertTrue(s1.toString().contains("Changed"));
+        Assertions.assertTrue(s1.toString().contains("Vanished"));
+        Assertions.assertTrue(s1.toString().contains("entities"));
+        Assertions.assertTrue(s1.toString().contains("Byte"));
+        Assertions.assertTrue(s1.toString().contains("Total"));
+    }
+
+    @Test
+    public void testFormat() {
+        Statistics s = new Statistics();
+        Assertions.assertEquals("1", s.formatLong(1L, null));
+        Assertions.assertEquals("1.20 k", s.formatLong(1_200L, null));
+        Assertions.assertEquals("634.80 GByte", s.formatLong(634_801_234_567L, "Byte"));
+        Assertions.assertEquals("-44.01 MWh", s.formatLong(-44_008_000, "Wh"));
     }
 }

@@ -106,6 +106,9 @@ OPTIONS:
    /*
     * Code
     */
+    // test flag
+    protected static boolean failWithoutConfigFile = true;
+
     public static boolean processCommandLine(String[] argv) {
         Options options = registerOptions();
         CommandLineParser parser = new DefaultParser();
@@ -130,17 +133,6 @@ OPTIONS:
                 Config.getInstance().setFullScan(true);
             }
 
-            if (cmdline.hasOption(configOpt.getOpt())) {
-                String cfgFile = cmdline.getOptionValue(configOpt.getOpt());
-                if (Config.getInstance().setConfigFile(cfgFile)) {
-                    System.out.println("Could not parse config file");
-                    return true;
-                }
-            } else {
-                printHelp("Missing configuration file", options);
-                return true;
-            }
-
             if (cmdline.hasOption(jobOpt.getOpt())) {
                 try {
                     JobType type = JobType.valueOf(
@@ -160,11 +152,25 @@ OPTIONS:
 
             if (cmdline.hasOption(levelOpt.getOpt())) {
                 String userInput = cmdline.getOptionValue(levelOpt.getOpt());
-                Level newLevel = Level.valueOf(userInput);
-                if (newLevel != null) {
+                try {
+                    Level newLevel = Level.valueOf(userInput);
                     Configurator.setLevel("de.ipb_halle", newLevel);
-                } else {
+                } catch (IllegalArgumentException e) {
                     printHelp("Unrecognized log level", options);
+                    return true;
+                }
+            }
+
+            // for testing: this option last
+            if (cmdline.hasOption(configOpt.getOpt())) {
+                String cfgFile = cmdline.getOptionValue(configOpt.getOpt());
+                if (Config.getInstance().setConfigFile(cfgFile)) {
+                    printHelp("Could not parse config file", options);
+                    return true;
+                }
+            } else {
+                if (failWithoutConfigFile) {
+                    printHelp("Missing configuration file", options);
                     return true;
                 }
             }

@@ -3,5 +3,16 @@
     "boolean" : true,
     "long" : 1234567890,
     "string" : "Hello World!"
+  },
+  "someObject" : {
+    "testArray" : [ {
+          "key" : "foo",
+          "value" : "FOO"
+      },{
+          "key" : "bar",
+          "value" : "BAR"
+      }
+    ],
+    "other" : "Just another string"
   }
 }

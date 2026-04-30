@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author fblocal
  */
-public class Config extends ConfigElement {
+public final class Config extends ConfigElement {
 
     private final static String PROJECT_VERSION = "projectVersion";
     private final static Config instance = new Config();
@@ -34,16 +34,25 @@ public class Config extends ConfigElement {
     private String namespace;
 
     // for testing purposes
-    private String globalPrefix = "";
+    private String globalPrefix;
 
     private Config() {
-        fullScan = false;
-        jobType = JobType.crawl;
         logger = LoggerFactory.getLogger(this.getClass());
+        reset();
     }
 
     public static Config getInstance() {
         return instance;
+    }
+
+    // for testing purposes
+    protected final Config reset() {
+        fullScan = false;
+        globalPrefix = "";
+        jobType = JobType.crawl;
+        namespace = null;
+        setJson(null);
+        return this;
     }
 
     public static String getProjectVersion() {

@@ -97,16 +97,16 @@ public class Statistics {
         StringBuilder sb = new StringBuilder();
         sb.append("New entities:      %12s (%s)\n".formatted(
                 formatLong(newEntities, null),
-                formatLong(newBytes, "Bytes")));
+                formatLong(newBytes, "Byte")));
         sb.append("Changed entities:  %12s (%s)\n".formatted(
                 formatLong(changedEntities, null),
-                formatLong(changedBytes, "Bytes")));
+                formatLong(changedBytes, "Byte")));
         sb.append("Vanished entities: %12s (%s)\n".formatted(
                 formatLong(vanishedEntities, null),
-                formatLong(vanishedBytes, "Bytes")));
+                formatLong(vanishedBytes, "Byte")));
         sb.append("Total entities:    %12s (%s)\n".formatted(
                 formatLong(getTotalEntities(), null),
-                formatLong(getTotalBytes(), "Bytes")));
+                formatLong(getTotalBytes(), "Byte")));
         return sb.toString();
     }
 

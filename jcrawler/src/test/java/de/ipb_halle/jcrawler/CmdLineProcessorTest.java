@@ -20,6 +20,45 @@ public class CmdLineProcessorTest {
     public void testOptions() {
         Assertions.assertTrue(
                 CmdLineProcessor.processCommandLine(
+                new String[] {"-c", "nonexistent file"}));
+
+        CmdLineProcessor.failWithoutConfigFile = false;
+
+        // namespace missing
+        Assertions.assertTrue(
+                CmdLineProcessor.processCommandLine(
+                new String[] {"-j", "purge"}));
+
+        Assertions.assertFalse(
+                CmdLineProcessor.processCommandLine(
+                new String[] {"-j", "purge", "-n", "test"}));
+
+        Assertions.assertTrue(
+                CmdLineProcessor.processCommandLine(
+                new String[] {"-j", "NONSENSE", "-n", "test"}));
+
+        Assertions.assertTrue(
+                CmdLineProcessor.processCommandLine(
                 new String[] {"-h", "-f"}));
+
+        Assertions.assertTrue(
+                CmdLineProcessor.processCommandLine(
+                new String[] {"-n"}));
+
+        Assertions.assertTrue(
+                CmdLineProcessor.processCommandLine(
+                new String[] {"-l"}));
+
+        Assertions.assertTrue(
+                CmdLineProcessor.processCommandLine(
+                new String[] {"-l", "semiconductor"}));
+
+        Assertions.assertFalse(
+                CmdLineProcessor.processCommandLine(
+                new String[] {"-l", "WARN"}));
+
+        Assertions.assertFalse(
+                CmdLineProcessor.processCommandLine(
+                new String[] {"-l", "DEBUG", "-f"}));
     }
 }
