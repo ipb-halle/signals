@@ -7,7 +7,6 @@
  */
 package de.ipb_halle.jcrawler.db;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -20,6 +19,10 @@ import java.util.List;
 public class DirectoryCreate extends SqlQuery<Directory> {
 
     private final static String QUERY = "INSERT INTO directories (namespace_id, path) VALUES (?, ?) RETURNING id, namespace_id, path, change_time";
+
+    public DirectoryCreate() {
+        super(QUERY);
+    }
 
     @Override
     public void execute(Directory dir) throws SQLException {
@@ -42,11 +45,6 @@ public class DirectoryCreate extends SqlQuery<Directory> {
         dir.setPath(result.getString(3));
         dir.setChangeTime(result.getTimestamp(4));
         return dir;
-    }
-
-    @Override
-    public void prepare(Connection conn) throws SQLException {
-        setStatement(conn.prepareStatement(QUERY));
     }
 
     @Override

@@ -44,6 +44,11 @@ COPY files (path_id, size, type, mode, uid,
     private Thread copyThread;
     private boolean busy = true;
 
+
+    public CrawlFileCreate() {
+        super(QUERY);
+    }
+
     @Override
     public void prepare(Connection c) throws SQLException {
         connection = c;
@@ -116,7 +121,7 @@ COPY files (path_id, size, type, mode, uid,
         try {
             logger.trace("copy-thread started");
             CopyManager cp = new CopyManager((BaseConnection) connection);
-            cp.copyIn(QUERY, copyStream);
+            cp.copyIn(getQuery(), copyStream);
             logger.trace("copy-thread completed");
         } catch (IOException | SQLException e) {
             throw new RuntimeException("SQL error: " + e.getMessage());

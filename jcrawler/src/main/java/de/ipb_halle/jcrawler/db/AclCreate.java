@@ -7,7 +7,6 @@
  */
 package de.ipb_halle.jcrawler.db;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +25,10 @@ public class AclCreate extends SqlQuery<Acl> {
                                         """;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    public AclCreate() {
+        super(QUERY);
+    }
+
     @Override
     public void execute(Acl acl) throws SQLException {
         List<Object> arguments = new ArrayList<> ();
@@ -41,11 +44,6 @@ public class AclCreate extends SqlQuery<Acl> {
     @Override
     protected Acl getRecord() throws SQLException {
         throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void prepare(Connection conn) throws SQLException {
-        setStatement(conn.prepareStatement(QUERY));
     }
 
     @Override

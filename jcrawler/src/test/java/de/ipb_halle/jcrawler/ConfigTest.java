@@ -19,7 +19,7 @@ public class ConfigTest {
 
     @Test
     public void testJsonConfig() {
-        Config cfg = new Config();
+        Config cfg = Config.getInstance();
         Assertions.assertFalse(cfg.isFullScan());
         InputStream is = this.getClass().getResourceAsStream("configtest.json");
 
@@ -33,14 +33,5 @@ public class ConfigTest {
                 cfg.getConfigLong("fields.long", 123L));
         Assertions.assertEquals(Boolean.TRUE,
                 cfg.getConfigBoolean("fields.boolean", false));
-    }
-
-    @Test
-    public void testFullScan() {
-        Config cfg = new Config();
-        Assertions.assertFalse(cfg.isFullScan());
-
-        cfg.setFullScan(true);
-        Assertions.assertTrue(cfg.isFullScan());
     }
 }

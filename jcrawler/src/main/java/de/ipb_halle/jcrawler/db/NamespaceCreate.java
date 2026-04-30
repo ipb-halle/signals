@@ -7,7 +7,6 @@
  */
 package de.ipb_halle.jcrawler.db;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -18,6 +17,10 @@ import java.sql.SQLException;
 public class NamespaceCreate extends SqlQuery<Namespace> {
 
     private final static String QUERY = "INSERT INTO namespaces (name) VALUES (?) RETURNING id, name";
+
+    public NamespaceCreate() {
+        super(QUERY);
+    }
 
     @Override
     protected Namespace getRecord() throws SQLException {
@@ -32,10 +35,4 @@ public class NamespaceCreate extends SqlQuery<Namespace> {
     public QueryType getType() {
         return QueryType.NamespaceCreate;
     }
-
-    @Override
-    public void prepare(Connection conn) throws SQLException {
-        setStatement(conn.prepareStatement(QUERY));
-    }
-
 }

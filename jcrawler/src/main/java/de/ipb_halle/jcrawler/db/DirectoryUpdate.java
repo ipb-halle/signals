@@ -7,7 +7,6 @@
  */
 package de.ipb_halle.jcrawler.db;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +21,10 @@ public class DirectoryUpdate extends SqlQuery<Directory> {
 UPDATE directories SET new_entries=?, changed_entries=?, vanished_entries=?,
 accumulated_sizes=?, change_time=now(), missing=? WHERE id=? RETURNING id
 """;
+
+    public DirectoryUpdate() {
+        super(QUERY);
+    }
 
     @Override
     public void execute(Directory dir) throws SQLException {
@@ -40,11 +43,6 @@ accumulated_sizes=?, change_time=now(), missing=? WHERE id=? RETURNING id
     @Override
     protected Directory getRecord() throws SQLException {
         throw new UnsupportedOperationException("No record available for UPDATE");
-    }
-
-    @Override
-    public void prepare(Connection conn) throws SQLException {
-        setStatement(conn.prepareStatement(QUERY));
     }
 
     @Override

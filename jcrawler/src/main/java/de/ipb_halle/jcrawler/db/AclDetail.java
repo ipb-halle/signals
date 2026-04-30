@@ -47,6 +47,10 @@ COPY acl_details (acl_id, seq, principal_id, type,
     private Thread copyThread;
     private boolean busy = true;
 
+    public AclDetail() {
+        super(QUERY);
+    }
+
     @Override
     public void prepare(Connection c) throws SQLException {
         connection = c;
@@ -137,7 +141,7 @@ COPY acl_details (acl_id, seq, principal_id, type,
         try {
             logger.trace("copy-thread started");
             CopyManager cp = new CopyManager((BaseConnection) connection);
-            cp.copyIn(QUERY, copyStream);
+            cp.copyIn(getQuery(), copyStream);
             logger.trace("copy-thread completed");
         } catch (IOException | SQLException e) {
             throw new RuntimeException("SQL error: " + e.getMessage());

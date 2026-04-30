@@ -7,7 +7,6 @@
  */
 package de.ipb_halle.jcrawler.db;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -22,6 +21,10 @@ SELECT id, namespace_id, path, new_entries, changed_entries, vanished_entries,
   accumulated_sizes, change_time, missing
   FROM directories
   WHERE namespace_id=? AND path=?""";
+
+    public DirectoryByName() {
+        super(QUERY);
+    }
 
     @Override
     protected Directory getRecord() throws SQLException {
@@ -39,11 +42,6 @@ SELECT id, namespace_id, path, new_entries, changed_entries, vanished_entries,
         dir.setChangeTime(result.getTimestamp(8));
         dir.setMissing(result.getBoolean(9));
         return dir;
-    }
-
-    @Override
-    public void prepare(Connection conn) throws SQLException {
-        setStatement(conn.prepareStatement(QUERY));
     }
 
     @Override

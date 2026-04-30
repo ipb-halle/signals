@@ -21,12 +21,10 @@ public class CrawlerFactoryImpl implements CrawlerFactory {
     private final static String CONFIG_NTHREADS = "threads";
     private final static long MAX_THREADS = 10L;     // requires 3*MAX_THREADS JDBC connections
 
-    private final Config config;
     private DbPrincipalCache principalCache;
     private AclCache aclCache;
 
-    public CrawlerFactoryImpl(Config config) {
-        this.config = config;
+    public CrawlerFactoryImpl() {
         setupAclCache();
         setupPrincipalCache();
     }
@@ -34,6 +32,7 @@ public class CrawlerFactoryImpl implements CrawlerFactory {
     @Override
     public LinkedList<Crawler> buildCrawlers() {
         LinkedList<Crawler> crawlers = new LinkedList<> ();
+        Config config = Config.getInstance();
         try {
             Long nThreads = config.getConfigLong(CONFIG_NTHREADS, null);
             if ((nThreads != null) && (nThreads > 0) && (nThreads < MAX_THREADS)) {
@@ -58,7 +57,7 @@ public class CrawlerFactoryImpl implements CrawlerFactory {
 
     private void setupAclCache() {
         try {
-            Connection conn = SqlConnection.getConnection(config);
+            Connection conn = SqlConnection.getConnection();
             aclCache = AclCache.getInstance();
             aclCache.setup(conn);
         } catch (SQLException e) {
@@ -67,7 +66,7 @@ public class CrawlerFactoryImpl implements CrawlerFactory {
     }
     private void setupPrincipalCache() {
         try {
-            Connection conn = SqlConnection.getConnection(config);
+            Connection conn = SqlConnection.getConnection();
             principalCache = DbPrincipalCache.getInstance();
             principalCache.setup(conn);
         } catch (SQLException e) {
@@ -76,19 +75,22 @@ public class CrawlerFactoryImpl implements CrawlerFactory {
     }
 
     private void addCopyConnections(Crawler crawler) throws SQLException {
-        Connection conn = SqlConnection.getConnection(config);
+        Connection conn = SqlConnection.getConnection();
+        crawler.addConnection(conn);
         addSqlQuery(crawler, conn, new CrawlFileCreate());
     }
 
     private void addQueryConnections(Crawler crawler) throws SQLException {
-        Connection conn = SqlConnection.getConnection(config);
+        Connection conn = SqlConnection.getConnection();
+        crawler.addConnection(conn);
         addSqlQuery(crawler, conn, new CrawlFileByDir());
         addSqlQuery(crawler, conn, new DirectoryByName());
         addSqlQuery(crawler, conn, new NamespaceByName());
     }
 
     private void addUpdateConnections(Crawler crawler) throws SQLException {
-        Connection conn = SqlConnection.getConnection(config);
+        Connection conn = SqlConnection.getConnection();
+        crawler.addConnection(conn);
         addSqlQuery(crawler, conn, new CrawlFileUpdate());
         addSqlQuery(crawler, conn, new DirectoryCreate());
         addSqlQuery(crawler, conn, new DirectoryUpdate());

@@ -185,6 +185,11 @@ public class CrawlPathImpl implements CrawlPath {
         statistics.incrementChanged();
         statistics.addChangedBytes(
                 fromDir.getSize() - fromDb.getSize());
+        // entry may have turned from directory into something different
+        // --> entire subdirectory tree will be missing
+        if (fromDb.isDirectory() && (! fromDir.isDirectory())) {
+            handleMissingDirectory(fromDb);
+        }
         fromDir.setId(fromDb.getId());
         fileUpdate.execute(fromDir);
     }

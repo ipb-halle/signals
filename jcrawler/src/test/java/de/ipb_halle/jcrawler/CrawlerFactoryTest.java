@@ -12,7 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
 import org.junit.jupiter.api.Test;
@@ -24,25 +23,25 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class CrawlerFactoryTest {
 
-    private final Config config;
     private CrawlerFactory factory;
 
     public CrawlerFactoryTest() {
-        config = new Config();
         setup();
     }
 
     private void setup() {
+        Config config = Config.getInstance();
         InputStream is = this.getClass().getResourceAsStream("crawler.json");
         config.setConfigStream(is);
         Properties props = System.getProperties();
         String dir = props.getProperty("user.dir");
         config.setGlobalPrefix(dir);
-        factory = new CrawlerFactoryImpl(config);
+        factory = new CrawlerFactoryImpl();
     }
 
     @Test
     public void testBuildCrawlers() {
+        Config config = Config.getInstance();
         Path pom = Paths.get(config.getGlobalPrefix(), "pom.xml");
         Path fail = Paths.get(config.getGlobalPrefix(), "will_never_exist.txt");
         assertTrue(Files.exists(pom, LinkOption.NOFOLLOW_LINKS));

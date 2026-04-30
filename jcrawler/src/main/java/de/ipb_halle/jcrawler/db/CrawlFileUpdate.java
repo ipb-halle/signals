@@ -7,7 +7,6 @@
  */
 package de.ipb_halle.jcrawler.db;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +21,11 @@ public class CrawlFileUpdate extends SqlQuery<CrawlFile> {
 UPDATE files SET path_id=?, size=?, uid=?, gid=?, type=?, mode=?,
   missing=?, atime=?, ctime=?, mtime=?, digest=?, link_target=?
   WHERE id=? RETURNING id""";
+
+
+    public  CrawlFileUpdate() {
+        super(QUERY);
+    }
 
     @Override
     public void execute(CrawlFile file) throws SQLException {
@@ -46,11 +50,6 @@ UPDATE files SET path_id=?, size=?, uid=?, gid=?, type=?, mode=?,
     @Override
     protected CrawlFile getRecord() throws SQLException {
         throw new UnsupportedOperationException("getRecord not implemented.");
-    }
-
-    @Override
-    public void prepare(Connection conn) throws SQLException {
-        setStatement(conn.prepareStatement(QUERY));
     }
 
     @Override

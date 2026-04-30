@@ -7,7 +7,6 @@
  */
 package de.ipb_halle.jcrawler.db;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -45,6 +44,11 @@ WITH upd_files AS (
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+
+    public MissingSubdirUpdate() {
+        super(QUERY);
+    }
+
     @Override
     public void execute(MissingSubdir subdir) throws SQLException {
         logger.debug("Flagging missing subdir {}", subdir.getPath());
@@ -73,11 +77,6 @@ WITH upd_files AS (
         subdir.setBytes(result.getLong(1));
         subdir.setEntities(result.getLong(2));
         return subdir;
-    }
-
-    @Override
-    public void prepare(Connection conn) throws SQLException {
-        setStatement(conn.prepareStatement(QUERY));
     }
 
     @Override

@@ -14,12 +14,12 @@ import org.junit.jupiter.api.Assertions;
  *
  * @author fblocal
  */
-public class MainTest {
+public class CmdLineProcessorTest {
 
     @Test
     public void testOptions() {
-        Main main = new Main();
-        Assertions.assertTrue(Main.processCommandLine(main,
+        Assertions.assertTrue(
+                CmdLineProcessor.processCommandLine(
                 new String[] {"-h", "-f"}));
     }
 }

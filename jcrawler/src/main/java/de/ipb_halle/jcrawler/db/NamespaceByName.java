@@ -7,7 +7,6 @@
  */
 package de.ipb_halle.jcrawler.db;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -18,6 +17,10 @@ import java.sql.SQLException;
 public class NamespaceByName extends SqlQuery<Namespace> {
 
     private final static String QUERY = "SELECT id, name FROM namespaces WHERE name=?";
+
+    public NamespaceByName() {
+        super(QUERY);
+    }
 
     @Override
     protected Namespace getRecord() throws SQLException {
@@ -31,10 +34,5 @@ public class NamespaceByName extends SqlQuery<Namespace> {
     @Override
     public QueryType getType() {
         return QueryType.NamespaceByName;
-    }
-
-    @Override
-    public void prepare(Connection conn) throws SQLException {
-        setStatement(conn.prepareStatement(QUERY));
     }
 }

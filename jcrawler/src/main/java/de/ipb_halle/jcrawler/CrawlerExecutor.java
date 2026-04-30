@@ -7,6 +7,8 @@
  */
 package de.ipb_halle.jcrawler;
 
+import de.ipb_halle.jcrawler.db.SqlConnection;
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -54,9 +56,12 @@ public class CrawlerExecutor {
             try {
                 c.getThread().join();
                 statistics.accumulateStatistics(c.getStatistics());
+                SqlConnection.closeConnections(c.getConnections());
                 crawlers.removeFirst();
             } catch (InterruptedException ex) {
                 logger.debug("joinAll() was interrupted.");
+            } catch (SQLException ex) {
+                logger.warn("SQLException in joinAll: {}", ex.getMessage());
             }
         }
         return statistics;

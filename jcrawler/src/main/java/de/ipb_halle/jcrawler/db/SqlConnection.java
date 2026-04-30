@@ -13,6 +13,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.HexFormat;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -26,7 +27,8 @@ public class SqlConnection {
     private final static String DB_USER = "dbUser";
     private final static String NULL = "\\N";
 
-    public static Connection getConnection(Config config) throws SQLException {
+    public static Connection getConnection() throws SQLException {
+        Config config = Config.getInstance();
         String user = config.getConfigString(DB_USER, null);
         String password = config.getConfigString(DB_PASSWORD, null);
         String connInfo = config.getConfigString(DB_CONNECTION_INFO, null);
@@ -37,6 +39,16 @@ public class SqlConnection {
         props.put("user", user);
         props.put("password", password);
         return DriverManager.getConnection(connInfo, props);
+    }
+
+    public static void closeConnection(Connection conn) throws SQLException {
+        conn.close();
+    }
+
+    public static void closeConnections(List<Connection> connections) throws SQLException {
+        for (Connection c : connections) {
+            c.close();
+        }
     }
 
     public static String copyEscape(Boolean b) {

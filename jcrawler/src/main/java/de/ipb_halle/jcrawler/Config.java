@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
@@ -24,11 +26,35 @@ import org.slf4j.LoggerFactory;
  */
 public class Config extends ConfigElement {
 
-    private boolean fullScan = false;
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final static String PROJECT_VERSION = "projectVersion";
+    private final static Config instance = new Config();
+    private final Logger logger;
+    private JobType jobType;
+    private boolean fullScan;
 
     // for testing purposes
     private String globalPrefix = "";
+
+    private Config() {
+        fullScan = false;
+        jobType = JobType.crawl;
+        logger = LoggerFactory.getLogger(this.getClass());
+    }
+
+    public static Config getInstance() {
+        return instance;
+    }
+
+    public static String getProjectVersion() {
+        try {
+            Manifest mf = new Manifest();
+            mf.read(Main.class.getResourceAsStream("/META-INF/MANIFEST.MF"));
+            Attributes attributes = mf.getMainAttributes();
+            return attributes.getValue(PROJECT_VERSION);
+        } catch (IOException e) {
+            return "unavail";
+        }
+    }
 
     public boolean isFullScan() {
         return fullScan;
@@ -44,6 +70,14 @@ public class Config extends ConfigElement {
 
     public void setGlobalPrefix(String globalPrefix) {
         this.globalPrefix = globalPrefix;
+    }
+
+    public JobType getJobType() {
+        return jobType;
+    }
+
+    public void setJobType(JobType jobType) {
+        this.jobType = jobType;
     }
 
     private boolean parseConfig(Reader reader) {

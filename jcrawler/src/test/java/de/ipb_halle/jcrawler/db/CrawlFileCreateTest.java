@@ -9,9 +9,6 @@ package de.ipb_halle.jcrawler.db;
 
 import de.ipb_halle.jcrawler.Config;
 import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.Properties;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -22,16 +19,15 @@ import org.junit.jupiter.api.Test;
  */
 public class CrawlFileCreateTest {
 
-    private Config config;
     private CrawlFileCreate create;
 
     public CrawlFileCreateTest() {
-        config = new Config();
         create = new CrawlFileCreate();
         setup();
     }
 
     private void setup() {
+        Config config = Config.getInstance();
         InputStream is = this.getClass().getResourceAsStream("../crawler.json");
         config.setConfigStream(is);
         Properties props = System.getProperties();

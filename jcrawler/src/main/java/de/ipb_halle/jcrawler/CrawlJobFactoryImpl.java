@@ -16,7 +16,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class CrawlJobFactoryImpl implements CrawlJobFactory {
 
-    private final Config config;
     private final static String ALGORITHM = "digestAlgorithm";
     private final static String PATHS_CONFIG = "paths";
     private final static String DIRECTORY = "directory";
@@ -24,12 +23,9 @@ public class CrawlJobFactoryImpl implements CrawlJobFactory {
     private final static String NAMESPACE = "namespace";
     private final static String THRESHOLD = "subtreeScanThreshold";
 
-    public CrawlJobFactoryImpl(Config config) {
-        this.config = config;
-    }
-
     @Override
     public ConcurrentLinkedQueue<CrawlPath> buildJobs() {
+        Config config = Config.getInstance();
         ConcurrentLinkedQueue<CrawlPath> queue = new ConcurrentLinkedQueue<> ();
         if (config.isArray(PATHS_CONFIG)) {
             int size = config.getArraySize(PATHS_CONFIG);
@@ -42,6 +38,7 @@ public class CrawlJobFactoryImpl implements CrawlJobFactory {
     }
 
     private CrawlPath setupPath(ConfigElement element) {
+        Config config = Config.getInstance();
         String globalPrefix = config.getGlobalPrefix();
 
         String algorithm = element.getConfigString(ALGORITHM, null);

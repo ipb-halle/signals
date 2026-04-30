@@ -7,7 +7,6 @@
  */
 package de.ipb_halle.jcrawler.db;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -24,6 +23,10 @@ SELECT id, path_id, size, uid, gid, type, mode, missing,
   WHERE path_id=?
   ORDER BY name
 """;
+
+    public CrawlFileByDir() {
+        super(QUERY);
+    }
 
     @Override
     protected CrawlFile getRecord() throws SQLException {
@@ -47,13 +50,7 @@ SELECT id, path_id, size, uid, gid, type, mode, missing,
     }
 
     @Override
-    public void prepare(Connection conn) throws SQLException {
-        setStatement(conn.prepareStatement(QUERY));
-    }
-
-    @Override
     public QueryType getType() {
         return QueryType.CrawlFileByDir;
     }
-
 }

@@ -7,7 +7,7 @@
  */
 package de.ipb_halle.jcrawler.acl;
 
-import de.ipb_halle.jcrawler.Main;
+import de.ipb_halle.jcrawler.Config;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -60,7 +60,7 @@ public class LinuxNFS4AclHandler implements AclHandler {
     private final static LinuxNFS4AclHandler instance;
 
     static {
-        System.loadLibrary("LinuxNFS4Acl.%s".formatted(Main.getProjectVersion()));
+        System.loadLibrary("LinuxNFS4Acl.%s".formatted(Config.getProjectVersion()));
         instance = new LinuxNFS4AclHandler();
     }
 

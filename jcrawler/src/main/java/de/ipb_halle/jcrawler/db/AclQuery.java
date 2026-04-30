@@ -7,7 +7,6 @@
  */
 package de.ipb_halle.jcrawler.db;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -17,8 +16,11 @@ import java.sql.SQLException;
  */
 public class AclQuery extends SqlQuery<Acl> {
 
-    private final String QUERY = "SELECT id, raw_attribute FROM acls";
+    private final static String QUERY = "SELECT id, raw_attribute FROM acls";
 
+    public AclQuery() {
+        super(QUERY);
+    }
 
     @Override
     protected Acl getRecord() throws SQLException {
@@ -27,11 +29,6 @@ public class AclQuery extends SqlQuery<Acl> {
         acl.setId(result.getLong(1));
         acl.setRawAttribute(result.getBytes(2));
         return acl;
-    }
-
-    @Override
-    public void prepare(Connection conn) throws SQLException {
-        setStatement(conn.prepareStatement(QUERY));
     }
 
     @Override
