@@ -36,6 +36,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.Objects;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
@@ -48,7 +49,7 @@ public class FileInspector {
     private final static int BUFFER_SIZE = 65536;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private static FileInspector getInstance() {
+    protected static FileInspector getInstance() {
         return instance;
     }
 
@@ -66,7 +67,7 @@ public class FileInspector {
             c.setAtime(new Timestamp(attrs.lastAccessTime().toMillis()));
             c.setCtime(new Timestamp(attrs.creationTime().toMillis()));
             c.setMtime(new Timestamp(attrs.lastModifiedTime().toMillis()));
-            c.setMode(getMode(attrs));
+            c.setMode(getMode(attrs.permissions()));
             c.setUid(getOwner(attrs));
             c.setGid(getGroup(attrs));
             c.setMissing(false);
@@ -91,7 +92,7 @@ public class FileInspector {
         return c;
     }
 
-    private CrawlFile.FileType getFileType(PosixFileAttributes attrs) {
+    protected CrawlFile.FileType getFileType(PosixFileAttributes attrs) {
         if (attrs.isRegularFile()) {
             return CrawlFile.FileType.REGULAR_FILE;
         }
@@ -133,9 +134,9 @@ public class FileInspector {
         return p.getId();
     }
 
-    private Integer getMode(PosixFileAttributes attrs) {
+    protected Integer getMode(Set<PosixFilePermission> perms) {
         int mode = 0;
-        for (PosixFilePermission p : attrs.permissions()) {
+        for (PosixFilePermission p : perms) {
             switch(p) {
                 case OWNER_READ -> mode |= 0x100;
                 case OWNER_WRITE -> mode |= 0x80;

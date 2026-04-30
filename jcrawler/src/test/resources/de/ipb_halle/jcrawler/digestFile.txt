@@ -1,0 +1,3 @@
+NOTE:
+- Modifications to this file will alter its hash
+- An altered hash will break the test
