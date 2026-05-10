@@ -17,6 +17,16 @@ import java.nio.file.Path;
  */
 public class LinuxPosixAclHandler implements AclHandler {
 
+    private final static LinuxPosixAclHandler instance = new LinuxPosixAclHandler();
+
+    private LinuxPosixAclHandler() {
+
+    }
+
+    public static AclHandler getInstance() {
+        return instance;
+    }
+
     @Override
     public Acl getAcl(Path path) throws IOException {
         // process attributes 'system.posix_acl_default' and 'system.posix_acl_access'

@@ -39,6 +39,9 @@ public class PathParameters {
     }
 
     public PathParameters createPathParameters(String p) {
+        if ((p == null) || (! p.startsWith(path))) {
+            throw new IllegalArgumentException("p is not child of path");
+        }
         PathParameters params = new PathParameters(p, prefix, namespaceName);
         params.setAclHandler(aclHandler);
         params.setAlgorithm(algorithm);

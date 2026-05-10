@@ -18,6 +18,17 @@ import java.util.ArrayList;
  */
 public class NullAclHandler implements AclHandler {
 
+
+    private final static NullAclHandler instance = new NullAclHandler();
+
+    private NullAclHandler() {
+
+    }
+
+    public static AclHandler getInstance() {
+        return instance;
+    }
+
     @Override
     public Acl getAcl(Path path) throws IOException {
         Acl acl = new Acl();
