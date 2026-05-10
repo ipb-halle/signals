@@ -1,15 +1,17 @@
 {
   "threads" : 1,
-  "dbConnectionInfo" : "jdbc:postgresql://localhost:5432/spider",
+  "dbConnectionInfo" : "jdbc:postgresql://localhost:65432/spider",
   "dbPassword" : "spider",
   "dbUser" : "spider",
   "paths" : [ {
+      "aclHandler" : "None",
       "digestAlgorithm" : "SHA1",
       "directory" : "/src/main",
       "namespace" : "localhost",
       "stripPrefix" : "/src",
       "subtreeScanThreshold" : 3600
     },{
+      "aclHandler" : "None",
       "digestAlgorithm" : "SHA1",
       "directory" : "/src/test",
       "namespace" : "localhost",

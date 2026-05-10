@@ -7,7 +7,9 @@
  */
 package de.ipb_halle.jcrawler.db;
 
+import java.nio.file.attribute.AclEntry;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -16,6 +18,7 @@ import java.util.Arrays;
 public class Acl {
     private Long id;
     private byte[] rawAttribute;
+    private List<AclEntry> acl;
 
     @Override
     public int hashCode() {
@@ -37,12 +40,24 @@ public class Acl {
         return Arrays.equals(this.rawAttribute, other.rawAttribute);
     }
 
+    public boolean isValid() {
+        return ((rawAttribute != null) && (acl != null));
+    }
+
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public List<AclEntry> getAcl() {
+        return acl;
+    }
+
+    public void setAcl(List<AclEntry> acl) {
+        this.acl = acl;
     }
 
     public byte[] getRawAttribute() {

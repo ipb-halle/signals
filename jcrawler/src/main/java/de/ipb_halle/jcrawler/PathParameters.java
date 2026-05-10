@@ -7,6 +7,7 @@
  */
 package de.ipb_halle.jcrawler;
 
+import de.ipb_halle.jcrawler.acl.AclHandler;
 import de.ipb_halle.jcrawler.db.Namespace;
 import java.io.File;
 import java.sql.Timestamp;
@@ -26,6 +27,7 @@ public class PathParameters {
     private final String prefix;
     private Timestamp scanCutOff;
     private DigestAlgorithm algorithm;
+    private AclHandler aclHandler;
 
     public PathParameters(String path, String prefix, String namespaceName) {
         this.fullScan = false;  // same as Config default
@@ -38,6 +40,7 @@ public class PathParameters {
 
     public PathParameters createPathParameters(String p) {
         PathParameters params = new PathParameters(p, prefix, namespaceName);
+        params.setAclHandler(aclHandler);
         params.setAlgorithm(algorithm);
         params.setNamespace(namespace);
         params.setScanCutOff(scanCutOff);
@@ -63,6 +66,14 @@ public class PathParameters {
 
     public Timestamp getScanCutOff() {
         return scanCutOff;
+    }
+
+    public AclHandler getAclHandler() {
+        return aclHandler;
+    }
+
+    public void setAclHandler(AclHandler aclHandler) {
+        this.aclHandler = aclHandler;
     }
 
     public DigestAlgorithm getAlgorithm() {

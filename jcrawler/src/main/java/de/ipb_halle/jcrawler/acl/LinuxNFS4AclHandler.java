@@ -8,6 +8,7 @@
 package de.ipb_halle.jcrawler.acl;
 
 import de.ipb_halle.jcrawler.Config;
+import de.ipb_halle.jcrawler.db.Acl;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -72,8 +73,12 @@ public class LinuxNFS4AclHandler implements AclHandler {
     }
 
     @Override
-    public byte[] getRawAttribute(Path path) throws IOException {
-        return readRawAttribute(path.toString());
+    public Acl getAcl(Path path) throws IOException {
+        Acl acl = new Acl();
+        byte[] rawBuffer = readRawAttribute(path.toString());
+        acl.setRawAttribute(rawBuffer);
+        acl.setAcl(AclConverter.getInstance().parseAcl(rawBuffer));
+        return acl;
     }
 
     private byte[] readRawAttribute(String filename) throws IOException {

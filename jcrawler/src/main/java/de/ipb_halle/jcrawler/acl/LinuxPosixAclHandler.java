@@ -13,9 +13,14 @@ import java.nio.file.Path;
 
 /**
  *
- * @author frank
+ * @author fbroda
  */
-public interface AclHandler {
+public class LinuxPosixAclHandler implements AclHandler {
 
-    public Acl getAcl(Path path) throws IOException;
+    @Override
+    public Acl getAcl(Path path) throws IOException {
+        // process attributes 'system.posix_acl_default' and 'system.posix_acl_access'
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

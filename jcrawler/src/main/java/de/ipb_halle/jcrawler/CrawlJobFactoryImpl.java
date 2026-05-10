@@ -7,7 +7,7 @@
  */
 package de.ipb_halle.jcrawler;
 
-import java.security.NoSuchAlgorithmException;
+import de.ipb_halle.jcrawler.acl.AclHandlerProvider;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class CrawlJobFactoryImpl implements CrawlJobFactory {
 
+    private final static String ACL_HANDLER = "aclHandler";
     private final static String ALGORITHM = "digestAlgorithm";
     private final static String PATHS_CONFIG = "paths";
     private final static String DIRECTORY = "directory";
@@ -52,6 +53,9 @@ public class CrawlJobFactoryImpl implements CrawlJobFactory {
                 globalPrefix + dir,
                 globalPrefix + prefix,
                 namespace);
+        parameters.setAclHandler(
+                AclHandlerProvider.getInstance().getHandler(
+            element.getConfigString(ACL_HANDLER, null)));
         parameters.setAlgorithm(DigestAlgorithm.byName(algorithm));
         parameters.setFullScan(config.isFullScan());
         parameters.setScanThreshold(element.getConfigLong(THRESHOLD, 0L));

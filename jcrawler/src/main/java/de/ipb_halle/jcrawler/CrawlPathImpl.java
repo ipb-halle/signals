@@ -149,7 +149,7 @@ public class CrawlPathImpl implements CrawlPath {
         Path currentPath = Paths.get(parameters.getPath());
         Stream<Path> pathStream = Files.walk(currentPath, 1);
         files = pathStream.filter(p -> !currentPath.equals(p))
-                .map(p -> FileInspector.inspect(p, parameters.getAlgorithm()))
+                .map(p -> FileInspector.inspect(p, parameters))
                 .map(f -> FileInspector.applyDirectory(f, directory))
                 .collect(Collectors.toMap(f -> f.getName(),
                         Function.identity()));

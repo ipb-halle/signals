@@ -10,12 +10,20 @@ package de.ipb_halle.jcrawler.acl;
 import de.ipb_halle.jcrawler.db.Acl;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 
 /**
  *
- * @author frank
+ * @author fbroda
  */
-public interface AclHandler {
+public class NullAclHandler implements AclHandler {
 
-    public Acl getAcl(Path path) throws IOException;
+    @Override
+    public Acl getAcl(Path path) throws IOException {
+        Acl acl = new Acl();
+        acl.setAcl(new ArrayList<> ());
+        acl.setRawAttribute(new byte[4]);
+        return acl;
+    }
+
 }

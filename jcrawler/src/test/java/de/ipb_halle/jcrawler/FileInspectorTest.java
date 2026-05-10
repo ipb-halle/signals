@@ -52,7 +52,9 @@ public class FileInspectorTest {
             URL url = this.getClass().getResource("digestFile.txt");
             Path p = Paths.get(url.toURI());
             FileInspector inspector = FileInspector.getInstance();
-            byte[] digest = inspector.digest(p, DigestAlgorithm.MD5);
+            PathParameters params = new PathParameters("/foo/bar", "/foo", "example.com");
+            params.setAlgorithm(DigestAlgorithm.MD5);
+            byte[] digest = inspector.digest(p, params);
             byte[] expected = HexFormat.of().parseHex("b5f3b2db7d97a68cae8c4cbf1ff66c7a");
             Assertions.assertArrayEquals(expected, digest);
         } catch (URISyntaxException | NoSuchAlgorithmException | IOException e) {

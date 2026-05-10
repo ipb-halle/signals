@@ -7,37 +7,36 @@
  */
 package de.ipb_halle.jcrawler.acl;
 
-import de.ipb_halle.jcrawler.DigestAlgorithm;
-import de.ipb_halle.jcrawler.FileInspector;
+import de.ipb_halle.jcrawler.db.Acl;
+import de.ipb_halle.testcontainers.PostgresqlContainerExtension;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.AclEntry;
-import java.security.NoSuchAlgorithmException;
-import java.util.HexFormat;
-import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  *
  * @author frank
  */
+@ExtendWith(PostgresqlContainerExtension.class)
 public class AclHandlerTest {
 
     @Test
     public void testAclHandler() {
-       GenericAclHandler handler = (GenericAclHandler) GenericAclHandler.getInstance();
-       GenericAclHandler.Platform platform = handler.getPlatform();
-       if (platform == GenericAclHandler.Platform.Windows) {
+       AclHandlerProvider provider = AclHandlerProvider.getInstance();
+       String platform = provider.getPlatform();
+       if (platform.toLowerCase().startsWith("windows")) {
+           AclHandler handler = provider.getHandler(Flavor.Windows.toString());
            try {
                URL url = this.getClass().getResource("../digestFile.txt");
                Path p = Paths.get(url.toURI());
-               byte[] rawAttribute = handler.getRawAttribute(p);
-               List<AclEntry> acl = AclConverter.getInstance().parseAcl(rawAttribute);
-               Assertions.assertFalse(acl.isEmpty());
+               Acl acl = handler.getAcl(p);
+               Assertions.assertTrue(acl.isValid());
+               Assertions.assertFalse(acl.getAcl().isEmpty());
            } catch (URISyntaxException | IOException e) {
                Assertions.fail(e);
            }

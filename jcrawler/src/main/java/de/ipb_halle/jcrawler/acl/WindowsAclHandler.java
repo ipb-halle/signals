@@ -7,6 +7,7 @@
  */
 package de.ipb_halle.jcrawler.acl;
 
+import de.ipb_halle.jcrawler.db.Acl;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -30,9 +31,13 @@ public class WindowsAclHandler implements AclHandler {
     }
 
     @Override
-    public byte[] getRawAttribute(Path path) throws IOException {
+    public Acl getAcl(Path path) throws IOException {
         AclFileAttributeView aclView = Files.getFileAttributeView(
                 path, AclFileAttributeView.class, LinkOption.NOFOLLOW_LINKS);
-        return AclConverter.getInstance().buildRawAttribute(aclView.getAcl());
+        Acl acl = new Acl();
+        acl.setAcl(aclView.getAcl());
+        acl.setRawAttribute(AclConverter.getInstance()
+                .buildRawAttribute(acl.getAcl()));
+        return acl;
     }
 }

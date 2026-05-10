@@ -7,7 +7,7 @@
  */
 package de.ipb_halle.jcrawler;
 
-import de.ipb_halle.jcrawler.acl.GenericAclHandler;
+import de.ipb_halle.jcrawler.acl.AclHandlerProvider;
 import de.ipb_halle.jcrawler.db.Acl;
 import de.ipb_halle.jcrawler.db.AclCache;
 import de.ipb_halle.jcrawler.db.CrawlFile;
@@ -35,7 +35,6 @@ import static java.nio.file.attribute.PosixFilePermission.OWNER_WRITE;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
-import java.util.Objects;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,11 +52,11 @@ public class FileInspector {
         return instance;
     }
 
-    public static CrawlFile inspect(Path p, DigestAlgorithm algorithm) {
-        return getInstance().getCrawlFile(p, algorithm);
+    public static CrawlFile inspect(Path p, PathParameters params) {
+        return getInstance().getCrawlFile(p, params);
     }
 
-    private CrawlFile getCrawlFile(Path p, DigestAlgorithm algorithm) {
+    private CrawlFile getCrawlFile(Path p, PathParameters params) {
         CrawlFile c = new CrawlFile();
         try {
             c.setName(p.getFileName().toString());
@@ -76,14 +75,14 @@ public class FileInspector {
             }
             if (c.getType() == CrawlFile.FileType.REGULAR_FILE) {
                 c.setSize(attrs.size());
-                if (algorithm != null) {
-                    c.setDigest(digest(p, algorithm));
+                if (params.getAlgorithm() != null) {
+                    c.setDigest(digest(p, params));
                 }
             } else {
                 c.setSize(0L);
                 c.setDigest(null);
             }
-            c.setAclId(getAclId(p));
+            c.setAclId(getAclId(p, params));
         } catch (NoSuchAlgorithmException | IOException e) {
             //
             logger.warn(e.getMessage());
@@ -105,16 +104,14 @@ public class FileInspector {
         return CrawlFile.FileType.OTHER;
     }
 
-    private Long getAclId(Path path) throws IOException {
-        byte[] rawAcl = GenericAclHandler.getInstance().getRawAttribute(path);
-        Acl acl = new Acl();
-        if (rawAcl == null) {
-            throw new NullPointerException("Was erlaube FileInspector!");
+    private Long getAclId(Path path, PathParameters params) throws IOException {
+        Acl acl = params.getAclHandler().getAcl(path);
+        if (! acl.isValid()) {
+            throw new NullPointerException("AclHandler returned null");
         }
-        acl.setRawAttribute(rawAcl);
         acl = AclCache.getInstance().lookup(acl);
         if (acl == null) {
-            return null;
+            throw new IllegalStateException("Acl lookup returned null");
         }
         return acl.getId();
     }
@@ -157,14 +154,10 @@ public class FileInspector {
         return file;
     }
 
-    public byte[] digest(Path path, DigestAlgorithm algorithm)
+    public byte[] digest(Path path, PathParameters params)
             throws IOException, NoSuchAlgorithmException {
-
-        Objects.requireNonNull(path, "path must not be null");
-        Objects.requireNonNull(algorithm, "algorithm must not be null");
-
         try (FileChannel fc = FileChannel.open(path, StandardOpenOption.READ)) {
-            MessageDigest md = algorithm.newDigest();
+            MessageDigest md = params.getAlgorithm().newDigest();
             ByteBuffer buffer = ByteBuffer.allocateDirect(BUFFER_SIZE); // Direct für native IO
 
             while (fc.read(buffer) != -1) {
