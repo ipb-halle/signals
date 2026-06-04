@@ -10,6 +10,7 @@ package de.ipb_halle.jcrawler.acl;
 import de.ipb_halle.jcrawler.Config;
 import de.ipb_halle.jcrawler.db.Acl;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HexFormat;
@@ -85,7 +86,13 @@ public class LinuxNFS4AclHandler implements AclHandler {
         byte[] buffer = new byte[ACL_BUFFER_SIZE];
         int size = readAttribute(filename, buffer);
         if (size > 0) {
-            return Arrays.copyOf(buffer, size);
+            // prepend FlavorId and size to buffer
+            ByteBuffer tmp = ByteBuffer.allocate(ACL_BUFFER_SIZE + 8)
+                    .putInt(Flavor.LinuxNFS4.getFlavorId())
+                    .putInt(size)
+                    .put(buffer, 0, size);
+
+            return Arrays.copyOf(tmp.array(), size + 8);
         }
         if (size == 0) {
             return null;

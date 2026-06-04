@@ -13,6 +13,7 @@ import de.ipb_halle.jcrawler.db.SqlConnection;
 import de.ipb_halle.testcontainers.PostgresqlContainerExtension;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.nio.file.attribute.AclEntry;
 import java.sql.SQLException;
 import java.util.List;
@@ -35,6 +36,14 @@ public class AclConverterTest {
         converter = AclConverter.getInstance();
     }
 
+    private byte[] prepareNFS4Acl(byte[] rawBuffer) {
+        ByteBuffer buf = ByteBuffer.allocate(rawBuffer.length + 8)
+                .putInt(Flavor.LinuxNFS4.getFlavorId())
+                .putInt(rawBuffer.length)
+                .put(rawBuffer);
+        return buf.array();
+    }
+
     private void setup() throws SQLException {
         Config config = Config.getInstance().reset();
         InputStream is = this.getClass().getResourceAsStream("../crawler.json");
@@ -53,7 +62,8 @@ public class AclConverterTest {
         byte[] rawBuffer;
         try (InputStream st = this.getClass().getResourceAsStream("testACL.bin")) {
             rawBuffer = st.readAllBytes();
-            List<AclEntry> acl = converter.parseAcl(rawBuffer);
+
+            List<AclEntry> acl = converter.parseAcl(prepareNFS4Acl(rawBuffer));
             Assertions.assertEquals(4, acl.size());
             byte[] reverseBuffer = converter.buildRawAttribute(acl);
             Assertions.assertArrayEquals(rawBuffer, reverseBuffer);

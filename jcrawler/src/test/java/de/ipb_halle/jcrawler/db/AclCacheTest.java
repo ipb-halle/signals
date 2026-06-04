@@ -11,6 +11,7 @@ import de.ipb_halle.jcrawler.Config;
 import de.ipb_halle.jcrawler.acl.AclConverter;
 import de.ipb_halle.jcrawler.db.DbPrincipalCache;
 import de.ipb_halle.jcrawler.db.SqlConnection;
+import de.ipb_halle.testcontainers.PostgresqlContainerExtension;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.attribute.AclEntry;
@@ -23,11 +24,13 @@ import java.util.List;
 import java.util.Properties;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  *
  * @author fblocal
  */
+@ExtendWith(PostgresqlContainerExtension.class)
 public class AclCacheTest {
 
     private AclConverter converter;

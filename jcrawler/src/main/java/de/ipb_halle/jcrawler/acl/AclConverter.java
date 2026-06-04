@@ -159,24 +159,40 @@ public class AclConverter {
     }
 
     public List<AclEntry> parseAcl(byte[] rawBuffer) {
-        List<AclEntry> acl = new ArrayList<> ();
         if (rawBuffer != null) {
-            ByteBuffer buf = ByteBuffer.wrap(rawBuffer);
-            int ptr = 0;
-            int nacl = buf.getInt(ptr);
-            ptr += 4;
-            for (int i=0; i < nacl; i++) {
-                AclEntry.Builder builder = AclEntry.newBuilder();
-                parseAceType(builder, buf.getInt(ptr));
-                boolean isGroup = parseAceFlags(builder, buf.getInt(ptr + 4));
-                parseAcePermissions(builder, buf.getInt(ptr + 8));
-                int wholen = buf.getInt(ptr + 12);
-                ptr += 16;
-                parseAcePrincipal(builder, new String(rawBuffer, ptr, wholen), isGroup);
-                // align ptr to 32 bit word address
-                ptr += (wholen & ~3) + (((wholen & 3) > 0) ? 4 : 0);
-                acl.add(builder.build());
+            ByteBuffer buffer = ByteBuffer.wrap(rawBuffer);
+            switch (Flavor.valueOf(buffer.getInt())) {
+                case Null :
+                    return new ArrayList<> ();
+                case LinuxNFS4 :
+                    return parseNFS4Acl(buffer);
+                case LinuxPosix :
+                    return parsePosixAcl(buffer);
+                case Windows :
+                    return parseNFS4Acl(buffer);
             }
+        }
+        return new ArrayList<> ();
+    }
+
+    private List<AclEntry> parseNFS4Acl(ByteBuffer buffer) {
+        List<AclEntry> acl = new ArrayList<> ();
+        int size = buffer.getInt(); // currently ignored
+        int nacl = buffer.getInt();
+        int ptr = buffer.position();
+        for (int i=0; i < nacl; i++) {
+            AclEntry.Builder builder = AclEntry.newBuilder();
+            parseAceType(builder, buffer.getInt(ptr));
+            boolean isGroup = parseAceFlags(builder, buffer.getInt(ptr + 4));
+            parseAcePermissions(builder, buffer.getInt(ptr + 8));
+            int wholen = buffer.getInt(ptr + 12);
+            ptr += 16;
+            byte[] who = new byte[wholen];
+            buffer.get(ptr, who, 0, wholen);
+            parseAcePrincipal(builder, new String(who), isGroup);
+            // align ptr to 32 bit word address
+            ptr += (wholen & ~3) + (((wholen & 3) > 0) ? 4 : 0);
+            acl.add(builder.build());
         }
         return acl;
     }
@@ -266,11 +282,32 @@ public class AclConverter {
     private void parseAcePrincipal(AclEntry.Builder builder, String name, boolean isGroup) {
         DbPrincipal principal = new DbPrincipal(name);
         principal.setGroup(isGroup);
-        if (NFS4_OWNER.equals(name)) {
+        if (NFS4_EVERYONE.equals(name)) {
             principal.setEveryone(true);
         }
         principal = principalCache.lookup(principal);
         builder.setPrincipal((UserPrincipal) principal);
+    }
+
+    private List<AclEntry> parsePosixAcl(ByteBuffer buffer) {
+        List<AclEntry> acl = new ArrayList<> ();
+        int posixCount = buffer.getInt();
+        int posixDefaultCount = buffer.getInt();
+        parsePosixAcl(acl, buffer, posixCount);
+        parsePosixDefaultAcl(acl, buffer, posixDefaultCount);
+        return acl;
+    }
+
+    private void parsePosixAcl(List<AclEntry> acl, ByteBuffer buffer, int count) {
+        for (int i = 0; i < count; i++) {
+
+        }
+    }
+
+    private void parsePosixDefaultAcl(List<AclEntry> acl, ByteBuffer buffer, int count) {
+        for (int i = 0; i < count; i++) {
+
+        }
     }
 
 }
