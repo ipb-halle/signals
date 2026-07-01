@@ -9,6 +9,8 @@ package de.ipb_halle.jcrawler.acl;
 
 import de.ipb_halle.jcrawler.Config;
 import de.ipb_halle.jcrawler.db.Acl;
+import de.ipb_halle.jcrawler.linux.LinuxCalls;
+import de.ipb_halle.jcrawler.linux.UnixError;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
@@ -21,47 +23,9 @@ import java.util.HexFormat;
  */
 public class LinuxNFS4AclHandler implements AclHandler {
 
-    public enum UnixError {
-        ENOENT(2, "No such file or directory"),
-        E2BIG(7, "Argument list too long"),
-        EBADF(9, "Bad file number"),
-        EACCES(13, "Permission denied"),
-        EFAULT(14, "Bad address"),
-        ENOTDIR(20, "Not a directory"),
-        ERANGE(34, "Math result not representable"),
-        ENAMETOOLONG(36, "File name too long"),
-        ELOOP(40, "Too many symbolic links encountered"),
-        ENODATA(61, "No data available"),
-        ERROR_PATH(10001, "Invalid path argument"),
-        ERROR_BUFFER(10002, "Invalid buffer argument"),
-        UNKNOWN(0, "Unknown error");
-
-        private final int errno;
-        private final String description;
-
-        private UnixError(int errno, String description) {
-            this.errno = errno;
-            this.description = description;
-        }
-
-        public static UnixError byErrNo(int errno) {
-            for (UnixError e : values()) {
-                if (e.errno == -errno) {
-                    return e;
-                }
-            }
-            return UNKNOWN;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-    }
-
     private final static int ACL_BUFFER_SIZE = 4196;
     private final static LinuxNFS4AclHandler instance;
     private final static String NFS4_ACL_ATTR = "system.nfs4_acl";
-
 
     static {
         System.loadLibrary("LinuxNFS4Acl.%s".formatted(Config.getProjectVersion()));
@@ -86,7 +50,7 @@ public class LinuxNFS4AclHandler implements AclHandler {
 
     private byte[] readRawAttribute(String filename) throws IOException {
         byte[] buffer = new byte[ACL_BUFFER_SIZE];
-        int size = readAttribute(filename, NFS4_ACL_ATTR, buffer);
+        int size = LinuxCalls.readAttribute(filename, NFS4_ACL_ATTR, buffer);
         if (size > 0) {
             // prepend FlavorId and size to buffer
             ByteBuffer tmp = ByteBuffer.allocate(ACL_BUFFER_SIZE + 8)
@@ -119,6 +83,4 @@ public class LinuxNFS4AclHandler implements AclHandler {
         }
         return sb.toString();
     }
-
-    private static native int readAttribute(String filename, String attrname, byte[] buffer);
 }

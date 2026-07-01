@@ -8,10 +8,9 @@
 #include <errno.h>
 #include <sys/xattr.h>
 #include <jni.h>
-#include "de_ipb_halle_jcrawler_acl_LinuxNFS4AclHandler.h"
+#include "de_ipb_halle_jcrawler_linux_LinuxCalls.h"
 
 
-#define NFS4_ACL_ATTR "system.nfs4_acl"
 #define ERROR_PATH      -10001
 #define ERROR_ATTR      -10002
 #define ERROR_BUFFER    -10003
@@ -44,7 +43,7 @@ static void releaseBuffer(JNIEnv *env, jbyteArray jbytes, char* buffer) {
     (*env)->ReleaseByteArrayElements(env, jbytes, buffer, 0);
 }
 
-jint JNICALL Java_de_ipb_1halle_jcrawler_acl_LinuxNFS4AclHandler_readAttribute
+jint JNICALL Java_de_ipb_1halle_jcrawler_linux_LinuxCalls_readAttribute
   (JNIEnv *env, jclass callingClass, jstring jfilename, jstring jattrname, jbyteArray jbytes) {
 
     const char *path;

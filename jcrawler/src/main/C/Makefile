@@ -12,7 +12,7 @@
 CFLAGS=-fPIC -c -I${JNI_INCLUDE} -I${JDK_HOME}/include -I${JDK_HOME}/include/linux
 LDFLAGS=-shared
 
-${BUILD_DIR}/libLinuxNFS4Acl.${VERSION}.so: LinuxNFS4AclHandler.c
+${BUILD_DIR}/libLinuxCalls.${VERSION}.so: LinuxCalls.c
 	mkdir -p ${BUILD_DIR}
-	${CC} ${CFLAGS} -o ${BUILD_DIR}/LinuxNFS4AclHandler.o LinuxNFS4AclHandler.c
-	${CC} ${LDFLAGS} -o ${BUILD_DIR}/libLinuxNFS4Acl.${VERSION}.so ${BUILD_DIR}/LinuxNFS4AclHandler.o
+	${CC} ${CFLAGS} -o ${BUILD_DIR}/LinuxCalls.o LinuxCalls.c
+	${CC} ${LDFLAGS} -o ${BUILD_DIR}/libLinuxCalls.${VERSION}.so ${BUILD_DIR}/LinuxCalls.o
