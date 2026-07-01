@@ -60,6 +60,8 @@ public class LinuxNFS4AclHandler implements AclHandler {
 
     private final static int ACL_BUFFER_SIZE = 4196;
     private final static LinuxNFS4AclHandler instance;
+    private final static String NFS4_ACL_ATTR = "system.nfs4_acl";
+
 
     static {
         System.loadLibrary("LinuxNFS4Acl.%s".formatted(Config.getProjectVersion()));
@@ -84,7 +86,7 @@ public class LinuxNFS4AclHandler implements AclHandler {
 
     private byte[] readRawAttribute(String filename) throws IOException {
         byte[] buffer = new byte[ACL_BUFFER_SIZE];
-        int size = readAttribute(filename, buffer);
+        int size = readAttribute(filename, NFS4_ACL_ATTR, buffer);
         if (size > 0) {
             // prepend FlavorId and size to buffer
             ByteBuffer tmp = ByteBuffer.allocate(ACL_BUFFER_SIZE + 8)
@@ -118,5 +120,5 @@ public class LinuxNFS4AclHandler implements AclHandler {
         return sb.toString();
     }
 
-    private static native int readAttribute(String filename, byte[] buffer);
+    private static native int readAttribute(String filename, String attrname, byte[] buffer);
 }

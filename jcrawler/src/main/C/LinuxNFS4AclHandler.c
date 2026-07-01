@@ -13,18 +13,19 @@
 
 #define NFS4_ACL_ATTR "system.nfs4_acl"
 #define ERROR_PATH      -10001
-#define ERROR_BUFFER    -10002
+#define ERROR_ATTR      -10002
+#define ERROR_BUFFER    -10003
 
-static int getPath(JNIEnv *env, jstring jstr, const char** path) {
-    *path = (*env)->GetStringUTFChars(env, jstr, NULL);
-    if (path == NULL) {
+static int getString(JNIEnv *env, jstring jstr, const char** cstr) {
+    *cstr = (*env)->GetStringUTFChars(env, jstr, NULL);
+    if (cstr == NULL) {
         return -1;
     }
     return 0;
 }
 
-static void releasePath(JNIEnv *env, jstring jstr, const char* path) {
-    (*env)->ReleaseStringUTFChars(env, jstr, path);
+static void releaseString(JNIEnv *env, jstring jstr, const char* cstr) {
+    (*env)->ReleaseStringUTFChars(env, jstr, cstr);
 }
 
 static int getBuffer(JNIEnv *env, jbyteArray jbytes, char **buffer, int *length) {
@@ -44,33 +45,39 @@ static void releaseBuffer(JNIEnv *env, jbyteArray jbytes, char* buffer) {
 }
 
 jint JNICALL Java_de_ipb_1halle_jcrawler_acl_LinuxNFS4AclHandler_readAttribute
-  (JNIEnv *env, jclass callingClass, jstring jstr, jbyteArray jbytes) {
+  (JNIEnv *env, jclass callingClass, jstring jfilename, jstring jattrname, jbyteArray jbytes) {
 
     const char *path;
+    const char *attr;
     char *buffer;
     int length;
     int result = 0;
 
-    if (getPath(env, jstr, &path)) {
+    if (getString(env, jfilename, &path)) {
         result = ERROR_PATH;
         goto errorReturn;
     }
 
-    if (getBuffer(env, jbytes, &buffer, &length)) {
-        releasePath(env, jstr, path);
-        result = ERROR_BUFFER;
-        goto errorCleanString;
+    if (getString(env, jattrname, &attr)) {
+        result = ERROR_ATTR;
+        goto errorCleanFile;
     }
 
-    result = getxattr(path, NFS4_ACL_ATTR, buffer, length);
+    if (getBuffer(env, jbytes, &buffer, &length)) {
+        result = ERROR_BUFFER;
+        goto errorCleanAttr;
+    }
+
+    result = getxattr(path, attr, buffer, length);
     if (result < 0) {
         result = -errno;
     }
 
-errorCleanBuffer:
     releaseBuffer(env, jbytes, buffer);
-errorCleanString:
-    releasePath(env, jstr, path);
+errorCleanAttr:
+    releaseString(env, jattrname, attr);
+errorCleanFile:
+    releaseString(env, jfilename, path);
 errorReturn:
     return result;
 }
