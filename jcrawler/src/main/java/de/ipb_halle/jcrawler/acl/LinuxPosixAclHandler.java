@@ -40,8 +40,10 @@ public class LinuxPosixAclHandler implements AclHandler {
     @Override
     public Acl getAcl(Path path) throws IOException {
         // process attributes 'system.posix_acl_default' and 'system.posix_acl_access'
+        Acl acl = new Acl();
         byte[] buffer = readRawAttribute(path);
-        throw new UnsupportedOperationException("Not supported yet.");
+        acl.setRawAttribute(buffer);
+        return acl;
     }
 
     private byte[] readRawAttribute(Path path) throws IOException {
