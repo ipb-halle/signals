@@ -85,7 +85,7 @@ public class FileInspector {
             c.setAclId(getAclId(p, params));
         } catch (NoSuchAlgorithmException | IOException e) {
             //
-            logger.warn(e.getMessage());
+            logger.warn(e.getMessage(), e);
             throw new RuntimeException("error in inspector");
         }
         return c;

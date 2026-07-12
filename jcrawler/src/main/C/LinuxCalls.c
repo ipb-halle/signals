@@ -67,7 +67,7 @@ jint JNICALL Java_de_ipb_1halle_jcrawler_linux_LinuxCalls_readAttribute
         goto errorCleanAttr;
     }
 
-    result = getxattr(path, attr, buffer, length);
+    result = lgetxattr(path, attr, buffer, length);
     if (result < 0) {
         result = -errno;
     }

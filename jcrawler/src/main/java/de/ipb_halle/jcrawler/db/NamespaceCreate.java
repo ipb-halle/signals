@@ -9,6 +9,8 @@ package de.ipb_halle.jcrawler.db;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -20,6 +22,16 @@ public class NamespaceCreate extends SqlQuery<Namespace> {
 
     public NamespaceCreate() {
         super(QUERY);
+    }
+
+    @Override
+    public void execute(Namespace spc) throws SQLException {
+        List<Object> param = new ArrayList<> ();
+        param.add(spc.getName());
+        execute(param);
+        Namespace dbSpc = next();
+        spc.setId(dbSpc.getId());
+        close();
     }
 
     @Override

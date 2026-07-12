@@ -8,6 +8,7 @@
 package de.ipb_halle.jcrawler.db;
 
 import java.nio.file.attribute.AclEntry;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,6 +20,10 @@ public class Acl {
     private Long id;
     private byte[] rawAttribute;
     private List<AclEntry> acl;
+
+    public Acl() {
+        acl = new ArrayList<> ();
+    }
 
     @Override
     public int hashCode() {

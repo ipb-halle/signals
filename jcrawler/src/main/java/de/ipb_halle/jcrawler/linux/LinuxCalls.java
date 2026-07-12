@@ -7,11 +7,17 @@
  */
 package de.ipb_halle.jcrawler.linux;
 
+import de.ipb_halle.jcrawler.Config;
+
 /**
  *
  * @author fblocal
  */
 public class LinuxCalls {
+
+    static {
+        System.loadLibrary("LinuxCalls.%s".formatted(Config.getProjectVersion()));
+    }
 
     public static native int readAttribute(String filename, String attrname, byte[] buffer);
 

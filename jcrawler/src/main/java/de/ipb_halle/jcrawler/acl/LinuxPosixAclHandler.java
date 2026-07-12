@@ -53,15 +53,12 @@ public class LinuxPosixAclHandler implements AclHandler {
         byte[] defaultBuffer = new byte[ACL_BUFFER_SIZE];
         int defaultSize = 0;
         int accessSize = LinuxCalls.readAttribute(filename, POSIX_ACL_ATTR, accessBuffer);
-        if (accessSize < 0) {
-            throw new IOException (UnixError.byErrNo(accessSize).getDescription() + " (access ACL)");
-        }
         if (isDir) {
             defaultSize = LinuxCalls.readAttribute(filename, POSIX_ACL_ATTR, defaultBuffer);
-            if (defaultSize < 0) {
-                throw new IOException (UnixError.byErrNo(defaultSize).getDescription() + " (default ACL)");
-            }
         }
+        accessSize = handleResult(accessSize, " (access ACL)");
+        defaultSize = handleResult(defaultSize, " (default ACL)");
+
         if ((accessSize > 0) || (defaultSize > 0)) {
             // prepend FlavorId and size to buffer
             ByteBuffer tmp = ByteBuffer.allocate(ACL_BUFFER_SIZE)
@@ -76,6 +73,16 @@ public class LinuxPosixAclHandler implements AclHandler {
             }
             return Arrays.copyOf(tmp.array(), accessSize + defaultSize + 12);
         }
-        return null;
+        return new byte[4];
+    }
+
+    private int handleResult(int value, String occasion) throws IOException {
+        if (value == UnixError.ENODATA.getErrNo()) {
+            return 0;
+        }
+        if (value >= 0) {
+            return value;
+        }
+        throw new IOException (UnixError.byErrNo(value).getDescription() + occasion);
     }
 }

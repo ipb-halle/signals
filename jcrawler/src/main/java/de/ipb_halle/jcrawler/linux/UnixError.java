@@ -48,4 +48,7 @@ public enum UnixError {
         return description;
     }
 
+    public int getErrNo() {
+        return -errno;
+    }
 }

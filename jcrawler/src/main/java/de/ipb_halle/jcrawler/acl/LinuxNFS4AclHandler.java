@@ -24,13 +24,8 @@ import java.util.HexFormat;
 public class LinuxNFS4AclHandler implements AclHandler {
 
     private final static int ACL_BUFFER_SIZE = 4196;
-    private final static LinuxNFS4AclHandler instance;
+    private final static LinuxNFS4AclHandler instance = new LinuxNFS4AclHandler();
     private final static String NFS4_ACL_ATTR = "system.nfs4_acl";
-
-    static {
-        System.loadLibrary("LinuxNFS4Acl.%s".formatted(Config.getProjectVersion()));
-        instance = new LinuxNFS4AclHandler();
-    }
 
     private LinuxNFS4AclHandler() {
     }
